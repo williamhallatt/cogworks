@@ -1,0 +1,102 @@
+---
+# Golden Sample Metadata: cogworks-learn
+# Generated: 2026-02-14
+# Purpose: Regression testing baseline for minimal, clean skill
+
+skill_slug: cogworks-learn
+sample_type: golden
+quality_tier: excellent
+description: Minimal skill covering Claude Code skill authoring - SKILL.md structure, frontmatter, invocation modes, context management, best practices
+
+# Expected Layer 1 Results
+layer1_expected:
+  status: pass
+  critical_failures: 0
+  warnings: 0
+  checks_passed: 10
+  line_count: 75
+  citation_count: 3
+
+# Layer 2 Expected (not yet implemented)
+layer2_expected:
+  status: pending
+  overall_score: null
+  weighted_score: null
+  dimensions: null
+
+# Tolerance Levels for Regression Testing
+tolerance:
+  line_count: 5  # ±5 lines acceptable (smaller skill, tighter tolerance)
+  citation_count: 1  # ±1 citation acceptable
+  warnings: 0  # Should remain at 0
+  score_percentage: 5  # ±5% for LLM-judge scores
+
+# Quality Benchmarks
+quality_benchmarks:
+  why_golden: |
+    - Minimal, focused skill (75 lines)
+    - Clean pass with zero warnings
+    - Efficient use of inline context
+    - Demonstrates minimal viable skill structure
+    - Perfect for testing baseline functionality
+
+  expected_characteristics:
+    - All deterministic checks pass
+    - Zero warnings (perfect score)
+    - Complete frontmatter
+    - Minimal but sufficient citations (3)
+    - Compact, efficient structure
+
+# Test Composition
+test_cases:
+  structural:
+    - "SKILL.md exists and is readable"
+    - "Valid YAML frontmatter with required fields"
+    - "Line count well within limit (75/500)"
+    - "Sufficient citations for compact skill"
+
+  content:
+    - "No supporting files (inline context)"
+    - "No forbidden patterns"
+    - "Description is concise and clear"
+
+  format:
+    - "No duplicate headers"
+    - "Valid markdown syntax"
+    - "Clean JSON output"
+
+# Regression Detection Scenarios
+regression_detection:
+  critical_regressions:
+    - "Critical failures increase from 0 to any value"
+    - "Status changes from pass to fail"
+    - "Citations drop below 3"
+    - "Any warnings appear"
+
+  warning_regressions:
+    - "Warnings increase from 0 to any value"
+    - "Line count increases by >5"
+
+  acceptable_changes:
+    - "Line count minor fluctuations (±5)"
+    - "Citation count minor changes (±1)"
+
+# Source Material
+sources:
+  primary: "cogworks-learn skill SKILL.md"
+  provenance: "Generated via cogworks-learn from skill authoring documentation"
+  last_updated: "2026-02-14"
+
+# Usage Notes
+usage_notes: |
+  This golden sample represents a minimal, perfectly clean skill with zero warnings.
+  Use for regression testing baseline functionality and to verify that minimal skills
+  pass without issues.
+
+  Expected behavior:
+  - Always passes with zero warnings
+  - Stable minimal line count (~75 ±5)
+  - Maintains minimal but sufficient citations (3 ±1)
+
+  Regression testing:
+  /cogworks-test cogworks-learn --compare-against tests/datasets/golden-samples/cogworks-learn/
