@@ -1,0 +1,103 @@
+# Golden Sample Metadata: deployment-skill
+
+## Expected Test Outcomes
+
+expected_scores:
+  overall_score: 0.87  # Tolerance: ±5%
+  weighted_score: 4.35  # Out of 5.0
+  source_fidelity: 5
+  self_sufficiency: 4
+  completeness: 4
+  specificity: 4
+  no_overlap: 5
+
+expected_structure:
+  skill_md_exists: true
+  skill_md_lines: 287  # Tolerance: ±10%
+  frontmatter_valid: true
+  has_name: true
+  has_description: true
+  supporting_files:
+    - name: "patterns.md"
+      expected_entries: 5  # ## headers
+    - name: "examples.md"
+      expected_entries: 4
+
+expected_synthesis:
+  concept_count: 7  # Range: 5-10
+  pattern_count: 6  # Range: 5-10
+  tldr_word_count: 120  # Range: 50-150
+  has_conflicts_section: false  # No source contradictions
+  citation_count: 15  # Minimum
+
+expected_invocability:
+  should_activate:
+    - "deploy to staging"
+    - "deploy to production"
+    - "help me deploy this feature"
+    - "rollback the deployment"
+    - "what's the deployment process"
+  should_not_activate:
+    - "write unit tests"
+    - "fix this bug"
+    - "what is REST?"
+    - "review my code"
+
+## Test Configuration
+
+test_cases_file: "test-cases.jsonl"
+test_count: 15
+test_composition:
+  deterministic: 8  # 53%
+  llm_judge: 5      # 33%
+  invocability: 2   # 13%
+
+## Source Information
+
+source_files:
+  - name: "deployment-workflow.md"
+    word_count: ~1000
+    key_topics:
+      - "Pre-deployment checklist"
+      - "Staging environment testing"
+      - "Production deployment steps"
+      - "Rollback procedures"
+      - "Emergency deployments"
+
+  - name: "cicd-automation.md"
+    word_count: ~900
+    key_topics:
+      - "CI/CD pipeline stages"
+      - "Continuous deployment to staging"
+      - "Production deployment triggers"
+      - "Rolling and blue-green deployments"
+      - "Feature flags"
+      - "Automated rollback"
+
+total_source_words: ~1900
+source_conflicts: none
+
+## Quality Benchmarks
+
+This golden sample represents:
+- **High-quality synthesis** - All claims traceable, no fabrication
+- **Well-structured skill** - Clear organization, actionable patterns
+- **Comprehensive coverage** - Covers stated scope thoroughly
+- **Strong examples** - Concrete, realistic examples throughout
+- **Novel value** - Specialized deployment workflow knowledge
+
+Use as reference for:
+- Calibrating LLM-judge rubrics
+- Setting quality thresholds
+- Training new skill authors
+- Regression testing framework changes
+
+## Validation History
+
+| Date       | Framework Version | Score | Pass/Fail | Notes                  |
+|------------|-------------------|-------|-----------|------------------------|
+| 2026-02-14 | 1.0.0             | 0.87  | PASS      | Initial golden sample  |
+
+## Known Edge Cases
+
+None currently identified. This is a straightforward skill with clear scope and well-defined patterns.

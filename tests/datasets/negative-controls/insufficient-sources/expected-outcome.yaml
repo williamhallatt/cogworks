@@ -1,0 +1,37 @@
+# Expected Outcome: Insufficient Sources
+
+## Scenario Description
+Source material contains only ~30 words - insufficient to create a meaningful skill.
+
+## Expected Behavior
+The cogworks workflow should:
+1. Detect sparse content during synthesis
+2. Warn user that content is insufficient
+3. Suggest adding more comprehensive sources
+4. Offer to proceed anyway (not recommended) or abort
+
+## Expected Warnings
+should_warn: true
+warning_type: "insufficient_sources"
+warning_messages:
+  - contains: "sparse"
+  - contains: "insufficient"
+  - contains: "more comprehensive"
+
+## Expected Recommendation
+recommendation: "RECONSIDER"
+should_proceed_by_default: false
+
+## Validation Criteria
+If skill is generated despite warning:
+- Source fidelity score should be low (≤3)
+- Completeness score should be low (≤3)
+- Overall score should be <0.75 (FAIL)
+
+## Test Case
+```jsonl
+{"id": "neg-001", "type": "negative_control", "scenario": "insufficient_sources", "expected_outcome": "warn_user", "should_fail_if_generated": true}
+```
+
+## Purpose
+Validates that the framework can identify when source material is too sparse to create a valuable skill, preventing low-quality skill generation.
