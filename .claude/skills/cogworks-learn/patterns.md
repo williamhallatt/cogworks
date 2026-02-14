@@ -176,3 +176,12 @@ packages/
 **Problem:** Description matches too many user requests
 **Why it fails:** Skill activates when unwanted, pollutes responses
 **Alternative:** Narrow description, add `disable-model-invocation: true` if needed
+
+### 9. Reformatted Duplication Across Files
+**Problem:** patterns.md restates reference.md concepts as "patterns", examples.md walks through procedures already documented in reference.md, same data (thresholds, config values, lists) appears in multiple files
+**Why it fails:** Inflates context consumption without adding information. A skill with 4 files totaling 2,500 lines may contain only 1,300 lines of unique content — the rest is the same ideas in different formats. Defeats the purpose of progressive disclosure.
+**Alternative:** Each file must contribute unique information:
+- **reference.md** — domain-specific concepts, procedures, configuration (the source of truth)
+- **patterns.md** — *transferable* patterns that generalize beyond the domain (if a "pattern" is just a domain procedure, it belongs in reference.md)
+- **examples.md** — usage scenarios that add context beyond what reference already shows (not walkthroughs of documented procedures)
+- If a supporting file would just reformat reference.md content, fold it into reference.md instead

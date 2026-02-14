@@ -4,82 +4,46 @@ Complete methodology for validating cogworks-generated skills through eval-drive
 
 ## TL;DR
 
-The cogworks testing framework validates skills through three-layer grading: fast deterministic checks ($0.00001, 5 seconds) catch structural issues; LLM-as-judge ($1.50, 45 seconds) evaluates five weighted quality dimensions (source fidelity 30%, self-sufficiency 25%, completeness 20%, specificity 15%, no overlap 10%); optional human review ($100, 20 minutes) calibrates judge accuracy. Success requires overall score ≥0.85 with zero critical failures. Golden samples provide regression testing, negative controls validate failure detection. The framework integrates with cogworks workflow via `--test` flag and generates machine-readable JSON plus human-readable Markdown reports. Cost asymmetry (150,000× difference between layers) makes layered grading economically essential. LLM-judge agreement with humans must exceed 90% to trust automated scoring.
+The cogworks testing framework validates skills through three-layer grading: fast deterministic checks ($0.00001, 5 seconds) catch structural issues; LLM-as-judge ($1.50, 45 seconds) evaluates five weighted quality dimensions (source fidelity 30%, self-sufficiency 25%, completeness 20%, specificity 15%, no overlap 10%); optional human review ($100, 20 minutes) calibrates judge accuracy. Success requires overall score ≥0.85 with zero critical failures. Golden samples provide regression testing, negative controls validate failure detection. The framework integrates with cogworks workflow via `--test` flag and generates machine-readable JSON plus human-readable Markdown reports.
 
 ## Table of Contents
 
 1. Core Concepts
-2. Concept Map
-3. Complete Testing Workflow
-4. Quality Dimension Rubrics
-5. Layer 1: Deterministic Checks
-6. Layer 2: LLM-as-Judge
-7. Layer 3: Human Calibration
-8. Test Data Organization
-9. Configuration Reference
-10. Integration with Cogworks
-11. Troubleshooting Guide
-12. Cost and Performance
-13. Deep Dives
-14. Quick Reference
-15. Sources
+2. Complete Testing Workflow
+3. Quality Dimension Rubrics
+4. Layer 1: Deterministic Checks
+5. Layer 2: LLM-as-Judge
+6. Layer 3: Human Calibration
+7. Test Data Organization
+8. Configuration Reference
+9. Integration with Cogworks
+10. Troubleshooting Guide
+11. Cost and Performance
+12. Deep Dives
+13. Quick Reference
+14. Sources
 
 ## Core Concepts
 
-### 1. Layered Grading
+1. **Layered Grading** - Progressive evaluation: cheap deterministic checks (Layer 1) gate expensive LLM evaluation (Layer 2), with optional human review (Layer 3) for calibration. Prevents waste by filtering obviously-failing skills early.
 
-Progressive quality evaluation starting with cheap deterministic checks (Layer 1), advancing to expensive LLM evaluation only if structural validation passes (Layer 2), and optionally using human review for calibration (Layer 3). Prevents waste by filtering obviously-failing skills before expensive evaluations.
+2. **Quality Dimensions** - Five measurable aspects scored 1-5 and combined using weights: source fidelity, self-sufficiency, completeness, specificity, no overlap. See [Quality Dimension Rubrics](#quality-dimension-rubrics).
 
-### 2. Quality Dimensions
+3. **Critical Failures** - Structural issues that immediately fail a skill regardless of content quality. Any critical failure stops evaluation at Layer 1. See [Configuration Reference](#configuration-reference) for the full list.
 
-Five measurable aspects of skill quality: source fidelity (traceability to sources), self-sufficiency (standalone understanding), completeness (scope coverage), specificity (actionable patterns), and no overlap (novel value). Each scored 1-5 and combined using weights reflecting relative importance.
+4. **LLM-as-Judge** - Using Claude to evaluate skill quality against structured rubrics. Faster and cheaper than human review but requires calibration to ensure reliability. Known biases include verbosity preference, position bias, and leniency.
 
-### 3. Critical Failures
+5. **Golden Samples** - Known-good skills with documented expected outcomes used for regression testing. Each includes sources, expected synthesis, expected skill structure, and test cases.
 
-Structural issues that immediately fail a skill regardless of content quality: missing frontmatter, no source citations, SKILL.md exceeds 500 lines, broken markdown syntax, forbidden patterns detected. Any critical failure stops evaluation and requires remediation before testing can proceed.
+6. **Negative Controls** - Test inputs designed to fail validation, verifying the framework correctly detects quality issues. Types: insufficient sources, overlapping builtin knowledge, structural violations.
 
-### 4. LLM-as-Judge
+7. **Weighted Scoring** - Combining quality dimensions using importance weights rather than simple averaging. Overall score = weighted sum / 5.0. See [Configuration Reference](#configuration-reference) for weights.
 
-Using Claude to evaluate skill quality against structured rubrics. Faster and cheaper than human review (45 seconds vs 20 minutes, $1.50 vs $100) but requires calibration against human grades to ensure reliability. Known biases include verbosity preference, position bias, and leniency.
+8. **Test Reports** - Dual-format output: JSON for automation/CI/CD and Markdown for human review. Both generated simultaneously with consistent data.
 
-### 5. Golden Samples
+9. **Calibration** - Validating LLM-judge accuracy by comparing automated grades against human expert grades. Target: within 0.5 points on 5-point scale for 90%+ of skills.
 
-Known-good skills with documented expected outcomes used for regression testing. When framework changes, re-running golden samples validates that quality detection remains consistent. Each golden sample includes sources, expected synthesis, expected skill structure, and test cases.
-
-### 6. Negative Controls
-
-Test inputs designed to fail validation, verifying framework correctly detects quality issues. Types include insufficient sources (should warn about completeness), overlapping builtin knowledge (should warn about no overlap), and structural violations (should fail deterministically).
-
-### 7. Weighted Scoring
-
-Combining quality dimensions using importance weights rather than simple averaging. Source fidelity weighted highest (30%) because fabrication is most critical; no overlap weighted lowest (10%) because minor overlap acceptable if other dimensions strong. Overall score = weighted sum / 5.0.
-
-### 8. Test Reports
-
-Dual-format output: JSON for automation/CI/CD (structured data, exit codes, machine parsing) and Markdown for human review (narrative explanations, git-friendly diffs, actionable recommendations). Both generated simultaneously with consistent data.
-
-### 9. Calibration
-
-Validating LLM-judge accuracy by comparing automated grades against human expert grades on same skills. Target agreement: within 0.5 points on 5-point scale for 90%+ of skills. Low agreement indicates rubric ambiguity or judge bias requiring correction.
-
-### 10. Framework Configuration
-
-Central YAML file (framework-config.yaml) defining all thresholds, weights, critical failures list, and tuning parameters. Allows adjusting sensitivity without code changes. Thresholds include overall_minimum (0.85), llm_judge minimum_average (4.0), and dimension-specific weights.
-
-## Concept Map
-
-**Relationships between concepts:**
-
-1. **Layered Grading** uses **Critical Failures** to gate progression to expensive evaluation
-2. **Quality Dimensions** are weighted by **Weighted Scoring** to compute overall score
-3. **LLM-as-Judge** requires **Calibration** to ensure reliable scoring
-4. **Golden Samples** enable regression testing using **Test Reports** comparison
-5. **Negative Controls** validate **Critical Failures** detection works correctly
-6. **Framework Configuration** defines thresholds for **Layered Grading** decision logic
-7. **Test Reports** contain **Quality Dimensions** scores and **Critical Failures** list
-8. **Calibration** measures **LLM-as-Judge** agreement with human grades
-9. **Weighted Scoring** prioritizes **Quality Dimensions** by failure severity
-10. **Golden Samples** and **Negative Controls** form comprehensive **Test Data Organization**
+10. **Framework Configuration** - Central YAML file defining all thresholds, weights, and tuning parameters. See [Configuration Reference](#configuration-reference).
 
 ## Complete Testing Workflow
 
@@ -88,79 +52,35 @@ Central YAML file (framework-config.yaml) defining all thresholds, weights, crit
 Resolve skill slug to filesystem path and verify skill exists.
 
 ```bash
-# Resolve skill path
 SKILL_SLUG="deployment-skill"
 SKILL_PATH=".claude/skills/${SKILL_SLUG}"
 
-# Verify skill exists
-if [ ! -d "$SKILL_PATH" ]; then
+if [ ! -d "$SKILL_PATH" ] || [ ! -f "$SKILL_PATH/SKILL.md" ]; then
     echo "Error: Skill not found at $SKILL_PATH"
     exit 1
 fi
-
-# Verify SKILL.md exists
-if [ ! -f "$SKILL_PATH/SKILL.md" ]; then
-    echo "Error: SKILL.md not found in $SKILL_PATH"
-    exit 1
-fi
-
-echo "Testing skill at: $SKILL_PATH"
 ```
 
 ### Step 2: Load Configuration
 
-Read framework configuration from `.claude/test-framework/config/framework-config.yaml`:
-
-```yaml
-thresholds:
-  overall_minimum: 0.85 # Minimum score to pass
-  critical_failure_tolerance: 0 # Zero critical failures allowed
-  llm_judge:
-    minimum_average: 4.0 # Minimum average score across dimensions
-    minimum_per_dimension: 3.0 # No dimension below this
-
-weights:
-  source_fidelity: 0.30 # Highest weight - fabrication is critical
-  self_sufficiency: 0.25 # Second - must work standalone
-  completeness: 0.20 # Third - scope coverage matters
-  specificity: 0.15 # Fourth - actionability important
-  no_overlap: 0.10 # Lowest - minor overlap acceptable
-
-critical_failures:
-  - missing_frontmatter # No YAML frontmatter block
-  - no_source_citations # No traceable claims
-  - skill_md_exceeds_500_lines # Context budget violation
-  - broken_markdown_syntax # Parse failures
-  - forbidden_patterns # Dangerous commands/patterns
-```
-
-Parse configuration and set validation parameters.
+Read thresholds, weights, and critical failure definitions from `.claude/test-framework/config/framework-config.yaml`. See [Configuration Reference](#configuration-reference) for complete structure.
 
 ### Step 3: Run Layer 1 (Deterministic Checks)
 
 Execute bash script that validates structure and syntax without LLM calls.
 
 ```bash
-# Run deterministic checks with JSON output
 bash .claude/test-framework/graders/deterministic-checks.sh "$SKILL_PATH" --json > layer1-results.json
 
-# Parse results
 LAYER1_STATUS=$(jq -r '.status' layer1-results.json)
 CRITICAL_FAILURES=$(jq -r '.critical_failures | length' layer1-results.json)
 
-# Check for critical failures
 if [ "$LAYER1_STATUS" = "fail" ] || [ "$CRITICAL_FAILURES" -gt 0 ]; then
     echo "❌ Layer 1 FAILED - Critical issues detected"
-
-    # Display failures
     jq -r '.critical_failures[]' layer1-results.json
-
-    echo ""
     echo "Fix critical failures before proceeding to Layer 2"
     exit 1
 fi
-
-echo "✅ Layer 1 PASSED - No critical failures"
 ```
 
 **Output format**:
@@ -176,205 +96,29 @@ echo "✅ Layer 1 PASSED - No critical failures"
 }
 ```
 
-**Cost**: ~$0.00001, **Duration**: ~5 seconds
-
 ### Step 4: Run Layer 2 (LLM-as-Judge)
 
-Only runs if Layer 1 passed (no critical failures).
-
-```bash
-# Read skill content and sources
-SKILL_CONTENT=$(cat "$SKILL_PATH/SKILL.md")
-SOURCES=$(find "$SKILL_PATH/_sources" -type f 2>/dev/null || echo "")
-
-# For each quality dimension, call LLM-judge
-for dimension in source_fidelity self_sufficiency completeness specificity no_overlap; do
-    # Load rubric for this dimension
-    RUBRIC=$(cat .claude/test-framework/graders/llm-judge-rubrics.md | \
-             sed -n "/## ${dimension}/,/## [A-Z]/p")
-
-    # Construct evaluation prompt
-    PROMPT="Evaluate the following skill on ${dimension} using this rubric:
-
-${RUBRIC}
-
-Skill content:
-${SKILL_CONTENT}
-
-Source material:
-${SOURCES}
-
-Output JSON with score (1-5), reasoning, and dimension-specific metrics."
-
-    # Call Claude with evaluation prompt
-    RESPONSE=$(call_claude_api "$PROMPT")
-
-    # Parse score
-    SCORE=$(echo "$RESPONSE" | jq -r '.score')
-    echo "${dimension}: ${SCORE}/5"
-done
-```
+Only runs if Layer 1 passed. For each quality dimension, load the rubric from `llm-judge-rubrics.md`, construct an evaluation prompt with skill content and source material, call Claude API, and parse the structured JSON response.
 
 **Scoring formula**:
 
 ```python
-# Extract scores from each dimension evaluation
-scores = {
-    'source_fidelity': 5,
-    'self_sufficiency': 4,
-    'completeness': 4,
-    'specificity': 4,
-    'no_overlap': 5
-}
+scores = {dim: evaluate(dim) for dim in DIMENSIONS}
 
-# Apply weights from configuration
-weights = {
-    'source_fidelity': 0.30,
-    'self_sufficiency': 0.25,
-    'completeness': 0.20,
-    'specificity': 0.15,
-    'no_overlap': 0.10
-}
-
-# Calculate weighted score
+# Apply weights from framework-config.yaml
 weighted_score = sum(scores[dim] * weights[dim] for dim in scores)
+overall_score = weighted_score / 5.0  # Normalize to 0-1
 
-# Normalize to 0-1 scale
-overall_score = weighted_score / 5.0
-
-# Example: (5*0.30 + 4*0.25 + 4*0.20 + 4*0.15 + 5*0.10) / 5.0
-#        = (1.5 + 1.0 + 0.8 + 0.6 + 0.5) / 5.0
-#        = 4.4 / 5.0
-#        = 0.88 ✓ (passes threshold of 0.85)
+# Example: (5×0.30 + 4×0.25 + 4×0.20 + 4×0.15 + 5×0.10) / 5.0 = 0.88
 ```
-
-**Duration**: ~45 seconds, **Cost**: ~$1.50
 
 ### Step 5: Generate Validation Report
 
-Create dual-format output for both machine and human consumption.
+Create dual-format output. Save both to `tests/results/{timestamp}/{skill-slug}-{results.json,report.md}`.
 
-**JSON (machine-readable)**:
+**JSON** contains: overall_score, weighted_score, recommendation (PASS/FAIL), critical_failures, warnings, layer_1 results, layer_2 per-dimension scores with reasoning.
 
-```json
-{
-  "skill_slug": "deployment-skill",
-  "timestamp": "2026-02-14T10:30:00Z",
-  "overall_score": 0.88,
-  "weighted_score": 4.4,
-  "recommendation": "PASS",
-  "critical_failures": [],
-  "warnings": ["Minor undefined term: CORS"],
-  "layer_1": {
-    "status": "pass",
-    "checks_passed": 12,
-    "checks_total": 13,
-    "duration_seconds": 4.2
-  },
-  "layer_2": {
-    "source_fidelity": {
-      "score": 5,
-      "weight": 0.3,
-      "reasoning": "All claims traceable with clear citations"
-    },
-    "self_sufficiency": {
-      "score": 4,
-      "weight": 0.25,
-      "reasoning": "Minor term undefined but inferable from context"
-    },
-    "completeness": {
-      "score": 4,
-      "weight": 0.2,
-      "reasoning": "85% source coverage, minor gaps acceptable"
-    },
-    "specificity": {
-      "score": 4,
-      "weight": 0.15,
-      "reasoning": "Most patterns actionable with examples"
-    },
-    "no_overlap": {
-      "score": 5,
-      "weight": 0.1,
-      "reasoning": "Entirely novel deployment workflow"
-    },
-    "duration_seconds": 42.3
-  }
-}
-```
-
-Save to: `tests/results/{timestamp}/{skill-slug}-results.json`
-
-**Markdown (human-readable)**:
-
-Use template from `.claude/test-framework/templates/validation-report.md`:
-
-```markdown
-# Validation Report: deployment-skill
-
-**Timestamp**: 2026-02-14T10:30:00Z
-**Recommendation**: ✅ PASS
-
-## Summary
-
-Overall score: **0.88/1.0** (threshold: ≥0.85)
-Weighted score: **4.4/5.0**
-
-## Layer 1: Deterministic Checks
-
-Status: ✅ PASS
-Checks passed: 12/13
-Duration: 4.2 seconds
-
-Warnings:
-
-- Minor undefined term: CORS
-
-## Layer 2: LLM-as-Judge
-
-| Dimension        | Score | Weight | Weighted |
-| ---------------- | ----- | ------ | -------- |
-| Source Fidelity  | 5/5   | 30%    | 1.50     |
-| Self-Sufficiency | 4/5   | 25%    | 1.00     |
-| Completeness     | 4/5   | 20%    | 0.80     |
-| Specificity      | 4/5   | 15%    | 0.60     |
-| No Overlap       | 5/5   | 10%    | 0.50     |
-| **Total**        |       |        | **4.40** |
-
-Duration: 42.3 seconds
-
-### Source Fidelity (5/5) ✓
-
-All claims traceable with clear citations. No fabrication detected.
-
-### Self-Sufficiency (4/5) ✓
-
-Minor term undefined (CORS) but inferable from context. 95% self-contained.
-
-### Completeness (4/5) ✓
-
-85% source coverage achieved. Minor gaps in edge cases acceptable for stated scope.
-
-### Specificity (4/5) ✓
-
-Most patterns actionable with when/why/how context and examples provided.
-
-### No Overlap (5/5) ✓
-
-Entirely novel deployment workflow, no overlap with Claude's general training.
-
-## Recommendations
-
-1. Define "CORS" term explicitly or add to glossary
-2. Consider adding edge case examples for completeness
-
-## Next Steps
-
-- ✅ Skill ready for production use
-- Archive test results for regression comparison
-- Update golden sample if this represents improved synthesis
-```
-
-Save to: `tests/results/{timestamp}/{skill-slug}-report.md`
+**Markdown** uses template from `.claude/test-framework/templates/validation-report.md` with narrative explanations, score table, per-dimension reasoning, and recommendations.
 
 ### Step 6: Report Results
 
@@ -421,61 +165,31 @@ Recommendations:
 1. Add citations to all claims (see llm-judge-rubrics.md)
 2. Move detailed content to reference.md to reduce SKILL.md size
 3. Address fabricated claims in sections: [list sections]
-
-Full report: tests/results/2026-02-14T10-30-00Z/deployment-skill-report.md
 ```
 
 ## Quality Dimension Rubrics
 
-### Source Fidelity Rubric (Weight: 0.30)
+### Source Fidelity (Weight: 0.30)
 
 **Definition**: Accuracy and traceability of claims to source material.
 
-**5-Point Scale**:
+**5 - Exceptional**: Every claim cited, contradictions flagged, synthesis preserves nuance, no fabrication, consistent citation format.
 
-**5 - Exceptional**:
+**4 - Strong**: 95%+ claims traceable, contradictions noted, minor omissions acceptable, rare citation inconsistencies.
 
-- Every claim has clear citation
-- Contradictions explicitly flagged
-- Synthesis preserves nuance
-- No fabrication
-- Citation format consistent
+**3 - Adequate**: 85%+ claims traceable, most contradictions noted, some synthesis gaps, mostly consistent citations.
 
-**4 - Strong**:
+**2 - Weak**: <85% claims traceable, contradictions missed, noticeable fabrication, poor citation practices.
 
-- 95%+ claims traceable
-- Contradictions noted
-- Minor omissions acceptable
-- Rare citation inconsistencies
-
-**3 - Adequate**:
-
-- 85%+ claims traceable
-- Most contradictions noted
-- Some synthesis gaps
-- Citation format mostly consistent
-
-**2 - Weak**:
-
-- <85% claims traceable
-- Contradictions missed
-- Noticeable fabrication
-- Poor citation practices
-
-**1 - Failing**:
-
-- Significant fabrication
-- Missing citations throughout
-- Contradictions ignored
-- Cannot verify claims
+**1 - Failing**: Significant fabrication, missing citations throughout, contradictions ignored, cannot verify claims.
 
 **Evaluation Process**:
 
-1. Sample 10 specific claims from the skill randomly
-2. For each claim, attempt to trace back to source material using citations
-3. Check contradictions - are source disagreements explicitly noted?
-4. Calculate traceability - percentage of sampled claims that can be verified
-5. Note fabrications - any claims not supported by sources
+1. Sample 10 specific claims randomly
+2. Trace each back to source material using citations
+3. Check if source disagreements are explicitly noted
+4. Calculate traceability percentage
+5. Note fabrications not supported by sources
 
 **Output Format**:
 
@@ -491,51 +205,23 @@ Full report: tests/results/2026-02-14T10-30-00Z/deployment-skill-report.md
 }
 ```
 
-### Self-Sufficiency Rubric (Weight: 0.25)
+### Self-Sufficiency (Weight: 0.25)
 
 **Definition**: Can the skill be understood and applied without external context?
 
-**5-Point Scale**:
+**5 - Exceptional**: Complete standalone understanding, all terms defined, no external dependencies.
 
-**5 - Exceptional**:
+**4 - Strong**: Minor context gaps, 95%+ self-contained, rare external references justified.
 
-- Complete standalone understanding
-- All terms defined
-- Context provided
-- No external dependencies
-- New user could apply immediately
+**3 - Adequate**: Some context assumed, 85%+ self-contained, user can infer gaps.
 
-**4 - Strong**:
+**2 - Weak**: Frequent context gaps, relies on external knowledge, terms undefined.
 
-- Minor context gaps
-- 95%+ self-contained
-- Rare external references justified
-- Terms mostly defined
-
-**3 - Adequate**:
-
-- Some context assumed
-- 85%+ self-contained
-- User can infer gaps
-- Most important terms defined
-
-**2 - Weak**:
-
-- Frequent context gaps
-- Relies heavily on external knowledge
-- Terms undefined
-- Difficult to follow
-
-**1 - Failing**:
-
-- Cannot understand without external context
-- Many undefined terms
-- Assumes significant prior knowledge
-- Not usable standalone
+**1 - Failing**: Cannot understand without external context, many undefined terms.
 
 **Evaluation Process**:
 
-1. List technical terms/concepts used in skill
+1. List technical terms/concepts used
 2. Check if each is defined or explained in-skill
 3. Identify assumptions about user knowledge
 4. Note dependencies on external context
@@ -553,46 +239,19 @@ Full report: tests/results/2026-02-14T10-30-00Z/deployment-skill-report.md
 }
 ```
 
-### Completeness Rubric (Weight: 0.20)
+### Completeness (Weight: 0.20)
 
 **Definition**: Coverage of stated scope and source material.
 
-**5-Point Scale**:
+**5 - Exceptional**: Stated scope fully covered, 90%+ source material synthesized, no significant gaps.
 
-**5 - Exceptional**:
+**4 - Strong**: 85%+ scope covered, minor gaps acceptable, key topics well-covered.
 
-- Stated scope fully covered
-- 90%+ of source material synthesized
-- No significant gaps
-- All promised topics addressed
+**3 - Adequate**: 75%+ scope covered, some gaps present, main topics addressed.
 
-**4 - Strong**:
+**2 - Weak**: <75% scope covered, significant gaps, important topics missing.
 
-- 85%+ scope covered
-- Minor gaps acceptable
-- Most source material used
-- Key topics well-covered
-
-**3 - Adequate**:
-
-- 75%+ scope covered
-- Some gaps present
-- Reasonable source coverage
-- Main topics addressed
-
-**2 - Weak**:
-
-- <75% scope covered
-- Significant gaps
-- Sparse source usage
-- Important topics missing
-
-**1 - Failing**:
-
-- Incomplete coverage
-- Major sections missing
-- Minimal source usage
-- Stated scope not delivered
+**1 - Failing**: Incomplete coverage, major sections missing, minimal source usage.
 
 **Evaluation Process**:
 
@@ -609,60 +268,29 @@ Full report: tests/results/2026-02-14T10-30-00Z/deployment-skill-report.md
   "score": 1-5,
   "scope_coverage_percentage": 0.85,
   "source_coverage_percentage": 0.87,
-  "gaps": ["Edge case handling not covered", "Rollback procedures minimal"],
+  "gaps": ["Edge case handling not covered"],
   "reasoning": "85% scope coverage with minor edge case gaps acceptable"
 }
 ```
 
-### Specificity Rubric (Weight: 0.15)
+### Specificity (Weight: 0.15)
 
 **Definition**: Actionability and detail of patterns/guidance.
 
-**5-Point Scale**:
+**5 - Exceptional**: All patterns have when/why/how context, concrete examples throughout, immediately actionable.
 
-**5 - Exceptional**:
+**4 - Strong**: 90%+ patterns actionable, minor abstraction acceptable, most have examples.
 
-- All patterns have when/why/how context
-- Concrete examples throughout
-- Clear decision criteria
-- Immediately actionable
+**3 - Adequate**: 75%+ patterns actionable, some vague guidance, examples present.
 
-**4 - Strong**:
+**2 - Weak**: <75% actionable, many vague/generic patterns, examples sparse.
 
-- 90%+ patterns actionable
-- Minor abstraction acceptable
-- Most have examples
-- Clear application guidance
-
-**3 - Adequate**:
-
-- 75%+ patterns actionable
-- Some vague guidance
-- Examples present
-- Can infer application
-
-**2 - Weak**:
-
-- <75% actionable
-- Many vague/generic patterns
-- Examples sparse
-- Difficult to apply
-
-**1 - Failing**:
-
-- Mostly generic advice
-- No clear patterns
-- Not actionable
-- Cannot apply guidance
+**1 - Failing**: Mostly generic advice, no clear patterns, not actionable.
 
 **Evaluation Process**:
 
-1. Count total patterns/guidelines in skill
-2. For each pattern, check if it includes:
-   - **When** to apply (context/triggers)
-   - **Why** it matters (reasoning/benefits)
-   - **How** to implement (concrete steps)
-   - **Example** demonstrating usage
+1. Count total patterns/guidelines
+2. For each, check for: **When** (context), **Why** (reasoning), **How** (steps), **Example**
 3. Calculate actionability percentage
 4. Note vague or generic patterns
 
@@ -674,67 +302,31 @@ Full report: tests/results/2026-02-14T10-30-00Z/deployment-skill-report.md
   "total_patterns": 15,
   "actionable_patterns": 13,
   "patterns_with_examples": 12,
-  "vague_patterns": ["Pattern 7 lacks concrete steps", "Pattern 11 too generic"],
+  "vague_patterns": ["Pattern 7 lacks concrete steps"],
   "reasoning": "87% patterns actionable with clear when/why/how context"
 }
 ```
 
-### No Overlap Rubric (Weight: 0.10)
+### No Overlap (Weight: 0.10)
 
 **Definition**: Skill provides novel value beyond Claude's built-in knowledge.
 
-**5-Point Scale**:
+**5 - Exceptional**: Entirely novel content, clear specialized value, unique insights.
 
-**5 - Exceptional**:
+**4 - Strong**: 90%+ novel, minor overlap acceptable, specialized knowledge.
 
-- Entirely novel content
-- No overlap with Claude's training
-- Clear specialized value
-- Unique insights
+**3 - Adequate**: 75%+ novel, some overlap but skill still justified.
 
-**4 - Strong**:
+**2 - Weak**: <75% novel, significant overlap, questionable value add.
 
-- 90%+ novel
-- Minor overlap acceptable
-- Adds significant value
-- Specialized knowledge
-
-**3 - Adequate**:
-
-- 75%+ novel
-- Some overlap but skill still justified
-- Moderate value add
-- Some unique content
-
-**2 - Weak**:
-
-- <75% novel
-- Significant overlap
-- Questionable value add
-- Mostly generic
-
-**1 - Failing**:
-
-- Mostly duplicates built-in knowledge
-- No clear value add
-- Generic best practices only
-- Skill not justified
+**1 - Failing**: Mostly duplicates built-in knowledge, no clear value add.
 
 **Evaluation Process**:
 
-1. Identify generic content (Claude's general training):
-   - Generic best practices (e.g., "write clear code")
-   - Common knowledge (e.g., "functions should be modular")
-   - Standard definitions (e.g., "REST is an architectural style")
-
-2. Identify specialized content:
-   - Organization-specific patterns
-   - Tool-specific workflows
-   - Novel methodologies
-   - Non-obvious insights
-
+1. Identify generic content (common best practices, standard definitions)
+2. Identify specialized content (org-specific patterns, tool-specific workflows, novel methodologies)
 3. Calculate novelty percentage
-4. Assess value justification - does skill add sufficient value to exist?
+4. Assess value justification
 
 **Output Format**:
 
@@ -742,26 +334,11 @@ Full report: tests/results/2026-02-14T10-30-00Z/deployment-skill-report.md
 {
   "score": 1-5,
   "novelty_percentage": 0.95,
-  "generic_content": ["Section on code review benefits (standard practice)"],
-  "specialized_content": ["Deployment workflow specific to infrastructure", "CI/CD integration patterns"],
+  "generic_content": ["Section on code review benefits"],
+  "specialized_content": ["Deployment workflow specific to infrastructure"],
   "value_justification": "Adds specialized deployment knowledge not in Claude's training",
   "reasoning": "95% novel with organization-specific deployment patterns"
 }
-```
-
-### Weighted Score Calculation
-
-```python
-weighted_score = (
-    source_fidelity * 0.30 +
-    self_sufficiency * 0.25 +
-    completeness * 0.20 +
-    specificity * 0.15 +
-    no_overlap * 0.10
-)
-
-# Normalize to 0-1 scale
-overall_score = weighted_score / 5.0
 ```
 
 ### Decision Thresholds
@@ -774,36 +351,22 @@ overall_score = weighted_score / 5.0
 
 Fast bash-based validation of skill structure and syntax.
 
-**Script location**: `.claude/test-framework/graders/deterministic-checks.sh`
+**Script**: `.claude/test-framework/graders/deterministic-checks.sh`
 
 **Checks performed**:
 
-1. **Frontmatter present** - YAML block at start of SKILL.md
-2. **Required fields** - description, tools, context
-3. **Line count** - SKILL.md ≤ 500 lines
-4. **Markdown syntax** - Valid markdown, no broken links
-5. **Source citations** - At least one citation/reference
-6. **Forbidden patterns** - No dangerous commands (rm -rf, eval, etc.)
-7. **File structure** - Expected files present (SKILL.md required, others optional)
-8. **Frontmatter syntax** - Valid YAML structure
-9. **Tool specifications** - Valid tool names if specified
-10. **Context modes** - Valid context value (inline, fork)
+1. Frontmatter present (YAML block at start of SKILL.md)
+2. Required fields (description, tools, context)
+3. Line count (SKILL.md ≤ 500 lines)
+4. Markdown syntax valid
+5. Source citations present (at least one)
+6. No forbidden patterns
+7. Expected file structure (SKILL.md required, others optional)
+8. Valid YAML frontmatter syntax
+9. Valid tool names if specified
+10. Valid context value (inline, fork)
 
-**Critical vs Warning failures**:
-
-**Critical** (blocks Layer 2):
-
-- Missing frontmatter
-- No source citations
-- SKILL.md exceeds 500 lines
-- Broken markdown syntax
-- Forbidden patterns detected
-
-**Warnings** (note but proceed):
-
-- Minor undefined terms
-- Optional files missing
-- Formatting inconsistencies
+**Critical failures** block Layer 2. **Warnings** are noted but allow progression. See [Configuration Reference](#configuration-reference) for the critical failure and forbidden pattern lists.
 
 **Performance**: ~5 seconds, ~$0.00001
 
@@ -811,40 +374,16 @@ Fast bash-based validation of skill structure and syntax.
 
 AI-powered evaluation of content quality using structured rubrics.
 
-**Rubric location**: `.claude/test-framework/graders/llm-judge-rubrics.md`
+**Rubrics**: `.claude/test-framework/graders/llm-judge-rubrics.md`
 
-**Process**:
-
-1. Read skill content and source material
-2. For each quality dimension:
-   - Load dimension-specific rubric
-   - Construct evaluation prompt with rubric + content
-   - Call Claude API for scoring
-   - Parse structured JSON response
-3. Compute weighted score using configuration weights
-4. Generate detailed reasoning for each score
+**Process**: Read skill + sources → evaluate each dimension against rubric → parse JSON responses → compute weighted score.
 
 **Known Biases**:
 
-**Verbosity Preference**:
-
-- **Description**: May favor longer, more detailed content over concise content
-- **Mitigation**: Rubrics explicitly allow conciseness; calibrate with human grades that value clarity
-
-**Position Bias**:
-
-- **Description**: Items appearing first may receive higher scores
-- **Mitigation**: Randomize evaluation order; present rubric categories in consistent order
-
-**Leniency**:
-
-- **Description**: May be reluctant to give low scores
-- **Mitigation**: Calibration validates judge can identify failing cases; use negative controls
-
-**Recency**:
-
-- **Description**: May weight recent Claude releases' capabilities more heavily
-- **Mitigation**: Reference "Claude's training" broadly, not specific version; calibration spans versions
+- **Verbosity preference** - May favor longer content. Mitigation: rubrics explicitly allow conciseness.
+- **Position bias** - Items appearing first may score higher. Mitigation: randomize evaluation order.
+- **Leniency** - Reluctant to give low scores. Mitigation: calibrate with negative controls.
+- **Recency** - May weight recent Claude capabilities more heavily. Mitigation: reference training broadly.
 
 **Performance**: ~45 seconds, ~$1.50
 
@@ -852,41 +391,20 @@ AI-powered evaluation of content quality using structured rubrics.
 
 Optional human review for validating LLM-judge accuracy.
 
-**Guide location**: `.claude/test-framework/graders/human-review-guide.md`
+**Guide**: `.claude/test-framework/graders/human-review-guide.md`
 
 **Process**:
 
-1. Generate human review form:
+1. Generate human review form: `/cogworks-test {slug} --generate-human-review-form`
+2. Expert completes form using same 5-point rubrics
+3. Calculate agreement: `python .claude/test-framework/scripts/calculate-agreement.py`
+4. Metrics: per-dimension agreement, overall agreement, systematic bias detection
 
-   ```bash
-   /cogworks-test deployment-skill --generate-human-review-form
-   ```
+**Target**: 90%+ agreement (within 0.5 points) across 20+ diverse skills
 
-2. Human expert completes form using same 5-point rubrics
+**When to run**: Initial setup, after rubric changes, quarterly validation, when scores seem off.
 
-3. Calculate agreement between LLM and human grades:
-
-   ```bash
-   python .claude/test-framework/scripts/calculate-agreement.py \
-       --human tests/calibration/deployment-skill-human.yaml \
-       --llm tests/results/latest/deployment-skill-results.json
-   ```
-
-4. Agreement metrics:
-   - **Per-dimension agreement** - Percentage within 0.5 points
-   - **Overall agreement** - Weighted average across dimensions
-   - **Systematic bias** - Consistent direction of disagreement
-
-**Target**: 90%+ agreement across 20+ diverse skills
-
-**When to run**:
-
-- Initial framework setup
-- After rubric changes
-- Quarterly validation
-- When LLM-judge scores seem off
-
-**Performance**: ~20 minutes human time, ~$100 opportunity cost
+**Performance**: ~20 minutes, ~$100 opportunity cost
 
 ## Test Data Organization
 
@@ -895,487 +413,210 @@ tests/
 ├── datasets/
 │   ├── golden-samples/              # Known-good skills for regression
 │   │   └── deployment-skill/
-│   │       ├── sources/             # Original source files used
-│   │       │   ├── cicd-automation.md
-│   │       │   └── deployment-workflow.md
-│   │       ├── expected-synthesis.md    # Expected cogworks-encode output
-│   │       ├── expected-skill/          # Expected cogworks-learn output
-│   │       │   ├── SKILL.md
-│   │       │   ├── reference.md
-│   │       │   ├── patterns.md
-│   │       │   └── examples.md
-│   │       ├── test-cases.jsonl         # Test inputs and expected outputs
-│   │       └── metadata.yaml            # Expected scores, line counts, structure
+│   │       ├── sources/             # Original source files
+│   │       ├── expected-synthesis.md
+│   │       ├── expected-skill/      # Expected SKILL.md + supporting files
+│   │       ├── test-cases.jsonl
+│   │       └── metadata.yaml        # Expected scores and structure
 │   ├── negative-controls/           # Should fail or warn
 │   │   ├── insufficient-sources/
-│   │   │   ├── sparse-content.md        # Minimal source material
-│   │   │   └── expected-outcome.yaml    # Should warn about completeness
+│   │   │   ├── sparse-content.md
+│   │   │   └── expected-outcome.yaml
 │   │   └── overlapping-builtin/
-│   │       ├── generic-coding-advice.md # Generic best practices
-│   │       └── expected-outcome.yaml    # Should warn about no overlap
+│   │       ├── generic-coding-advice.md
+│   │       └── expected-outcome.yaml
 │   └── edge-cases/                  # Boundary conditions
-│       ├── exactly-500-lines/           # At line limit
-│       ├── multiple-contradictions/     # Source disagreements
-│       └── highly-technical/            # Dense specialized content
+│       ├── exactly-500-lines/
+│       ├── multiple-contradictions/
+│       └── highly-technical/
 ├── results/                         # Test run outputs (gitignored)
-│   └── 2026-02-14T10-30-00Z/
-│       ├── deployment-skill-results.json
-│       └── deployment-skill-report.md
-└── calibration/                    # Human grades for validation
-    ├── deployment-skill-human.yaml
-    └── agreement-report.md
+└── calibration/                     # Human grades for validation
 ```
 
-**Golden sample purpose**: Regression testing to ensure framework changes don't affect quality detection
-
-**Negative control purpose**: Validate framework correctly identifies quality issues
-
-**Edge case purpose**: Test boundary conditions and unusual but valid inputs
+- **Golden samples**: Regression testing — ensure framework changes don't affect quality detection
+- **Negative controls**: Validate framework correctly identifies quality issues
+- **Edge cases**: Test boundary conditions and unusual but valid inputs
 
 ## Configuration Reference
 
 **File**: `.claude/test-framework/config/framework-config.yaml`
 
-**Complete structure**:
+This is the single source of truth for all thresholds, weights, and tuning parameters.
 
 ```yaml
 thresholds:
-  overall_minimum: 0.85 # Minimum overall score to pass
-  critical_failure_tolerance: 0 # Zero critical failures allowed
+  overall_minimum: 0.85
+  critical_failure_tolerance: 0
   llm_judge:
-    minimum_average: 4.0 # Average across dimensions
-    minimum_per_dimension: 3.0 # No dimension below this
+    minimum_average: 4.0
+    minimum_per_dimension: 3.0
   layer_1:
-    max_skill_md_lines: 500 # Context budget limit
-    min_citations: 1 # At least one source reference
+    max_skill_md_lines: 500
+    min_citations: 1
 
 weights:
-  source_fidelity: 0.30 # Fabrication most critical
-  self_sufficiency: 0.25 # Must work standalone
-  completeness: 0.20 # Scope coverage important
-  specificity: 0.15 # Actionability matters
-  no_overlap: 0.10 # Minor overlap acceptable
+  source_fidelity: 0.30      # Fabrication most critical
+  self_sufficiency: 0.25     # Must work standalone
+  completeness: 0.20         # Scope coverage important
+  specificity: 0.15          # Actionability matters
+  no_overlap: 0.10           # Minor overlap acceptable
 
 critical_failures:
-  - missing_frontmatter # No YAML block
-  - no_source_citations # No traceable claims
-  - skill_md_exceeds_500_lines # Context budget violation
-  - broken_markdown_syntax # Parse failures
-  - forbidden_patterns # Dangerous commands
+  - missing_frontmatter
+  - no_source_citations
+  - skill_md_exceeds_500_lines
+  - broken_markdown_syntax
+  - forbidden_patterns
 
 forbidden_patterns:
-  - "rm -rf" # Destructive file operations
-  - "eval" # Code injection risk
-  - ">/dev/null 2>&1 &" # Background processes
-  - "curl | bash" # Piped execution
+  - "rm -rf"
+  - "eval"
+  - ">/dev/null 2>&1 &"
+  - "curl | bash"
 
 tuning:
-  llm_temperature: 0.0 # Deterministic scoring
-  llm_max_tokens: 2000 # Per evaluation
-  layer1_timeout_seconds: 30 # Deterministic check timeout
-  layer2_timeout_seconds: 120 # LLM evaluation timeout
+  llm_temperature: 0.0
+  llm_max_tokens: 2000
+  layer1_timeout_seconds: 30
+  layer2_timeout_seconds: 120
 ```
 
-**When to adjust weights**:
+**When to adjust weights**: Increase source_fidelity for high-stakes domains, self_sufficiency for novice users, no_overlap when context budget is tight.
 
-- **Increase source_fidelity** if fabrication is critical concern
-- **Increase self_sufficiency** if skills used by novices
-- **Increase completeness** if comprehensive coverage required
-- **Increase specificity** if actionability is priority
-- **Increase no_overlap** if context budget severely constrained
-
-**When to adjust thresholds**:
-
-- **Raise overall_minimum** (e.g., 0.90) for production-critical skills
-- **Lower overall_minimum** (e.g., 0.80) during development/prototyping
-- **Adjust minimum_per_dimension** if specific dimension is blocker
+**When to adjust thresholds**: Raise overall_minimum (e.g., 0.90) for production-critical skills, lower (e.g., 0.80) during prototyping.
 
 ## Integration with Cogworks
 
-This framework integrates with the cogworks workflow for automatic validation.
-
-**Automatic invocation**:
+**Automatic invocation** via `--test` flag:
 
 ```bash
-# User runs cogworks with --test flag
 @cogworks encode deployment-sources/ --test
-
-# Cogworks workflow:
-# 1. Run cogworks-encode (synthesis)
-# 2. Run cogworks-learn (skill generation)
-# 3. Run cogworks-test (validation) ← automatic
-# 4. Report results to user
+# Workflow: encode → learn → test (automatic) → report
 ```
 
 **Manual invocation**:
 
 ```bash
-# Test after manual skill editing
 /cogworks-test deployment-skill
-
-# Test with comparison
 /cogworks-test deployment-skill --compare-against tests/datasets/golden-samples/deployment-skill/
-
-# Test with full calibration
 /cogworks-test deployment-skill --full
 ```
 
-**CI/CD integration**:
-
-```bash
-#!/bin/bash
-# In CI pipeline
-
-# Test all golden samples
-for sample in tests/datasets/golden-samples/*/; do
-    slug=$(basename "$sample")
-
-    # Run test with JSON output
-    /cogworks-test "$slug" --json > "results/${slug}.json"
-
-    # Check exit code
-    if [ $? -ne 0 ]; then
-        echo "Golden sample failed: $slug"
-        exit 1
-    fi
-done
-
-echo "All golden samples passed"
-```
-
-**Integration points in `.claude/agents/cogworks.md`**:
-
-- Step 6.5: Optional testing after skill generation
-- Uses `--test` flag to trigger automatic validation
-- Blocks completion if validation fails (when --test used)
+**Integration point**: Step 6.5 in `.claude/agents/cogworks.md` — optional testing after skill generation. Blocks completion if validation fails when `--test` flag is used.
 
 ## Troubleshooting Guide
 
-### Issue: Layer 1 Takes Too Long
+### Layer 1 Takes Too Long
 
-**Symptoms**: Deterministic checks exceed 30 seconds
+**Symptoms**: Deterministic checks exceed 30 seconds.
 
-**Causes**:
+**Causes**: Large skill files, many supporting files, inefficient bash patterns.
 
-- Large skill files (SKILL.md > 1000 lines)
-- Many supporting files to scan
-- Inefficient bash script patterns
-- Slow filesystem operations
+**Solutions**: Check 500-line limit first, optimize bash script, increase layer1_timeout_seconds if justified.
 
-**Solutions**:
+### LLM-Judge Scores Inconsistent
 
-1. Check if skill violates 500-line limit first
-2. Optimize bash script to avoid expensive operations
-3. Use grep/sed efficiently instead of loops
-4. Increase layer1_timeout_seconds in config if justified
+**Symptoms**: Same skill gets different scores on repeated tests.
 
-### Issue: LLM-Judge Scores Inconsistent
+**Causes**: Temperature > 0.0, rubric ambiguity, evaluation prompt not specific enough, model version changes.
 
-**Symptoms**: Same skill gets different scores on repeated tests
+**Solutions**: Verify temperature = 0.0, run calibration, tighten rubric language, add concrete examples to rubrics.
 
-**Causes**:
+### All Skills Failing on Same Check
 
-- Temperature > 0.0 introduces randomness
-- Rubric ambiguity allows interpretation variance
-- Evaluation prompt not specific enough
-- Model version changes
+**Symptoms**: Multiple unrelated skills fail same validation.
 
-**Solutions**:
+**Causes**: Configuration too strict, recent framework code change, rubric interpretation changed.
 
-1. Verify temperature = 0.0 in configuration
-2. Run calibration to identify systematic disagreements
-3. Tighten rubric language for clarity
-4. Add concrete examples to rubrics
-5. Check if model version changed (API)
+**Solutions**: Review recent changes (git log), check thresholds, test negative controls, re-run golden samples.
 
-### Issue: All Skills Failing on Same Check
+### False Positives in Deterministic Checks
 
-**Symptoms**: Multiple unrelated skills fail same validation
+**Symptoms**: Valid patterns flagged as critical failures.
 
-**Causes**:
+**Causes**: Forbidden pattern list too broad, check logic doesn't handle valid edge cases (e.g., "rm -rf" in quoted examples).
 
-- Framework configuration too strict
-- Recent framework code change introduced bug
-- Rubric interpretation changed
-- Source material format changed
+**Solutions**: Review forbidden_patterns, add exceptions for valid usage contexts.
 
-**Solutions**:
+### Low Calibration Agreement
 
-1. Review recent framework changes (git log)
-2. Check threshold settings in framework-config.yaml
-3. Test negative controls - should they fail differently?
-4. Re-run golden samples - did they regress?
-5. Adjust thresholds if genuinely too strict
+**Symptoms**: LLM and human grades differ on >10% of skills.
 
-### Issue: False Positives in Deterministic Checks
+**Causes**: Rubric ambiguity, human reviewer misunderstanding, systematic LLM bias.
 
-**Symptoms**: Valid patterns flagged as critical failures
-
-**Causes**:
-
-- Forbidden pattern list too broad
-- Check logic doesn't account for valid edge cases
-- Markdown parser too strict
-
-**Solutions**:
-
-1. Review forbidden_patterns list in config
-2. Add exceptions for valid patterns (e.g., "rm -rf" in quoted examples)
-3. Update check logic to distinguish usage contexts
-4. Add validation for exception handling
-
-### Issue: Low Calibration Agreement
-
-**Symptoms**: LLM and human grades differ on >10% of skills
-
-**Causes**:
-
-- Rubric ambiguity
-- Human reviewer misunderstanding rubrics
-- Systematic LLM bias
-- Skills outside calibration training set
-
-**Solutions**:
-
-1. Review disagreement patterns - systematic or random?
-2. Clarify rubric language where disagreements cluster
-3. Re-train human reviewers on rubric interpretation
-4. Add negative controls covering disagreement areas
-5. Document known edge cases where disagreement acceptable
+**Solutions**: Review disagreement patterns, clarify rubric language, add negative controls for disagreement areas.
 
 ## Cost and Performance
 
 ### Per-Skill Test Run
 
-**Layer 1 (Deterministic)**:
+| Layer | Cost | Duration | What It Does |
+|-------|------|----------|--------------|
+| Layer 1 (Deterministic) | ~$0.00001 | ~5 sec | Structure, syntax, required elements |
+| Layer 2 (LLM-as-Judge) | ~$1.50 | ~45 sec | 5 quality dimensions with reasoning |
+| Layer 3 (Human Review) | ~$100 | ~20 min | Expert calibration |
+| **Typical (L1+L2)** | **~$1.50** | **<1 min** | |
 
-- **Cost**: ~$0.00001 (negligible)
-- **Duration**: ~5 seconds
-- **What it does**: Structure, syntax, required elements validation
+### Cost Asymmetry
 
-**Layer 2 (LLM-as-Judge)**:
+Layer 2 / Layer 1 cost = $1.50 / $0.00001 = **150,000×**. This massive asymmetry justifies layered grading:
 
-- **Cost**: ~$1.50 (varies with skill size and source length)
-- **Duration**: ~45 seconds
-- **What it does**: 5 quality dimension evaluations with reasoning
+- If 30% of skills have critical failures, Layer 1 saves 30% × $1.50 = $0.45/skill
+- For 100 skills over 100 test runs during development: ~$1,500 saved
+- Time savings: 30 failed skills × 45 seconds = 22.5 minutes saved per batch
 
-**Layer 3 (Human Review)**:
+### Full Golden Sample Suite (20 samples)
 
-- **Cost**: ~$100 (opportunity cost at $300/hr engineer rate)
-- **Duration**: ~20 minutes
-- **What it does**: Expert validation for calibration
+- **Layer 1 only**: $0.0002, ~2 minutes
+- **Layer 1 + Layer 2**: $30, ~15 minutes
+- **With human calibration**: Add ~$2,000 + 7 hours
 
-**Typical validation**: Layer 1 + Layer 2 = ~$1.50 and <1 minute
-
-### Full Golden Sample Suite
-
-Assuming 20 golden samples:
-
-- **Layer 1 only**: 20 × $0.00001 = $0.0002, ~2 minutes total
-- **Layer 1 + Layer 2**: 20 × $1.50 = $30, ~15 minutes total
-- **With human calibration**: Add $2000 + 7 hours for 20 skills
-
-**Recommendation**: Run full suite (Layer 1 + 2) on every framework change, human calibration quarterly.
+**Recommendation**: Full suite (L1+L2) on every framework change. Human calibration quarterly.
 
 ### Optimization Strategies
 
-**Reduce Layer 2 cost**:
-
-- Filter with Layer 1 first (prevents unnecessary LLM calls)
-- Use shorter source excerpts when full text not needed
-- Cache LLM evaluations for unchanged skills
-- Batch multiple dimension evaluations in single prompt
-
-**Reduce Layer 1 duration**:
-
-- Optimize bash scripts (avoid loops, use grep efficiently)
-- Parallelize independent checks
-- Skip optional checks in fast mode
-
-**Reduce human calibration cost**:
-
-- Start with small sample (5 skills) to identify major issues
-- Focus calibration on dimensions with known disagreements
-- Use subject matter experts (faster, more accurate)
-
-### Cost Asymmetry Analysis
-
-Layer 1 vs Layer 2 cost difference:
-
-```
-Layer 2 cost / Layer 1 cost = $1.50 / $0.00001 = 150,000×
-```
-
-This massive asymmetry (150,000× difference) justifies layered grading architecture:
-
-- If 50% of skills have critical failures, Layer 1 saves 50% × $1.50 = $0.75 per skill
-- For 20 golden samples, saves $15 per test run
-- Over 100 test runs (typical during framework development), saves $1,500
-
-**Key insight**: Even if Layer 1 only catches 10% of failures, the cost savings justify the architecture.
+- **Reduce Layer 2 cost**: Filter with Layer 1 first, use shorter source excerpts, cache evaluations for unchanged skills, batch dimension evaluations
+- **Reduce Layer 1 duration**: Optimize bash (avoid loops, use grep), parallelize independent checks
+- **Reduce human cost**: Start with 5-skill sample, focus on dimensions with known disagreements
 
 ## Deep Dives
-
-### Why Layered Grading Works
-
-Layered grading leverages **cost asymmetry** between validation methods.
-
-**Cost spectrum**:
-
-1. Deterministic checks: $0.00001 (150,000× cheaper than LLM)
-2. LLM-as-judge: $1.50 (67× cheaper than human)
-3. Human review: $100 (most expensive, most accurate)
-
-**Probability analysis**:
-
-Assume:
-
-- 30% of skills have critical structural failures (caught by Layer 1)
-- 50% of remaining skills fail LLM evaluation (caught by Layer 2)
-- 5% of LLM passes need human review (caught by Layer 3)
-
-**Without layering** (LLM-judge everything):
-
-- 100 skills × $1.50 = $150
-
-**With layering**:
-
-- Layer 1: 100 skills × $0.00001 = $0.001
-- Layer 2: 70 skills × $1.50 = $105 (30% filtered by Layer 1)
-- Layer 3: 2 skills × $100 = $200 (5% of 35 LLM passes)
-- Total: $305
-
-Wait, this seems more expensive! But:
-
-1. Layer 3 is **optional** - only run quarterly for calibration
-2. Layer 1 prevents wasting 45 seconds per obviously-failing skill
-3. **Time savings** matter: 30 skills × 45 seconds = 22.5 minutes saved per run
-
-**Corrected analysis (without Layer 3)**:
-
-- Without layering: $150, 75 minutes (100 × 45 seconds)
-- With layering: $105, 53 minutes (70 × 45 seconds + 100 × 5 seconds)
-- Savings: $45 and 22 minutes per 100 skills
-
-**Key insight**: Layer 1 acts as a **fast reject filter**, preventing expensive operations on obviously-failing inputs.
 
 ### Weighted Scoring Philosophy
 
 Why weights differ between quality dimensions:
 
-**Source Fidelity (30% - Highest)**:
+**Source Fidelity (30%)** — Fabrication destroys trust in all skill content. Users cannot distinguish fabricated from accurate claims. Requires complete re-synthesis to fix.
 
-- **Failure severity**: Fabrication destroys trust in all skill content
-- **Impact**: Users cannot distinguish fabricated from accurate claims
-- **Recovery**: Requires complete re-synthesis to fix
-- **Example**: Skill claims "Feature X supports Y" but source never mentions this - user tries to use non-existent functionality
+**Self-Sufficiency (25%)** — Skill unusable without external context. Users cannot apply skill without additional research. Moderate recovery — can add definitions.
 
-**Self-Sufficiency (25% - Second)**:
+**Completeness (20%)** — Missing content reduces utility but doesn't create false information. Easy recovery — add missing content.
 
-- **Failure severity**: Skill unusable without external context
-- **Impact**: Users cannot apply skill without additional research
-- **Recovery**: Moderate - can add definitions/context
-- **Example**: Skill uses "CORS" throughout without definition - users unfamiliar with term cannot apply guidance
+**Specificity (15%)** — Vague guidance harder to apply but not wrong. Easy recovery — add examples and specifics.
 
-**Completeness (20% - Third)**:
+**No Overlap (10%)** — Skill still useful if minor overlap exists. Trivial recovery — trim generic sections.
 
-- **Failure severity**: Missing content reduces utility
-- **Impact**: Users miss important edge cases or scenarios
-- **Recovery**: Easy - can add missing content
-- **Example**: Deployment skill covers happy path but omits rollback procedures
-
-**Specificity (15% - Fourth)**:
-
-- **Failure severity**: Vague guidance harder to apply but not wrong
-- **Impact**: Users need to infer implementation details
-- **Recovery**: Easy - can add examples and specifics
-- **Example**: Pattern says "handle errors appropriately" without showing how
-
-**No Overlap (10% - Lowest)**:
-
-- **Failure severity**: Skill still useful if minor overlap exists
-- **Impact**: Some context budget waste but skill adds value
-- **Recovery**: Trivial - can trim generic sections
-- **Example**: Skill includes "code should be readable" (generic) alongside specialized patterns
-
-**Weight calibration**:
-
-Weights determined by:
-
-1. **Failure impact** - How much does poor performance harm users?
-2. **Recovery cost** - How hard is it to fix after detection?
-3. **Trust damage** - Does failure undermine confidence in framework?
-
-These weights represent **organizational priorities** and should be tuned based on:
-
-- User expertise (novices need higher self-sufficiency weight)
-- Context budget constraints (tight budgets need higher no overlap weight)
-- Trust requirements (high-stakes domains need higher source fidelity weight)
+Weights reflect **failure impact**, **recovery cost**, and **trust damage**. Tune based on: user expertise (novices need higher self-sufficiency), context budget (tight budgets need higher no-overlap), trust requirements (high-stakes need higher source fidelity).
 
 ### LLM-as-Judge Reliability
 
-When to trust automated scoring vs human review:
+**When to trust LLM scores**: Calibration shows >90% agreement, skill fits standard patterns, scores are extreme (1-2 or 4-5), multiple dimensions agree.
 
-**LLM-as-Judge strengths**:
+**When to be skeptical**: Agreement <90%, scores cluster around threshold (3-4), single dimension dramatically different, novel skill structure, systematic bias suspected.
 
-- **Consistency**: Same rubric interpretation every time (temperature = 0.0)
-- **Speed**: 45 seconds vs 20 minutes human time
-- **Cost**: $1.50 vs $100 opportunity cost
-- **Scalability**: Can evaluate thousands of skills
+**Mitigation strategies**: Regular calibration (quarterly), negative controls, rubric tightening with concrete examples, ensemble scoring (multiple evaluations averaged), automatic human escalation for ambiguous scores.
 
-**LLM-as-Judge weaknesses**:
-
-- **Bias sensitivity**: Verbosity preference, position bias, leniency
-- **Rubric ambiguity**: Vague rubric language causes interpretation variance
-- **Context limits**: Cannot evaluate skills exceeding context window
-- **Novel patterns**: May misidentify truly novel approaches as generic
-
-**When to trust LLM scores**:
-
-- Calibration shows >90% agreement with humans
-- Skill fits standard patterns (not novel methodology)
-- Scores are extreme (1-2 or 4-5) - less ambiguity
-- Multiple dimensions agree (not just one dimension low)
-
-**When to be skeptical**:
-
-- Calibration agreement <90%
-- Scores cluster around threshold (3-4 range) - ambiguous
-- Single dimension dramatically different from others
-- Novel skill structure/content LLM hasn't seen before
-- Systematic bias suspected (e.g., consistently rates long skills higher)
-
-**Mitigation strategies**:
-
-1. **Regular calibration** - Quarterly validation against human grades
-2. **Negative controls** - Verify judge catches known failures
-3. **Rubric tightening** - Add concrete examples to reduce ambiguity
-4. **Ensemble scoring** - Run multiple evaluations, average results
-5. **Human review triggers** - Automatic escalation when scores ambiguous
-
-**Key insight**: LLM-as-judge is a **probabilistic tool**, not ground truth. Use it as fast filter with human escalation for edge cases.
+**Key insight**: LLM-as-judge is a probabilistic tool, not ground truth. Use as fast filter with human escalation for edge cases.
 
 ## Quick Reference
 
 ### Command Cheatsheet
 
 ```bash
-# Basic test
-/cogworks-test {skill-slug}
-
-# JSON output
-/cogworks-test {skill-slug} --json
-
-# Compare to golden sample
-/cogworks-test {skill-slug} --compare-against tests/datasets/golden-samples/{slug}/
-
-# Full suite with human review prompts
-/cogworks-test {skill-slug} --full
-
-# Generate human review form
+/cogworks-test {skill-slug}                    # Basic test
+/cogworks-test {skill-slug} --json             # JSON output
+/cogworks-test {skill-slug} --full             # Include human review prompts
 /cogworks-test {skill-slug} --generate-human-review-form
-
-# Compare grades
+/cogworks-test {skill-slug} --compare-against tests/datasets/golden-samples/{slug}/
 /cogworks-test {skill-slug} --compare-grades \
     --human tests/calibration/{slug}-human.yaml \
     --llm tests/results/latest/{slug}-results.json
@@ -1386,62 +627,25 @@ for sample in tests/datasets/golden-samples/*/; do
 done
 ```
 
-### Configuration Quick Reference
-
-**Key thresholds** (framework-config.yaml):
-
-| Setting                    | Default | Purpose                           |
-| -------------------------- | ------- | --------------------------------- |
-| overall_minimum            | 0.85    | Minimum overall score to pass     |
-| critical_failure_tolerance | 0       | Zero critical failures allowed    |
-| llm_judge.minimum_average  | 4.0     | Minimum average across dimensions |
-| max_skill_md_lines         | 500     | Context budget limit              |
-
-**Quality dimension weights**:
-
-| Dimension        | Weight | Rationale                 |
-| ---------------- | ------ | ------------------------- |
-| Source Fidelity  | 30%    | Fabrication most critical |
-| Self-Sufficiency | 25%    | Must work standalone      |
-| Completeness     | 20%    | Scope coverage important  |
-| Specificity      | 15%    | Actionability matters     |
-| No Overlap       | 10%    | Minor overlap acceptable  |
-
-### Decision Tree
-
-```
-Start: Test skill
-    ├─> Run Layer 1 (deterministic checks)
-    ├─> Critical failures found?
-    │   ├─> YES: Report failures, STOP (don't run Layer 2)
-    │   └─> NO: Proceed to Layer 2
-    ├─> Run Layer 2 (LLM-as-judge)
-    ├─> Overall score ≥ 0.85?
-    │   ├─> YES: PASS (report success)
-    │   └─> NO: FAIL (report failures and recommendations)
-    └─> Optional: Run Layer 3 (human calibration) for validation
-```
-
-### File Locations Quick Reference
+### File Locations
 
 ```
 .claude/test-framework/
-├── config/
-│   └── framework-config.yaml          # All settings
+├── config/framework-config.yaml          # All settings
 ├── graders/
-│   ├── deterministic-checks.sh        # Layer 1
-│   ├── llm-judge-rubrics.md          # Layer 2
-│   └── human-review-guide.md         # Layer 3
+│   ├── deterministic-checks.sh          # Layer 1
+│   ├── llm-judge-rubrics.md             # Layer 2
+│   └── human-review-guide.md            # Layer 3
 ├── templates/
-│   ├── test-case-template.jsonl      # Example test cases
-│   └── validation-report.md          # Report template
+│   ├── test-case-template.jsonl
+│   └── validation-report.md
 └── scripts/
-    └── calculate-agreement.py        # Calibration analysis
+    └── calculate-agreement.py
 
 tests/
-├── datasets/                          # Test data
-├── results/                          # Test outputs (gitignored)
-└── calibration/                      # Human grades
+├── datasets/                             # Test data
+├── results/                              # Outputs (gitignored)
+└── calibration/                          # Human grades
 ```
 
 ## Sources
@@ -1458,5 +662,3 @@ This framework synthesizes knowledge from:
 8. `CLAUDE.md:48-54` - Quality requirements definition
 9. `.claude/agents/cogworks.md` - Integration with cogworks workflow
 10. Anthropic eval-driven development best practices
-
-All claims in this reference document are traceable to these authoritative sources.

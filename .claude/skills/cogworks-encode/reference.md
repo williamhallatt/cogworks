@@ -123,6 +123,8 @@ For each pattern found:
 
 **Target:** 5-10 patterns minimum
 
+**Uniqueness rule:** Each pattern must describe a *transferable approach* — something applicable beyond the specific domain being synthesized. If a "pattern" is just a domain procedure already documented in Core Concepts, it belongs there, not in Patterns. Test: could this pattern be applied to a different topic? If not, it's a concept, not a pattern.
+
 ### Phase 5: Anti-Pattern Documentation
 
 **Objective:** Document what NOT to do and why
@@ -222,6 +224,14 @@ Structure the synthesis logically:
 - Use consistent terminology throughout
 - Add transitions between sections
 - Create connections between ideas
+
+**Deduplication principle:** Each section must contribute unique information. Before finalizing, verify that:
+- **Patterns** generalize beyond the domain (not restatements of Core Concepts as procedures)
+- **Examples** demonstrate usage scenarios that add context beyond what the reference already shows (not walkthroughs of documented procedures)
+- **Deep Dives** analyze trade-offs or nuance (not expanded restatements of concepts)
+- **Quick Reference** provides lookup values (not condensed restatements of concepts)
+
+If a section just reformats content from another section, merge it into the original and delete the duplicate.
 
 ## Output Format (REQUIRED)
 
@@ -364,7 +374,8 @@ Before completing synthesis, verify:
 - [ ] Each pattern has when/why/how
 - [ ] Patterns cite source examples
 - [ ] Patterns are actionable
-- [ ] Patterns aren't just restatements of concepts
+- [ ] Each pattern generalizes beyond the specific domain (transferable to other topics)
+- [ ] No pattern restates a Core Concept as a procedure
 
 ### Anti-Pattern Quality
 
@@ -432,6 +443,7 @@ Before completing synthesis, verify:
 - **Use vague patterns** - Be specific about when/why/how
 - **Skip relationships** - Show how concepts connect
 - **Write summaries** - Synthesize, don't summarize
+- **Restate across sections** - If Patterns repeats Core Concepts as procedures, or Examples walks through documented workflows, merge or delete the duplicate
 - **Ignore structure** - Follow the required format exactly
 
 ## Examples of Good vs Bad Synthesis

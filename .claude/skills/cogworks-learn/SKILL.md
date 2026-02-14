@@ -61,7 +61,7 @@ Core knowledge in [reference.md](reference.md):
 
 Patterns and examples in separate files (loaded on-demand):
 
-- [patterns.md](patterns.md) - 10 reusable patterns + 8 anti-patterns to avoid
+- [patterns.md](patterns.md) - 10 reusable patterns + 9 anti-patterns to avoid
 - [examples.md](examples.md) - 12 complete practical examples with citations
 
 ## Writing Checklist
