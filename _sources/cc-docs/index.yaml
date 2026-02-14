@@ -1,0 +1,1677 @@
+# Claude Code Documentation Smart Index
+# Source: https://code.claude.com/docs/
+
+meta:
+  generated_at: "2026-02-12"
+  source_url: "https://code.claude.com/docs/llms.txt"
+  total_docs: 55
+  valid_docs: 54
+  invalid_docs: 1
+
+documents:
+  overview:
+    local_path: "_sources/cc-docs/overview.md"
+    title: "What is Claude Code?"
+    description: "Introduction to Claude Code - an agentic coding tool that lives in your terminal"
+    difficulty: beginner
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: false
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: getting_started
+      key_topics:
+        - "agentic coding"
+        - "terminal tool"
+        - "Claude integration"
+      unique_value: "Foundational overview of Claude Code capabilities"
+    related:
+      prerequisites: []
+      complements: ["quickstart", "setup"]
+      advanced_topics: ["how-claude-code-works"]
+
+  quickstart:
+    local_path: "_sources/cc-docs/quickstart.md"
+    title: "Quickstart"
+    description: "Get up and running with Claude Code in under 5 minutes"
+    difficulty: beginner
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: getting_started
+      key_topics:
+        - "installation"
+        - "first conversation"
+        - "basic commands"
+      unique_value: "Fastest path to productive Claude Code usage"
+    related:
+      prerequisites: []
+      complements: ["overview", "setup"]
+      advanced_topics: ["common-workflows", "best-practices"]
+
+  setup:
+    local_path: "_sources/cc-docs/setup.md"
+    title: "Set up Claude Code"
+    description: "Install, authenticate, and start using Claude Code on your development machine"
+    difficulty: beginner
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: getting_started
+      key_topics:
+        - "installation methods"
+        - "authentication"
+        - "auto-updates"
+        - "uninstallation"
+      unique_value: "Definitive installation reference with all platform variants"
+    related:
+      prerequisites: []
+      complements: ["quickstart", "authentication"]
+      advanced_topics: ["troubleshooting"]
+
+  authentication:
+    local_path: "_sources/cc-docs/authentication.md"
+    title: "Authentication"
+    description: "Configure authentication for Claude Code access"
+    difficulty: beginner
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: getting_started
+      key_topics:
+        - "OAuth flow"
+        - "API keys"
+        - "team authentication"
+      unique_value: "Authentication configuration for individuals and teams"
+    related:
+      prerequisites: ["setup"]
+      complements: ["third-party-integrations"]
+      advanced_topics:
+        ["amazon-bedrock", "google-vertex-ai", "microsoft-foundry"]
+
+  how-claude-code-works:
+    local_path: "_sources/cc-docs/how-claude-code-works.md"
+    title: "How Claude Code works"
+    description: "Understand the agentic loop, tools, and context management architecture"
+    difficulty: beginner
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: false
+      has_code_samples: true
+      has_diagrams: true
+      actionable: false
+    synthesis:
+      target_audience: beginner
+      domain: getting_started
+      key_topics:
+        - "agentic loop"
+        - "tool system"
+        - "context window"
+        - "auto-compaction"
+      unique_value: "Foundational architecture understanding"
+    related:
+      prerequisites: ["overview"]
+      complements: ["features-overview"]
+      advanced_topics: ["best-practices", "model-config"]
+
+  interactive-mode:
+    local_path: "_sources/cc-docs/interactive-mode.md"
+    title: "Interactive mode"
+    description: "Keyboard shortcuts, vim mode, and UI controls reference"
+    difficulty: beginner
+    authority: reference
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: false
+      has_code_samples: false
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: getting_started
+      key_topics:
+        - "keyboard shortcuts"
+        - "vim mode"
+        - "slash commands"
+        - "context mentions"
+      unique_value: "Complete UI interaction reference"
+    related:
+      prerequisites: ["quickstart"]
+      complements: ["keybindings", "terminal-config"]
+      advanced_topics: []
+
+  cli-reference:
+    local_path: "_sources/cc-docs/cli-reference.md"
+    title: "CLI reference"
+    description: "Complete reference for command-line flags and modes"
+    difficulty: beginner
+    authority: reference
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: getting_started
+      key_topics:
+        - "command flags"
+        - "execution modes"
+        - "non-interactive usage"
+        - "subcommands"
+      unique_value: "Definitive CLI argument reference"
+    related:
+      prerequisites: ["quickstart"]
+      complements: ["headless", "github-actions"]
+      advanced_topics: []
+
+  common-workflows:
+    local_path: "_sources/cc-docs/common-workflows.md"
+    title: "Common workflows"
+    description: "Step-by-step guides for codebase exploration, debugging, refactoring, testing, and PRs"
+    difficulty: intermediate
+    authority: tutorial
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: getting_started
+      key_topics:
+        - "codebase exploration"
+        - "debugging"
+        - "refactoring"
+        - "test writing"
+        - "pull requests"
+      unique_value: "Practical workflow patterns for real development tasks"
+    related:
+      prerequisites: ["quickstart", "overview"]
+      complements: ["best-practices"]
+      advanced_topics: ["skills", "sub-agents"]
+
+  best-practices:
+    local_path: "_sources/cc-docs/best-practices.md"
+    title: "Best practices"
+    description: "Comprehensive guide covering context management, verification, CLAUDE.md, skills, subagents, hooks"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: getting_started
+      key_topics:
+        - "context management"
+        - "verification patterns"
+        - "CLAUDE.md conventions"
+        - "skill design"
+        - "subagent usage"
+      unique_value: "Authoritative patterns and anti-patterns for effective Claude Code usage"
+    related:
+      prerequisites: ["overview", "common-workflows"]
+      complements: ["memory", "skills"]
+      advanced_topics: ["agent-teams"]
+
+  # === MEMORY AND CONFIGURATION ===
+
+  memory:
+    local_path: "_sources/cc-docs/memory.md"
+    title: "Memory and CLAUDE.md files"
+    description: "Configure project context via CLAUDE.md files at different scopes"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: configuration
+      key_topics:
+        - "CLAUDE.md structure"
+        - "scope hierarchy"
+        - "context injection"
+        - "team standards"
+      unique_value: "Definitive reference for project memory configuration"
+    related:
+      prerequisites: ["quickstart"]
+      complements: ["settings", "best-practices"]
+      advanced_topics: ["skills"]
+
+  settings:
+    local_path: "_sources/cc-docs/settings.md"
+    title: "Settings"
+    description: "Configure Claude Code behavior via settings files and environment variables"
+    difficulty: intermediate
+    authority: reference
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: configuration
+      key_topics:
+        - "settings.json schema"
+        - "environment variables"
+        - "scope hierarchy"
+        - "managed settings"
+      unique_value: "Complete configuration reference with all settings options"
+    related:
+      prerequisites: ["setup"]
+      complements: ["memory", "permissions"]
+      advanced_topics: ["network-config"]
+
+  model-config:
+    local_path: "_sources/cc-docs/model-config.md"
+    title: "Model configuration"
+    description: "Configure model aliases, effort levels, and extended context"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: configuration
+      key_topics:
+        - "model aliases"
+        - "effort levels"
+        - "extended thinking"
+        - "fast mode"
+      unique_value: "Model selection and performance tuning"
+    related:
+      prerequisites: ["overview"]
+      complements: ["fast-mode", "costs"]
+      advanced_topics: []
+
+  keybindings:
+    local_path: "_sources/cc-docs/keybindings.md"
+    title: "Custom keybindings"
+    description: "Configure custom keyboard shortcuts for Claude Code"
+    difficulty: intermediate
+    authority: reference
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: false
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: configuration
+      key_topics:
+        - "keybindings schema"
+        - "action types"
+        - "mode contexts"
+      unique_value: "Custom keyboard shortcut configuration"
+    related:
+      prerequisites: ["interactive-mode"]
+      complements: ["terminal-config"]
+      advanced_topics: []
+
+  output-styles:
+    local_path: "_sources/cc-docs/output-styles.md"
+    title: "Custom output styles"
+    description: "Configure custom output formatting and styles"
+    difficulty: intermediate
+    authority: reference
+    completeness: partial
+    quality:
+      score: 3
+      has_examples: true
+      has_warnings: false
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: configuration
+      key_topics:
+        - "output formatting"
+        - "style configuration"
+      unique_value: "Output customization options"
+    related:
+      prerequisites: ["settings"]
+      complements: ["statusline"]
+      advanced_topics: []
+
+  statusline:
+    local_path: "_sources/cc-docs/statusline.md"
+    title: "Custom status line"
+    description: "Configure custom status bar scripts for contextual information"
+    difficulty: intermediate
+    authority: reference
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: configuration
+      key_topics:
+        - "status line scripts"
+        - "context variables"
+        - "shell integration"
+      unique_value: "Custom status bar configuration with many examples"
+    related:
+      prerequisites: ["terminal-config"]
+      complements: ["settings"]
+      advanced_topics: []
+
+  # === EXTENSIBILITY ===
+
+  features-overview:
+    local_path: "_sources/cc-docs/features-overview.md"
+    title: "Extension overview"
+    description: "Compare CLAUDE.md, skills, subagents, MCP, hooks, and plugins"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: false
+      has_code_samples: false
+      has_diagrams: true
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: extensibility
+      key_topics:
+        - "extension comparison"
+        - "decision matrix"
+        - "capability mapping"
+      unique_value: "Authoritative guide for choosing the right extension mechanism"
+    related:
+      prerequisites: ["overview"]
+      complements: ["skills", "hooks", "mcp", "plugins"]
+      advanced_topics: ["sub-agents"]
+
+  skills:
+    local_path: "_sources/cc-docs/skills.md"
+    title: "Extend Claude with skills"
+    description: "Create, manage, and share skills for extended Claude capabilities"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: extensibility
+      key_topics:
+        - "SKILL.md structure"
+        - "slash commands"
+        - "invocation modes"
+        - "scope hierarchy"
+      unique_value: "Authoritative reference for skill architecture"
+    related:
+      prerequisites: ["memory", "quickstart"]
+      complements: ["sub-agents", "plugins", "hooks"]
+      advanced_topics: ["plugins-reference"]
+
+  sub-agents:
+    local_path: "_sources/cc-docs/sub-agents.md"
+    title: "Custom agents"
+    description: "Create specialized AI agents for domain-specific tasks"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: extensibility
+      key_topics:
+        - "agent definition"
+        - "tool restrictions"
+        - "model selection"
+        - "orchestration"
+      unique_value: "Complete guide to creating specialized AI agents"
+    related:
+      prerequisites: ["skills"]
+      complements: ["agent-teams", "hooks"]
+      advanced_topics: ["agent-teams"]
+
+  hooks:
+    local_path: "_sources/cc-docs/hooks.md"
+    title: "Hooks reference"
+    description: "Event-driven automation via lifecycle hooks"
+    difficulty: intermediate
+    authority: reference
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: extensibility
+      key_topics:
+        - "hook types"
+        - "event matching"
+        - "shell commands"
+        - "configuration"
+      unique_value: "Complete hook system reference"
+    related:
+      prerequisites: ["settings"]
+      complements: ["hooks-guide"]
+      advanced_topics: []
+
+  hooks-guide:
+    local_path: "_sources/cc-docs/hooks-guide.md"
+    title: "Hooks cookbook"
+    description: "Practical examples and patterns for hooks"
+    difficulty: intermediate
+    authority: tutorial
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: extensibility
+      key_topics:
+        - "hook patterns"
+        - "auto-formatting"
+        - "notifications"
+        - "security controls"
+      unique_value: "Practical hook examples ready for copy-paste"
+    related:
+      prerequisites: ["hooks"]
+      complements: ["best-practices"]
+      advanced_topics: []
+
+  mcp:
+    local_path: "_sources/cc-docs/mcp.md"
+    title: "MCP servers"
+    description: "Extend Claude with Model Context Protocol servers"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: extensibility
+      key_topics:
+        - "MCP configuration"
+        - "server types"
+        - "tool exposure"
+        - "managed MCP"
+      unique_value: "Complete MCP integration guide"
+    related:
+      prerequisites: ["overview"]
+      complements: ["plugins", "skills"]
+      advanced_topics: []
+
+  plugins:
+    local_path: "_sources/cc-docs/plugins.md"
+    title: "Plugins overview"
+    description: "Introduction to the plugin system for extending Claude Code"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: extensibility
+      key_topics:
+        - "plugin concepts"
+        - "installation"
+        - "configuration"
+      unique_value: "Plugin system introduction"
+    related:
+      prerequisites: ["features-overview"]
+      complements: ["discover-plugins"]
+      advanced_topics: ["plugins-reference", "plugin-marketplaces"]
+
+  plugins-reference:
+    local_path: "_sources/cc-docs/plugins-reference.md"
+    title: "Plugin development reference"
+    description: "Complete reference for building plugins"
+    difficulty: advanced
+    authority: reference
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: extensibility
+      key_topics:
+        - "plugin API"
+        - "tool hooks"
+        - "context providers"
+        - "permissions"
+      unique_value: "Definitive plugin development guide"
+    related:
+      prerequisites: ["plugins"]
+      complements: ["plugin-marketplaces"]
+      advanced_topics: []
+
+  discover-plugins:
+    local_path: "_sources/cc-docs/discover-plugins.md"
+    title: "Discover plugins"
+    description: "Find and install plugins from marketplaces"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: false
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: extensibility
+      key_topics:
+        - "plugin discovery"
+        - "marketplace browsing"
+        - "installation"
+      unique_value: "Plugin discovery and installation guide"
+    related:
+      prerequisites: ["plugins"]
+      complements: ["plugin-marketplaces"]
+      advanced_topics: []
+
+  plugin-marketplaces:
+    local_path: "_sources/cc-docs/plugin-marketplaces.md"
+    title: "Plugin marketplaces"
+    description: "Create and manage plugin distribution marketplaces"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: extensibility
+      key_topics:
+        - "marketplace creation"
+        - "plugin distribution"
+        - "version management"
+      unique_value: "Marketplace operator guide"
+    related:
+      prerequisites: ["plugins-reference"]
+      complements: ["discover-plugins"]
+      advanced_topics: []
+
+  agent-teams:
+    local_path: "_sources/cc-docs/agent-teams.md"
+    title: "Multi-agent coordination"
+    description: "Coordinate multiple Claude Code instances for complex tasks"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: true
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: automation
+      key_topics:
+        - "multi-agent patterns"
+        - "orchestration"
+        - "task distribution"
+        - "headless coordination"
+      unique_value: "Advanced multi-agent coordination patterns"
+    related:
+      prerequisites: ["sub-agents", "headless"]
+      complements: ["github-actions"]
+      advanced_topics: []
+
+  # === IDE INTEGRATION ===
+
+  vs-code:
+    local_path: "_sources/cc-docs/vs-code.md"
+    title: "VS Code integration"
+    description: "Use Claude Code within Visual Studio Code"
+    difficulty: beginner
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: false
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: ide_integration
+      key_topics:
+        - "extension installation"
+        - "workspace integration"
+        - "terminal embedding"
+      unique_value: "VS Code-specific integration guide"
+    related:
+      prerequisites: ["setup"]
+      complements: ["jetbrains", "terminal-config"]
+      advanced_topics: []
+
+  jetbrains:
+    local_path: "_sources/cc-docs/jetbrains.md"
+    title: "JetBrains IDEs integration"
+    description: "Use Claude Code within IntelliJ, PyCharm, and other JetBrains IDEs"
+    difficulty: beginner
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: ide_integration
+      key_topics:
+        - "plugin installation"
+        - "IDE configuration"
+        - "WSL integration"
+      unique_value: "JetBrains-specific integration guide"
+    related:
+      prerequisites: ["setup"]
+      complements: ["vs-code", "terminal-config"]
+      advanced_topics: ["troubleshooting"]
+
+  desktop:
+    local_path: "_sources/cc-docs/desktop.md"
+    title: "Desktop integration"
+    description: "Launch Claude Code from system interfaces and global shortcuts"
+    difficulty: beginner
+    authority: official
+    completeness: partial
+    quality:
+      score: 3
+      has_examples: true
+      has_warnings: false
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: ide_integration
+      key_topics:
+        - "system integration"
+        - "global shortcuts"
+        - "launcher configuration"
+      unique_value: "OS-level integration options"
+    related:
+      prerequisites: ["setup"]
+      complements: ["terminal-config"]
+      advanced_topics: []
+
+  terminal-config:
+    local_path: "_sources/cc-docs/terminal-config.md"
+    title: "Optimize your terminal setup"
+    description: "Configure terminal for optimal Claude Code experience"
+    difficulty: beginner
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: false
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: ide_integration
+      key_topics:
+        - "terminal themes"
+        - "line breaks"
+        - "notifications"
+        - "vim mode"
+      unique_value: "Terminal optimization tips"
+    related:
+      prerequisites: ["setup"]
+      complements: ["interactive-mode", "keybindings"]
+      advanced_topics: []
+
+  chrome:
+    local_path: "_sources/cc-docs/chrome.md"
+    title: "Chrome browser integration"
+    description: "Control Chrome browser for web automation tasks"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: ide_integration
+      key_topics:
+        - "browser control"
+        - "web automation"
+        - "debugging"
+      unique_value: "Web browser integration for automation"
+    related:
+      prerequisites: ["setup"]
+      complements: ["common-workflows"]
+      advanced_topics: []
+
+  # === CLOUD PROVIDERS ===
+
+  amazon-bedrock:
+    local_path: "_sources/cc-docs/amazon-bedrock.md"
+    title: "Amazon Bedrock"
+    description: "Configure Claude Code with Amazon Bedrock"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: cloud_providers
+      key_topics:
+        - "IAM configuration"
+        - "credential setup"
+        - "model regions"
+        - "cross-region inference"
+      unique_value: "AWS Bedrock integration guide"
+    related:
+      prerequisites: ["authentication"]
+      complements: ["google-vertex-ai", "microsoft-foundry"]
+      advanced_topics: ["llm-gateway", "network-config"]
+
+  google-vertex-ai:
+    local_path: "_sources/cc-docs/google-vertex-ai.md"
+    title: "Google Vertex AI"
+    description: "Configure Claude Code with Google Vertex AI"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: cloud_providers
+      key_topics:
+        - "GCP IAM"
+        - "service accounts"
+        - "regional configuration"
+      unique_value: "GCP Vertex AI integration guide"
+    related:
+      prerequisites: ["authentication"]
+      complements: ["amazon-bedrock", "microsoft-foundry"]
+      advanced_topics: ["llm-gateway", "network-config"]
+
+  microsoft-foundry:
+    local_path: "_sources/cc-docs/microsoft-foundry.md"
+    title: "Microsoft Foundry"
+    description: "Configure Claude Code with Microsoft Foundry"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: cloud_providers
+      key_topics:
+        - "Azure configuration"
+        - "Entra ID authentication"
+        - "API keys"
+      unique_value: "Azure Foundry integration guide"
+    related:
+      prerequisites: ["authentication"]
+      complements: ["amazon-bedrock", "google-vertex-ai"]
+      advanced_topics: ["llm-gateway", "network-config"]
+
+  third-party-integrations:
+    local_path: "_sources/cc-docs/third-party-integrations.md"
+    title: "Enterprise deployment overview"
+    description: "Compare deployment options and configure enterprise integrations"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: false
+      has_code_samples: true
+      has_diagrams: true
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: enterprise
+      key_topics:
+        - "deployment comparison"
+        - "proxy configuration"
+        - "LLM gateway"
+        - "enterprise best practices"
+      unique_value: "Enterprise deployment decision guide"
+    related:
+      prerequisites: ["authentication"]
+      complements: ["amazon-bedrock", "google-vertex-ai", "microsoft-foundry"]
+      advanced_topics: ["network-config", "llm-gateway"]
+
+  # === ENTERPRISE / SECURITY ===
+
+  permissions:
+    local_path: "_sources/cc-docs/permissions.md"
+    title: "Permissions"
+    description: "Manage tool permissions and approval workflows"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: enterprise
+      key_topics:
+        - "permission rules"
+        - "approval modes"
+        - "managed permissions"
+        - "scope hierarchy"
+      unique_value: "Complete permission system reference"
+    related:
+      prerequisites: ["settings"]
+      complements: ["security", "sandboxing"]
+      advanced_topics: []
+
+  security:
+    local_path: "_sources/cc-docs/security.md"
+    title: "Security"
+    description: "Security architecture and best practices"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: enterprise
+      key_topics:
+        - "security model"
+        - "managed settings"
+        - "audit logging"
+        - "compliance"
+      unique_value: "Security architecture and enterprise controls"
+    related:
+      prerequisites: ["permissions"]
+      complements: ["sandboxing", "legal-and-compliance"]
+      advanced_topics: []
+
+  sandboxing:
+    local_path: "_sources/cc-docs/sandboxing.md"
+    title: "Sandboxing"
+    description: "Isolate code execution in secure sandboxes"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: enterprise
+      key_topics:
+        - "sandbox modes"
+        - "platform support"
+        - "network isolation"
+        - "file system restrictions"
+      unique_value: "Sandbox configuration and security isolation"
+    related:
+      prerequisites: ["permissions", "security"]
+      complements: ["devcontainer"]
+      advanced_topics: []
+
+  llm-gateway:
+    local_path: "_sources/cc-docs/llm-gateway.md"
+    title: "LLM gateway configuration"
+    description: "Route Claude Code traffic through LLM gateways and proxies"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: enterprise
+      key_topics:
+        - "LiteLLM integration"
+        - "gateway configuration"
+        - "authentication passthrough"
+        - "provider routing"
+      unique_value: "LLM gateway and proxy configuration"
+    related:
+      prerequisites: ["third-party-integrations"]
+      complements: ["network-config"]
+      advanced_topics: []
+
+  network-config:
+    local_path: "_sources/cc-docs/network-config.md"
+    title: "Enterprise network configuration"
+    description: "Configure proxies, CA certificates, and mTLS for enterprise networks"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: enterprise
+      key_topics:
+        - "HTTP proxy"
+        - "CA certificates"
+        - "mTLS"
+        - "network troubleshooting"
+      unique_value: "Enterprise network configuration reference"
+    related:
+      prerequisites: ["third-party-integrations"]
+      complements: ["llm-gateway"]
+      advanced_topics: []
+
+  legal-and-compliance:
+    local_path: "_sources/cc-docs/legal-and-compliance.md"
+    title: "Legal and compliance"
+    description: "Legal agreements, BAA availability, and compliance information"
+    difficulty: beginner
+    authority: official
+    completeness: partial
+    quality:
+      score: 3
+      has_examples: false
+      has_warnings: true
+      has_code_samples: false
+      has_diagrams: false
+      actionable: false
+    synthesis:
+      target_audience: beginner
+      domain: enterprise
+      key_topics:
+        - "terms of service"
+        - "BAA"
+        - "compliance"
+      unique_value: "Legal and compliance reference"
+    related:
+      prerequisites: []
+      complements: ["security", "data-usage"]
+      advanced_topics: []
+
+  data-usage:
+    local_path: "_sources/cc-docs/data-usage.md"
+    title: "Data and privacy"
+    description: "Data retention, training policies, and telemetry controls"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: false
+      has_warnings: true
+      has_code_samples: false
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: enterprise
+      key_topics:
+        - "data retention"
+        - "training policy"
+        - "telemetry"
+        - "privacy controls"
+      unique_value: "Data handling and privacy configuration"
+    related:
+      prerequisites: ["security"]
+      complements: ["legal-and-compliance"]
+      advanced_topics: []
+
+  monitoring-usage:
+    local_path: "_sources/cc-docs/monitoring-usage.md"
+    title: "Monitoring and telemetry"
+    description: "Configure OpenTelemetry metrics and events for monitoring"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: enterprise
+      key_topics:
+        - "OpenTelemetry setup"
+        - "metrics collection"
+        - "event tracking"
+        - "observability"
+      unique_value: "Enterprise monitoring and observability setup"
+    related:
+      prerequisites: ["settings"]
+      complements: ["analytics"]
+      advanced_topics: []
+
+  # === AUTOMATION / CI/CD ===
+
+  headless:
+    local_path: "_sources/cc-docs/headless.md"
+    title: "Non-interactive mode"
+    description: "Run Claude Code in headless/non-interactive mode for automation"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: automation
+      key_topics:
+        - "headless execution"
+        - "CLI flags"
+        - "output formats"
+        - "automation patterns"
+      unique_value: "Non-interactive automation reference"
+    related:
+      prerequisites: ["cli-reference"]
+      complements: ["github-actions", "gitlab-ci-cd"]
+      advanced_topics: ["agent-teams"]
+
+  github-actions:
+    local_path: "_sources/cc-docs/github-actions.md"
+    title: "GitHub Actions"
+    description: "Run Claude Code in GitHub Actions workflows"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: automation
+      key_topics:
+        - "workflow configuration"
+        - "secrets management"
+        - "PR automation"
+        - "issue automation"
+      unique_value: "GitHub Actions integration guide"
+    related:
+      prerequisites: ["headless"]
+      complements: ["gitlab-ci-cd"]
+      advanced_topics: ["agent-teams"]
+
+  gitlab-ci-cd:
+    local_path: "_sources/cc-docs/gitlab-ci-cd.md"
+    title: "GitLab CI/CD"
+    description: "Run Claude Code in GitLab pipelines"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: automation
+      key_topics:
+        - "pipeline configuration"
+        - "CI variables"
+        - "MR automation"
+      unique_value: "GitLab CI/CD integration guide"
+    related:
+      prerequisites: ["headless"]
+      complements: ["github-actions"]
+      advanced_topics: ["agent-teams"]
+
+  devcontainer:
+    local_path: "_sources/cc-docs/devcontainer.md"
+    title: "Dev containers"
+    description: "Run Claude Code in development containers"
+    difficulty: advanced
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: advanced
+      domain: automation
+      key_topics:
+        - "devcontainer.json"
+        - "Docker integration"
+        - "VS Code remote"
+      unique_value: "Development container configuration"
+    related:
+      prerequisites: ["setup", "sandboxing"]
+      complements: ["vs-code"]
+      advanced_topics: []
+
+  # === PLATFORM FEATURES ===
+
+  checkpointing:
+    local_path: "_sources/cc-docs/checkpointing.md"
+    title: "Checkpointing and resuming"
+    description: "Save, restore, and rewind Claude Code sessions"
+    difficulty: beginner
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: false
+      has_code_samples: false
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: platform
+      key_topics:
+        - "session checkpoints"
+        - "rewind functionality"
+        - "summarization"
+      unique_value: "Session state management"
+    related:
+      prerequisites: ["quickstart"]
+      complements: ["interactive-mode"]
+      advanced_topics: []
+
+  fast-mode:
+    local_path: "_sources/cc-docs/fast-mode.md"
+    title: "Fast mode"
+    description: "Enable faster responses with optimized model configuration"
+    difficulty: intermediate
+    authority: official
+    completeness: partial
+    quality:
+      score: 3
+      has_examples: true
+      has_warnings: true
+      has_code_samples: false
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: platform
+      key_topics:
+        - "fast mode toggle"
+        - "performance tradeoffs"
+      unique_value: "Speed optimization feature"
+    related:
+      prerequisites: ["model-config"]
+      complements: ["costs"]
+      advanced_topics: []
+
+  costs:
+    local_path: "_sources/cc-docs/costs.md"
+    title: "Costs and usage"
+    description: "Track costs, manage usage, and optimize token consumption"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: true
+      has_code_samples: false
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: platform
+      key_topics:
+        - "cost tracking"
+        - "rate limits"
+        - "token optimization"
+        - "team budgets"
+      unique_value: "Cost management and optimization"
+    related:
+      prerequisites: ["overview"]
+      complements: ["analytics", "model-config"]
+      advanced_topics: []
+
+  analytics:
+    local_path: "_sources/cc-docs/analytics.md"
+    title: "Analytics"
+    description: "Team usage analytics and PR attribution for Teams/Enterprise"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: false
+      has_code_samples: false
+      has_diagrams: true
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: platform
+      key_topics:
+        - "usage dashboard"
+        - "PR attribution"
+        - "contribution metrics"
+      unique_value: "Team analytics and attribution"
+    related:
+      prerequisites: ["costs"]
+      complements: ["monitoring-usage"]
+      advanced_topics: []
+
+  claude-code-on-the-web:
+    local_path: "_sources/cc-docs/claude-code-on-the-web.md"
+    title: "Claude Code on the web"
+    description: "Run Claude Code in the cloud via claude.ai"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 4
+      has_examples: true
+      has_warnings: true
+      has_code_samples: false
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: platform
+      key_topics:
+        - "web interface"
+        - "teleport functionality"
+        - "session sharing"
+        - "GitHub integration"
+      unique_value: "Cloud-based Claude Code usage"
+    related:
+      prerequisites: ["overview"]
+      complements: ["slack"]
+      advanced_topics: []
+
+  slack:
+    local_path: "_sources/cc-docs/slack.md"
+    title: "Claude Code in Slack"
+    description: "Delegate coding tasks directly from Slack"
+    difficulty: intermediate
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: false
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: intermediate
+      domain: platform
+      key_topics:
+        - "Slack integration"
+        - "routing modes"
+        - "repository selection"
+        - "session flow"
+      unique_value: "Slack-based Claude Code invocation"
+    related:
+      prerequisites: ["claude-code-on-the-web"]
+      complements: []
+      advanced_topics: []
+
+  # === TROUBLESHOOTING ===
+
+  troubleshooting:
+    local_path: "_sources/cc-docs/troubleshooting.md"
+    title: "Troubleshooting"
+    description: "Solutions to common installation and usage issues"
+    difficulty: beginner
+    authority: official
+    completeness: comprehensive
+    quality:
+      score: 5
+      has_examples: true
+      has_warnings: true
+      has_code_samples: true
+      has_diagrams: false
+      actionable: true
+    synthesis:
+      target_audience: beginner
+      domain: getting_started
+      key_topics:
+        - "installation issues"
+        - "Windows/WSL problems"
+        - "authentication issues"
+        - "IDE integration issues"
+        - "configuration reset"
+      unique_value: "Problem-solving reference for common issues"
+    related:
+      prerequisites: ["setup"]
+      complements: ["terminal-config", "jetbrains"]
+      advanced_topics: []
+
+# Topic clusters with learning paths
+clusters:
+  getting_started:
+    name: "Getting Started"
+    description: "Essential docs for new Claude Code users"
+    difficulty: beginner
+    docs:
+      - overview
+      - quickstart
+      - setup
+      - authentication
+      - how-claude-code-works
+      - interactive-mode
+      - cli-reference
+      - common-workflows
+      - best-practices
+      - troubleshooting
+    learning_path:
+      - overview
+      - quickstart
+      - setup
+      - interactive-mode
+      - common-workflows
+      - best-practices
+
+  configuration:
+    name: "Configuration"
+    description: "Settings, memory, and customization"
+    difficulty: intermediate
+    docs:
+      - memory
+      - settings
+      - model-config
+      - keybindings
+      - output-styles
+      - statusline
+    learning_path:
+      - memory
+      - settings
+      - model-config
+      - keybindings
+
+  extensibility:
+    name: "Extensibility"
+    description: "Extend Claude Code with skills, agents, hooks, MCP, and plugins"
+    difficulty: intermediate
+    docs:
+      - features-overview
+      - skills
+      - sub-agents
+      - hooks
+      - hooks-guide
+      - mcp
+      - plugins
+      - plugins-reference
+      - discover-plugins
+      - plugin-marketplaces
+    learning_path:
+      - features-overview
+      - skills
+      - hooks
+      - hooks-guide
+      - sub-agents
+      - mcp
+      - plugins
+      - plugins-reference
+
+  ide_integration:
+    name: "IDE Integration"
+    description: "Use Claude Code with your IDE"
+    difficulty: beginner
+    docs:
+      - vs-code
+      - jetbrains
+      - desktop
+      - terminal-config
+      - chrome
+    learning_path:
+      - terminal-config
+      - vs-code
+      - jetbrains
+      - chrome
+
+  cloud_providers:
+    name: "Cloud Providers"
+    description: "Deploy Claude Code via cloud infrastructure"
+    difficulty: advanced
+    docs:
+      - amazon-bedrock
+      - google-vertex-ai
+      - microsoft-foundry
+      - third-party-integrations
+    learning_path:
+      - third-party-integrations
+      - amazon-bedrock
+      - google-vertex-ai
+      - microsoft-foundry
+
+  enterprise:
+    name: "Enterprise & Security"
+    description: "Security, compliance, and enterprise deployment"
+    difficulty: advanced
+    docs:
+      - permissions
+      - security
+      - sandboxing
+      - llm-gateway
+      - network-config
+      - legal-and-compliance
+      - data-usage
+      - monitoring-usage
+    learning_path:
+      - permissions
+      - security
+      - sandboxing
+      - network-config
+      - llm-gateway
+      - monitoring-usage
+
+  automation:
+    name: "CI/CD & Automation"
+    description: "Automated workflows and multi-agent coordination"
+    difficulty: advanced
+    docs:
+      - headless
+      - github-actions
+      - gitlab-ci-cd
+      - devcontainer
+      - agent-teams
+    learning_path:
+      - headless
+      - github-actions
+      - gitlab-ci-cd
+      - agent-teams
+
+  platform:
+    name: "Platform Features"
+    description: "Web interface, costs, and platform capabilities"
+    difficulty: intermediate
+    docs:
+      - checkpointing
+      - fast-mode
+      - costs
+      - analytics
+      - claude-code-on-the-web
+      - slack
+    learning_path:
+      - checkpointing
+      - costs
+      - analytics
+      - claude-code-on-the-web
+
+# Documents that failed validation or are not proper markdown
+failed:
+  - slug: changelog
+    local_path: "_sources/cc-docs/changelog.md"
+    error: "File contains HTML content (GitHub page), not markdown documentation"
+    note: "This appears to be a raw HTML dump of the GitHub releases page, not a proper markdown doc"
