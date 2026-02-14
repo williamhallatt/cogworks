@@ -1,0 +1,214 @@
+name: Release Cogworks Agent & Skills
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Validate cogworks agent exists
+        run: |
+          if [ ! -f ".claude/agents/cogworks.md" ]; then
+            echo "ERROR: cogworks agent not found at .claude/agents/cogworks.md"
+            exit 1
+          fi
+          echo "✓ cogworks agent found"
+
+      - name: Validate cogworks-* skills exist
+        run: |
+          SKILLS_DIR=".claude/skills"
+          FOUND_SKILLS=()
+
+          # Find all cogworks-* skill directories
+          for skill_dir in "$SKILLS_DIR"/cogworks-*/; do
+            if [ -d "$skill_dir" ]; then
+              skill_name=$(basename "$skill_dir")
+
+              # Check for required SKILL.md file
+              if [ ! -f "$skill_dir/SKILL.md" ]; then
+                echo "ERROR: SKILL.md not found in $skill_name"
+                exit 1
+              fi
+
+              FOUND_SKILLS+=("$skill_name")
+              echo "✓ $skill_name (SKILL.md present)"
+            fi
+          done
+
+          if [ ${#FOUND_SKILLS[@]} -eq 0 ]; then
+            echo "WARNING: No cogworks-* skills found"
+          else
+            echo "Found ${#FOUND_SKILLS[@]} cogworks-* skill(s): ${FOUND_SKILLS[@]}"
+          fi
+
+      - name: Validate SKILL.md frontmatter syntax
+        run: |
+          set +e
+          ERROR_COUNT=0
+
+          for skill_file in .claude/skills/cogworks-*/SKILL.md; do
+            if [ -f "$skill_file" ]; then
+              # Extract frontmatter (lines between first and second ---)
+              if head -1 "$skill_file" | grep -q "^---$"; then
+                # Simple check: file starts with --- and has closing ---
+                if tail -n +2 "$skill_file" | grep -q "^---$"; then
+                  echo "✓ $skill_file frontmatter syntax valid"
+                else
+                  echo "ERROR: Missing closing --- in $skill_file"
+                  ((ERROR_COUNT++))
+                fi
+              else
+                echo "ERROR: $skill_file does not start with ---"
+                ((ERROR_COUNT++))
+              fi
+            fi
+          done
+
+          if [ $ERROR_COUNT -gt 0 ]; then
+            echo "Found $ERROR_COUNT SKILL.md validation error(s)"
+            exit 1
+          fi
+          set -e
+
+      - name: Verify cogworks agent dependencies
+        run: |
+          echo "Checking cogworks agent dependencies..."
+
+          # Look for references to cogworks-encode and cogworks-learn in agent file
+          if grep -q "cogworks-encode" ".claude/agents/cogworks.md"; then
+            echo "✓ cogworks-encode dependency declared"
+          else
+            echo "WARNING: cogworks-encode dependency not found in agent (may be referenced differently)"
+          fi
+
+          if grep -q "cogworks-learn" ".claude/agents/cogworks.md"; then
+            echo "✓ cogworks-learn dependency declared"
+          else
+            echo "WARNING: cogworks-learn dependency not found in agent (may be referenced differently)"
+          fi
+
+      - name: Create release artifact
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          ARTIFACT_NAME="cogworks-${VERSION}"
+
+          # Create temporary directory structure
+          mkdir -p "${ARTIFACT_NAME}/.claude/agents"
+          mkdir -p "${ARTIFACT_NAME}/.claude/skills"
+
+          # Copy agent
+          cp ".claude/agents/cogworks.md" "${ARTIFACT_NAME}/.claude/agents/"
+
+          # Copy all cogworks-* skills
+          for skill_dir in .claude/skills/cogworks-*/; do
+            skill_name=$(basename "$skill_dir")
+            cp -r "$skill_dir" "${ARTIFACT_NAME}/.claude/skills/"
+            echo "Packaged: $skill_name"
+          done
+
+          # Copy documentation and licensing
+          cp README.md "${ARTIFACT_NAME}/"
+          cp LICENSE "${ARTIFACT_NAME}/"
+          cp INSTALL.md "${ARTIFACT_NAME}/" 2>/dev/null || echo "Note: INSTALL.md not found"
+
+          # Generate file list for release notes
+          echo "## Release Contents" > release-contents.txt
+          echo "" >> release-contents.txt
+          echo "### Agent" >> release-contents.txt
+          echo "- cogworks" >> release-contents.txt
+          echo "" >> release-contents.txt
+          echo "### Skills Included" >> release-contents.txt
+          for skill_dir in .claude/skills/cogworks-*/; do
+            skill_name=$(basename "$skill_dir")
+            echo "- ${skill_name}" >> release-contents.txt
+          done
+
+          # Create archives
+          tar -czf "${ARTIFACT_NAME}.tar.gz" "${ARTIFACT_NAME}/"
+          zip -r -q "${ARTIFACT_NAME}.zip" "${ARTIFACT_NAME}/"
+
+          echo "artifact_name=${ARTIFACT_NAME}" >> $GITHUB_ENV
+
+          # Show what was packaged
+          echo ""
+          echo "=== Release Artifact Created ==="
+          echo "Name: ${ARTIFACT_NAME}"
+          echo "Archives:"
+          ls -lh "${ARTIFACT_NAME}".{tar.gz,zip}
+          echo ""
+          echo "Contents:"
+          tar -tzf "${ARTIFACT_NAME}.tar.gz" | head -20
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          TAG=${{ steps.version.outputs.tag }}
+          ARTIFACT_NAME=${{ env.artifact_name }}
+
+          # Generate release notes
+          RELEASE_NOTES=$(cat <<'EOF'
+          ## Installation
+
+          Extract the archive and copy the `.claude/` directory into your Claude Code project:
+
+          ```bash
+          tar -xzf ${{ env.artifact_name }}.tar.gz
+          cp -r ${{ env.artifact_name }}/.claude/* your-project/.claude/
+          ```
+
+          Or for zip:
+          ```bash
+          unzip ${{ env.artifact_name }}.zip
+          cp -r ${{ env.artifact_name }}/.claude/* your-project/.claude/
+          ```
+
+          ## What's Included
+
+          - **cogworks** agent for automated skill generation and synthesis
+          - **cogworks-* skills**: All dependency skills required by the cogworks agent
+
+          See [INSTALL.md](${{ env.artifact_name }}/INSTALL.md) for detailed setup instructions.
+
+          ## Dependencies
+
+          The cogworks agent requires:
+          - `cogworks-encode` - Skill synthesis methodology
+          - `cogworks-learn` - Skill authoring expertise
+
+          Both are included in this release.
+          EOF
+          )
+
+          # Create release with both archive types
+          gh release create "${TAG}" \
+            "${ARTIFACT_NAME}.tar.gz" \
+            "${ARTIFACT_NAME}.zip" \
+            --title "Cogworks v${VERSION}" \
+            --notes "${RELEASE_NOTES}" \
+            --draft=false
+
+      - name: Verify release creation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=${{ steps.version.outputs.tag }}
+          echo "Release created for tag: ${TAG}"
+          gh release view "${TAG}" --json assets
