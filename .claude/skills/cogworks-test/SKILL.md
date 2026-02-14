@@ -26,10 +26,9 @@ Validates that generated skills meet quality requirements through three-layer gr
 
 ## Knowledge Base Summary
 
-- **Layered grading prevents waste** - $0.00001 deterministic checks filter failures before $1.50 LLM evaluation (150,000× cost difference)
+- **Three-layer grading prevents waste** - Fast deterministic ($0.00001) → LLM-judge ($1.50) → human review ($100, only when needed). 150,000× cost difference between layers justifies the architecture
 - **Five weighted quality dimensions** - Source fidelity (30%), self-sufficiency (25%), completeness (20%), specificity (15%), no overlap (10%)
 - **Success threshold is 0.85** - Overall score ≥0.85 with zero critical failures required to pass
-- **Three-layer architecture** - Fast deterministic → moderate LLM-judge → expensive human review (only when needed)
 - **Test data organization** - Golden samples (regression), negative controls (should fail), edge cases (boundary conditions)
 - **Integration ready** - Automatically invoked via `@cogworks encode --test` flag
 
@@ -88,7 +87,7 @@ Framework is working correctly when:
 
 **Full knowledge base**: [reference.md](reference.md) - Complete methodology, rubrics, configuration, troubleshooting
 
-**Testing patterns**: [patterns.md](patterns.md) - Layered grading, weighted scoring, machine + human readable outputs
+**Testing patterns**: [patterns.md](patterns.md) - Reusable patterns: layered grading, weighted scoring, dual-format reporting, regression, negative controls
 
 **Usage examples**: [examples.md](examples.md) - Concrete test scenarios, calibration workflows, regression testing
 

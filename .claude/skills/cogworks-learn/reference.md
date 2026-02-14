@@ -20,7 +20,7 @@ Claude Code Skills are SKILL.md files that extend Claude's capabilities through 
 
 ## Related Files
 
-- [patterns.md](patterns.md) - 10 reusable patterns + 8 anti-patterns
+- [patterns.md](patterns.md) - 10 reusable patterns + 9 anti-patterns
 - [examples.md](examples.md) - 12 complete practical examples
 
 ---
@@ -91,6 +91,17 @@ my-skill/
 **Definition:** Keep SKILL.md focused (~100-500 lines) with detailed reference material in supporting files. Claude loads additional files on-demand when needed.
 
 **Why:** Context window is a public good. Large skills consume tokens that could go to user messages or other skills.
+
+**File uniqueness criteria:** Each supporting file must contribute information not present in other files. If a file just reformats content from reference.md, it wastes context rather than saving it.
+
+| File | Contains | Does NOT contain |
+|------|----------|-----------------|
+| SKILL.md | Overview, decision framework, file index | Detailed procedures or config values |
+| reference.md | Domain-specific concepts, procedures, configuration, rubrics | Transferable patterns or usage scenarios |
+| patterns.md | Transferable patterns that generalize beyond the domain | Domain procedures already in reference.md |
+| examples.md | Usage scenarios that add context beyond reference | Walkthroughs of documented procedures |
+
+**Test:** If removing a supporting file would lose no unique information (everything is in reference.md), that file should not exist.
 
 **Pattern:**
 ```markdown
