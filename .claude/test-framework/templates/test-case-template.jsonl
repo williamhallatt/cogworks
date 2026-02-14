@@ -1,0 +1,32 @@
+{"id": "struct-001", "type": "synthesis_structure", "category": "deterministic", "check": "has_tldr_section", "expected": true, "description": "Synthesis must include TL;DR section"}
+{"id": "struct-002", "type": "synthesis_structure", "category": "deterministic", "check": "concept_count", "expected": {"min": 5, "max": 10}, "description": "Synthesis should identify 5-10 key concepts"}
+{"id": "struct-003", "type": "synthesis_structure", "category": "deterministic", "check": "pattern_count", "expected": {"min": 5, "max": 10}, "description": "Synthesis should identify 5-10 patterns"}
+{"id": "struct-004", "type": "synthesis_structure", "category": "deterministic", "check": "tldr_word_count", "expected": {"min": 50, "max": 150}, "description": "TL;DR should be 50-150 words"}
+{"id": "struct-005", "type": "synthesis_structure", "category": "deterministic", "check": "has_conflicts_section", "expected": true, "description": "Synthesis should flag source contradictions if present"}
+{"id": "skill-001", "type": "skill_structure", "category": "deterministic", "check": "skill_md_exists", "expected": true, "description": "SKILL.md file must exist"}
+{"id": "skill-002", "type": "skill_structure", "category": "deterministic", "check": "frontmatter_valid", "expected": true, "description": "Frontmatter must be valid YAML"}
+{"id": "skill-003", "type": "skill_structure", "category": "deterministic", "check": "has_user_invocable_field", "expected": true, "description": "Frontmatter must include name field"}
+{"id": "skill-004", "type": "skill_structure", "category": "deterministic", "check": "has_description_field", "expected": true, "description": "Frontmatter must include description field"}
+{"id": "skill-005", "type": "skill_structure", "category": "deterministic", "check": "skill_md_line_count", "expected": {"max": 500}, "description": "SKILL.md must not exceed 500 lines"}
+{"id": "skill-006", "type": "skill_structure", "category": "deterministic", "check": "supporting_file_threshold", "expected": {"min_entries": 3}, "description": "Supporting files should only exist if they have 3+ entries"}
+{"id": "skill-007", "type": "skill_structure", "category": "deterministic", "check": "description_keyword_count", "expected": {"min": 3}, "description": "Description should contain 3+ keywords for discoverability"}
+{"id": "fidelity-001", "type": "source_fidelity", "category": "llm_judge", "check": "citation_coverage", "expected": {"min": 0.95}, "description": "95%+ of claims must be traceable to sources"}
+{"id": "fidelity-002", "type": "source_fidelity", "category": "llm_judge", "check": "no_fabrication", "expected": true, "description": "No fabricated claims not supported by sources"}
+{"id": "fidelity-003", "type": "source_fidelity", "category": "llm_judge", "check": "contradictions_flagged", "expected": true, "description": "Source contradictions must be explicitly noted"}
+{"id": "fidelity-004", "type": "source_fidelity", "category": "llm_judge", "check": "citation_format", "expected": true, "description": "Citations should use consistent format"}
+{"id": "quality-001", "type": "content_quality", "category": "llm_judge", "check": "self_sufficiency_score", "expected": {"min": 4.0}, "description": "Skill must be understandable without external context"}
+{"id": "quality-002", "type": "content_quality", "category": "llm_judge", "check": "completeness_score", "expected": {"min": 4.0}, "description": "Stated scope must be fully covered"}
+{"id": "quality-003", "type": "content_quality", "category": "llm_judge", "check": "specificity_score", "expected": {"min": 4.0}, "description": "Patterns must be actionable with when/why/how context"}
+{"id": "quality-004", "type": "content_quality", "category": "llm_judge", "check": "no_overlap_score", "expected": {"min": 4.0}, "description": "Skill must provide novel value beyond built-in knowledge"}
+{"id": "invocability-001", "type": "observable_behavior", "category": "invocation_test", "user_request": "Help me deploy to staging", "should_activate": true, "description": "Deployment skill should activate on deployment requests"}
+{"id": "invocability-002", "type": "observable_behavior", "category": "invocation_test", "user_request": "Write unit tests for my function", "should_activate": false, "description": "Deployment skill should NOT activate on testing requests"}
+{"id": "invocability-003", "type": "observable_behavior", "category": "invocation_test", "user_request": "What is the capital of France?", "should_activate": false, "description": "Domain skill should NOT activate on unrelated requests"}
+{"id": "negative-001", "type": "negative_control", "category": "synthesis", "scenario": "insufficient_sources", "expected_outcome": "warn_user", "description": "Should warn when source material is too sparse"}
+{"id": "negative-002", "type": "negative_control", "category": "synthesis", "scenario": "overlapping_builtin", "expected_outcome": "suggest_reconsider", "description": "Should suggest reconsidering when content overlaps with built-in knowledge"}
+{"id": "negative-003", "type": "negative_control", "category": "synthesis", "scenario": "contradictory_only", "expected_outcome": "flag_contradiction", "description": "Should explicitly flag when sources only contradict each other"}
+{"id": "security-001", "type": "security", "category": "deterministic", "check": "no_api_keys", "expected": true, "description": "Skill must not contain hardcoded API keys"}
+{"id": "security-002", "type": "security", "category": "deterministic", "check": "no_passwords", "expected": true, "description": "Skill must not contain hardcoded passwords"}
+{"id": "security-003", "type": "security", "category": "deterministic", "check": "no_command_injection", "expected": true, "description": "Skill must not demonstrate command injection patterns"}
+{"id": "edge-001", "type": "edge_case", "category": "synthesis", "scenario": "single_source", "expected": "valid_synthesis", "description": "Should handle single-source synthesis gracefully"}
+{"id": "edge-002", "type": "edge_case", "category": "synthesis", "scenario": "large_source_set", "expected": "valid_synthesis", "description": "Should handle 5+ sources without context overflow"}
+{"id": "edge-003", "type": "edge_case", "category": "skill", "scenario": "minimal_content", "expected": "valid_skill", "description": "Should create valid skill even with minimal source content"}

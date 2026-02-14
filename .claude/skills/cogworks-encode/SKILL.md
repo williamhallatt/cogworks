@@ -1,6 +1,7 @@
 ---
 name: cogworks-encode
 description: Use when synthesizing multiple sources into coherent knowledge bases, performing multi-source analysis, or creating topic expertise from URLs and files. Also use when encountering content integration tasks requiring connections across disparate materials.
+user-invocable: true
 ---
 
 # Topic Synthesis Expertise

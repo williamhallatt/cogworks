@@ -40,16 +40,26 @@ your-project/
 └── .claude/
     ├── agents/
     │   └── cogworks.md              # Orchestrating agent
-    └── skills/
-        ├── cogworks-encode/         # Synthesis methodology
-        │   ├── SKILL.md
-        │   └── reference.md
-        └── cogworks-learn/          # Skill-writing expertise
-            ├── SKILL.md
-            ├── reference.md
-            ├── patterns.md
-            ├── persuasion-principles.md
-            └── examples.md
+    ├── skills/
+    │   ├── cogworks-encode/         # Synthesis methodology
+    │   │   ├── SKILL.md
+    │   │   └── reference.md
+    │   ├── cogworks-learn/          # Skill-writing expertise
+    │   │   ├── SKILL.md
+    │   │   ├── reference.md
+    │   │   ├── patterns.md
+    │   │   ├── persuasion-principles.md
+    │   │   └── examples.md
+    │   └── cogworks-test/           # Testing and validation
+    │       ├── SKILL.md
+    │       ├── reference.md
+    │       ├── patterns.md
+    │       └── examples.md
+    └── test-framework/              # Testing infrastructure
+        ├── config/
+        ├── graders/
+        ├── templates/
+        └── scripts/
 ```
 
 ## Quick Start
@@ -68,6 +78,9 @@ Where `<command>` could be `encode`, `learn`, or `automate`, `<sources>` can be 
 
 ```bash
 @cogworks encode https://example.com/some-guide
+
+# With automated testing (optional)
+@cogworks encode https://example.com/some-guide --test
 ```
 
 Here's what happens step by step:
@@ -91,7 +104,14 @@ You approve or decline. If you decline, `cogworks` stops.
 
 **6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing.
 
-**7. Done** — `cogworks` confirms the skill location and how to invoke it.
+**6.5. Optional Testing** — If you added the `--test` flag, `cogworks` runs automated quality validation:
+
+- Layer 1: Deterministic checks (structure, syntax, citations) - ~5 seconds
+- Layer 2: LLM-as-judge evaluation (5 quality dimensions) - ~45 seconds
+- Generates detailed validation report with scores and recommendations
+- Cost: ~$1.50 per skill
+
+**7. Done** — `cogworks` confirms the skill location and how to invoke it (with test results if `--test` was used).
 
 Your new skill is now available as `/{slug}` — Claude will auto-discover it whenever the topic comes up, or you can invoke it directly.
 
@@ -108,6 +128,7 @@ Invoke by typing a `@cogworks` command in natural language:
 
 ```bash
 @cogworks encode <sources> as <skill_name>
+@cogworks encode <sources> as <skill_name> --test  # With automated testing
 @cogworks automate <description of what to automate> from <sources>
 ```
 
@@ -149,6 +170,22 @@ Loads expertise on writing Claude Code skills — SKILL.md files, frontmatter co
 /cogworks-learn prompt-optimisation from <reference_doc>
 ```
 
+### `/cogworks-test` — Testing and validation
+
+Validates generated skills through layered grading (deterministic checks, LLM-as-judge, optional human review). Tests synthesis quality, skill structure, source fidelity, and observable behavior.
+
+**When to use independently:** when validating skills after manual edits, running regression tests on golden samples, checking quality before production use, or calibrating LLM-judge accuracy.
+
+**Example invocations:**
+
+```bash
+/cogworks-test deployment-skill
+/cogworks-test my-skill --json
+/cogworks-test my-skill --compare-against tests/datasets/golden-samples/my-skill/
+```
+
+See `.claude/test-framework/README.md` for complete testing documentation.
+
 ## Limitations
 
 Related to my setup that will likely be improved over time:
@@ -156,7 +193,6 @@ Related to my setup that will likely be improved over time:
 - **Claude Code only [FOR NOW]** — output formats specifically target Claude Code structures, may not work well for other agent frameworks without modification
 - **Not portable** — `cogworks` assumes Linux (Ubuntu), edit paths throughout agent and associated skills definitions accordingly
 - **Local creation** — encoded skills are created in `.claude/skills/` within the repo where `cogworks` is used
-- **Manual testing only** — no automated testing of new skills yet, rely on user feedback to identify issues
 - **Agent generation not yet implemented** — `cogworks` for generating sub-agents is planned but not available
 
 Limitations I'm not planning on addressing:

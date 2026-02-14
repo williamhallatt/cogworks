@@ -31,16 +31,52 @@ This roadmap tracks planned work to address current known limitations in no part
 
 ---
 
-## 3. Automated Testing
+## 3. Automated Testing ✅ COMPLETED (2026-02-14)
 
-**Limitation**: No automated testing of new skills. Relies entirely on manual user feedback to identify issues.
+**Previous Limitation**: No automated testing of new skills. Relied entirely on manual user feedback to identify issues.
 
-**Work**:
+**Implemented Solution**:
 
-- Design a testing strategy for validating synthesis output quality
-- Build a test harness that can verify skill structure and correctness
-- Add regression tests for known-good synthesis scenarios
-- Consider snapshot-style testing for reference.md output stability
+A comprehensive testing framework using layered grading methodology from the skill-evaluation skill:
+
+- **Layer 1: Deterministic checks** - Bash script for fast structural validation (structure, syntax, citations, line counts)
+- **Layer 2: LLM-as-judge** - Claude Opus 4.6 evaluates content quality across 5 dimensions with weighted scoring
+- **Layer 3: Human review** - Optional calibration and dispute resolution
+
+**Components Created**:
+
+1. **cogworks-test skill** (`.claude/skills/cogworks-test/`) - Testing orchestration
+2. **Test infrastructure** (`.claude/test-framework/`) - Graders, rubrics, configuration, templates
+3. **Golden samples** (`tests/datasets/golden-samples/`) - Known-good skills for regression testing
+4. **Negative controls** (`tests/datasets/negative-controls/`) - Intentionally flawed scenarios
+5. **Integration** - Added Step 6.5 to cogworks workflow for opt-in testing via `--test` flag
+
+**Quality Dimensions** (from CLAUDE.md requirements):
+- Source Fidelity (30%) - Traceability, no fabrication
+- Self-Sufficiency (25%) - Standalone understanding
+- Completeness (20%) - Scope coverage
+- Specificity (15%) - Actionable patterns
+- No Overlap (10%) - Novel value
+
+**Success Threshold**: Overall score ≥0.85 with zero critical failures
+
+**Usage**:
+```bash
+# Test generated skill
+/cogworks-test deployment-skill
+
+# Generate with testing
+@cogworks encode sources/ --test
+
+# Regression test suite
+for sample in tests/datasets/golden-samples/*/; do
+    /cogworks-test $(basename $sample) --compare-against $sample
+done
+```
+
+**Cost & Performance**: ~$1.50 and <1 minute per skill (Layer 1 + Layer 2)
+
+See `.claude/test-framework/README.md` for complete documentation.
 
 ---
 

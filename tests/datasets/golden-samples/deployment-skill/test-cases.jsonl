@@ -1,0 +1,15 @@
+{"id": "deploy-struct-001", "type": "skill_structure", "category": "deterministic", "check": "skill_md_exists", "expected": true, "description": "SKILL.md file must exist"}
+{"id": "deploy-struct-002", "type": "skill_structure", "category": "deterministic", "check": "frontmatter_valid", "expected": true, "description": "Frontmatter must be valid YAML"}
+{"id": "deploy-struct-003", "type": "skill_structure", "category": "deterministic", "check": "skill_md_line_count", "expected": {"min": 250, "max": 320}, "description": "SKILL.md should be ~287 lines (±10%)"}
+{"id": "deploy-struct-004", "type": "skill_structure", "category": "deterministic", "check": "has_name_field", "expected": true, "description": "Must have name: true"}
+{"id": "deploy-struct-005", "type": "skill_structure", "category": "deterministic", "check": "has_description_field", "expected": true, "description": "Must have description field"}
+{"id": "deploy-struct-006", "type": "skill_structure", "category": "deterministic", "check": "supporting_file_entries", "file": "patterns.md", "expected": {"min": 3}, "description": "patterns.md should have 5 entries (≥3 required)"}
+{"id": "deploy-struct-007", "type": "skill_structure", "category": "deterministic", "check": "supporting_file_entries", "file": "examples.md", "expected": {"min": 3}, "description": "examples.md should have 4 entries (≥3 required)"}
+{"id": "deploy-struct-008", "type": "skill_structure", "category": "deterministic", "check": "citation_count", "expected": {"min": 10}, "description": "Should have ~15 citations (≥10 required)"}
+{"id": "deploy-fidelity-001", "type": "source_fidelity", "category": "llm_judge", "check": "traceability_percentage", "expected": {"min": 0.95}, "description": "95%+ of claims should be traceable"}
+{"id": "deploy-fidelity-002", "type": "source_fidelity", "category": "llm_judge", "check": "no_fabrication", "expected": true, "description": "No fabricated claims"}
+{"id": "deploy-quality-001", "type": "content_quality", "category": "llm_judge", "check": "self_sufficiency_score", "expected": {"min": 3.5}, "description": "Self-sufficiency score should be 4/5"}
+{"id": "deploy-quality-002", "type": "content_quality", "category": "llm_judge", "check": "completeness_score", "expected": {"min": 3.5}, "description": "Completeness score should be 4/5"}
+{"id": "deploy-quality-003", "type": "content_quality", "category": "llm_judge", "check": "specificity_score", "expected": {"min": 3.5}, "description": "Specificity score should be 4/5"}
+{"id": "deploy-invocability-001", "type": "observable_behavior", "category": "invocation_test", "user_request": "Deploy to staging", "should_activate": true, "description": "Should activate on deployment requests"}
+{"id": "deploy-invocability-002", "type": "observable_behavior", "category": "invocation_test", "user_request": "Write unit tests for my function", "should_activate": false, "description": "Should NOT activate on testing requests"}

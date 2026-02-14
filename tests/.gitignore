@@ -1,0 +1,8 @@
+# Test results are timestamped and should not be committed
+results/
+
+# Calibration data may contain sensitive information
+calibration/
+
+# Keep datasets (golden samples, negative controls)
+!datasets/

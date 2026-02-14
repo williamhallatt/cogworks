@@ -1,0 +1,53 @@
+# Expected Outcome: Overlapping Built-in Knowledge
+
+## Scenario Description
+Source material contains only generic coding advice that Claude already knows from training data.
+
+## Expected Behavior
+The cogworks workflow should:
+1. Detect that content overlaps with built-in knowledge
+2. Flag low novelty score during synthesis
+3. Suggest reconsidering whether skill is needed
+4. Warn that skill may not add value
+
+## Expected Warnings
+should_warn: true
+warning_type: "overlapping_builtin"
+warning_messages:
+  - contains: "generic"
+  - contains: "built-in knowledge"
+  - contains: "may not add value"
+
+## Expected Recommendation
+recommendation: "RECONSIDER"
+reason: "Content duplicates Claude's general training"
+
+## Validation Criteria
+If skill is generated despite warning:
+- No overlap score should be low (≤3)
+- Self-sufficiency might be high (content is clear)
+- But overall value justification should fail
+- Overall score may pass structurally but fail on novelty
+
+Expected scores:
+  no_overlap: 2  # Significant overlap
+  value_justification: false
+  recommendation: "RECONSIDER"
+
+## Test Case
+```jsonl
+{"id": "neg-002", "type": "negative_control", "scenario": "overlapping_builtin", "expected_outcome": "suggest_reconsider", "no_overlap_score_max": 3}
+```
+
+## Purpose
+Validates that the framework identifies when a skill would duplicate Claude's existing knowledge, preventing unnecessary skills that don't add value.
+
+## False Positive Risk
+**Low** - Generic advice like "write clear code" is definitively in Claude's training.
+
+If sources contained:
+- Organization-specific coding standards
+- Tool-specific best practices
+- Non-obvious insights
+
+Then it would NOT be overlapping and should pass.
