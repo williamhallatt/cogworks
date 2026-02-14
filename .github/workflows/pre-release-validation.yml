@@ -1,0 +1,155 @@
+name: Pre-Release Validation
+
+on:
+  pull_request:
+    paths:
+      - ".claude/**"
+      - "README.md"
+      - "INSTALL.md"
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate cogworks agent
+        run: |
+          AGENT_FILE=".claude/agents/cogworks.md"
+
+          if [ ! -f "$AGENT_FILE" ]; then
+            echo "ERROR: Agent not found: $AGENT_FILE"
+            exit 1
+          fi
+
+          # Check for YAML frontmatter
+          if ! head -1 "$AGENT_FILE" | grep -q "^---$"; then
+            echo "ERROR: Agent missing YAML frontmatter (should start with ---)"
+            exit 1
+          fi
+
+          # Check for closing ---
+          if ! awk 'NR>1 && /^---$/ {found=1; exit} END {if (!found) exit 1}' "$AGENT_FILE"; then
+            echo "ERROR: Agent YAML frontmatter not closed (missing second ---)"
+            exit 1
+          fi
+
+          echo "✓ Agent file valid: $AGENT_FILE"
+
+      - name: Validate cogworks-* skills
+        run: |
+          set +e
+          ERROR_COUNT=0
+          SKILLS_DIR=".claude/skills"
+
+          if [ ! -d "$SKILLS_DIR" ]; then
+            echo "ERROR: Skills directory not found: $SKILLS_DIR"
+            exit 1
+          fi
+
+          # Check for each cogworks-* skill
+          for skill_dir in "$SKILLS_DIR"/cogworks-*/; do
+            if [ -d "$skill_dir" ]; then
+              skill_name=$(basename "$skill_dir")
+              skill_file="$skill_dir/SKILL.md"
+
+              # Check SKILL.md exists
+              if [ ! -f "$skill_file" ]; then
+                echo "ERROR: $skill_name missing SKILL.md"
+                ((ERROR_COUNT++))
+                continue
+              fi
+
+              # Check frontmatter exists
+              if ! head -1 "$skill_file" | grep -q "^---$"; then
+                echo "ERROR: $skill_name/SKILL.md missing frontmatter opening"
+                ((ERROR_COUNT++))
+                continue
+              fi
+
+              # Check frontmatter closes
+              if ! awk 'NR>1 && /^---$/ {found=1; exit} END {if (!found) exit 1}' "$skill_file"; then
+                echo "ERROR: $skill_name/SKILL.md frontmatter not closed"
+                ((ERROR_COUNT++))
+                continue
+              fi
+
+              # Check for required fields in frontmatter
+              if ! grep -q "^name:" "$skill_file"; then
+                echo "ERROR: $skill_name/SKILL.md missing 'name:' field in frontmatter"
+                ((ERROR_COUNT++))
+                continue
+              fi
+
+              if ! grep -q "^description:" "$skill_file"; then
+                echo "ERROR: $skill_name/SKILL.md missing 'description:' field in frontmatter"
+                ((ERROR_COUNT++))
+                continue
+              fi
+
+              echo "✓ $skill_name (valid)"
+            fi
+          done
+
+          # Warn if no cogworks-* skills found
+          if [ ! "$(ls -A "$SKILLS_DIR"/cogworks-* 2>/dev/null)" ]; then
+            echo "WARNING: No cogworks-* skills found in $SKILLS_DIR"
+          fi
+
+          if [ $ERROR_COUNT -gt 0 ]; then
+            echo ""
+            echo "Found $ERROR_COUNT validation error(s)"
+            exit 1
+          fi
+
+          set -e
+
+      - name: Check for required dependencies
+        run: |
+          AGENT_FILE=".claude/agents/cogworks.md"
+
+          # Check that cogworks-encode is mentioned
+          if ! grep -q "cogworks-encode" "$AGENT_FILE"; then
+            echo "WARNING: cogworks-encode dependency not found in agent"
+          else
+            echo "✓ cogworks-encode dependency declared"
+          fi
+
+          # Check that cogworks-learn is mentioned
+          if ! grep -q "cogworks-learn" "$AGENT_FILE"; then
+            echo "WARNING: cogworks-learn dependency not found in agent"
+          else
+            echo "✓ cogworks-learn dependency declared"
+          fi
+
+      - name: Validate markdown syntax
+        run: |
+          set +e
+          ERROR_COUNT=0
+
+          # Check for markdown syntax issues (basic checks)
+          for md_file in .claude/**/*.md README.md INSTALL.md RELEASES.md; do
+            if [ -f "$md_file" ]; then
+              # Check for unclosed code blocks
+              open_blocks=$(grep -c '```' "$md_file" 2>/dev/null || echo "0")
+              if [ $((open_blocks % 2)) -ne 0 ]; then
+                echo "WARNING: $md_file may have unclosed code blocks (``` count: $open_blocks)"
+              fi
+            fi
+          done
+
+          set -e
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "✓ All validations passed"
+          echo ""
+          echo "Ready to create release:"
+          echo "  Command: git tag -a v{version} -m 'Release cogworks v{version}'"
+          echo "           git push origin v{version}"

@@ -17,7 +17,23 @@ Provide sources (URLs, files, directories) → `cogworks` synthesizes them via a
 
 ## Installation
 
-Creating a plugin is on the roadmap. For now, copy the `cogworks` agent and its supporting skills into your project's `.claude/` directory. All three are required — the agent (`cogworks`) orchestrates the workflow, and the two skills provide the synthesis (`cogworks-encode`) and skill-writing (`cogworks-learn`) methodologies it depends on:
+### From Release (Recommended)
+
+Download the latest release from [GitHub Releases](https://github.com/williamhallatt/cogworks/releases):
+
+```bash
+# Extract release
+tar -xzf cogworks-{version}.tar.gz
+
+# Copy to your project
+cp -r cogworks-{version}/.claude/* your-project/.claude/
+```
+
+See [INSTALL.md](INSTALL.md) for detailed installation instructions.
+
+### Manual Installation
+
+Alternatively, copy the `cogworks` agent and its supporting skills directly from this repository. All three are required — the agent (`cogworks`) orchestrates the workflow, and the two skills provide the synthesis (`cogworks-encode`) and skill-writing (`cogworks-learn`) methodologies it depends on:
 
 ```bash
 your-project/
