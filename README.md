@@ -78,9 +78,6 @@ Where `<command>` could be `encode`, `learn`, or `automate`, `<sources>` can be 
 
 ```bash
 @cogworks encode https://example.com/some-guide
-
-# With automated testing (optional)
-@cogworks encode https://example.com/some-guide --test
 ```
 
 Here's what happens step by step:
@@ -104,14 +101,7 @@ You approve or decline. If you decline, `cogworks` stops.
 
 **6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing.
 
-**6.5. Optional Testing** — If you added the `--test` flag, `cogworks` runs automated quality validation:
-
-- Layer 1: Deterministic checks (structure, syntax, citations) - ~5 seconds
-- Layer 2: LLM-as-judge evaluation (5 quality dimensions) - ~45 seconds
-- Generates detailed validation report with scores and recommendations
-- Cost: ~$1.50 per skill
-
-**7. Done** — `cogworks` confirms the skill location and how to invoke it (with test results if `--test` was used).
+**7. Done** — `cogworks` confirms the skill location and how to invoke it.
 
 Your new skill is now available as `/{slug}` — Claude will auto-discover it whenever the topic comes up, or you can invoke it directly.
 
@@ -128,7 +118,6 @@ Invoke by typing a `@cogworks` command in natural language:
 
 ```bash
 @cogworks encode <sources> as <skill_name>
-@cogworks encode <sources> as <skill_name> --test  # With automated testing
 @cogworks automate <description of what to automate> from <sources>
 ```
 
@@ -174,15 +163,25 @@ Loads expertise on writing Claude Code skills — SKILL.md files, frontmatter co
 
 Validates generated skills through layered grading (deterministic checks, LLM-as-judge, optional human review). Tests synthesis quality, skill structure, source fidelity, and observable behavior.
 
-**When to use independently:** when validating skills after manual edits, running regression tests on golden samples, checking quality before production use, or calibrating LLM-judge accuracy.
-
-**Example invocations:**
+Testing is a separate step from encoding. After encoding a skill, run tests independently:
 
 ```bash
-/cogworks-test deployment-skill
+# Test a skill after encoding it
+/cogworks-test my-skill
+
+# Other examples
 /cogworks-test my-skill --json
 /cogworks-test my-skill --compare-against tests/datasets/golden-samples/my-skill/
 ```
+
+Testing runs two validation layers:
+
+- **Layer 1**: Deterministic checks (structure, syntax, citations)
+- **Layer 2**: LLM-as-judge evaluation (5 quality dimensions)
+
+Generates a detailed validation report with scores and recommendations. Cost: ~$1.50 per skill.
+
+**When to use:** after encoding a new skill, after manual edits to an existing skill, for regression testing golden samples, or to check quality before production use.
 
 See `.claude/test-framework/README.md` for complete testing documentation.
 
