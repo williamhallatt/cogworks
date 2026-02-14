@@ -89,13 +89,18 @@ cogworks-{version}/
 ├── .claude/
 │   ├── agents/
 │   │   └── cogworks.md              # Main agent
-│   └── skills/
-│       ├── cogworks-encode/         # Required
-│       │   └── SKILL.md, reference.md, ...
-│       ├── cogworks-learn/          # Required
-│       │   └── SKILL.md, patterns.md, examples.md, reference.md, ...
-│       └── cogworks-test/           # If available
-│           └── SKILL.md, ...
+│   ├── skills/
+│   │   ├── cogworks-encode/         # Required
+│   │   │   └── SKILL.md, reference.md, ...
+│   │   ├── cogworks-learn/          # Required
+│   │   │   └── SKILL.md, patterns.md, examples.md, reference.md, ...
+│   │   └── cogworks-test/           # Testing skill
+│   │       └── SKILL.md, ...
+│   └── test-framework/              # Required by cogworks-test
+│       ├── config/
+│       ├── graders/
+│       ├── scripts/
+│       └── templates/
 ├── README.md                         # Project overview
 ├── LICENSE                           # MIT License
 └── INSTALL.md                       # Installation instructions

@@ -111,6 +111,7 @@ jobs:
           # Create temporary directory structure
           mkdir -p "${ARTIFACT_NAME}/.claude/agents"
           mkdir -p "${ARTIFACT_NAME}/.claude/skills"
+          mkdir -p "${ARTIFACT_NAME}/.claude/test-framework"
 
           # Copy agent
           cp ".claude/agents/cogworks.md" "${ARTIFACT_NAME}/.claude/agents/"
@@ -121,6 +122,14 @@ jobs:
             cp -r "$skill_dir" "${ARTIFACT_NAME}/.claude/skills/"
             echo "Packaged: $skill_name"
           done
+
+          # Copy test-framework (dependency for cogworks-test skill)
+          if [ -d ".claude/test-framework" ]; then
+            cp -r .claude/test-framework/* "${ARTIFACT_NAME}/.claude/test-framework/"
+            echo "Packaged: test-framework (cogworks-test dependency)"
+          else
+            echo "WARNING: test-framework not found (required by cogworks-test)"
+          fi
 
           # Copy documentation and licensing
           cp README.md "${ARTIFACT_NAME}/"
@@ -183,7 +192,10 @@ jobs:
           ## What's Included
 
           - **cogworks** agent for automated skill generation and synthesis
-          - **cogworks-* skills**: All dependency skills required by the cogworks agent
+          - **cogworks-encode** - Skill synthesis methodology (required)
+          - **cogworks-learn** - Skill authoring expertise (required)
+          - **cogworks-test** - Testing and validation framework (optional)
+          - **test-framework** - Supporting files for cogworks-test skill
 
           See [INSTALL.md](${{ env.artifact_name }}/INSTALL.md) for detailed setup instructions.
 
@@ -193,7 +205,10 @@ jobs:
           - `cogworks-encode` - Skill synthesis methodology
           - `cogworks-learn` - Skill authoring expertise
 
-          Both are included in this release.
+          Optional testing capability:
+          - `cogworks-test` - Depends on `.claude/test-framework/` (included)
+
+          All dependencies are included in this release.
           EOF
           )
 
