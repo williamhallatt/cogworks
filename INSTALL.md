@@ -50,10 +50,15 @@ The cogworks agent **requires** these skills to function:
 - **cogworks-encode** - Synthesis methodology for combining multiple sources
 - **cogworks-learn** - Expertise in writing and structuring skills
 
-Install them:
+Optional skill included in releases:
+
+- **cogworks-test** - Testing and validation framework (requires test-framework)
+
+Install all skills and dependencies:
 
 ```bash
 cp -r cogworks-{version}/.claude/skills/cogworks-* your-project/.claude/skills/
+cp -r cogworks-{version}/.claude/test-framework your-project/.claude/
 ```
 
 ### 4. Verify installation
@@ -65,17 +70,24 @@ your-project/
 └── .claude/
     ├── agents/
     │   └── cogworks.md
-    └── skills/
-        ├── cogworks-encode/
-        │   ├── SKILL.md
-        │   └── reference.md
-        ├── cogworks-learn/
-        │   ├── SKILL.md
-        │   ├── patterns.md
-        │   ├── examples.md
-        │   ├── reference.md
-        │   └── persuasion-principles.md
-        └── [other cogworks-* skills]/
+    ├── skills/
+    │   ├── cogworks-encode/
+    │   │   ├── SKILL.md
+    │   │   └── reference.md
+    │   ├── cogworks-learn/
+    │   │   ├── SKILL.md
+    │   │   ├── patterns.md
+    │   │   ├── examples.md
+    │   │   ├── reference.md
+    │   │   └── persuasion-principles.md
+    │   ├── cogworks-test/
+    │   │   └── SKILL.md
+    │   └── [other cogworks-* skills]/
+    └── test-framework/              # Required by cogworks-test
+        ├── config/
+        ├── graders/
+        ├── scripts/
+        └── templates/
 ```
 
 ## Usage
@@ -188,19 +200,8 @@ rm -r your-project/.claude/
 For issues with cogworks installation or usage:
 
 1. Check the [README.md](README.md) for project overview
-2. See [CLAUDE.md](CLAUDE.md) for development guidance
-3. Review [ROADMAP.md](ROADMAP.md) for known limitations
-4. Open an issue on the [GitHub repository](https://github.com/williamhallatt/cogworks)
-
-## Version Information
-
-This release contains:
-ks installation or usage:
-
-1. Check the [README.md](README.md) for project overview
-2. See [CLAUDE.md](CLAUDE.md) for development guidance
-3. Review [ROADMAP.md](ROADMAP.md) for known limitations
-4. Open an issue on the [GitHub repository](https://github.com/williamhallatt/cogworks)
+2. Review [ROADMAP.md](ROADMAP.md) for known limitations
+3. Open an issue on the [GitHub repository](https://github.com/williamhallatt/cogworks)
 
 ## Version Information
 
