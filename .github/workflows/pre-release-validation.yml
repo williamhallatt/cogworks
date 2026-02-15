@@ -6,6 +6,7 @@ on:
       - ".claude/**"
       - "README.md"
       - "INSTALL.md"
+      - "LICENSE"
     branches:
       - main
   workflow_dispatch:
@@ -126,6 +127,25 @@ jobs:
           else
             echo "✓ cogworks-learn dependency declared"
           fi
+
+      - name: Validate test-framework (cogworks-test dependency)
+        run: |
+          TEST_FRAMEWORK_DIR=".claude/test-framework"
+
+          if [ ! -d "$TEST_FRAMEWORK_DIR" ]; then
+            echo "ERROR: test-framework directory not found at $TEST_FRAMEWORK_DIR"
+            echo "This is required by the cogworks-test skill"
+            exit 1
+          fi
+
+          # Check that the directory is not empty
+          if [ -z "$(ls -A "$TEST_FRAMEWORK_DIR")" ]; then
+            echo "ERROR: test-framework directory is empty"
+            exit 1
+          fi
+
+          FILE_COUNT=$(find "$TEST_FRAMEWORK_DIR" -type f | wc -l)
+          echo "✓ test-framework present ($FILE_COUNT file(s))"
 
       - name: Validate markdown syntax
         run: |
