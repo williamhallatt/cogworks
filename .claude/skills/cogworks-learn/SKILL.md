@@ -61,8 +61,9 @@ Core knowledge in [reference.md](reference.md):
 
 Patterns and examples in separate files (loaded on-demand):
 
-- [patterns.md](patterns.md) - 10 reusable patterns + 9 anti-patterns to avoid
+- [patterns.md](patterns.md) - 10 reusable patterns + 10 anti-patterns to avoid
 - [examples.md](examples.md) - 12 complete practical examples with citations
+- [persuasion-principles.md](persuasion-principles.md) - Persuasion psychology for discipline-enforcing skills
 
 ## Writing Checklist
 
@@ -73,3 +74,5 @@ Before finalizing any skill:
 3. Does invocation mode match the task's risk profile?
 4. Are high-stakes steps explicit with verification gates?
 5. Does scope match the intended audience?
+6. Does `name` use only lowercase letters, numbers, and hyphens (max 64 chars)?
+7. Is `description` under 1024 characters with no XML tags?

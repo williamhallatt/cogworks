@@ -20,7 +20,7 @@ Claude Code Skills are SKILL.md files that extend Claude's capabilities through 
 
 ## Related Files
 
-- [patterns.md](patterns.md) - 10 reusable patterns + 9 anti-patterns
+- [patterns.md](patterns.md) - 10 reusable patterns + 10 anti-patterns
 - [examples.md](examples.md) - 12 complete practical examples
 
 ---
@@ -57,6 +57,12 @@ my-skill/
 | `context` | `fork` runs in isolated subagent. |
 | `agent` | Subagent type when `context: fork` set. |
 | `hooks` | Lifecycle hooks scoped to this skill. |
+
+**Validation Rules:**
+| Field | Constraint |
+|-------|-----------|
+| `name` | Max 64 characters. Lowercase letters, numbers, and hyphens only. No XML tags. Cannot contain reserved words: "anthropic", "claude". |
+| `description` | Required (non-empty). Max 1024 characters. No XML tags. |
 
 ### 3. Invocation Duality
 **Definition:** Skills have two invocation paths: automatic (Claude decides based on description match) and manual (user types /skill-name). This duality is controlled by frontmatter.
@@ -202,6 +208,11 @@ Claude uses description (and first paragraph if no description) to decide auto-l
 2. Include trigger phrases users would say ("how does this work", "deploy to production")
 3. List concrete use cases
 4. Avoid generic terms that match everything
+
+**Critical: Write descriptions in third person.** The description is injected into the system prompt — inconsistent point-of-view causes discovery problems.
+- Good: "Processes Excel files and generates reports"
+- Avoid: "I can help you process Excel files"
+- Avoid: "You can use this to process Excel files"
 
 ### Specificity Calibration
 

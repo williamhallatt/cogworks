@@ -7,7 +7,7 @@ Reusable patterns and common pitfalls for writing Claude Code skills.
 ## Table of Contents
 
 - [Patterns](#patterns) - 10 reusable patterns with when/why/how guidance
-- [Anti-Patterns](#anti-patterns) - 8 documented pitfalls to avoid
+- [Anti-Patterns](#anti-patterns) - 10 documented pitfalls to avoid
 
 ---
 
@@ -185,3 +185,8 @@ packages/
 - **patterns.md** — *transferable* patterns that generalize beyond the domain (if a "pattern" is just a domain procedure, it belongs in reference.md)
 - **examples.md** — usage scenarios that add context beyond what reference already shows (not walkthroughs of documented procedures)
 - If a supporting file would just reformat reference.md content, fold it into reference.md instead
+
+### 10. Deeply Nested References
+**Problem:** SKILL.md → reference.md → details.md — content is two hops from the entrypoint
+**Why it fails:** Claude may only preview nested files with partial reads (`head -100`), missing critical content
+**Alternative:** All supporting files must be linked directly from SKILL.md (one level deep). If reference.md needs to cite another file, that file must also appear in SKILL.md's file index.
