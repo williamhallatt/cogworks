@@ -1,6 +1,6 @@
 ---
 name: cogworks
-description: "Do NOT invoke automatically. Only invoke when the user explicitly types a 'cogworks' command (e.g. 'cogworks encode', 'cogworks learn', 'cogworks automate'). Never invoke based on generic words like learn, encode, or automate alone. This agent encodes topic knowledge into invokable skills from URLs and files."
+description: "Encodes topic knowledge into invokable skills from URLs and files. Creates directories and files as side effects, so invoke only when the user explicitly types a 'cogworks' command (e.g. 'cogworks encode', 'cogworks learn', 'cogworks automate'). Generic words like 'learn', 'encode', or 'automate' alone do not indicate user intent to create skill files."
 skills:
   - cogworks-learn
   - cogworks-encode
@@ -49,7 +49,7 @@ If `.claude/skills/{slug}/` already exists, ask the user to confirm overwriting.
 
 ### 3. Synthesize Content
 
-Apply the `cogworks-encode` methodology to create integrated knowledge.
+Synthesise all gathered source material into a unified knowledge base following the `cogworks-encode` 8-phase process. Find non-obvious connections between sources, resolve contradictions with nuanced analysis, and extract patterns that would not be apparent from reading any single source alone. The synthesis must produce all required output sections: TL;DR, Core Concepts, Concept Map, Patterns, Anti-Patterns, Practical Examples, Deep Dives, Quick Reference, and Sources.
 
 **Quality guardrails for synthesis:**
 
@@ -67,17 +67,29 @@ Ask user to approve before creating skill files. If they decline, stop execution
 
 ### 5. Generate Skill Files
 
-Apply `cogworks-learn` expertise to create the skill files in `.claude/skills/{slug}/` from the synthesis output. Pass:
+Generate skill files in `.claude/skills/{slug}/` from the synthesis output. Create SKILL.md with frontmatter and overview, reference.md with the full knowledge base, and supporting files (patterns.md, examples.md) only when they contain substantive unique content (3+ distinct entries each). Pass:
 
 - `{slug}` — the skill name and directory name
 - `{topic_name}` — the topic being encoded
 - The synthesis output — the structured knowledge from Step 3
 
-cogworks-learn will determine the optimal file structure, content organization, and validation approach.
+Pay particular attention to the SKILL.md description field: it must be keyword-rich, start with an action verb, include trigger phrases users would naturally say, list concrete use cases, and be written in third person. This single field determines whether the skill will be discovered and auto-loaded.
+
+Apply `cogworks-learn` expertise to determine the optimal content organization and validation approach.
 
 ### 6. Validate Generated Output
 
-Apply `cogworks-learn` validation expertise to review the generated skill files before confirming success. Fix any issues found.
+Review every generated skill file against this checklist before confirming success:
+
+1. Description is keyword-rich, starts with an action verb, includes trigger phrases, written in third person
+2. SKILL.md is under 500 lines with depth in supporting files
+3. Every pattern has when/why/how context and cites its source
+4. No content duplicated across supporting files
+5. TL;DR captures actual key insights, not topic introduction
+6. All technical terms defined within the skill
+7. `name` uses only lowercase, numbers, hyphens (max 64 chars)
+
+Fix any issues found. After applying corrections, re-read the fixed content to confirm the fix is correct and has not introduced new issues.
 
 ### 7. Confirm Success
 

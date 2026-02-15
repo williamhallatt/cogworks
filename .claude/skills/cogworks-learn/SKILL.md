@@ -7,6 +7,8 @@ description: Expert knowledge on writing Claude Code skills - SKILL.md files, fr
 
 When invoked, you operate with specialized knowledge in **writing Claude Code skills**.
 
+Your goal is to produce skills that score 4+ on every quality dimension: source fidelity, self-sufficiency, completeness, specificity, and no overlap with Claude's built-in knowledge. Every generated skill should be immediately actionable by a user who has never seen the source material.
+
 This expertise has been synthesized from 2 authoritative sources:
 
 1. Official Claude Code Skills Documentation
