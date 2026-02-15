@@ -386,7 +386,7 @@ mkdir tests/test-data/my-new-test-skill
 echo "..." > tests/test-data/my-new-test-skill/SKILL.md
 ```
 
-2. **Add test definition** to `tests/test-suite/mvp-test-cases.jsonl`:
+1. **Add test definition** to `tests/test-suite/mvp-test-cases.jsonl`:
 
 ```json
 {
@@ -405,13 +405,13 @@ echo "..." > tests/test-data/my-new-test-skill/SKILL.md
 }
 ```
 
-3. **Run tests**:
+1. **Run tests**:
 
 ```bash
 bash tests/run-black-box-tests.sh
 ```
 
-4. **Verify your test**:
+1. **Verify your test**:
 
 - If it passes: New feature works correctly ✅
 - If it fails: Either feature broken or test expectation wrong
@@ -428,7 +428,7 @@ bash tests/run-black-box-tests.sh
 mkdir -p tests/datasets/golden-samples/my-skill/{expected-skill,sources}
 ```
 
-2. **Generate Layer 1 baseline**:
+1. **Generate Layer 1 baseline**:
 
 ```bash
 bash .claude/test-framework/graders/deterministic-checks.sh \
@@ -436,14 +436,14 @@ bash .claude/test-framework/graders/deterministic-checks.sh \
     > tests/datasets/golden-samples/my-skill/expected-layer1-results.json
 ```
 
-3. **Copy skill files**:
+1. **Copy skill files**:
 
 ```bash
 cp -r .claude/skills/my-skill/* \
     tests/datasets/golden-samples/my-skill/expected-skill/
 ```
 
-4. **Create metadata.yaml**:
+1. **Create metadata.yaml**:
 
 ```yaml
 ---
@@ -488,7 +488,7 @@ regression_detection:
     - "Citation count ±2"
 ```
 
-5. **Test the baseline**:
+1. **Test the baseline**:
 
 ```bash
 # Verify baseline matches current skill
@@ -585,7 +585,7 @@ forbidden=(
 )
 ```
 
-2. **Create test fixture** (`tests/test-data/aws-secret-skill/SKILL.md`):
+1. **Create test fixture** (`tests/test-data/aws-secret-skill/SKILL.md`):
 
 ```markdown
 ---
@@ -598,7 +598,7 @@ description: Test skill with AWS secret
 This has an AWS secret: aws_secret_access_key=wJalrXUtnFEMI/K7MDENG
 ```
 
-3. **Add test case** (`tests/test-suite/mvp-test-cases.jsonl`):
+1. **Add test case** (`tests/test-suite/mvp-test-cases.jsonl`):
 
 ```json
 {
@@ -617,7 +617,7 @@ This has an AWS secret: aws_secret_access_key=wJalrXUtnFEMI/K7MDENG
 }
 ```
 
-4. **Run tests**:
+1. **Run tests**:
 
 ```bash
 bash tests/run-black-box-tests.sh
