@@ -63,8 +63,8 @@ Once the tag is pushed:
    - `cogworks-{version}.zip` (for Windows)
 4. GitHub Release is automatically created with:
    - Both archive formats attached
-   - Auto-generated release notes with installation instructions
-   - List of included skills
+   - Auto-generated changelog grouped by commit type (`add/`, `fix/`, `refactor/`, etc.)
+   - Release contents summary and link to installation instructions
 
 ### Step 5: Verify release
 
@@ -128,13 +128,27 @@ Before tagging a release, verify:
 - [ ] README.md is up to date
 - [ ] No broken internal links in .md files
 
-## Release Notes Template
+## Release Notes (Auto-Generated Changelog)
 
-GitHub Actions auto-generates release notes with installation instructions. You can customize this by:
+Release notes are automatically generated from commit messages between tags. The workflow parses the `{type}/ {description}` commit prefix convention and groups changes into categories:
 
-1. Editing `.github/workflows/release.yml`
-2. Modifying the `RELEASE_NOTES` variable in the "Create GitHub Release" step
-3. Commit and push before creating the release tag
+| Commit Prefix | Release Heading |
+| ------------- | --------------- |
+| `add/`        | New Features    |
+| `update/`     | Enhancements    |
+| `fix/`        | Bug Fixes       |
+| `refactor/`   | Refactoring     |
+| `docs/`       | Documentation   |
+| `test/`       | Testing         |
+| (other)       | Other Changes   |
+
+Empty categories are omitted. The release notes also include a "Release Contents" section (built dynamically from the packaged skills) and a full changelog comparison link.
+
+**Writing good commit messages for changelogs:**
+
+- Use the correct prefix — it determines which section the change appears under
+- Write the description as a user-facing summary, e.g. `add/ eval-based skill testing workflow`
+- Keep descriptions concise — they appear as-is in the changelog (first letter auto-capitalised)
 
 ## Troubleshooting Release Issues
 
@@ -223,9 +237,8 @@ zip -r "${ARTIFACT_NAME}.zip" "${ARTIFACT_NAME}/"
 
 Planned improvements to the release process:
 
-- [ ] Automated changelog generation from commit messages
+- [x] Automated changelog generation from commit messages
 - [ ] Pre-release validation workflow (runs on branch PRs)
 - [ ] Skill quality checks (syntax, link validation, frontmatter validation)
-- [ ] npm registry distribution for skills (exploratory)
 - [ ] Cross-platform validation (Windows, macOS, Linux)
 - [ ] Integration with skill marketplace/registry

@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Extract version from tag
         id: version
@@ -164,6 +166,109 @@ jobs:
           echo "Contents:"
           tar -tzf "${ARTIFACT_NAME}.tar.gz" | head -20
 
+      - name: Generate changelog from commits
+        run: |
+          TAG=${{ steps.version.outputs.tag }}
+
+          # Find previous tag (gracefully handle first release)
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || echo "")
+
+          if [ -z "${PREVIOUS_TAG}" ]; then
+            echo "No previous tag found — generating changelog from all commits"
+            COMMITS=$(git log --format='%s' "${TAG}")
+          else
+            echo "Generating changelog: ${PREVIOUS_TAG}..${TAG}"
+            COMMITS=$(git log --format='%s' "${PREVIOUS_TAG}..${TAG}")
+          fi
+
+          # Initialise category arrays
+          declare -a CAT_ADD CAT_UPDATE CAT_FIX CAT_REFACTOR CAT_DOCS CAT_TEST CAT_OTHER
+
+          while IFS= read -r msg; do
+            [ -z "$msg" ] && continue
+
+            # Extract prefix (everything before the first "/ ")
+            if [[ "$msg" =~ ^([a-z]+)/[[:space:]]+(.*) ]]; then
+              prefix="${BASH_REMATCH[1]}"
+              desc="${BASH_REMATCH[2]}"
+            else
+              prefix="other"
+              desc="$msg"
+            fi
+
+            # Capitalise first letter of description
+            desc="$(echo "${desc:0:1}" | tr '[:lower:]' '[:upper:]')${desc:1}"
+
+            case "$prefix" in
+              add)      CAT_ADD+=("$desc") ;;
+              update)   CAT_UPDATE+=("$desc") ;;
+              fix)      CAT_FIX+=("$desc") ;;
+              refactor) CAT_REFACTOR+=("$desc") ;;
+              docs)     CAT_DOCS+=("$desc") ;;
+              test)     CAT_TEST+=("$desc") ;;
+              *)        CAT_OTHER+=("$desc") ;;
+            esac
+          done <<< "$COMMITS"
+
+          # Write categorised changelog to file
+          {
+            echo "## What's Changed"
+            echo ""
+
+            declare -A HEADINGS=(
+              [ADD]="New Features"
+              [UPDATE]="Enhancements"
+              [FIX]="Bug Fixes"
+              [REFACTOR]="Refactoring"
+              [DOCS]="Documentation"
+              [TEST]="Testing"
+              [OTHER]="Other Changes"
+            )
+
+            for key in ADD UPDATE FIX REFACTOR DOCS TEST OTHER; do
+              eval "items=(\"\${CAT_${key}[@]}\")"
+              if [ ${#items[@]} -gt 0 ]; then
+                echo "### ${HEADINGS[$key]}"
+                for item in "${items[@]}"; do
+                  echo "- ${item}"
+                done
+                echo ""
+              fi
+            done
+          } > release-notes.md
+
+          # Append release contents section
+          {
+            echo "---"
+            echo ""
+            echo "## Release Contents"
+            echo ""
+            echo "- **cogworks** agent"
+            while IFS= read -r skill_line; do
+              skill_name=$(echo "$skill_line" | sed 's/^- //')
+              case "$skill_name" in
+                cogworks-encode|cogworks-learn)
+                  echo "- **${skill_name}** skill (required)" ;;
+                cogworks-test)
+                  echo "- **${skill_name}** skill + test-framework (optional)" ;;
+                *)
+                  echo "- **${skill_name}** skill" ;;
+              esac
+            done < <(grep '^- cogworks-' release-contents.txt)
+            echo ""
+            echo "See [INSTALL.md](https://github.com/williamhallatt/cogworks/blob/main/INSTALL.md) for installation instructions."
+            echo ""
+            if [ -n "${PREVIOUS_TAG}" ]; then
+              echo "**Full changelog**: https://github.com/williamhallatt/cogworks/compare/${PREVIOUS_TAG}...${TAG}"
+            fi
+          } >> release-notes.md
+
+          echo "=== Generated Release Notes ==="
+          cat release-notes.md
+
+          # Export previous tag for later use
+          echo "previous_tag=${PREVIOUS_TAG}" >> $GITHUB_ENV
+
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -172,52 +277,12 @@ jobs:
           TAG=${{ steps.version.outputs.tag }}
           ARTIFACT_NAME=${{ env.artifact_name }}
 
-          # Generate release notes
-          RELEASE_NOTES=$(cat <<'EOF'
-          ## Installation
-
-          Extract the archive and copy the `.claude/` directory into your Claude Code project:
-
-          ```bash
-          tar -xzf ${{ env.artifact_name }}.tar.gz
-          cp -r ${{ env.artifact_name }}/.claude/* your-project/.claude/
-          ```
-
-          Or for zip:
-          ```bash
-          unzip ${{ env.artifact_name }}.zip
-          cp -r ${{ env.artifact_name }}/.claude/* your-project/.claude/
-          ```
-
-          ## What's Included
-
-          - **cogworks** agent for automated skill generation and synthesis
-          - **cogworks-encode** - Skill synthesis methodology (required)
-          - **cogworks-learn** - Skill authoring expertise (required)
-          - **cogworks-test** - Testing and validation framework (optional)
-          - **test-framework** - Supporting files for cogworks-test skill
-
-          See [INSTALL.md](${{ env.artifact_name }}/INSTALL.md) for detailed setup instructions.
-
-          ## Dependencies
-
-          The cogworks agent requires:
-          - `cogworks-encode` - Skill synthesis methodology
-          - `cogworks-learn` - Skill authoring expertise
-
-          Optional testing capability:
-          - `cogworks-test` - Depends on `.claude/test-framework/` (included)
-
-          All dependencies are included in this release.
-          EOF
-          )
-
           # Create release with both archive types
           gh release create "${TAG}" \
             "${ARTIFACT_NAME}.tar.gz" \
             "${ARTIFACT_NAME}.zip" \
             --title "Cogworks v${VERSION}" \
-            --notes "${RELEASE_NOTES}" \
+            --notes-file release-notes.md \
             --draft=false
 
       - name: Verify release creation
