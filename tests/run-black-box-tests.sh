@@ -264,15 +264,12 @@ main() {
     echo "Detailed results saved to: $RESULTS_DIR"
     echo ""
 
-    # Determine overall result
+    # Determine overall result (100% threshold — every test matters)
     if [[ $FAILED -eq 0 ]]; then
         echo -e "${GREEN}✅ ALL TESTS PASSED${NC}"
         exit 0
-    elif [[ $pass_rate -ge 80 ]]; then
-        echo -e "${YELLOW}⚠️  MVP THRESHOLD MET (≥80%)${NC}"
-        exit 0
     else
-        echo -e "${RED}❌ TESTS FAILED (below 80% threshold)${NC}"
+        echo -e "${RED}❌ TESTS FAILED ($FAILED of $total failed)${NC}"
         exit 1
     fi
 }

@@ -1,6 +1,24 @@
 #!/bin/bash
 # Deterministic structural validation for cogworks skills
 # Usage: deterministic-checks.sh <skill-directory> [--json]
+#
+# Thresholds (authoritative values — no external config file):
+#   SKILL.md max lines:          500 (critical failure if exceeded)
+#   SKILL.md warning threshold:  450 (warning if exceeded)
+#   Minimum citations:           3   (warning if fewer, critical if zero)
+#   Required frontmatter fields: name, description
+#   Supporting file min entries: 3   (warning if fewer ## headings)
+#   Description min words:       10  (warning if shorter)
+#   Forbidden patterns:          TODO, FIXME, XXX, HACK, OpenAI key, AWS key
+#   Name format:                 lowercase + numbers + hyphens, max 64 chars
+#   Name reserved words:         anthropic, claude
+#   Section substantiveness:     <20 words = thin; >50% thin = warning
+#   Citation line plausibility:  >10000 = implausible
+#
+# Exit codes:
+#   0 = all checks passed, no warnings
+#   1 = critical failure(s) detected
+#   2 = passed with warnings
 
 set -euo pipefail
 
@@ -34,8 +52,8 @@ check_frontmatter_valid() {
         return 1
     fi
 
-    # Extract frontmatter
-    local frontmatter=$(sed -n '/^---$/,/^---$/p' "$SKILL_FILE" | sed '1d;$d')
+    # Extract frontmatter (only the first --- delimited block)
+    local frontmatter=$(awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found{print}' "$SKILL_FILE")
 
     # Validate YAML (using python)
     if ! echo "$frontmatter" | python3 -c "import sys, yaml; yaml.safe_load(sys.stdin)" 2>/dev/null; then
@@ -48,7 +66,7 @@ check_frontmatter_valid() {
 
 # Check 3: Required frontmatter fields present
 check_required_frontmatter_fields() {
-    local frontmatter=$(sed -n '/^---$/,/^---$/p' "$SKILL_FILE" | sed '1d;$d')
+    local frontmatter=$(awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found{print}' "$SKILL_FILE")
 
     if ! echo "$frontmatter" | grep -q "^name:"; then
         log_critical "Missing required field: name"
@@ -92,7 +110,7 @@ check_citations_present() {
     log_pass "Citations present (${citation_count} found)"
 }
 
-# Check 6: Forbidden patterns
+# Check 6: Forbidden patterns (reports all matches, not just first)
 check_forbidden_patterns() {
     local forbidden=(
         "TODO"
@@ -103,12 +121,17 @@ check_forbidden_patterns() {
         "AKIA[0-9A-Z]{16}"     # AWS access key pattern
     )
 
+    local found_any=false
     for pattern in "${forbidden[@]}"; do
         if grep -qE "$pattern" "$SKILL_FILE"; then
             log_critical "Forbidden pattern found: $pattern"
-            return 1
+            found_any=true
         fi
     done
+
+    if $found_any; then
+        return 1
+    fi
 
     log_pass "No forbidden patterns"
 }
@@ -132,7 +155,7 @@ check_supporting_files() {
 
 # Check 8: Description has keywords
 check_description_keywords() {
-    local frontmatter=$(sed -n '/^---$/,/^---$/p' "$SKILL_FILE" | sed '1d;$d')
+    local frontmatter=$(awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found{print}' "$SKILL_FILE")
     local description=$(echo "$frontmatter" | grep "^description:" | cut -d: -f2- | tr -d '"')
 
     # Count words
@@ -170,10 +193,179 @@ check_markdown_syntax() {
     log_pass "Markdown syntax valid"
 }
 
+# Check 11: Cross-file heading duplication
+check_cross_file_heading_duplication() {
+    local all_headings=""
+    local files_checked=0
+
+    for file in "${SKILL_DIR}/reference.md" "${SKILL_DIR}/patterns.md" "${SKILL_DIR}/examples.md"; do
+        if [[ -f "$file" ]]; then
+            local filename=$(basename "$file")
+            # Extract ## headings outside code fences using awk
+            local headings=$(awk '
+                /^```/ { in_fence = !in_fence; next }
+                !in_fence && /^## / { print }
+            ' "$file" 2>/dev/null || true)
+            if [[ -n "$headings" ]]; then
+                while IFS= read -r heading; do
+                    all_headings+="${heading}|${filename}"$'\n'
+                done <<< "$headings"
+            fi
+            files_checked=$((files_checked + 1))
+        fi
+    done
+
+    # Need at least 2 files to check for cross-file duplication
+    if (( files_checked < 2 )); then
+        log_pass "Cross-file heading duplication (fewer than 2 supporting files)"
+        return 0
+    fi
+
+    # Check for identical headings across different files
+    local duplicates_found=false
+    local seen_headings=()
+    local seen_files=()
+
+    while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
+        local heading="${line%%|*}"
+        local file="${line##*|}"
+
+        for i in "${!seen_headings[@]}"; do
+            if [[ "${seen_headings[$i]}" == "$heading" && "${seen_files[$i]}" != "$file" ]]; then
+                log_warning "Duplicate heading '${heading}' found in ${seen_files[$i]} and ${file}"
+                duplicates_found=true
+                break
+            fi
+        done
+
+        seen_headings+=("$heading")
+        seen_files+=("$file")
+    done <<< "$all_headings"
+
+    if ! $duplicates_found; then
+        log_pass "No cross-file heading duplication"
+    fi
+}
+
+# Check 12: Frontmatter name format
+check_name_format() {
+    local frontmatter=$(awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found{print}' "$SKILL_FILE")
+    local name_value=$(echo "$frontmatter" | grep "^name:" | head -1 | sed 's/^name:[[:space:]]*//' | tr -d '"' | tr -d "'")
+
+    if [[ -z "$name_value" ]]; then
+        # Missing name is caught by check 3; skip here
+        return 0
+    fi
+
+    # Check format: lowercase + numbers + hyphens only
+    if [[ ! "$name_value" =~ ^[a-z0-9-]+$ ]]; then
+        log_warning "Frontmatter name '${name_value}' contains invalid characters (allowed: lowercase, numbers, hyphens)"
+    fi
+
+    # Check max length
+    if (( ${#name_value} > 64 )); then
+        log_warning "Frontmatter name '${name_value}' exceeds 64 characters (${#name_value} chars)"
+    fi
+
+    # Check reserved words
+    if [[ "$name_value" == *"anthropic"* || "$name_value" == *"claude"* ]]; then
+        log_warning "Frontmatter name '${name_value}' contains reserved word ('anthropic' or 'claude')"
+    fi
+
+    log_pass "Frontmatter name format valid"
+}
+
+# Check 13: Supporting file substantiveness
+check_supporting_file_substantiveness() {
+    local thin_files_found=false
+
+    for support_file in "${SKILL_DIR}/patterns.md" "${SKILL_DIR}/examples.md"; do
+        if [[ -f "$support_file" ]]; then
+            local filename=$(basename "$support_file")
+            local total_sections=0
+            local thin_sections=0
+
+            # Extract sections between ## headings and count words in each
+            local in_section=false
+            local section_words=0
+
+            while IFS= read -r line; do
+                if [[ "$line" =~ ^##\  ]]; then
+                    # Process previous section
+                    if $in_section; then
+                        total_sections=$((total_sections + 1))
+                        if (( section_words < 20 )); then
+                            thin_sections=$((thin_sections + 1))
+                        fi
+                    fi
+                    in_section=true
+                    section_words=0
+                elif $in_section; then
+                    local words=$(echo "$line" | wc -w)
+                    section_words=$((section_words + words))
+                fi
+            done < "$support_file"
+
+            # Process last section
+            if $in_section; then
+                total_sections=$((total_sections + 1))
+                if (( section_words < 20 )); then
+                    thin_sections=$((thin_sections + 1))
+                fi
+            fi
+
+            # Flag if >50% of sections have <20 words
+            if (( total_sections > 0 )); then
+                local thin_pct=$((thin_sections * 100 / total_sections))
+                if (( thin_pct > 50 )); then
+                    log_warning "${filename} has thin content (${thin_sections}/${total_sections} sections have <20 words)"
+                    thin_files_found=true
+                fi
+            fi
+        fi
+    done
+
+    if ! $thin_files_found; then
+        log_pass "Supporting files have substantive content"
+    fi
+}
+
+# Check 14: Citation format consistency
+check_citation_format() {
+    # Look for file-path citations matching pattern (filename.ext:line)
+    local citations=$(grep -oE '\([a-zA-Z0-9_/-]+\.[a-z]+:[0-9]+\)' "$SKILL_FILE" 2>/dev/null || true)
+
+    if [[ -z "$citations" ]]; then
+        # No file-path citations — nothing to validate (general citations checked in check 5)
+        log_pass "Citation format consistency (no file-path citations to validate)"
+        return 0
+    fi
+
+    local implausible=false
+    while IFS= read -r citation; do
+        # Extract line number
+        local line_num=$(echo "$citation" | grep -oE '[0-9]+\)$' | tr -d ')')
+
+        # Flag implausible line numbers (>10000)
+        if (( line_num > 10000 )); then
+            log_warning "Implausible citation ${citation} — line number >10000"
+            implausible=true
+        fi
+    done <<< "$citations"
+
+    if ! $implausible; then
+        log_pass "Citation format consistency"
+    fi
+}
+
 # Run all checks
 run_all_checks() {
     check_skill_file_exists || true
-    [[ ${#CRITICAL_FAILURES[@]} -eq 0 ]] || return 1
+    # If SKILL.md is missing, skip remaining checks (they'd all fail)
+    if [[ ${#CRITICAL_FAILURES[@]} -gt 0 ]]; then
+        return 0
+    fi
 
     check_frontmatter_valid || true
     check_required_frontmatter_fields || true
@@ -184,33 +376,46 @@ run_all_checks() {
     check_description_keywords || true
     check_no_duplicate_headers || true
     check_markdown_syntax || true
+    check_cross_file_heading_duplication || true
+    check_name_format || true
+    check_supporting_file_substantiveness || true
+    check_citation_format || true
 }
 
 # Generate output
 generate_output() {
     if [[ "$JSON_OUTPUT" == "--json" ]]; then
-        # JSON output for machine consumption
-        echo "{"
-        echo "  \"critical_failures\": ["
-        for ((i=0; i<${#CRITICAL_FAILURES[@]}; i++)); do
-            echo -n "    \"${CRITICAL_FAILURES[$i]}\""
-            [[ $i -lt $((${#CRITICAL_FAILURES[@]} - 1)) ]] && echo "," || echo ""
-        done
-        echo "  ],"
-        echo "  \"warnings\": ["
-        for ((i=0; i<${#WARNINGS[@]}; i++)); do
-            echo -n "    \"${WARNINGS[$i]}\""
-            [[ $i -lt $((${#WARNINGS[@]} - 1)) ]] && echo "," || echo ""
-        done
-        echo "  ],"
-        echo "  \"checks_passed\": ["
-        for ((i=0; i<${#CHECKS_PASSED[@]}; i++)); do
-            echo -n "    \"${CHECKS_PASSED[$i]}\""
-            [[ $i -lt $((${#CHECKS_PASSED[@]} - 1)) ]] && echo "," || echo ""
-        done
-        echo "  ],"
-        echo "  \"status\": \"$([[ ${#CRITICAL_FAILURES[@]} -eq 0 ]] && echo 'pass' || echo 'fail')\""
-        echo "}"
+        # JSON output for machine consumption (using jq for safe escaping)
+        local status="pass"
+        [[ ${#CRITICAL_FAILURES[@]} -gt 0 ]] && status="fail"
+
+        # Build arrays safely via jq to handle special characters
+        local cf_json="[]"
+        if [[ ${#CRITICAL_FAILURES[@]} -gt 0 ]]; then
+            cf_json=$(printf '%s\n' "${CRITICAL_FAILURES[@]}" | jq -R . | jq -s .)
+        fi
+
+        local w_json="[]"
+        if [[ ${#WARNINGS[@]} -gt 0 ]]; then
+            w_json=$(printf '%s\n' "${WARNINGS[@]}" | jq -R . | jq -s .)
+        fi
+
+        local cp_json="[]"
+        if [[ ${#CHECKS_PASSED[@]} -gt 0 ]]; then
+            cp_json=$(printf '%s\n' "${CHECKS_PASSED[@]}" | jq -R . | jq -s .)
+        fi
+
+        jq -n \
+            --argjson critical_failures "$cf_json" \
+            --argjson warnings "$w_json" \
+            --argjson checks_passed "$cp_json" \
+            --arg status "$status" \
+            '{
+                critical_failures: $critical_failures,
+                warnings: $warnings,
+                checks_passed: $checks_passed,
+                status: $status
+            }'
     else
         # Human-readable output
         echo "=== Deterministic Checks Results ==="

@@ -61,16 +61,15 @@ Validates that a cogworks-generated skill meets quality requirements through:
 ```
 .claude/test-framework/
 ├── README.md                      # Complete framework documentation
-├── config/
-│   └── framework-config.yaml      # Thresholds (line limits, scores, weights)
 ├── graders/
-│   ├── deterministic-checks.sh    # Layer 1: Fast structural validation
-│   ├── llm-judge-rubrics.md       # Layer 2: Quality evaluation criteria
+│   ├── deterministic-checks.sh    # Layer 1: Fast structural validation (14 checks)
+│   ├── llm-judge-rubrics.md       # Layer 2: Quality evaluation rubrics
 │   └── human-review-guide.md      # Layer 3: Human evaluation guide
 ├── scripts/
 │   └── calculate-agreement.py     # Calibration: Compare LLM vs human scores
 └── templates/
-    └── test-case-template.md      # Template for creating test cases
+    ├── test-case-template.jsonl   # Template for creating test cases
+    └── validation-report.md       # Template for validation reports
 ```
 
 ### Usage Scenarios
@@ -89,15 +88,15 @@ Validates that a cogworks-generated skill meets quality requirements through:
 
 1. Locates skill at `.claude/skills/my-new-skill/`
 2. Runs Layer 1 deterministic checks (~50ms)
-3. If Layer 1 passes, runs Layer 2 LLM-judge evaluation (~50 seconds, ~$1.50)
-4. Generates reports (JSON + Markdown)
+3. If Layer 1 passes, runs Layer 2 LLM-judge evaluation (inline, no external API)
+4. Writes results to `tests/results/{slug}-results.json`
 5. Returns PASS/FAIL with scores and recommendations
 
 **Expected output**:
 
 ```
 === Layer 1: Deterministic Checks ===
-✓ All structural checks passed (10/10)
+✓ All structural checks passed (14/14)
 
 === Layer 2: LLM-as-Judge Evaluation ===
 Source Fidelity:     4.5/5.0 (30% weight)
@@ -124,62 +123,27 @@ Recommendation:      PASS ✅ (threshold: 0.85)
 
 ```json
 {
-  "skill_slug": "my-skill",
-  "status": "pass",
   "layer1": {
     "status": "pass",
-    "critical_failures": 0,
-    "warnings": 1,
-    "checks_passed": 10
+    "critical_failures": [],
+    "warnings": ["..."],
+    "checks_passed": ["... 14 check names ..."]
   },
   "layer2": {
-    "overall_score": 4.35,
-    "weighted_score": 0.87,
-    "dimensions": {
-      "source_fidelity": 4.5,
-      "self_sufficiency": 4.0,
-      "completeness": 4.5,
-      "specificity": 4.0,
-      "no_overlap": 5.0
-    }
+    "source_fidelity": { "score": 4, "weight": 0.30, "evidence": {}, "reasoning": "..." },
+    "self_sufficiency": { "score": 4, "weight": 0.25, "evidence": {}, "reasoning": "..." },
+    "completeness": { "score": 4, "weight": 0.20, "evidence": {}, "reasoning": "..." },
+    "specificity": { "score": 4, "weight": 0.15, "evidence": {}, "reasoning": "..." },
+    "no_overlap": { "score": 4, "weight": 0.10, "evidence": {}, "reasoning": "..." }
   },
-  "recommendation": "pass"
+  "overall": {
+    "weighted_score": 0.80,
+    "recommendation": "FAIL"
+  }
 }
 ```
 
-#### Scenario 3: Regression Testing (Compare Against Baseline)
-
-**When**: Framework changed, want to verify skills didn't regress
-
-**Command**:
-
-```
-/cogworks-test my-skill --compare-against tests/datasets/golden-samples/my-skill/
-```
-
-**What happens**:
-
-1. Runs current test on skill
-2. Loads expected results from `golden-samples/my-skill/expected-layer1-results.json`
-3. Compares actual vs expected within tolerance (±5% for scores, ±10 lines, etc.)
-4. Reports: PASS (within tolerance) or REGRESSION DETECTED
-
-**Output**:
-
-```
-=== Regression Testing ===
-Comparing against: tests/datasets/golden-samples/my-skill/
-
-Layer 1 Comparison:
-  Line count:        186 → 188 (within ±10 tolerance) ✓
-  Citations:         4 → 4 (unchanged) ✓
-  Warnings:          1 → 1 (unchanged) ✓
-  Critical failures: 0 → 0 (unchanged) ✓
-
-Result: NO REGRESSION DETECTED ✅
-```
-
-#### Scenario 4: Direct Layer 1 Testing (Fast Feedback)
+#### Scenario 3: Layer 1 Only (Fast Feedback)
 
 **When**: Quick structural validation without LLM costs
 
@@ -194,7 +158,7 @@ bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/my-sk
 ```
 === Deterministic Checks Results ===
 
-✓ Passed (10):
+✓ Passed (14):
   - SKILL.md exists
   - Frontmatter is valid YAML
   - Required frontmatter fields present
@@ -205,6 +169,10 @@ bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/my-sk
   - Description has sufficient content
   - No duplicate headers
   - Markdown syntax valid
+  - No cross-file heading duplication
+  - Frontmatter name format valid
+  - Supporting files have substantive content
+  - Citation format consistency
 
 ⚠ Warnings (1):
   - patterns.md has <3 entries (2) - should fold into reference.md
@@ -223,7 +191,7 @@ bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/my-sk
 A skill passes when:
 
 - **Layer 1**: Zero critical failures (warnings OK)
-- **Layer 2**: Weighted score ≥0.85 (on 0-1 scale)
+- **Layer 2**: Weighted score ≥0.85 AND no dimension scores below 3
 - All required structural elements present
 
 #### Common Failures
@@ -241,7 +209,7 @@ A skill passes when:
 
 If Layer 1 has critical failures:
 
-- Layer 2 is **skipped** (saves ~$1.50 per skill)
+- Layer 2 is **skipped** (saves context and evaluation effort)
 - Fix Layer 1 issues first
 - Re-run test after fixes
 
@@ -263,16 +231,17 @@ Validates that the testing framework itself works correctly through:
 tests/
 ├── run-black-box-tests.sh              # Main test runner (340 lines)
 ├── test-suite/
-│   └── mvp-test-cases.jsonl            # 15 test definitions
-├── test-data/                          # Test fixtures (8 skills)
-│   ├── no-citations-skill/             # Should trigger citation failure
-│   ├── bad-yaml-skill/                 # Should trigger YAML failure
-│   ├── overlimit-skill/                # Should trigger line limit failure
-│   ├── few-citations-skill/            # Should trigger citation warning
-│   ├── near-limit-skill/               # Should trigger line limit warning
-│   ├── exactly-500-skill/              # Edge case: exactly at limit
-│   ├── exactly-3-entries-skill/        # Edge case: minimum entries
-│   └── unclosed-fence-skill/           # Should trigger markdown error
+│   └── mvp-test-cases.jsonl            # 8 test definitions
+├── test-data/                          # Test fixtures (frozen snapshots + synthetic)
+│   ├── snapshot-skill-evaluation/     # Clean pass baseline
+│   ├── snapshot-cogworks-learn/       # Clean pass baseline (exit code 0)
+│   ├── no-citations-skill/            # Should trigger citation failure
+│   ├── bad-yaml-skill/                # Should trigger YAML failure
+│   ├── no-skillmd-skill/             # Should trigger missing SKILL.md failure
+│   ├── duplicate-headings-skill/     # Should trigger cross-file duplication warning
+│   └── bad-name-skill/               # Should trigger name format warning
+├── calibration/                       # Human evaluation templates for LLM-judge calibration
+│   └── template-human.yaml           # Template for human scoring
 ├── datasets/
 │   └── golden-samples/                 # Regression baselines (3 skills)
 │       ├── skill-evaluation/
@@ -300,7 +269,7 @@ bash tests/run-black-box-tests.sh
 
 **What happens**:
 
-1. Reads 15 test cases from `mvp-test-cases.jsonl`
+1. Reads 8 test cases from `mvp-test-cases.jsonl`
 2. Executes each test against deterministic-checks.sh
 3. Compares actual vs expected results
 4. Reports pass/fail for each test
@@ -319,14 +288,14 @@ Running: mvp-001 - layer1_passes_clean_skill
 Running: mvp-002 - layer1_catches_missing_citations
 ✅ PASS: mvp-002
 
-[... 13 more tests ...]
+[... 6 more tests ...]
 
 ╔════════════════════════════════════════════════════════════════╗
 ║                      TEST RESULTS SUMMARY                       ║
 ╚════════════════════════════════════════════════════════════════╝
 
-Total Tests:  15
-Passed:       15
+Total Tests:  8
+Passed:       8
 Failed:       0
 Skipped:      0
 
@@ -390,7 +359,7 @@ echo "..." > tests/test-data/my-new-test-skill/SKILL.md
 
 ```json
 {
-  "id": "mvp-016",
+  "id": "mvp-019",
   "tier": 1,
   "test": "my_new_feature_test",
   "description": "New feature should trigger expected behavior",
@@ -401,7 +370,7 @@ echo "..." > tests/test-data/my-new-test-skill/SKILL.md
     "critical_failures": 1,
     "failure_contains": "Expected error message"
   },
-  "rationale": "Tests new feature documented in framework-config.yaml:123"
+  "rationale": "Tests new feature documented in deterministic-checks.sh"
 }
 ```
 
@@ -456,7 +425,7 @@ layer1_expected:
   status: pass
   critical_failures: 0
   warnings: 0
-  checks_passed: 10
+  checks_passed: 14
   line_count: 150
   citation_count: 5
 
@@ -508,14 +477,14 @@ If no diff: Baseline is accurate ✅
 ```bash
 # Run tests before changes
 bash tests/run-black-box-tests.sh
-# Result: 15/15 passed
+# Result: 8/8 passed
 
 # Make framework changes
 vim .claude/test-framework/graders/deterministic-checks.sh
 
 # Run tests after changes
 bash tests/run-black-box-tests.sh
-# Result: 14/15 passed (regression detected!)
+# Result: 7/8 passed (regression detected!)
 ```
 
 **If tests fail**:
@@ -530,13 +499,13 @@ bash tests/run-black-box-tests.sh
 
 ### Testing Skills (Normal Usage)
 
-| Task                     | Command                                                                                     | Layer | Speed | Cost   |
-| ------------------------ | ------------------------------------------------------------------------------------------- | ----- | ----- | ------ |
-| Quick structural check   | `bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/{slug}/`        | L1    | ~50ms | Free   |
-| Full quality evaluation  | `/cogworks-test {slug}`                                                                     | L1+L2 | ~50s  | ~$1.50 |
-| JSON output (automation) | `/cogworks-test {slug} --json`                                                              | L1+L2 | ~50s  | ~$1.50 |
-| Regression testing       | `/cogworks-test {slug} --compare-against tests/datasets/golden-samples/{slug}/`             | L1+L2 | ~50s  | ~$1.50 |
-| Layer 1 JSON output      | `bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/{slug}/ --json` | L1    | ~50ms | Free   |
+| Task                     | Command                                                                                     | Layer | Cost             |
+| ------------------------ | ------------------------------------------------------------------------------------------- | ----- | ---------------- |
+| Quick structural check   | `bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/{slug}/`        | L1    | Free             |
+| Full quality evaluation  | `/cogworks-test {slug}`                                                                     | L1+L2 | Conversation ctx |
+| JSON output (automation) | `/cogworks-test {slug} --json`                                                              | L1+L2 | Conversation ctx |
+| Layer 1 only             | `/cogworks-test {slug} --layer1-only`                                                       | L1    | Free             |
+| Layer 1 JSON output      | `bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/{slug}/ --json` | L1    | Free             |
 
 ### Testing the Framework (Meta-Testing)
 
@@ -560,10 +529,10 @@ bash tests/run-black-box-tests.sh
 
 | Component                      | Status              | Notes                                                |
 | ------------------------------ | ------------------- | ---------------------------------------------------- |
-| Layer 1 (deterministic checks) | ✅ Fully tested     | 15 tests, 100% pass rate                             |
-| Layer 2 (LLM-judge)            | ⚠️ Not automated    | Rubrics exist, needs wrapper script                  |
-| Layer 3 (human review)         | ⚠️ Manual only      | Guide exists, no automation                          |
-| Regression baselines           | ✅ 3 golden samples | skill-evaluation, cogworks-learn, advanced-prompting |
+| Layer 1 (deterministic checks) | ✅ Fully tested     | 14 checks, 8 meta-tests, 100% pass rate              |
+| Layer 2 (LLM-judge)            | ✅ Implemented      | 5 dimensions scored via `/cogworks-test` skill        |
+| Layer 3 (human review)         | ⚠️ Manual only      | Guide + calibration templates exist                   |
+| Regression baselines           | ✅ 3 golden samples | skill-evaluation, cogworks-learn, advanced-prompting  |
 
 ---
 
@@ -621,7 +590,7 @@ This has an AWS secret: aws_secret_access_key=wJalrXUtnFEMI/K7MDENG
 
 ```bash
 bash tests/run-black-box-tests.sh
-# Should show: 16/16 passed (if feature works correctly)
+# Should show: 9/9 passed (8 existing + 1 new)
 ```
 
 ### Adding a Golden Sample
@@ -656,80 +625,15 @@ See [Scenario 4](#scenario-4-create-new-golden-sample-regression-baseline) above
 5. Fix framework
 6. Verify test now passes
 
-### "Layer 2 tests can't run"
+### "Layer 2 scores seem too high"
 
-**Cause**: Layer 2 (LLM-judge) orchestration not implemented
-
-**Status**:
-
-- Layer 2 rubrics fully documented (`.claude/test-framework/graders/llm-judge-rubrics.md`)
-- Wrapper script needed to automate execution
-- Estimated work: 4-6 hours
-
-**Workaround**:
-
-- Test Layer 1 only (already comprehensive)
-- Manually apply Layer 2 rubrics when needed
-- Use `/cogworks-test` skill invocation (orchestrates Layer 2 manually)
-
-### "Golden sample comparison not working"
-
-**Cause**: `--compare-against` flag not implemented in test runner
-
-**Status**: Documented but not coded
-
-**Workaround**: Manually compare:
-
-```bash
-# Run current test
-bash .claude/test-framework/graders/deterministic-checks.sh \
-    .claude/skills/{slug}/ --json > /tmp/actual.json
-
-# Compare with baseline
-diff <(jq 'del(.timestamp)' /tmp/actual.json) \
-     <(jq 'del(.timestamp)' tests/datasets/golden-samples/{slug}/expected-layer1-results.json)
-```
-
-### "Test fixtures modifying production skills"
-
-**Cause**: Test created in wrong location
+**Cause**: LLM-as-judge leniency bias
 
 **Solution**:
-t now passes
 
-### "Layer 2 tests can't run"
-
-**Cause**: Layer 2 (LLM-judge) orchestration not implemented
-
-**Status**:
-
-- Layer 2 rubrics fully documented (`.claude/test-framework/graders/llm-judge-rubrics.md`)
-- Wrapper script needed to automate execution
-- Estimated work: 4-6 hours
-
-**Workaround**:
-
-- Test Layer 1 only (already comprehensive)
-- Manually apply Layer 2 rubrics when needed
-- Use `/cogworks-test` skill invocation (orchestrates Layer 2 manually)
-
-### "Golden sample comparison not working"
-
-**Cause**: `--compare-against` flag not implemented in test runner
-
-**Status**: Documented but not coded
-
-**Workaround**: Manually compare:
-
-```bash
-# Run current test
-bash .claude/test-framework/graders/deterministic-checks.sh \
-    .claude/skills/{slug}/ --json > /tmp/actual.json
-
-# Compare with baseline
-diff <(jq 'del(.timestamp)' /tmp/actual.json) \
-     <(jq 'del(.timestamp)' tests/datasets/golden-samples/{slug}/expected-layer1-results.json)
-```
+- The SKILL.md includes anti-leniency prompting ("Score 5 should be rare")
+- If scores are consistently 4-5, the rubric anchors may need tightening
+- Run calibration: fill in `tests/calibration/{slug}-human.yaml`, then compare with `python3 .claude/test-framework/scripts/calculate-agreement.py`
 
 ### "Test fixtures modifying production skills"
 
@@ -781,15 +685,16 @@ diff <(jq 'del(.timestamp)' /tmp/actual.json) \
 ## Related Commands
 
 ```bash
-# Test a skill
+# Test a skill (Layer 1 + Layer 2)
 /cogworks-test my-skill
 /cogworks-test my-skill --json
-/cogworks-test my-skill --compare-against tests/datasets/golden-samples/my-skill/
+/cogworks-test my-skill --sources _sources/my-skill/
+/cogworks-test my-skill --layer1-only
 
 # Test the framework
 bash tests/run-black-box-tests.sh
 
-# Quick checks
+# Quick checks (Layer 1 only, no skill invocation needed)
 bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/my-skill/
 bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/my-skill/ --json
 
@@ -798,14 +703,13 @@ ls -t tests/results/ | head -1
 cat tests/results/black-box-*/summary.csv
 cat tests/results/black-box-*/mvp-001-report.txt
 
-# Create golden sample
-mkdir -p tests/datasets/golden-samples/my-skill/expected-skill
-bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/my-skill/ --json \
-    > tests/datasets/golden-samples/my-skill/expected-layer1-results.json
+# Calibration
+python3 .claude/test-framework/scripts/calculate-agreement.py tests/calibration/ tests/results/
 ```
 
 ---
 
-**Last Updated**: 2026-02-14
-**Test Coverage**: 15 tests, 100% pass rate (Layer 1 only)
+**Last Updated**: 2026-02-15
+**Test Coverage**: 8 tests, 100% pass rate (Layer 1 only)
 **Golden Samples**: 3 (skill-evaluation, cogworks-learn, advanced-prompting)
+**Test inputs**: All tests use frozen snapshots in `tests/test-data/` — no production skill references
