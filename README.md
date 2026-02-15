@@ -4,11 +4,35 @@ A clockwork engine for AI agents: encode knowledge from sources, automate the cr
 
 ## What it does
 
-`cogworks` transforms URLs and files into invokable Claude `skills` through systematic synthesis. It performs deep integration that extracts core concepts, maps relationships between them, detects conflicts across sources, and produces structured knowledge you can query and build on.
+`cogworks` transforms URLs and files into invokable Claude `skills` through systematic synthesis — extracting core concepts, mapping relationships between them, detecting conflicts across sources, and producing structured knowledge you can query and build on.
 
 ## How it works
 
-Provide sources (URLs, files, directories) → `cogworks` synthesizes them via an 8-phase process (content analysis, concept extraction, relationship mapping, pattern extraction, anti-pattern documentation, conflict detection, example collection, narrative construction) → outputs a multi-file skill package → the skill becomes auto-discoverable and invokable via `/{slug}`.
+Provide sources (URLs, files, directories) → `cogworks` synthesises them via an 8-phase process (content analysis, concept extraction, relationship mapping, pattern extraction, anti-pattern documentation, conflict detection, example collection, narrative construction) → outputs a multi-file skill package → the skill becomes auto-discoverable and invokable via `/{slug}`.
+
+## How I use it
+
+`cogworks` is a personal workflow tool. It does what I need well, but it isn't fully productionised — see [ROADMAP.md](ROADMAP.md) for known limitations and planned work.
+
+My typical workflow:
+
+1. **Prepare sources** — I find authoritative content online and save it as markdown to `_sources/<topic>/` (e.g., `_sources/cc-docs/`, `_sources/advanced-prompting/`). Some documentation hubs already publish markdown, which makes this straightforward. You can also pass URLs directly instead of local files.
+
+2. **Encode** — I run the agent with something like:
+
+   ```bash
+   @cogworks encode advanced-prompting from _sources/advanced-prompting/
+   ```
+
+   This kicks off the full pipeline: source gathering through to skill generation and validation.
+
+3. **Skills used alone** — If I want to, say, only run knowledge synthesis (skipping the full agent workflow), I invoke the encode skill directly:
+
+   ```bash
+   /cogworks-encode _sources/my-topic/ and output your synthesis to _sources/my-topic/ as synthesis.md
+   ```
+
+(The `_sources/` directory is local-only and excluded from releases.)
 
 ## Prerequisites
 
@@ -17,7 +41,7 @@ Provide sources (URLs, files, directories) → `cogworks` synthesizes them via a
 
 ## Installation
 
-The packaged release includes the `cogworks` agent, it's two required supporting skills (`cogworks-encode` and `cogworks-learn`), and the optional, but useful testing skill (`cogworks-test`) with associated testing infrastructure (`.claude/test-framework/`). The testing skill is not required for using `cogworks`, but is recommended if you want to validate generated skills.
+The packaged release includes the `cogworks` agent, its two required supporting skills (`cogworks-encode` and `cogworks-learn`), and the optional, but useful testing skill (`cogworks-test`) with associated testing infrastructure (`.claude/test-framework/`). The testing skill is not required for using `cogworks`, but is recommended if you want to validate generated skills.
 
 ### From Release (Recommended)
 
@@ -74,7 +98,7 @@ Start Claude Code in your project directory and run some version of the followin
 
 Where `<command>` could be `encode`, `learn`, or `automate`, `<sources>` can be a mix of URLs, local files, directories, and files containing URLs, and `as <skill_name>` is optional (if not provided, `cogworks` generates a slug from the source topic).
 
-> Note: There is no mechanism for disallowing implicit invocation of Claude sub-agents, but the `cogworks` agent description does attempt a "soft block" by asking the user to explicitly invoke it for encoding tasks. If you find that `cogworks` is being invoked when you don't want it to be, please open an issue with details so I can improve the prompt instructions.
+> Note: Claude Code doesn't let you prevent sub-agents from firing on their own. The `cogworks` agent prompt tries to soft-block this, but it's not foolproof. If `cogworks` fires when you don't want it to, open an issue so I can tighten the prompt.
 
 ### Example: encoding knowledge from a URL
 
@@ -94,7 +118,7 @@ content analysis → concept extraction → relationship mapping → pattern ext
 **4. Review** — `cogworks` presents a summary for your review:
 
 - Topic name and source count
-- A TL;DR of the synthesized knowledge
+- A TL;DR of the synthesised knowledge
 - Statistics (concept, pattern, and example counts)
 
 You approve or decline. If you decline, `cogworks` stops.
@@ -138,12 +162,12 @@ Loads the 8-phase synthesis methodology into Claude's context:
 7. Example Collection
 8. Narrative Construction
 
-**When to use independently:** when you want synthesis expertise without the full skill-generation workflow — analyzing multiple sources, creating a reference document, building a knowledge base outside the skill format, or reconciling conflicting information across documents.
+**When to use independently:** when you want synthesis expertise without the full skill-generation workflow — analysing multiple sources, creating a reference document, building a knowledge base outside the skill format, or reconciling conflicting information across documents.
 
 **Example invocations:**
 
 ```bash
-/cogworks-encode I have three API docs open. Help me synthesize them into a unified reference.
+/cogworks-encode I have three API docs open. Help me synthesise them into a unified reference.
 /cogworks-encode product management best practices from <source_dir> and output results to <output_dir>.
 ```
 
@@ -151,7 +175,7 @@ Loads the 8-phase synthesis methodology into Claude's context:
 
 Loads expertise on writing Claude Code skills — SKILL.md files, frontmatter configuration, invocation modes, context management, and best practices.
 
-**When to use independently:** when writing or reviewing skills manually, designing skill architecture, understanding invocation modes, or optimizing skill discoverability and context efficiency.
+**When to use independently:** when writing or reviewing skills manually, designing skill architecture, understanding invocation modes, or optimising skill discoverability and context efficiency.
 
 **Example invocations:**
 
@@ -163,7 +187,7 @@ Loads expertise on writing Claude Code skills — SKILL.md files, frontmatter co
 
 ### `/cogworks-test` — Testing and validation
 
-Validates generated skills through layered grading (deterministic checks, LLM-as-judge, optional human review). Tests synthesis quality, skill structure, source fidelity, and observable behavior.
+Validates generated skills through layered grading (deterministic checks, LLM-as-judge, optional human review). Tests synthesis quality, skill structure, source fidelity, and observable behaviour.
 
 Testing is a separate step from encoding. After encoding a skill, run tests independently:
 
@@ -189,7 +213,7 @@ See `.claude/test-framework/README.md` for complete testing documentation.
 
 ## Limitations
 
-Related to my setup that will likely be improved over time:
+Related to this being a personal workflow tool (see [ROADMAP.md](ROADMAP.md) for planned work):
 
 - **Claude Code only [FOR NOW]** — output formats specifically target Claude Code structures, may not work well for other agent frameworks without modification
 - **Not portable** — `cogworks` assumes Linux (Ubuntu), edit paths throughout agent and associated skills definitions accordingly
