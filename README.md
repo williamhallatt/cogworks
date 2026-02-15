@@ -17,6 +17,8 @@ Provide sources (URLs, files, directories) → `cogworks` synthesizes them via a
 
 ## Installation
 
+The packaged release includes the `cogworks` agent, it's two required supporting skills (`cogworks-encode` and `cogworks-learn`), and the optional, but useful testing skill (`cogworks-test`) with associated testing infrastructure (`.claude/test-framework/`). The testing skill is not required for using `cogworks`, but is recommended if you want to validate generated skills.
+
 ### From Release (Recommended)
 
 Download the latest release from [GitHub Releases](https://github.com/williamhallatt/cogworks/releases):
@@ -33,7 +35,7 @@ See [INSTALL.md](INSTALL.md) for detailed installation instructions.
 
 ### Manual Installation
 
-Alternatively, copy the `cogworks` agent and its supporting skills directly from this repository. All three are required — the agent (`cogworks`) orchestrates the workflow, and the two skills provide the synthesis (`cogworks-encode`) and skill-writing (`cogworks-learn`) methodologies it depends on:
+Alternatively, copy the `cogworks` agent and its dependencies (`cogworks-encode` and `cogworks-learn`) directly from this repository. All three are required — the agent orchestrates the workflow, and the two skills provide the synthesis and skill-writing (`cogworks-test` is not required, but recommended if you want to validate generated skills. If you do want to use it, you'll also need the testing infrastructure in `.claude/test-framework/`)
 
 ```bash
 your-project/
@@ -107,10 +109,10 @@ Your new skill is now available as `/{slug}` — Claude will auto-discover it wh
 
 ## Using `@cogworks`
 
-The `cogworks` agent and its two skills can be used together or independently. The agent orchestrates a full end-to-end workflow; the skills load specialized expertise into Claude's context for you to direct manually.
+The `cogworks` agent orchestrates a full end-to-end workflow, but you can also direct `cogworks-*` skills manually through direct invocation.
 
 - **The agent** (`@cogworks`) — runs the complete 7-step workflow (source gathering → synthesis → review → skill generation → validation). It automatically loads both skills.
-- **The skills** (`/cogworks-encode`, `/cogworks-learn`) — inject domain expertise into your conversation. You then direct Claude in natural language, applying that expertise however you need. They don't run workflows on their own.
+- **The skills** (`/cogworks-encode`, `/cogworks-learn`, `/cogworks-test`) — inject domain expertise into your conversation. You then direct Claude in natural language, applying that expertise however you need. They don't run workflows on their own.
 
 ### The cogworks agent
 
@@ -121,7 +123,7 @@ Invoke by typing a `@cogworks` command in natural language:
 @cogworks automate <description of what to automate> from <sources>
 ```
 
-This is what I need and use 99% of the time, but the agent is basically a fancy wrapper for the skills, so if you want to do something more custom or run the synthesis without generating a skill, or create a skill without the need to synthesise any information you can invoke the skills directly.
+This is what I need and use 99% of the time, but the agent is basically a fancy wrapper for the skills, so if you want to do something more custom or run the synthesis without generating a skill (or create a skill without the need to synthesise any information) you can invoke the skills directly.
 
 ### `/cogworks-encode` — Synthesis expertise
 

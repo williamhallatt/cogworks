@@ -65,7 +65,7 @@ cp -r cogworks-{version}/.claude/test-framework your-project/.claude/
 
 Your `.claude/` directory structure should now look like:
 
-```
+```bash
 your-project/
 └── .claude/
     ├── agents/
@@ -92,47 +92,9 @@ your-project/
 
 ## Usage
 
-Once installed, the cogworks agent can be invoked in Claude Code:
-
-### Auto-invocation
-
-Claude automatically loads the cogworks skill when your request is related to:
-
-- Synthesizing knowledge from multiple sources
-- Learning how to write skills
-- Other cogworks-related tasks
-
-### Manual invocation
-
-Force load cogworks by typing:
-
-```
-@cogworks <your request>
-```
-
-Or use the `/cogworks` slash command in Claude Code.
+See [README.md](README.md) for instructions on using the `cogworks` agent and its skills in your Claude Code projects.
 
 ## Troubleshooting
-
-### "cogworks-encode skill not found"
-
-**Cause:** The required `cogworks-encode` skill is not installed.
-
-**Solution:**
-
-```bash
-cp -r cogworks-{version}/.claude/skills/cogworks-encode your-project/.claude/skills/
-```
-
-### "cogworks-learn skill not found"
-
-**Cause:** The required `cogworks-learn` skill is not installed.
-
-**Solution:**
-
-```bash
-cp -r cogworks-{version}/.claude/skills/cogworks-learn your-project/.claude/skills/
-```
 
 ### Skill not loading in Claude Code
 
@@ -144,47 +106,43 @@ cp -r cogworks-{version}/.claude/skills/cogworks-learn your-project/.claude/skil
 2. Verify `.claude/` directory is at your project root (same level as `.git/`)
 3. Check that SKILL.md files are present in each skill directory
 
-### File permission errors
-
-**Cause:** Files copied with incorrect permissions on Linux/macOS.
-
-**Solution:**
-
-```bash
-chmod 644 your-project/.claude/**/*.md
-chmod 755 your-project/.claude
-chmod 755 your-project/.claude/agents
-chmod 755 your-project/.claude/skills
-```
-
 ## Updating
 
 To update to a newer version:
 
 1. Extract the new release archive
-2. Back up your current `.claude/` directory:
+2. Back up your current `.claude/` directory (just in case, but the new release should be a drop-in replacement):
+
    ```bash
    cp -r your-project/.claude your-project/.claude.backup
    ```
+
 3. Copy new files (replacing existing):
+
    ```bash
    cp -r cogworks-{new-version}/.claude/* your-project/.claude/
    ```
-4. If you have custom skills, restore them from backup
+
+4. Confirm that the gremlins didn't nuke anything they shouldn't have. If so, restore from backup.
+
+   ```bash
+   rm -r your-project/.claude
+   mv your-project/.claude.backup your-project/.claude
+   ```
 
 ## Uninstalling
 
 To remove cogworks and its skills:
 
 ```bash
-# Keep cogworks agent but remove skills
+# Remove skills
 rm -r your-project/.claude/skills/cogworks-*
+
+# Remove test framework (if installed)
+rm -r your-project/.claude/test-framework
 
 # Remove agent
 rm your-project/.claude/agents/cogworks.md
-
-# Remove entire .claude directory (if no other agents/skills)
-rm -r your-project/.claude/
 ```
 
 ## Platform Support

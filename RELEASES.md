@@ -78,13 +78,13 @@ gh release view v1.0.0
 gh release view v1.0.0 --json assets
 ```
 
-Navigate to https://github.com/williamhallatt/cogworks/releases to verify in browser.
+Navigate to <https://github.com/williamhallatt/cogworks/releases> to verify in browser.
 
 ## What Gets Released
 
 Each release package includes:
 
-```
+```bash
 cogworks-{version}/
 ├── .claude/
 │   ├── agents/
@@ -94,7 +94,7 @@ cogworks-{version}/
 │   │   │   └── SKILL.md, reference.md, ...
 │   │   ├── cogworks-learn/          # Required
 │   │   │   └── SKILL.md, patterns.md, examples.md, reference.md, ...
-│   │   └── cogworks-test/           # Testing skill
+│   │   └── cogworks-test/           # Testing skill (Optional use, but included)
 │   │       └── SKILL.md, ...
 │   └── test-framework/              # Required by cogworks-test
 │       ├── config/
@@ -103,7 +103,7 @@ cogworks-{version}/
 │       └── templates/
 ├── README.md                         # Project overview
 ├── LICENSE                           # MIT License
-└── INSTALL.md                       # Installation instructions
+└── INSTALL.md                        # Installation instructions
 ```
 
 **Excluded from releases:**
@@ -173,7 +173,7 @@ done
 
 **Solution:**
 
-1. Check workflow logs: https://github.com/williamhallatt/cogworks/actions
+1. Check workflow logs: <https://github.com/williamhallatt/cogworks/actions>
 2. Look for error messages in the "Create release artifact" step
 3. Fix the issue and rerun with a new tag version (can't reuse tags)
 
@@ -229,10 +229,3 @@ Planned improvements to the release process:
 - [ ] npm registry distribution for skills (exploratory)
 - [ ] Cross-platform validation (Windows, macOS, Linux)
 - [ ] Integration with skill marketplace/registry
-
-## Related Documentation
-
-- [README.md](README.md) - Project overview and quick start
-- [INSTALL.md](INSTALL.md) - End-user installation instructions
-- [CLAUDE.md](CLAUDE.md) - Development team guidance
-- [ROADMAP.md](ROADMAP.md) - Future feature planning

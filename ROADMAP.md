@@ -52,6 +52,7 @@ A comprehensive testing framework using layered grading methodology from the ski
 5. **Integration** - Added Step 6.5 to cogworks workflow for opt-in testing via `--test` flag
 
 **Quality Dimensions** (from CLAUDE.md requirements):
+
 - Source Fidelity (30%) - Traceability, no fabrication
 - Self-Sufficiency (25%) - Standalone understanding
 - Completeness (20%) - Scope coverage
@@ -61,6 +62,7 @@ A comprehensive testing framework using layered grading methodology from the ski
 **Success Threshold**: Overall score ≥0.85 with zero critical failures
 
 **Usage**:
+
 ```bash
 # Test generated skill
 /cogworks-test deployment-skill
