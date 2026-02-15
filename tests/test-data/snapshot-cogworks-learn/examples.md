@@ -4,7 +4,7 @@ Complete skill examples demonstrating various patterns and configurations.
 
 ---
 
-## Table of Contents
+## Example Index
 
 - [Example 1](#example-1-api-conventions-reference-skill) - API Conventions (Reference Skill)
 - [Example 2](#example-2-deploy-task-skill-with-side-effects) - Deploy (Task Skill with Side Effects)

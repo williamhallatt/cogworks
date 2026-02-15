@@ -44,7 +44,12 @@ def load_human_grades(grades_dir: Path) -> Dict[str, Dict]:
     return grades
 
 def load_llm_grades(results_dir: Path) -> Dict[str, Dict]:
-    """Load LLM grades from JSON result files."""
+    """Load LLM grades from JSON result files.
+
+    Supports both formats:
+    - Legacy: {"categories": {"source_fidelity": {"score": 4}, ...}}
+    - Current: {"layer2": {"source_fidelity": {"score": 4}, ...}}
+    """
     grades = {}
 
     for json_file in results_dir.glob("*-results.json"):
@@ -53,7 +58,13 @@ def load_llm_grades(results_dir: Path) -> Dict[str, Dict]:
         with open(json_file) as f:
             data = json.load(f)
 
-        grades[skill_slug] = data["categories"]
+        if "layer2" in data:
+            grades[skill_slug] = data["layer2"]
+        elif "categories" in data:
+            grades[skill_slug] = data["categories"]
+        else:
+            print(f"Warning: Unrecognised format in {json_file}, skipping")
+            continue
 
     return grades
 

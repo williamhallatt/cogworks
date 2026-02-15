@@ -46,11 +46,8 @@ done
 
 ```
 .claude/test-framework/
-├── config/
-│   └── framework-config.yaml       # All configuration and thresholds
 ├── graders/
-│   ├── deterministic-checks.sh     # Layer 1 bash script
-│   ├── deterministic-checks.md     # Layer 1 documentation
+│   ├── deterministic-checks.sh     # Layer 1 bash script (thresholds documented inline)
 │   ├── llm-judge-rubrics.md        # Layer 2 evaluation rubrics
 │   └── human-review-guide.md       # Layer 3 calibration guide
 ├── templates/
@@ -77,45 +74,13 @@ tests/
 
 ## Configuration
 
-All settings are in `config/framework-config.yaml`:
+All Layer 1 thresholds are documented inline in the `deterministic-checks.sh` script header. There is no external config file — the script is the single source of truth for all deterministic check values.
 
-### Key Parameters
+To adjust thresholds, edit the script directly and run the meta-test suite to verify changes:
 
-```yaml
-# Success thresholds
-thresholds:
-  overall_minimum: 0.85 # Required weighted score
-  synthesis:
-    concept_count: { min: 5, max: 10 }
-    pattern_count: { min: 5, max: 10 }
-  skill:
-    skill_md_max_lines: 500
-    supporting_file_threshold: 3
-
-# Quality dimension weights
-weights:
-  source_fidelity: 0.30 # Most important
-  self_sufficiency: 0.25
-  completeness: 0.20
-  specificity: 0.15
-  no_overlap: 0.10
-
-# Critical failures (auto-fail)
-critical_failures:
-  - missing_frontmatter
-  - no_source_citations
-  - skill_md_exceeds_500_lines
-  - fabricated_claims
+```bash
+bash tests/run-black-box-tests.sh
 ```
-
-### Adjusting Thresholds
-
-To make grading more/less strict:
-
-1. Edit `config/framework-config.yaml`
-2. Change `thresholds.overall_minimum` (0.85 = 85%)
-3. Adjust category weights if priorities change
-4. Re-run golden samples to verify changes
 
 ## Quality Requirements
 
@@ -479,25 +444,4 @@ Report issues: <https://github.com/anthropics/claude-code/issues>
 ---
 
 _Framework version: 1.0.0_
-_Last updated: 2026-02-14_
-
-1. Create flawed source material
-2. Define expected outcome in expected-outcome.yaml
-3. Create test cases
-4. Validate that framework correctly identifies the flaw
-
-## References
-
-- **CLAUDE.md** - Quality requirements and platform limitations
-- **ROADMAP.md Section 3** - Testing strategy requirements
-- **skill-evaluation skill** - Eval-driven development methodology
-- **cogworks-learn skill** - Skill structure requirements
-
-## Support
-
-Report issues: <https://github.com/anthropics/claude-code/issues>
-
----
-
-_Framework version: 1.0.0_
-_Last updated: 2026-02-14_
+_Last updated: 2026-02-15_

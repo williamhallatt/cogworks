@@ -1,5 +1,7 @@
 # LLM-as-Judge Rubrics (Layer 2)
 
+> **Source of truth** for Layer 2 rubric scales and evaluation prompts. Update `cogworks-test/SKILL.md` condensed tables to match when this file changes.
+
 Quality assessment rubrics for cogworks skills using Claude Opus 4.6 as evaluator.
 
 ## Evaluation Principles
@@ -291,44 +293,7 @@ weighted_score = (
 
 ## Usage in cogworks-test Skill
 
-```python
-def llm_judge_evaluation(skill_path, sources_path):
-    """Run LLM-as-judge evaluation on skill"""
-
-    # Read skill content
-    skill_content = read_file(f"{skill_path}/SKILL.md")
-    source_content = read_sources(sources_path)
-
-    # Evaluate each category
-    results = {}
-    for category, rubric in RUBRICS.items():
-        prompt = rubric["prompt"].format(
-            skill=skill_content,
-            sources=source_content
-        )
-
-        response = claude_api_call(
-            model="claude-opus-4-6",
-            temperature=0.0,
-            max_tokens=4096,
-            system="You are an expert evaluator of technical documentation...",
-            messages=[{"role": "user", "content": prompt}]
-        )
-
-        results[category] = json.loads(response)
-
-    # Compute weighted score
-    weighted_score = compute_weighted_score(results)
-
-    # Generate recommendation
-    recommendation = "PASS" if weighted_score >= 0.85 else "FAIL"
-
-    return {
-        "overall_score": weighted_score,
-        "categories": results,
-        "recommendation": recommendation
-    }
-```
+Layer 2 evaluation runs inline within the invoking Claude conversation — no external API calls. The `cogworks-test/SKILL.md` skill reads the skill-under-test and source material into its context, then evaluates each dimension sequentially using the rubrics above. Scores, evidence, and reasoning are produced as structured JSON and written to `tests/results/`.
 
 ## Maintenance
 
