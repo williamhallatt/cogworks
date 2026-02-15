@@ -20,7 +20,7 @@ Transform disparate source materials into a unified knowledge base that:
 6. Provides practical examples with citations
 7. Creates a coherent narrative flow
 
-**Critical:** This is NOT copy-paste. This is NOT summarization. This is **expert** synthesis - finding connections, building understanding, creating new insights from combined knowledge by applying the Expert Subtraction Principle.
+**Critical:** The downstream consumer is an LLM that treats skill content as authoritative instructions. True synthesis creates new understanding that Claude cannot derive on its own — connections between sources, resolved contradictions, and actionable patterns with when/why/how context. Apply the Expert Subtraction Principle throughout.
 
 ### Overriding Principles
 
@@ -69,7 +69,7 @@ See [reference.md](reference.md) for the complete synthesis methodology includin
 - **Detailed phase instructions** - Step-by-step guidance for each phase
 - **Output format template** - Required structure for synthesis output
 - **Quality standards checklist** - Self-check before completing
-- **Synthesis principles** - DO and DON'T guidelines
+- **Synthesis principles** - Practices and common mistakes
 - **Good vs bad examples** - Concrete comparisons
 - **Edge case handling** - Similar sources, contradictions, sparse info, technical content
 - **Success criteria** - How to evaluate synthesis quality

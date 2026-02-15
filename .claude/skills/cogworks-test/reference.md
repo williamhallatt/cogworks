@@ -112,6 +112,8 @@ overall_score = weighted_score / 5.0  # Normalize to 0-1
 # Example: (5×0.30 + 4×0.25 + 4×0.20 + 4×0.15 + 5×0.10) / 5.0 = 0.88
 ```
 
+**Self-consistency check**: After scoring all dimensions, review scores as a set. Check for internal inconsistencies — for example, a skill cannot credibly score 5 on source fidelity but 2 on self-sufficiency (accurate citations imply sufficient context). If scores seem contradictory, re-evaluate the anomalous dimension with the other scores as context. Report any adjustments and reasoning in the evaluation output.
+
 ### Step 5: Generate Validation Report
 
 Create dual-format output. Save both to `tests/results/{timestamp}/{skill-slug}-{results.json,report.md}`.
@@ -293,6 +295,12 @@ Recommendations:
 2. For each, check for: **When** (context), **Why** (reasoning), **How** (steps), **Example**
 3. Calculate actionability percentage
 4. Note vague or generic patterns
+5. Evaluate prompt engineering quality:
+   - **Positive framing**: Guidance uses DO instructions rather than DON'T lists (DON'T lists are acceptable only as brief "Common Mistakes" cross-references)
+   - **Appropriate emphasis**: Authority language (imperatives, ALL CAPS) is reserved for high-fragility workflows; reference skills use natural-language clarity
+   - **Verification gates**: High-fragility workflows include explicit STOP conditions or checklists
+   - **Action clarity**: Instructions use imperative phrasing ("Run tests", "Verify output"), not suggestions ("Consider running tests", "You might want to verify")
+   - **Context-before-rule**: Non-obvious instructions explain WHY before stating the rule
 
 **Output Format**:
 
@@ -303,6 +311,13 @@ Recommendations:
   "actionable_patterns": 13,
   "patterns_with_examples": 12,
   "vague_patterns": ["Pattern 7 lacks concrete steps"],
+  "prompt_quality": {
+    "positive_framing": true,
+    "appropriate_emphasis": true,
+    "verification_gates": "present where needed",
+    "action_clarity": true,
+    "context_before_rule": true
+  },
   "reasoning": "87% patterns actionable with clear when/why/how context"
 }
 ```
@@ -455,11 +470,11 @@ thresholds:
     min_citations: 1
 
 weights:
-  source_fidelity: 0.30      # Fabrication most critical
-  self_sufficiency: 0.25     # Must work standalone
-  completeness: 0.20         # Scope coverage important
-  specificity: 0.15          # Actionability matters
-  no_overlap: 0.10           # Minor overlap acceptable
+  source_fidelity: 0.30 # Fabrication most critical
+  self_sufficiency: 0.25 # Must work standalone
+  completeness: 0.20 # Scope coverage important
+  specificity: 0.15 # Actionability matters
+  no_overlap: 0.10 # Minor overlap acceptable
 
 critical_failures:
   - missing_frontmatter
@@ -550,12 +565,12 @@ tuning:
 
 ### Per-Skill Test Run
 
-| Layer | Cost | Duration | What It Does |
-|-------|------|----------|--------------|
-| Layer 1 (Deterministic) | ~$0.00001 | ~5 sec | Structure, syntax, required elements |
-| Layer 2 (LLM-as-Judge) | ~$1.50 | ~45 sec | 5 quality dimensions with reasoning |
-| Layer 3 (Human Review) | ~$100 | ~20 min | Expert calibration |
-| **Typical (L1+L2)** | **~$1.50** | **<1 min** | |
+| Layer                   | Cost       | Duration   | What It Does                         |
+| ----------------------- | ---------- | ---------- | ------------------------------------ |
+| Layer 1 (Deterministic) | ~$0.00001  | ~5 sec     | Structure, syntax, required elements |
+| Layer 2 (LLM-as-Judge)  | ~$1.50     | ~45 sec    | 5 quality dimensions with reasoning  |
+| Layer 3 (Human Review)  | ~$100      | ~20 min    | Expert calibration                   |
+| **Typical (L1+L2)**     | **~$1.50** | **<1 min** |                                      |
 
 ### Cost Asymmetry
 

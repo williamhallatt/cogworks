@@ -36,25 +36,17 @@ Follow this process systematically:
 
 **Objective:** Understand what each source contains
 
-For each source:
+For each source, build a mental model of what it contributes — its main topics, key concepts, tone and authority level (tutorial, reference, opinion, research), and potential conflicts with other sources.
 
-1. **Identify main topics** - What is this source primarily about?
-2. **Extract key terms** - What concepts, terms, or ideas are introduced?
-3. **Note tone and authority** - Is this tutorial, reference, opinion, research?
-4. **Flag potential conflicts** - Does this disagree with previous sources?
-
-**Mental model:** Build a map of what each source contributes.
+**Output:** A clear picture of what each source brings to the synthesis and where sources might disagree.
 
 ### Phase 2: Concept Extraction (Cross-Source Analysis)
 
 **Objective:** Find the fundamental building blocks
 
-1. **List all concepts mentioned** across ALL sources
-2. **Merge similar concepts** - Different terms for same idea?
-3. **Define each concept clearly** - What does it mean? (Don't assume Claude knows)
-4. **Track source coverage** - Which sources discuss each concept?
+Identify all concepts across sources, merge different terms for the same idea, and define each concept clearly (assuming no prior knowledge). Track which sources discuss each concept to enable citation later.
 
-**Output:** 5-10 core concepts with clear definitions
+**Output:** 5-10 core concepts with clear, standalone definitions
 
 **Example:**
 
@@ -108,7 +100,8 @@ For each pattern found:
 ```markdown
 ### Pattern: {Descriptive Name}
 
-**When to use:** {Specific contexts or scenarios}
+**When to use:** {Describe the specific situation, trigger condition, or decision point.
+Good: "When X is true and Y is needed". Avoid: "When relevant" or "In appropriate contexts".}
 
 **How:**
 
@@ -123,7 +116,7 @@ For each pattern found:
 
 **Target:** 5-10 patterns minimum
 
-**Uniqueness rule:** Each pattern must describe a *transferable approach* — something applicable beyond the specific domain being synthesized. If a "pattern" is just a domain procedure already documented in Core Concepts, it belongs there, not in Patterns. Test: could this pattern be applied to a different topic? If not, it's a concept, not a pattern.
+**Uniqueness rule:** Each pattern must describe a _transferable approach_ — something applicable beyond the specific domain being synthesized. If a "pattern" is just a domain procedure already documented in Core Concepts, it belongs there, not in Patterns. Test: could this pattern be applied to a different topic? If not, it's a concept, not a pattern.
 
 ### Phase 5: Anti-Pattern Documentation
 
@@ -226,6 +219,7 @@ Structure the synthesis logically:
 - Create connections between ideas
 
 **Deduplication principle:** Each section must contribute unique information. Before finalizing, verify that:
+
 - **Patterns** generalize beyond the domain (not restatements of Core Concepts as procedures)
 - **Examples** demonstrate usage scenarios that add context beyond what the reference already shows (not walkthroughs of documented procedures)
 - **Deep Dives** analyze trade-offs or nuance (not expanded restatements of concepts)
@@ -236,6 +230,7 @@ If a section just reformats content from another section, merge it into the orig
 ## Output Format (REQUIRED)
 
 **Length targets:**
+
 - reference.md: 300-500 lines optimal
 - If exceeding 500 lines, consider splitting into multiple files (e.g., patterns.md, examples.md)
 - Table of Contents is REQUIRED for files over 100 lines
@@ -245,7 +240,10 @@ Your synthesis MUST follow this structure exactly:
 ```markdown
 ## TL;DR
 
-{3-5 key insights that capture the essence of the topic, 100-150 words}
+{3-5 key insights in 100-150 words. Insights are statements that would change how
+someone approaches the topic — surprising, actionable, or counter-intuitive.
+"This skill covers advanced prompting techniques" is an introduction.
+"Extended thinking has been superseded by adaptive thinking" is an insight.}
 
 ---
 
@@ -343,12 +341,23 @@ _Why this matters:_ {Relevance}
    - {Description}
 ```
 
+## Quality Anchor
+
+A high-quality synthesis hits these specific attributes:
+
+- **Concept depth**: Core concepts with cross-source synthesis (not single-source summaries) — each concept integrates insights from multiple sources
+- **Relationship density**: 10-15 relationships in the concept map showing dependencies, contrasts, and compositions — not just "A relates to B"
+- **Pattern specificity**: Every pattern has when/why/how/example with source citations — each pattern describes a transferable approach applicable beyond the specific domain
+- **Deep dive nuance**: Deep dives analyse trade-offs and edge cases, not expanded restatements of concepts already covered
+- **Example quality**: Before/after comparisons or concrete demonstrations with source citations — examples that show the difference between naive and expert approaches
+- **Deduplication**: No content restated across supporting files — each file contributes unique information
+
 ## Overriding Principles
 
-These principles take precedence over all other guidance in this skill:
+Generated skills become part of Claude's operational context — fabricated claims will be treated as ground truth during all future invocations, with no mechanism for the user to distinguish fabricated from accurate claims. These principles take precedence over all other guidance in this skill:
 
-1. **Never fabricate domain knowledge.** If sources are ambiguous or incomplete, say so explicitly. Do not invent information to fill gaps. This rule overrides all others.
-2. **Prefer precision over coverage.** A focused, accurate synthesis is better than a broad, shallow one. It is better to document fewer concepts thoroughly than many concepts superficially.
+1. **Never fabricate domain knowledge.** If sources are ambiguous or incomplete, say so explicitly. Do not invent information to fill gaps. Cross-source synthesis (inferring connections between sources) is encouraged; only unsupported invention is prohibited. This rule overrides all others.
+2. **Prefer precision over coverage.** Every line must earn its context budget — a focused, accurate synthesis is better than a broad, shallow one. It is better to document fewer concepts thoroughly than many concepts superficially.
 
 ## Quality Standards (Self-Check Before Completing)
 
@@ -422,29 +431,22 @@ Before completing synthesis, verify:
 
 ## Synthesis Principles (Internalize These)
 
-### DO:
+### Synthesis Practices
 
 - **Find connections** between sources that aren't explicit
 - **Build new understanding** by combining insights
-- **Define terms clearly** even if "everyone knows"
-- **Flag all conflicts** with citations
-- **Credit sources** - maintain Sources section with URLs where available
-- **Cite examples** - examples should reference their source
-- **Write for learners** who need complete context
-- **Be specific** - concrete examples over abstractions
+- **Integrate ideas across sources** — write as a unified voice, not "Source 1 says... Source 2 says..."
+- **Define terms clearly** even if "everyone knows" — write for learners who need complete context
+- **Flag all conflicts** with citations and both perspectives documented
+- **Credit sources** — maintain Sources section with URLs where available; every example references its source
+- **Be specific** — concrete examples over abstractions, patterns with when/why/how
 - **Show relationships** explicitly with arrows and explanations
+- **Verify each section contributes unique information** — if Patterns repeats Core Concepts as procedures, or Examples walks through documented workflows, merge or delete the duplicate
+- **Follow the required output format exactly**
 
-### DON'T:
+### Common Mistakes
 
-- **Concatenate sources** - "Source 1 says... Source 2 says..."
-- **Copy-paste without citation** - Always attribute
-- **Assume knowledge** - Define all concepts
-- **Hide conflicts** - Always flag disagreements
-- **Use vague patterns** - Be specific about when/why/how
-- **Skip relationships** - Show how concepts connect
-- **Write summaries** - Synthesize, don't summarize
-- **Restate across sections** - If Patterns repeats Core Concepts as procedures, or Examples walks through documented workflows, merge or delete the duplicate
-- **Ignore structure** - Follow the required format exactly
+See the [Examples of Good vs Bad Synthesis](#examples-of-good-vs-bad-synthesis) section for concrete comparisons of concatenation vs true synthesis.
 
 ## Examples of Good vs Bad Synthesis
 
