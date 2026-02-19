@@ -265,3 +265,42 @@ Map source material characteristics to appropriate persuasion intensity in gener
 | **Low fragility** — reference, conventions, style guides                   | Minimal          | Clarity only — no persuasion techniques. Let the content speak for itself.                                  |
 
 Overusing persuasion in low-fragility skills causes overtriggering on newer models (Opus 4.6+), where Authority language like "No exceptions" can make Claude overly rigid in contexts that genuinely warrant flexibility. See [persuasion-principles.md](persuasion-principles.md) for the full framework.
+
+### Generated Skill Format Requirements
+
+When generating skills from source material (e.g., using cogworks), include snapshot date information to help users understand knowledge freshness:
+
+**SKILL.md structure:**
+```markdown
+---
+name: skill-name
+description: What this skill does...
+---
+
+# Skill Title
+
+> **Knowledge snapshot from:** YYYY-MM-DD
+
+{Rest of content}
+```
+
+**reference.md Sources section:**
+```markdown
+## Sources
+
+> **Knowledge snapshot date:** YYYY-MM-DD
+>
+> These sources were fetched and synthesized on the date shown above.
+> Information may have changed since then.
+
+1. **Source Title** - URL or "Internal documentation"
+   - Description of source
+```
+
+**Checklist for generated skills:**
+- [ ] Snapshot date present in SKILL.md (immediately after title)
+- [ ] Snapshot date present in reference.md (at Sources section)
+- [ ] Date uses ISO 8601 format (YYYY-MM-DD)
+- [ ] Date represents synthesis time, not individual fetch times
+
+**Note:** Manually created skills don't require snapshot dates. This is specifically for skills generated from external sources where freshness matters.

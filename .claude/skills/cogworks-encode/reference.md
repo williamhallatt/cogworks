@@ -235,6 +235,20 @@ If a section just reformats content from another section, merge it into the orig
 - If exceeding 500 lines, consider splitting into multiple files (e.g., patterns.md, examples.md)
 - Table of Contents is REQUIRED for files over 100 lines
 
+**SKILL.md Requirements:**
+
+When creating the SKILL.md file, include a snapshot date immediately after the title to show when sources were synthesized:
+
+```markdown
+# {Skill Title}
+
+> **Knowledge snapshot from:** {YYYY-MM-DD}
+
+{Skill description and content}
+```
+
+Use ISO 8601 format (YYYY-MM-DD) for the date. This represents when the knowledge was synthesized, helping users understand information freshness.
+
 Your synthesis MUST follow this structure exactly:
 
 ```markdown
@@ -331,6 +345,11 @@ _Why this matters:_ {Relevance}
 {10-20 quick reference items}
 
 ## Sources
+
+> **Knowledge snapshot date:** {YYYY-MM-DD}
+>
+> These sources were fetched and synthesized on the date shown above.
+> Information may have changed since then.
 
 {Full bibliography with URLs where available}
 
