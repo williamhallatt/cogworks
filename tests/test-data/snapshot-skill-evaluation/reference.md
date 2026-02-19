@@ -38,7 +38,7 @@ Effective skill evaluation begins before building: define SMART success criteria
 3. Latency: Response time percentiles (p50, p95, p99)
 4. Cost: Tokens per task, API cost per use
 
-**Source**: Anthropic - Define Success Criteria
+**Source**: Anthropic - Define Success Criteria [Source 1]
 
 ---
 
@@ -53,7 +53,7 @@ Effective skill evaluation begins before building: define SMART success criteria
 
 **Key Property**: Repeatability -- same input should produce comparable results across runs, accounting for LLM nondeterminism by using scored outcomes rather than binary pass/fail.
 
-**Sources**: Anthropic test case guidance, OpenAI eval reference
+**Sources**: Anthropic test case guidance, OpenAI eval reference [Source 2]
 
 ---
 
@@ -71,7 +71,7 @@ Effective skill evaluation begins before building: define SMART success criteria
 
 **Key Difference from TDD**: Traditional TDD tests have binary pass/fail on deterministic code; EDD tests have scored outcomes on probabilistic systems. Success is "passing enough" rather than "passing all."
 
-**Sources**: Anthropic best practices, OpenAI eval-driven workflow
+**Sources**: Anthropic best practices, OpenAI eval-driven workflow [Source 3]
 
 ---
 
