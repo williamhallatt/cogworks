@@ -26,7 +26,26 @@ You combine the analytical rigor of a research scientist with the systems thinki
 
 ### 1. Gather Sources
 
-Collect content from whatever sources the user provides:
+**Parse destination from user invocation:**
+
+Check if the user specified a destination in their command. Common patterns:
+- "cogworks encode {topic} to {destination}"
+- "cogworks encode {topic} in {destination}"
+- "cogworks encode {topic} at {destination}"
+- "cogworks learn {topic} to {destination}"
+- Explicit paths: ".claude/skills/", "~/.claude/skills/", "/custom/path/"
+- Scope keywords: "project", "personal", "user"
+
+If destination is specified:
+- Parse and store as `{skill_path}` (resolve paths like "project" → `.claude/skills/{slug}/`, "personal" → `~/.claude/skills/{slug}/`)
+- Set `{destination_provided}` = true
+- Skip destination question in Step 2
+
+If not specified:
+- Set `{destination_provided}` = false
+- Will ask in Step 2
+
+**Collect content from whatever sources the user provides:**
 
 - **Files** - Use Read to get content from local files
 - **Directories** - Use Glob to find files, then Read each one
@@ -46,7 +65,37 @@ slug = replace spaces and multiple hyphens with single hyphen
 slug = trim leading/trailing hyphens
 ```
 
-If `.claude/skills/{slug}/` already exists, ask the user to confirm overwriting.
+**Determine skill destination:**
+
+If `{destination_provided}` is false (user didn't specify destination), ask using AskUserQuestion:
+
+**Question**: "Where would you like to create the '{slug}' skill?"
+
+**Options**:
+- **Project scope (Recommended)** - `.claude/skills/{slug}/`
+  - Shared with your team through version control
+  - Available when working in this project
+  - Best for team workflows and project-specific patterns
+
+- **Personal scope** - `~/.claude/skills/{slug}/`
+  - Private to your user account
+  - Available across all projects
+  - Best for personal workflows and preferences
+
+- **Custom path** - Specify a custom directory
+  - For plugin locations or non-standard deployments
+  - User provides the full destination path
+
+Store the selected path as `{skill_path}`.
+
+**Path resolution:**
+- If Project selected: `{skill_path}` = `.claude/skills/{slug}/`
+- If Personal selected: Expand home directory using `echo $HOME`, then `{skill_path}` = `$HOME/.claude/skills/{slug}/`
+- If Custom selected: Ask user for full path, validate it's an absolute path and parent directory exists
+
+**If `{destination_provided}` is true** (user already specified), skip the question and use the parsed `{skill_path}`.
+
+**In both cases**, check if `{skill_path}` already exists and ask the user to confirm overwriting.
 
 ### 3. Synthesize Content
 
@@ -61,6 +110,7 @@ Synthesise all gathered source material into a unified knowledge base following 
 Present the synthesis summary to the user:
 
 - Topic name and source count
+- **Destination**: {skill_path}
 - TL;DR section
 - Statistics (concept/pattern/example counts)
 
@@ -68,8 +118,9 @@ Ask user to approve before creating skill files. If they decline, stop execution
 
 ### 5. Generate Skill Files
 
-Generate skill files in `.claude/skills/{slug}/` from the synthesis output. Create SKILL.md with frontmatter and overview, reference.md with the full knowledge base, and supporting files (patterns.md, examples.md) only when they contain substantive unique content (3+ distinct entries each). Pass:
+Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.md with frontmatter and overview, reference.md with the full knowledge base, and supporting files (patterns.md, examples.md) only when they contain substantive unique content (3+ distinct entries each). Pass:
 
+- `{skill_path}` — the full destination path for skill files
 - `{slug}` — the skill name and directory name
 - `{topic_name}` — the topic being encoded
 - The synthesis output — the structured knowledge from Step 3
@@ -84,12 +135,12 @@ Run automated validation on the generated skill:
 
 1. **Layer 1 — Deterministic checks**:
    ```bash
-   bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/{slug}/ --json
+   bash .claude/test-framework/graders/deterministic-checks.sh {skill_path} --json
    ```
    If critical failures: fix the issues, then re-run (max 1 retry).
 
 2. **Layer 2 — Semantic quality evaluation**:
-   - Read all skill files + source material from `_sources/{slug}/`
+   - Read all skill files from `{skill_path}`
    - Evaluate each of the 5 quality dimensions using the rubrics from `.claude/test-framework/graders/llm-judge-rubrics.md`:
      - Source Fidelity (weight 0.30): trace 10 claims to sources, check citations
      - Self-Sufficiency (weight 0.25): verify all terms defined, no external dependencies
@@ -111,9 +162,19 @@ Run automated validation on the generated skill:
 Display:
 
 - Topic name and slug
-- File locations
+- **Skill location**: {skill_path}
 - How to invoke the new skill (`/{slug}`)
 - Validation results: Layer 1 status, Layer 2 scores per dimension, overall weighted score, and recommendation (PASS/FAIL)
+
+## Variable Naming Convention
+
+Throughout the workflow, use these variables consistently:
+
+- `{skill_path}` — Full destination path for skill files (user-selectable)
+- `{slug}` — Skill name/identifier derived from topic name
+- `{topic_name}` — Human-readable topic name provided by user
+
+The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` references.
 
 ## Edge Case Handling
 
@@ -131,7 +192,7 @@ Display:
 
 ## Success Criteria
 
-1. `.claude/skills/{slug}/` directory created
+1. `{skill_path}` directory created (location selected by user)
 2. Skill files generated following cogworks-learn expertise
 3. Layer 1 deterministic checks pass (no critical failures)
 4. Layer 2 weighted score >= 0.85 with no dimension below 3
