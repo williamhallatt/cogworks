@@ -2,6 +2,61 @@
 
 This guide explains how to install the cogworks agent and its required skills into your Claude Code project.
 
+## Automated Installation (Recommended)
+
+The cogworks release includes an installation script that handles setup automatically.
+
+### Extract and Run
+
+#### Linux/macOS
+
+```bash
+tar -xzf cogworks-{version}.tar.gz
+cd cogworks-{version}
+./install.sh
+```
+
+#### Windows (using Git Bash or WSL)
+
+```bash
+unzip cogworks-{version}.zip
+cd cogworks-{version}
+./install.sh
+```
+
+The script will:
+- Present a menu to choose installation location (local or global)
+- Create necessary directories
+- Copy agent, skills, and test framework
+- Validate the installation
+- Provide next steps
+
+### Non-Interactive Installation
+
+For automation or CI/CD:
+
+```bash
+# Install to current project
+./install.sh --local
+
+# Install to personal directory
+./install.sh --global
+
+# Force overwrite existing files
+./install.sh --global --force
+
+# Preview changes without modifying files
+./install.sh --local --dry-run
+```
+
+Run `./install.sh --help` for all options.
+
+---
+
+## Manual Installation
+
+If you prefer manual installation or need custom setup, follow these instructions.
+
 ## Quick Start
 
 ### Using tar.gz (Linux/macOS)
@@ -59,6 +114,21 @@ Install all skills and dependencies:
 ```bash
 cp -r cogworks-{version}/.claude/skills/cogworks-* your-project/.claude/skills/
 cp -r cogworks-{version}/.claude/test-framework your-project/.claude/
+```
+
+### Dependencies (for cogworks-test)
+
+The deterministic checks require:
+
+- `jq`
+- `python3` with `PyYAML` installed
+
+Example install commands:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install -y jq python3-pip
+python3 -m pip install pyyaml
 ```
 
 ### 4. Verify installation

@@ -43,19 +43,30 @@ My typical workflow:
 
 The packaged release includes the `cogworks` agent, its two required supporting skills (`cogworks-encode` and `cogworks-learn`), and the optional, but useful testing skill (`cogworks-test`) with associated testing infrastructure (`.claude/test-framework/`). The testing skill is not required for using `cogworks`, but is recommended if you want to validate generated skills.
 
-### From Release (Recommended)
+### Quick Install (Recommended)
 
-Download the latest release from [GitHub Releases](https://github.com/williamhallatt/cogworks/releases):
+Download the latest release from [GitHub Releases](https://github.com/williamhallatt/cogworks/releases) and run the installation script:
 
 ```bash
-# Extract release
+# Extract and install
 tar -xzf cogworks-{version}.tar.gz
-
-# Copy to your project
-cp -r cogworks-{version}/.claude/* your-project/.claude/
+cd cogworks-{version}
+./install.sh
 ```
 
-See [INSTALL.md](INSTALL.md) for detailed installation instructions.
+The script provides an interactive menu to choose between local (project) or global (personal) installation, handles directory creation, and validates the installation.
+
+For non-interactive installation:
+
+```bash
+# Install to current project
+./install.sh --local
+
+# Install to personal directory
+./install.sh --global
+```
+
+See [INSTALL.md](INSTALL.md) for detailed instructions and manual installation options.
 
 ### Manual Installation
 
