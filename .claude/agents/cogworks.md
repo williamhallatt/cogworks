@@ -99,6 +99,8 @@ Store the selected path as `{skill_path}`.
 
 ### 3. Synthesize Content
 
+**Capture the current date as `{snapshot_date}` using ISO 8601 format (YYYY-MM-DD).** This will be embedded in the generated skill files to show when sources were current.
+
 Synthesise all gathered source material into a unified knowledge base following the `cogworks-encode` 8-phase process. Find non-obvious connections between sources, resolve contradictions with nuanced analysis, and extract patterns that would not be apparent from reading any single source alone. The synthesis must produce all required output sections: TL;DR, Core Concepts, Concept Map, Patterns, Anti-Patterns, Practical Examples, Deep Dives, Quick Reference, and Sources.
 
 **Quality guardrails for synthesis:**
@@ -123,7 +125,21 @@ Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.m
 - `{skill_path}` — the full destination path for skill files
 - `{slug}` — the skill name and directory name
 - `{topic_name}` — the topic being encoded
+- `{snapshot_date}` — the date when sources were synthesized (YYYY-MM-DD format)
 - The synthesis output — the structured knowledge from Step 3
+
+**IMPORTANT:** Add the snapshot date in two locations:
+
+1. **In SKILL.md**: Add `> **Knowledge snapshot from:** {snapshot_date}` immediately after the H1 title
+2. **In reference.md**: Add snapshot metadata at the start of the Sources section:
+   ```markdown
+   ## Sources
+
+   > **Knowledge snapshot date:** {snapshot_date}
+   >
+   > These sources were fetched and synthesized on the date shown above.
+   > Information may have changed since then.
+   ```
 
 Pay particular attention to the SKILL.md description field: it must be keyword-rich, start with an action verb, include trigger phrases users would naturally say, list concrete use cases, and be written in third person. This single field determines whether the skill will be discovered and auto-loaded.
 
@@ -173,6 +189,7 @@ Throughout the workflow, use these variables consistently:
 - `{skill_path}` — Full destination path for skill files (user-selectable)
 - `{slug}` — Skill name/identifier derived from topic name
 - `{topic_name}` — Human-readable topic name provided by user
+- `{snapshot_date}` — ISO 8601 date (YYYY-MM-DD) when sources were synthesized
 
 The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` references.
 
