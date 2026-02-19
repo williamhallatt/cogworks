@@ -1,5 +1,5 @@
 #!/bin/bash
-# Cogworks Installation Script
+# cogworks Installation Script
 # Interactive installer for cogworks agent and skills
 #
 # Usage:
@@ -630,7 +630,7 @@ verify_installation() {
 #
 
 show_installation_menu() {
-    print_header "Cogworks Installation"
+    print_header "cogworks Installation"
 
     echo "This script will install the cogworks agent and its skills to your chosen location."
     echo
@@ -878,7 +878,7 @@ show_success_message() {
         exit 1
     fi
 
-    print_success "Cogworks is ready to use!"
+    print_success "cogworks is ready to use!"
     echo
     echo "Next steps:"
     if [[ "$INSTALL_TARGET" == "codex" ]]; then
@@ -899,7 +899,7 @@ show_success_message() {
 
 show_help() {
     cat << EOF
-Cogworks Installation Script v${VERSION}
+cogworks Installation Script v${VERSION}
 
 Usage:
   ./install.sh [OPTIONS]

@@ -333,7 +333,7 @@ jobs:
           gh release create "${TAG}" \
             "${ARTIFACT_NAME}.tar.gz" \
             "${ARTIFACT_NAME}.zip" \
-            --title "Cogworks v${VERSION}" \
+            --title "cogworks v${VERSION}" \
             --notes-file release-notes.md \
             --draft=false
 
