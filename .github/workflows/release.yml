@@ -138,6 +138,11 @@ jobs:
           cp LICENSE "${ARTIFACT_NAME}/"
           cp INSTALL.md "${ARTIFACT_NAME}/" 2>/dev/null || echo "Note: INSTALL.md not found"
 
+          # Copy installation script
+          cp install.sh "${ARTIFACT_NAME}/"
+          chmod +x "${ARTIFACT_NAME}/install.sh"
+          echo "Packaged: install.sh"
+
           # Generate file list for release notes
           echo "## Release Contents" > release-contents.txt
           echo "" >> release-contents.txt
@@ -256,7 +261,27 @@ jobs:
               esac
             done < <(grep '^- cogworks-' release-contents.txt)
             echo ""
-            echo "See [INSTALL.md](https://github.com/williamhallatt/cogworks/blob/main/INSTALL.md) for installation instructions."
+            echo "## Installation"
+            echo ""
+            echo "Extract the archive and run \`./install.sh\` for guided installation:"
+            echo ""
+            echo "\`\`\`bash"
+            echo "tar -xzf cogworks-{version}.tar.gz"
+            echo "cd cogworks-{version}"
+            echo "./install.sh"
+            echo "\`\`\`"
+            echo ""
+            echo "Or use non-interactive mode:"
+            echo ""
+            echo "\`\`\`bash"
+            echo "# Install to current project"
+            echo "./install.sh --local"
+            echo ""
+            echo "# Install to personal directory"
+            echo "./install.sh --global"
+            echo "\`\`\`"
+            echo ""
+            echo "See [INSTALL.md](https://github.com/williamhallatt/cogworks/blob/main/INSTALL.md) for manual installation instructions."
             echo ""
             if [ -n "${PREVIOUS_TAG}" ]; then
               echo "**Full changelog**: https://github.com/williamhallatt/cogworks/compare/${PREVIOUS_TAG}...${TAG}"
