@@ -281,7 +281,7 @@ rm your-project/.claude/agents/cogworks.md
 - ✅ **macOS** - File structure compatible
 - ✅ **Windows** - File structure compatible (use WSL for best results)
 
-> **Note:** Cogworks uses Linux-specific paths in some skills. See [ROADMAP.md](ROADMAP.md) for cross-platform support plans.
+> **Note:** cogworks uses Linux-specific paths in some skills. See [ROADMAP.md](ROADMAP.md) for cross-platform support plans.
 
 ## Getting Help
 
