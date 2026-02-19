@@ -423,6 +423,36 @@ check_citation_format() {
     fi
 }
 
+# Check 15: Snapshot date present in generated skills
+check_snapshot_date_present() {
+    # This check only applies to generated skills (with reference.md)
+    if [[ ! -f "${SKILL_DIR}/reference.md" ]]; then
+        log_pass "Snapshot date (not applicable - no reference.md)"
+        return 0
+    fi
+
+    local skill_has_snapshot=false
+    local ref_has_snapshot=false
+
+    # Check SKILL.md for snapshot date
+    if grep -q "^> \*\*Knowledge snapshot from:\*\*" "$SKILL_FILE"; then
+        skill_has_snapshot=true
+    fi
+
+    # Check reference.md for snapshot date in Sources section
+    if grep -q "^> \*\*Knowledge snapshot date:\*\*" "${SKILL_DIR}/reference.md"; then
+        ref_has_snapshot=true
+    fi
+
+    if $skill_has_snapshot && $ref_has_snapshot; then
+        log_pass "Snapshot date present in both SKILL.md and reference.md"
+    elif $skill_has_snapshot || $ref_has_snapshot; then
+        log_warning "Snapshot date missing in one location"
+    else
+        log_warning "Snapshot date missing (generated skills should include snapshot date)"
+    fi
+}
+
 # Run all checks
 run_all_checks() {
     check_dependencies || true
@@ -450,6 +480,7 @@ run_all_checks() {
     check_name_format || true
     check_supporting_file_substantiveness || true
     check_citation_format || true
+    check_snapshot_date_present || true
 }
 
 # Generate output

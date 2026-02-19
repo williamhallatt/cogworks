@@ -4,11 +4,12 @@ Automated validation system for cogworks-generated skills using layered grading 
 
 ## Overview
 
-The cogworks testing framework validates that generated skills meet quality requirements through three evaluation layers:
+The cogworks testing framework validates that generated skills meet quality requirements through four evaluation layers. Framework meta-tests live under `tests/` and are run separately (see `TESTING.md`).
 
 1. **Layer 1: Deterministic checks** (~5 sec, ~$0.00001) - Fast structural validation
 2. **Layer 2: LLM-as-judge** (~45 sec, ~$1.50) - Content quality assessment
-3. **Layer 3: Human review** (optional, ~20 min, ~$100) - Calibration and disputes
+3. **Layer 2.5: Behavioral tests** (variable) - Activation + execution traces
+4. **Layer 3: Human review** (optional, ~20 min, ~$100) - Calibration and disputes
 
 ## Quick Start
 
@@ -42,6 +43,26 @@ for sample in tests/datasets/golden-samples/*/; do
 done
 ```
 
+### Run Behavioral Tests
+
+```bash
+# Run behavioral tests for all skills
+python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run
+
+# Only run for cogworks-* skills
+python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run --skill-prefix cogworks-
+```
+
+### Scaffold Behavioral Test Cases
+
+```bash
+# Scaffold cases for a single skill
+python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral scaffold --skill my-skill
+
+# Scaffold cases for all cogworks-* skills
+python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral scaffold --skill-prefix cogworks-
+```
+
 ## Directory Structure
 
 ```
@@ -50,8 +71,12 @@ done
 │   ├── deterministic-checks.sh     # Layer 1 bash script (thresholds documented inline)
 │   ├── llm-judge-rubrics.md        # Layer 2 evaluation rubrics
 │   └── human-review-guide.md       # Layer 3 calibration guide
+├── scripts/
+│   ├── cogworks-test-framework.py  # Unified CLI
 ├── templates/
 │   ├── test-case-template.jsonl    # Example test case formats
+│   ├── behavioral-test-case-template.jsonl
+│   └── behavioral-trace-template.json
 │   └── validation-report.md        # Report template (Handlebars)
 └── README.md                        # This file
 
@@ -68,6 +93,8 @@ tests/
 │   │   ├── insufficient-sources/
 │   │   └── overlapping-builtin/
 │   └── edge-cases/                  # Boundary conditions
+├── behavioral/
+│   └── {skill_slug}/                 # Per-skill activation cases + traces
 ├── results/                         # Test outputs (timestamped, gitignored)
 └── calibration/                     # Human grades for LLM validation
 ```
@@ -95,6 +122,8 @@ Skills must meet these criteria (from CLAUDE.md):
 | No Overlap       | 10%    | Novel value beyond Claude's built-in knowledge |
 
 **Pass threshold**: Overall score ≥ 0.85 AND zero critical failures
+
+**Behavioral gate**: activation_f1 ≥ 0.85 AND false_positive_rate ≤ 0.05 AND negative control ratio ≥ 0.25 AND no missing traces
 
 ## Layered Grading
 
@@ -156,6 +185,21 @@ weighted_score = (
 - Cost: ~$1.50 per skill
 - Duration: ~45 seconds
 
+### Layer 2.5: Behavioral Tests
+
+**Purpose**: Validate activation behavior and observable actions using execution traces.
+
+**Inputs**:
+
+- `tests/behavioral/{skill_slug}/test-cases.jsonl`
+- `tests/behavioral/{skill_slug}/traces/{case_id}.json`
+
+**Usage**:
+
+```bash
+python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run
+```
+
 ### Layer 3: Human Review (Optional)
 
 **Purpose**: Calibrate LLM-judge accuracy, resolve disputes
@@ -195,6 +239,24 @@ Known-good skills that should always pass. Use for:
 5. Create metadata.yaml with expected scores
 6. Create test-cases.jsonl
 7. Run test: `/cogworks-test {slug} --compare-against golden-samples/{slug}/`
+
+### Leakage Audit (Golden Samples)
+
+Prevent skill files from embedding source text or oracle content:
+
+```bash
+python3 .claude/test-framework/scripts/cogworks-test-framework.py leakage audit \\
+  --skill-dir tests/datasets/golden-samples/{slug}/expected-skill \\
+  --sources-dir tests/datasets/golden-samples/{slug}/sources
+```
+
+### Behavioral Tests
+
+For each skill, create a behavioral test case set under `tests/behavioral/{skill_slug}/` and capture traces in `traces/`.
+
+In this repository, behavioral tests are required only for `cogworks-*` skills. Use `--skill-prefix cogworks-` to scope runs.
+
+Testing is optional for users of the cogworks engine. To test a generated skill, use the `cogworks-test` skill and the unified CLI in this framework when you choose to validate.
 
 ### Negative Controls
 
@@ -248,6 +310,12 @@ Comprehensive report with:
 
 Saved to: `tests/results/{timestamp}/{slug}-report.md`
 
+### Behavioral Outputs
+
+- `tests/results/behavioral/{timestamp}/{slug}-behavioral.json`
+- `tests/results/behavioral/{timestamp}/{slug}-behavioral.md`
+- `tests/results/behavioral/{timestamp}/summary.json`
+
 ## Calibration
 
 ### Running Calibration
@@ -280,6 +348,16 @@ Saved to: `tests/results/{timestamp}/{slug}-report.md`
        tests/calibration/*-human.yaml \
        tests/results/latest/*-results.json
    ```
+
+5. **Run calibration gate**:
+
+   ```bash
+   python3 .claude/test-framework/scripts/cogworks-test-framework.py calibration run
+   ```
+
+If calibration data is not available yet, you may temporarily skip the check. CI should be tightened once real calibration data exists.
+
+If calibration data is not available yet, skip the check until real human and LLM results exist.
 
 5. **Target**: 90%+ agreement (within 0.5 points on 5-point scale)
 
@@ -348,7 +426,7 @@ time bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/
 ### All Skills Failing
 
 **Check**: Are thresholds too strict?
-**Solution**: Review `config/framework-config.yaml`, consider lowering `thresholds.overall_minimum`
+**Solution**: Review `deterministic-checks.sh` and `graders/llm-judge-rubrics.md`, adjust thresholds with calibration evidence
 
 **Check**: Is rubric biased?
 **Solution**: Run calibration to validate LLM-judge accuracy
@@ -411,7 +489,7 @@ jobs:
 1. Define new category in `graders/llm-judge-rubrics.md`
 2. Create 5-point scale with anchors
 3. Write evaluation prompt
-4. Add weight to `config/framework-config.yaml`
+4. Update `cogworks-test/SKILL.md` tables to match
 5. Run calibration to validate
 
 ### Adding Golden Samples

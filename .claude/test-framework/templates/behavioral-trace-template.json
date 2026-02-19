@@ -1,0 +1,15 @@
+{
+  "skill_slug": "deployment-skill",
+  "case_id": "invocability-001",
+  "activated": true,
+  "tools_used": ["Bash"],
+  "commands": [
+    {"cmd": "git status", "exit_code": 0}
+  ],
+  "files_modified": [],
+  "files_created": [],
+  "harness": "claude-code",
+  "model": "claude-opus-4-6",
+  "timestamp": "2026-02-19T12:00:00Z",
+  "notes": "Captured manually"
+}

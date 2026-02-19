@@ -41,7 +41,7 @@ My typical workflow:
 
 ## Installation
 
-The packaged release includes the `cogworks` agent, its two required supporting skills (`cogworks-encode` and `cogworks-learn`), and the optional, but useful testing skill (`cogworks-test`) with associated testing infrastructure (`.claude/test-framework/`). The testing skill is not required for using `cogworks`, but is recommended if you want to validate generated skills.
+The packaged release includes the `cogworks` agent, its two required supporting skills (`cogworks-encode` and `cogworks-learn`), and the optional testing skill (`cogworks-test`) with associated testing infrastructure (`.claude/test-framework/`). The testing skill is not required for using `cogworks`, and it is **user‑initiated**: if you want to validate generated skills, you explicitly run `cogworks-test` and the test framework yourself.
 
 ### Quick Install (Recommended)
 
@@ -70,7 +70,7 @@ See [INSTALL.md](INSTALL.md) for detailed instructions and manual installation o
 
 ### Manual Installation
 
-Alternatively, copy the `cogworks` agent and its dependencies (`cogworks-encode` and `cogworks-learn`) directly from this repository. All three are required — the agent orchestrates the workflow, and the two skills provide the synthesis and skill-writing (`cogworks-test` is not required, but recommended if you want to validate generated skills. If you do want to use it, you'll also need the testing infrastructure in `.claude/test-framework/`)
+Alternatively, copy the `cogworks` agent and its dependencies (`cogworks-encode` and `cogworks-learn`) directly from this repository. All three are required — the agent orchestrates the workflow, and the two skills provide the synthesis and skill-writing (`cogworks-test` is optional and only runs when you invoke it. If you want testing, also include `.claude/test-framework/`.)
 
 ```bash
 your-project/
@@ -137,7 +137,7 @@ You approve or decline. If you decline, `cogworks` stops.
 
 **5. Skill generation** — On approval, `cogworks` writes the skill files to your chosen destination (SKILL.md, reference.md, patterns.md, examples.md).
 
-**6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing.
+**6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing. If you want additional or repeatable validation later, run `cogworks-test` yourself (see `TESTING.md`).
 
 **7. Done** — `cogworks` confirms the skill location and how to invoke it.
 

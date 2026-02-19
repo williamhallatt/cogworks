@@ -1,6 +1,6 @@
 ---
 name: cogworks-test
-description: "Validates cogworks skills through structural checks and semantic quality evaluation. Tests structure, citations, source fidelity, completeness, and specificity. Use when validating generated skills, checking quality after generation, or running regression tests."
+description: "Validates generated cogworks skills through structural checks and semantic quality evaluation. Tests structure, citations, source fidelity, completeness, and specificity. Use when validating generated skills, checking quality after generation, or running regression tests."
 tools: [Read, Glob, Bash, Write]
 context: inline
 disable-model-invocation: true
@@ -8,7 +8,9 @@ disable-model-invocation: true
 
 # Cogworks Skill Validator
 
-Two-layer validation: fast structural checks (Layer 1) followed by semantic quality evaluation (Layer 2).
+**Scope**: This skill validates generated skills only. Framework meta-tests live under `tests/` and are run separately (see `TESTING.md`).
+
+Layered validation: deterministic checks (Layer 1), semantic quality evaluation (Layer 2), plus behavioral and calibration gates.
 
 ## Invocation
 
@@ -178,10 +180,36 @@ weighted_score = (
 ```
 
 Determine recommendation:
-- **PASS**: weighted_score >= 0.85 AND no dimension scores below 3
-- **FAIL**: weighted_score < 0.85 OR any dimension below 3
+- **PASS**: weighted_score >= 0.85 AND no dimension scores below 3 AND behavioral gate passes AND calibration gate passes
+- **FAIL**: weighted_score < 0.85 OR any dimension below 3 OR behavioral gate fails OR calibration gate fails
 
-### Step 8: Write Results
+### Step 8: Behavioral Gate (External)
+
+Run behavioral tests (activation + traces) and confirm the skill passes the behavioral gate:
+
+```bash
+python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run
+```
+
+Behavioral pass criteria:
+- activation_f1 >= 0.85
+- false_positive_rate <= 0.05
+- negative control ratio >= 0.25
+- no missing traces
+
+If behavioral tests fail, mark the overall recommendation as FAIL even if Layer 1/2 pass.
+
+### Step 9: Calibration Gate (External)
+
+Verify LLM-judge calibration agreement:
+
+- `tests/calibration/latest/summary.json` must exist
+- `agreement_overall >= 0.90`
+- Each category agreement >= 0.85
+
+If calibration fails, mark the overall recommendation as FAIL.
+
+### Step 10: Write Results
 
 Write JSON results to `{skill_path}/.cogworks-results/{slug}-results.json`.
 
@@ -211,7 +239,7 @@ Example JSON:
 }
 ```
 
-### Step 9: Report
+### Step 11: Report
 
 Display results to user:
 
@@ -249,5 +277,6 @@ The `tests/` directory validates that Layer 1 works correctly:
 - `.claude/test-framework/graders/llm-judge-rubrics.md` — Layer 2 rubric specification (authoritative; this file condenses it for inline execution)
 - `.claude/test-framework/graders/human-review-guide.md` — Layer 3 guide (manual process)
 - `.claude/test-framework/scripts/calculate-agreement.py` — Calibration script
+- `.claude/test-framework/scripts/run-behavioral-tests.py` — Behavioral gate runner
 
 See [reference.md](reference.md) for scoring methodology, known biases, and troubleshooting.
