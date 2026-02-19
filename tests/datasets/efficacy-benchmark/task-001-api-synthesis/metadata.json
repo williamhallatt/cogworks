@@ -1,0 +1,26 @@
+{
+  "task_id": "task-001-api-synthesis",
+  "domain": "software-engineering",
+  "description": "Generate API skill from documentation and implement authentication endpoint",
+  "baseline_success_rate": 0.22,
+  "target_with_skill_rate": 0.85,
+  "baseline_runs": 10,
+  "difficulty": "medium",
+  "estimated_time_min": 5,
+  "success_criteria": [
+    "Correct endpoint route (POST /api/auth/login)",
+    "Request body validation present",
+    "Password verification logic",
+    "JWT token generation",
+    "Error handling with appropriate status codes",
+    "Response format matches specification"
+  ],
+  "common_baseline_failures": [
+    "Missing error handling",
+    "Incorrect response format",
+    "No password verification",
+    "Missing validation",
+    "Mock implementation without real authentication"
+  ],
+  "notes": "This task tests whether cogworks-generated skills effectively capture API patterns. Baseline agents often produce partial implementations."
+}

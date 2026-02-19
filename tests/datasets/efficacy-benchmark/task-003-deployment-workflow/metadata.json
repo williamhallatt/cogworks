@@ -1,0 +1,27 @@
+{
+  "task_id": "task-003-deployment-workflow",
+  "domain": "devops-infrastructure",
+  "description": "Generate deployment skill and implement safe production deployment workflow",
+  "baseline_success_rate": 0.25,
+  "target_with_skill_rate": 0.82,
+  "baseline_runs": 10,
+  "difficulty": "medium",
+  "estimated_time_min": 8,
+  "success_criteria": [
+    "Checked git status for uncommitted changes",
+    "Ran test suite before deployment",
+    "Created git tag for release",
+    "Deployed to staging first",
+    "Included verification for staging",
+    "Deployed to production with safety checks",
+    "Provided rollback instructions"
+  ],
+  "common_baseline_failures": [
+    "Skipped test execution",
+    "No git tagging",
+    "Direct production deployment without staging",
+    "Missing verification steps",
+    "No rollback plan provided"
+  ],
+  "notes": "Tests whether skill captures complete deployment workflow including safety checks and rollback procedures. Baseline agents often produce partial workflows."
+}
