@@ -37,7 +37,7 @@ My typical workflow:
 ## Prerequisites
 
 - **Claude Code** — installed and working ([docs](https://docs.anthropic.com/en/docs/claude-code))
-- **A project repository** — `cogworks` creates skills inside `.claude/skills/` within whichever repo you run it in
+- **A project repository** — `cogworks` creates skills in your chosen location (project scope `.claude/skills/`, personal scope `~/.claude/skills/`, or a custom path)
 
 ## Installation
 
@@ -110,7 +110,7 @@ Here's what happens step by step:
 
 **1. Source gathering** — `cogworks` fetches the URL content. If any sources fail to load, it tells you and asks whether to continue with what it has.
 
-**2. Slug generation** — if not provided, `cogworks` picks a URL-safe slug from the source topic (e.g., `eating-pizza`). If `.claude/skills/eating-pizza/` already exists, it asks you to confirm overwriting.
+**2. Slug generation and destination selection** — if not provided, `cogworks` picks a URL-safe slug from the source topic (e.g., `eating-pizza`). You can specify a destination in your command (e.g., "to personal" or "to project"), or `cogworks` will ask where to create the skill (project, personal, or custom path). If the destination already exists, it asks you to confirm overwriting.
 
 **3. Synthesis** — `cogworks` runs the 8-phase synthesis process on the gathered content:
 content analysis → concept extraction → relationship mapping → pattern extraction → anti-pattern documentation → conflict detection → example collection → narrative construction
@@ -118,12 +118,13 @@ content analysis → concept extraction → relationship mapping → pattern ext
 **4. Review** — `cogworks` presents a summary for your review:
 
 - Topic name and source count
+- Destination path where the skill will be created
 - A TL;DR of the synthesised knowledge
 - Statistics (concept, pattern, and example counts)
 
 You approve or decline. If you decline, `cogworks` stops.
 
-**5. Skill generation** — On approval, `cogworks` writes the skill files to `.claude/skills/{slug}/` (SKILL.md, reference.md, patterns.md, examples.md).
+**5. Skill generation** — On approval, `cogworks` writes the skill files to your chosen destination (SKILL.md, reference.md, patterns.md, examples.md).
 
 **6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing.
 
@@ -215,9 +216,9 @@ See `.claude/test-framework/README.md` for complete testing documentation.
 
 Related to this being a personal workflow tool (see [ROADMAP.md](ROADMAP.md) for planned work):
 
-- **Claude Code only [FOR NOW]** — output formats specifically target Claude Code structures, may not work well for other agent frameworks without modification
+- **Cogworks is Claude Code-specific** — The `cogworks` agent and its workflow rely on Claude Code features (subagent orchestration, the Task tool, specific invocation patterns) that don't exist in GitHub Copilot, OpenAI Codex, or other agent platforms. **However, the skills cogworks generates ARE portable** — they follow the universal AgentSkills standard (SKILL.md format with minimal frontmatter) and work across Claude Code, GitHub Copilot, Cursor, and other tools supporting the standard. Think of cogworks as a Claude Code-native authoring tool that produces cross-platform outputs.
 - **Not portable** — `cogworks` assumes Linux (Ubuntu), edit paths throughout agent and associated skills definitions accordingly
-- **Local creation** — encoded skills are created in `.claude/skills/` within the repo where `cogworks` is used
+- **Flexible destination** — encoded skills can be created in project scope (`.claude/skills/`), personal scope (`~/.claude/skills/`), or custom paths
 - **Agent generation not yet implemented** — `cogworks` for generating sub-agents is planned but not available
 
 Limitations I'm not planning on addressing:
