@@ -13,6 +13,8 @@ It assumes no prior knowledge of this repo or toolkit.
 - **Generated skill testing**: Use `/cogworks-test` and the unified CLI in `.claude/test-framework/scripts/cogworks-test-framework.py`.
 - **Framework testing (meta-tests)**: Use `tests/run-black-box-tests.sh` and fixtures under `tests/test-data/`.
 
+> **Codex note**: Deterministic checks (Layer 1) work for Codex-generated skills when you pass the `.agents/skills/{slug}` path. Layer 2 and behavioral gates rely on Claude-specific tooling and are not part of the default Codex workflow.
+
 ---
 
 ## Prerequisites

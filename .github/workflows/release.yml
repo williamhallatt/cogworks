@@ -138,6 +138,15 @@ jobs:
           cp LICENSE "${ARTIFACT_NAME}/"
           cp INSTALL.md "${ARTIFACT_NAME}/" 2>/dev/null || echo "Note: INSTALL.md not found"
 
+          # Copy Codex skills
+          if [ -d "codex/skills" ]; then
+            mkdir -p "${ARTIFACT_NAME}/codex"
+            cp -r codex/skills "${ARTIFACT_NAME}/codex/skills"
+            echo "Packaged: codex/skills"
+          else
+            echo "WARNING: codex/skills not found (Codex support unavailable)"
+          fi
+
           # Copy installation script
           cp install.sh "${ARTIFACT_NAME}/"
           chmod +x "${ARTIFACT_NAME}/install.sh"
@@ -154,6 +163,16 @@ jobs:
             skill_name=$(basename "$skill_dir")
             echo "- ${skill_name}" >> release-contents.txt
           done
+          echo "" >> release-contents.txt
+          echo "### Codex Skills Included" >> release-contents.txt
+          if [ -d "codex/skills" ]; then
+            for skill_dir in codex/skills/*/; do
+              skill_name=$(basename "$skill_dir")
+              echo "- ${skill_name}" >> release-contents.txt
+            done
+          else
+            echo "- (none)" >> release-contents.txt
+          fi
 
           # Create archives
           tar -czf "${ARTIFACT_NAME}.tar.gz" "${ARTIFACT_NAME}/"
@@ -279,6 +298,14 @@ jobs:
             echo ""
             echo "# Install to personal directory"
             echo "./install.sh --global"
+            echo "\`\`\`"
+            echo ""
+            echo "Codex installs:"
+            echo ""
+            echo "\`\`\`bash"
+            echo "./install.sh --target codex --local"
+            echo "./install.sh --target codex --global"
+            echo "./install.sh --codex  # legacy global"
             echo "\`\`\`"
             echo ""
             echo "See [INSTALL.md](https://github.com/williamhallatt/cogworks/blob/main/INSTALL.md) for manual installation instructions."

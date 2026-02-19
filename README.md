@@ -37,6 +37,7 @@ My typical workflow:
 ## Prerequisites
 
 - **Claude Code** — installed and working ([docs](https://docs.anthropic.com/en/docs/claude-code))
+- **OpenAI Codex (optional)** — use the Codex skill workflow instead of the Claude agent (see below)
 - **A project repository** — `cogworks` creates skills in your chosen location (project scope `.claude/skills/`, personal scope `~/.claude/skills/`, or a custom path)
 
 ## Installation
@@ -71,6 +72,15 @@ See [INSTALL.md](INSTALL.md) for detailed instructions and manual installation o
 ### Manual Installation
 
 Alternatively, copy the `cogworks` agent and its dependencies (`cogworks-encode` and `cogworks-learn`) directly from this repository. All three are required — the agent orchestrates the workflow, and the two skills provide the synthesis and skill-writing (`cogworks-test` is optional and only runs when you invoke it. If you want testing, also include `.claude/test-framework/`.)
+
+For OpenAI Codex users, install the Codex skills instead of the Claude agent:
+
+```
+./install.sh --target codex --local
+./install.sh --target codex --global
+# Legacy shorthand (global):
+./install.sh --codex
+```
 
 ```bash
 your-project/
@@ -210,14 +220,56 @@ Testing is a separate step from encoding. After encoding a skill, run tests inde
 # Other examples
 /cogworks-test my-skill --json
 /cogworks-test my-skill --compare-against tests/datasets/golden-samples/my-skill/
+
+## OpenAI Codex Usage
+
+Codex does not support Claude sub-agents, so the workflow is provided as a Codex skill instead. Codex discovers skills in `.agents/skills/` under your repo (local scope) or in `~/.agents/skills` (user scope).
+
+1. Install Codex skills:
+
+```
+./install.sh --target codex --local
+./install.sh --target codex --global
+# Legacy shorthand (global):
+./install.sh --codex
 ```
 
-Testing runs two validation layers:
+2. Invoke the Codex skill orchestrator:
+
+```
+cogworks encode <sources> as <skill_name>
+```
+
+3. Or use the skills directly:
+
+- `cogworks-encode`
+- `cogworks-learn`
+- `cogworks-test` (optional, Layer 1 by default)
+
+### Codex Testing (Recommended: Layer 1)
+
+For Codex users, the deterministic checks (Layer 1) are the supported default. Layer 2 and behavioral gates require Claude-specific tooling.
+
+```
+/cogworks-test my-skill --layer1-only
+```
+```
+
+Testing runs three validation layers:
 
 - **Layer 1**: Deterministic checks (structure, syntax, citations)
 - **Layer 2**: LLM-as-judge evaluation (5 quality dimensions)
+- **Layer 2.5**: Efficacy measurement (task performance with/without skill using SkillsBench methodology)
 
 Generates a detailed validation report with scores and recommendations. Cost: ~$1.50 per skill.
+
+**Efficacy Validation**: The cogworks pipeline has been empirically validated to produce highly effective skills:
+- **4/4 benchmark tasks** passed with 100% success rate (20/20 runs)
+- **Average improvement**: +54.2pp over baseline (task completion without skill)
+- **3.3x more effective** than SkillsBench curated skills benchmark (+54.2pp vs +16.2pp)
+- Skills validated across software-engineering and devops-infrastructure domains
+
+See `_sources/skillsbench-implementation/ALL_BENCHMARKS_COMPLETE.md` for complete efficacy validation results (archived validation report).
 
 **When to use:** after encoding a new skill, after manual edits to an existing skill, for regression testing golden samples, or to check quality before production use.
 
@@ -227,7 +279,7 @@ See `.claude/test-framework/README.md` for complete testing documentation.
 
 Related to this being a personal workflow tool (see [ROADMAP.md](ROADMAP.md) for planned work):
 
-- **Cogworks is Claude Code-specific** — The `cogworks` agent and its workflow rely on Claude Code features (subagent orchestration, the Task tool, specific invocation patterns) that don't exist in GitHub Copilot, OpenAI Codex, or other agent platforms. **However, the skills cogworks generates ARE portable** — they follow the universal AgentSkills standard (SKILL.md format with minimal frontmatter) and work across Claude Code, GitHub Copilot, Cursor, and other tools supporting the standard. Think of cogworks as a Claude Code-native authoring tool that produces cross-platform outputs.
+- **Claude agent is Claude Code-specific** — The `@cogworks` agent relies on Claude Code features (subagent orchestration, Task tool, specific invocation patterns). For Codex, use the Codex skill orchestrator in `codex/skills/cogworks`, installed via `./install.sh --target codex --local|--global` (or legacy `./install.sh --codex`). Codex discovers skills in `.agents/skills/` (repo) or `~/.agents/skills` (user). **The skills cogworks generates ARE portable** — they follow the universal AgentSkills standard (SKILL.md format with minimal frontmatter) and work across Claude Code, GitHub Copilot, Cursor, and other tools supporting the standard.
 - **Not portable** — `cogworks` assumes Linux (Ubuntu), edit paths throughout agent and associated skills definitions accordingly
 - **Flexible destination** — encoded skills can be created in project scope (`.claude/skills/`), personal scope (`~/.claude/skills/`), or custom paths
 - **Agent generation not yet implemented** — `cogworks` for generating sub-agents is planned but not available

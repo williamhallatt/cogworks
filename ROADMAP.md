@@ -31,7 +31,22 @@ This roadmap tracks planned work to address current known limitations in no part
 
 ---
 
-## 3. Automated Testing ✅ COMPLETED (2026-02-14)
+## 3. OpenAI Codex Support ✅ COMPLETED (2026-02-19)
+
+**Delivered**:
+
+- Codex-native workflow via `codex/skills/cogworks`
+- Codex-compatible skill copies for `cogworks-encode`, `cogworks-learn`, and `cogworks-test`
+- Installer support via `./install.sh --target codex --local|--global` (installs to `./.agents/skills` or `~/.agents/skills`)
+
+**Limitations**:
+
+- The Claude `@cogworks` agent remains Claude Code-specific
+- The Claude test framework is optional for Codex users
+
+---
+
+## 4. Automated Testing ✅ COMPLETED (2026-02-14)
 
 **Previous Limitation**: No automated testing of new skills. Relied entirely on manual user feedback to identify issues.
 
@@ -82,7 +97,7 @@ See `.claude/test-framework/README.md` for complete documentation.
 
 ---
 
-## 4. Skill Portability Across Repos
+## 5. Skill Portability Across Repos
 
 **Limitation**: Encoded skills are created in `.claude/skills/` within the repo where cogworks is used. No mechanism for sharing or reusing across projects.
 
@@ -95,7 +110,7 @@ See `.claude/test-framework/README.md` for complete documentation.
 
 ---
 
-## 5. Multi-Framework Support
+## 6. Multi-Framework Support
 
 **Limitation**: Output formats specifically target Claude Code structures. Skills may not work for other agent frameworks without modification.
 

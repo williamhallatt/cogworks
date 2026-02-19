@@ -13,3 +13,10 @@
 ## Quick Reference
 
 - `disable-model-invocation: true` for side-effectful tasks. [Source 5]
+
+## Sources
+
+> **Knowledge snapshot date:** 2026-02-19
+
+1. Claude Code Skills Documentation
+2. Best Practices for Skill Authoring
