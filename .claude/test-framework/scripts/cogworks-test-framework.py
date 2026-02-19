@@ -6,7 +6,13 @@ import sys
 from datetime import datetime
 from typing import Any, Dict, List
 
-from behavioral_lib import load_json, load_jsonl, validate_case, compute_f1
+from behavioral_lib import (
+    load_json,
+    load_jsonl,
+    validate_case,
+    compute_f1,
+    compute_efficacy_metrics,
+)
 
 
 def _write_json(path: str, payload: Dict[str, Any]) -> None:
@@ -21,22 +27,84 @@ def _write_text(path: str, content: str) -> None:
         f.write(content)
 
 
+def _assess_domain_efficacy(domain: str, efficacy_delta: float) -> str:
+    """Assess efficacy delta in context of domain-specific expectations.
+
+    Based on SkillsBench findings:
+    - Healthcare: +51.9pp typical
+    - Manufacturing: +35-50pp typical
+    - Data Analysis: +15-30pp typical
+    - Software Engineering: +4.5pp typical
+    - Mathematics: +5-12pp typical
+    """
+    domain_ranges = {
+        "healthcare": (0.40, 0.60, "Healthcare"),
+        "manufacturing": (0.35, 0.50, "Manufacturing"),
+        "data-analysis": (0.15, 0.30, "Data Analysis"),
+        "software-engineering": (0.05, 0.15, "Software Engineering"),
+        "devops-infrastructure": (0.05, 0.15, "DevOps/Infrastructure"),
+        "mathematics": (0.05, 0.12, "Mathematics"),
+    }
+
+    domain_key = domain.lower()
+    if domain_key in domain_ranges:
+        low, high, display_name = domain_ranges[domain_key]
+        typical = (low + high) / 2
+        if efficacy_delta >= high:
+            return f"Exceptional efficacy for {display_name} (above typical {typical:.1%})"
+        elif efficacy_delta >= low:
+            return f"Good efficacy for {display_name} (within typical {low:.1%}-{high:.1%})"
+        else:
+            return f"Below expected for {display_name} (typical {low:.1%}-{high:.1%})"
+    else:
+        # Unknown domain - provide generic assessment
+        if efficacy_delta >= 0.25:
+            return f"Exceptional efficacy ({efficacy_delta:.1%})"
+        elif efficacy_delta >= 0.10:
+            return f"Good efficacy ({efficacy_delta:.1%})"
+        else:
+            return f"Modest efficacy ({efficacy_delta:.1%})"
+
+
 def _format_md_report(skill: str, summary: Dict[str, Any], case_results: List[Dict[str, Any]]) -> str:
     lines = []
     lines.append(f"# Behavioral Test Report: {skill}\n")
     lines.append(f"Status: {summary['status']}")
     lines.append(f"Cases: {summary['cases_total']}")
-    lines.append(f"F1: {summary['activation_f1']:.3f}")
-    lines.append(f"False positive rate: {summary['false_positive_rate']:.3f}")
-    lines.append(f"Negative control ratio: {summary['negative_control_ratio']:.3f}\n")
+
+    # Activation metrics
+    lines.append("\n## Activation Metrics")
+    lines.append(f"- Activation F1: {summary['activation_f1']:.3f}")
+    lines.append(f"- False Positive Rate: {summary['false_positive_rate']:.3f}")
+    lines.append(f"- Negative Control Ratio: {summary['negative_control_ratio']:.3f}")
+
+    # Efficacy metrics (if available)
+    if summary.get("efficacy_metrics"):
+        efficacy = summary["efficacy_metrics"]
+        lines.append("\n## Efficacy Metrics")
+        lines.append(f"- Baseline Success Rate: {efficacy['baseline_success_rate']:.1%} (without skill)")
+        lines.append(f"- With Skill Success Rate: {efficacy['with_skill_success_rate']:.1%} (with skill)")
+        lines.append(f"- Absolute Delta: {efficacy['efficacy_delta']:+.1%}")
+        lines.append(f"- Normalized Gain: {efficacy['normalized_gain']:.1%}")
+        lines.append(f"- Baseline Runs: {efficacy['baseline_runs']}")
+        lines.append(f"- Skill Runs: {efficacy['skill_runs']}")
+
+        # Domain context (if available)
+        if summary.get("domain"):
+            lines.append(f"\n## Domain Context")
+            lines.append(f"- Domain: {summary['domain']}")
+            if summary.get("domain_assessment"):
+                lines.append(f"- Assessment: {summary['domain_assessment']}")
+
+    lines.append("")
 
     if summary["failures"]:
-        lines.append("Failures:")
+        lines.append("## Failures")
         for f in summary["failures"]:
             lines.append(f"- {f}")
         lines.append("")
 
-    lines.append("Case Results:")
+    lines.append("## Case Results")
     for case in case_results:
         status = "PASS" if case["pass"] else "FAIL"
         lines.append(f"- {case['case_id']}: {status}")
@@ -84,6 +152,9 @@ def behavioral_run(args: argparse.Namespace) -> int:
             "activation_f1": 0.0,
             "false_positive_rate": 0.0,
             "negative_control_ratio": 0.0,
+            "efficacy_metrics": None,
+            "domain": None,
+            "domain_assessment": None,
             "failures": [],
         }
 
@@ -118,6 +189,9 @@ def behavioral_run(args: argparse.Namespace) -> int:
 
         tp = fp = fn = tn = 0
         negative_controls = 0
+        baseline_traces_list = []
+        skill_traces_list = []
+        domains_seen = set()
 
         for case in cases:
             case_id = case.get("id")
@@ -153,6 +227,19 @@ def behavioral_run(args: argparse.Namespace) -> int:
             else:
                 tn += 1
 
+            # Collect traces for efficacy calculation
+            if args.with_baseline:
+                is_baseline = bool(trace.get("baseline_run", False))
+                if is_baseline:
+                    baseline_traces_list.append(trace)
+                else:
+                    skill_traces_list.append(trace)
+
+            # Track domains
+            domain = case.get("domain")
+            if domain:
+                domains_seen.add(domain)
+
             if not result["pass"]:
                 skill_summary["status"] = "FAIL"
 
@@ -175,6 +262,32 @@ def behavioral_run(args: argparse.Namespace) -> int:
         if fpr > 0.05:
             skill_summary["status"] = "FAIL"
             skill_summary["failures"].append(f"false_positive_rate > 0.05 ({fpr:.3f})")
+
+        # Compute efficacy metrics if baseline traces are available
+        if args.with_baseline and baseline_traces_list and skill_traces_list:
+            efficacy = compute_efficacy_metrics(baseline_traces_list, skill_traces_list)
+            skill_summary["efficacy_metrics"] = efficacy
+
+            # Check efficacy thresholds
+            if efficacy["efficacy_delta"] < args.efficacy_delta_min:
+                skill_summary["status"] = "FAIL"
+                skill_summary["failures"].append(
+                    f"efficacy_delta < {args.efficacy_delta_min} ({efficacy['efficacy_delta']:.3f})"
+                )
+
+            if efficacy["normalized_gain"] < args.normalized_gain_min:
+                skill_summary["status"] = "FAIL"
+                skill_summary["failures"].append(
+                    f"normalized_gain < {args.normalized_gain_min} ({efficacy['normalized_gain']:.3f})"
+                )
+
+            # Add domain context
+            if domains_seen:
+                skill_summary["domain"] = ", ".join(sorted(domains_seen))
+                skill_summary["domain_assessment"] = _assess_domain_efficacy(
+                    list(domains_seen)[0] if len(domains_seen) == 1 else "mixed",
+                    efficacy["efficacy_delta"]
+                )
 
         overall["skills"].append(skill_summary)
         if skill_summary["status"] == "FAIL":
@@ -229,6 +342,9 @@ def behavioral_scaffold(args: argparse.Namespace) -> int:
                 "forbidden_commands": [],
                 "expected_files_modified": [],
                 "expected_files_created": [],
+                "baseline_success_rate": None,
+                "with_skill_target": None,
+                "domain": None,
                 "notes": "Explicit invocation should activate",
             },
             {
@@ -241,6 +357,9 @@ def behavioral_scaffold(args: argparse.Namespace) -> int:
                 "forbidden_commands": [],
                 "expected_files_modified": [],
                 "expected_files_created": [],
+                "baseline_success_rate": None,
+                "with_skill_target": None,
+                "domain": None,
                 "notes": "Explicit skill name should activate",
             },
             {
@@ -253,6 +372,9 @@ def behavioral_scaffold(args: argparse.Namespace) -> int:
                 "forbidden_commands": [],
                 "expected_files_modified": [],
                 "expected_files_created": [],
+                "baseline_success_rate": None,
+                "with_skill_target": None,
+                "domain": None,
                 "notes": "Implicit intent should activate",
             },
             {
@@ -265,6 +387,9 @@ def behavioral_scaffold(args: argparse.Namespace) -> int:
                 "forbidden_commands": [],
                 "expected_files_modified": [],
                 "expected_files_created": [],
+                "baseline_success_rate": None,
+                "with_skill_target": None,
+                "domain": None,
                 "notes": "Contextual intent should activate",
             },
             {
@@ -277,6 +402,9 @@ def behavioral_scaffold(args: argparse.Namespace) -> int:
                 "forbidden_commands": [],
                 "expected_files_modified": [],
                 "expected_files_created": [],
+                "baseline_success_rate": None,
+                "with_skill_target": None,
+                "domain": None,
                 "notes": "Unrelated request should not activate",
             },
             {
@@ -289,6 +417,9 @@ def behavioral_scaffold(args: argparse.Namespace) -> int:
                 "forbidden_commands": [],
                 "expected_files_modified": [],
                 "expected_files_created": [],
+                "baseline_success_rate": None,
+                "with_skill_target": None,
+                "domain": None,
                 "notes": "Meta question should not activate",
             },
         ]
@@ -444,6 +575,215 @@ def calibration_run(args: argparse.Namespace) -> int:
     return calibration_check(check_args)
 
 
+def efficacy_validate(args: argparse.Namespace) -> int:
+    """Validate a generated skill against efficacy benchmark tasks.
+
+    This tests whether skills generated by the cogworks pipeline
+    actually improve task performance versus baseline.
+    """
+    from pathlib import Path
+
+    benchmark_path = Path(args.benchmark_task)
+    if not benchmark_path.exists():
+        print(f"Error: Benchmark task not found: {benchmark_path}", file=sys.stderr)
+        return 2
+
+    # Load metadata
+    metadata_path = benchmark_path / "metadata.json"
+    if not metadata_path.exists():
+        print(f"Error: metadata.json not found in {benchmark_path}", file=sys.stderr)
+        return 2
+
+    with open(metadata_path, "r", encoding="utf-8") as f:
+        metadata = json.load(f)
+
+    task_id = metadata["task_id"]
+    baseline_success_rate = metadata["baseline_success_rate"]
+    target_success_rate = metadata.get("target_with_skill_rate", 0.85)
+    domain = metadata.get("domain", "unknown")
+
+    print(f"Validating skill against benchmark: {task_id}")
+    print(f"Domain: {domain}")
+    print(f"Baseline success rate: {baseline_success_rate:.1%}")
+    print(f"Target with skill: {target_success_rate:.1%}")
+    print()
+
+    # Load baseline traces
+    baseline_traces_dir = benchmark_path / "baseline-traces"
+    if not baseline_traces_dir.exists():
+        print(f"Error: baseline-traces/ not found in {benchmark_path}", file=sys.stderr)
+        return 2
+
+    baseline_traces = []
+    for trace_file in sorted(baseline_traces_dir.glob("*.json")):
+        with open(trace_file, "r", encoding="utf-8") as f:
+            baseline_traces.append(json.load(f))
+
+    if not baseline_traces:
+        print(f"Error: No baseline traces found in {baseline_traces_dir}", file=sys.stderr)
+        return 2
+
+    baseline_completed = sum(1 for t in baseline_traces if t.get("task_completed", False))
+    baseline_rate = baseline_completed / len(baseline_traces)
+
+    print(f"Baseline traces loaded: {len(baseline_traces)}")
+    print(f"Baseline completion rate: {baseline_rate:.1%}")
+    print()
+
+    # Check for with-skill traces
+    skill_traces_dir = benchmark_path / "skill-traces"
+    if not skill_traces_dir.exists():
+        print("NOTE: No skill-traces/ directory found.")
+        print("To complete validation:")
+        print(f"1. Use the generated skill at: {args.generated_skill}")
+        print(f"2. Run the task in: {benchmark_path / 'instruction.md'}")
+        print(f"3. Capture traces to: {skill_traces_dir}/")
+        print(f"4. Re-run this validation")
+        return 0
+
+    skill_traces = []
+    for trace_file in sorted(skill_traces_dir.glob("*.json")):
+        with open(trace_file, "r", encoding="utf-8") as f:
+            skill_traces.append(json.load(f))
+
+    if not skill_traces:
+        print(f"NOTE: No traces found in {skill_traces_dir}")
+        print("Capture with-skill traces and re-run validation.")
+        return 0
+
+    skill_completed = sum(1 for t in skill_traces if t.get("task_completed", False))
+    skill_rate = skill_completed / len(skill_traces)
+
+    print(f"With-skill traces loaded: {len(skill_traces)}")
+    print(f"With-skill completion rate: {skill_rate:.1%}")
+    print()
+
+    # Compute efficacy metrics
+    from behavioral_lib import compute_efficacy_delta, compute_normalized_gain
+
+    delta = compute_efficacy_delta(baseline_rate, skill_rate)
+    gain = compute_normalized_gain(baseline_rate, skill_rate)
+
+    print("=== EFFICACY METRICS ===")
+    print(f"Baseline Success Rate: {baseline_rate:.1%}")
+    print(f"With Skill Success Rate: {skill_rate:.1%}")
+    print(f"Absolute Delta: {delta:+.1%}")
+    print(f"Normalized Gain: {gain:.1%}")
+    print()
+
+    # Domain assessment
+    assessment = _assess_domain_efficacy(domain, delta)
+    print(f"Domain: {domain}")
+    print(f"Assessment: {assessment}")
+    print()
+
+    # Check thresholds
+    failures = []
+    if delta < args.efficacy_delta_min:
+        failures.append(f"efficacy_delta < {args.efficacy_delta_min} ({delta:.3f})")
+
+    if gain < args.normalized_gain_min:
+        failures.append(f"normalized_gain < {args.normalized_gain_min} ({gain:.3f})")
+
+    if failures:
+        print("Status: FAIL")
+        for f in failures:
+            print(f"  - {f}")
+        return 1
+
+    print("Status: PASS")
+    print(f"Skill exceeds efficacy thresholds for {task_id}")
+
+    # Write results if output specified
+    if args.output:
+        result = {
+            "task_id": task_id,
+            "domain": domain,
+            "baseline_success_rate": baseline_rate,
+            "with_skill_success_rate": skill_rate,
+            "efficacy_delta": delta,
+            "normalized_gain": gain,
+            "baseline_runs": len(baseline_traces),
+            "skill_runs": len(skill_traces),
+            "status": "PASS",
+            "assessment": assessment,
+        }
+        os.makedirs(os.path.dirname(args.output), exist_ok=True)
+        with open(args.output, "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2)
+        print(f"\nResults written to: {args.output}")
+
+    return 0
+
+
+def efficacy_run_benchmarks(args: argparse.Namespace) -> int:
+    """Run efficacy validation across all benchmark tasks."""
+    from pathlib import Path
+
+    benchmarks_root = Path(args.benchmarks_root)
+    if not benchmarks_root.exists():
+        print(f"Error: Benchmarks root not found: {benchmarks_root}", file=sys.stderr)
+        return 2
+
+    # Find all benchmark tasks
+    tasks = sorted([d for d in benchmarks_root.iterdir() if d.is_dir() and d.name.startswith("task-")])
+
+    if not tasks:
+        print(f"No benchmark tasks found in {benchmarks_root}", file=sys.stderr)
+        return 2
+
+    print(f"Running efficacy validation on {len(tasks)} benchmark tasks")
+    print(f"Generated skill: {args.generated_skill}")
+    print()
+
+    results = []
+    for task_path in tasks:
+        print(f"=" * 60)
+        print(f"Task: {task_path.name}")
+        print(f"=" * 60)
+
+        # Run validation for this task
+        validate_args = argparse.Namespace(
+            benchmark_task=str(task_path),
+            generated_skill=args.generated_skill,
+            efficacy_delta_min=args.efficacy_delta_min,
+            normalized_gain_min=args.normalized_gain_min,
+            output=None,
+        )
+
+        status = efficacy_validate(validate_args)
+        results.append({
+            "task": task_path.name,
+            "status": "PASS" if status == 0 else "FAIL",
+        })
+
+        print()
+
+    # Summary
+    print("=" * 60)
+    print("SUMMARY")
+    print("=" * 60)
+
+    passed = sum(1 for r in results if r["status"] == "PASS")
+    total = len(results)
+
+    for r in results:
+        print(f"  {r['task']}: {r['status']}")
+
+    print()
+    print(f"Passed: {passed}/{total} ({passed/total:.1%})")
+
+    if passed == total:
+        print("\nAll benchmarks PASSED")
+        return 0
+    elif passed >= total * 0.7:
+        print(f"\nMost benchmarks passed ({passed}/{total}), but some failed")
+        return 1
+    else:
+        print(f"\nFailed too many benchmarks ({passed}/{total})")
+        return 1
+
+
 def leakage_audit(args: argparse.Namespace) -> int:
     def read_files(root: str) -> Dict[str, str]:
         data = {}
@@ -517,6 +857,9 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--timestamp", default=None)
     run.add_argument("--skill-prefix", action="append", default=[], help="Only include skills with this prefix (repeatable)")
     run.add_argument("--allow-missing-tests", action="store_true")
+    run.add_argument("--with-baseline", action="store_true", help="Compute efficacy metrics from baseline traces")
+    run.add_argument("--efficacy-delta-min", type=float, default=0.10, help="Minimum efficacy delta threshold (default: 0.10)")
+    run.add_argument("--normalized-gain-min", type=float, default=0.15, help="Minimum normalized gain threshold (default: 0.15)")
     run.set_defaults(func=behavioral_run)
 
     validate = behavioral_sub.add_parser("validate", help="Validate a single trace")
@@ -544,6 +887,24 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--overall-min", type=float, default=0.90)
     run.add_argument("--category-min", type=float, default=0.85)
     run.set_defaults(func=calibration_run)
+
+    efficacy = sub.add_parser("efficacy", help="Efficacy validation (SkillsBench methodology)")
+    efficacy_sub = efficacy.add_subparsers(dest="subcommand", required=True)
+
+    validate = efficacy_sub.add_parser("validate", help="Validate generated skill against benchmark task")
+    validate.add_argument("--generated-skill", required=True, help="Path to generated skill directory")
+    validate.add_argument("--benchmark-task", required=True, help="Path to benchmark task directory")
+    validate.add_argument("--efficacy-delta-min", type=float, default=0.10, help="Minimum efficacy delta (default: 0.10)")
+    validate.add_argument("--normalized-gain-min", type=float, default=0.15, help="Minimum normalized gain (default: 0.15)")
+    validate.add_argument("--output", default=None, help="Output JSON results file")
+    validate.set_defaults(func=efficacy_validate)
+
+    run_benchmarks = efficacy_sub.add_parser("run", help="Run all benchmark tasks for a generated skill")
+    run_benchmarks.add_argument("--generated-skill", required=True, help="Path to generated skill directory")
+    run_benchmarks.add_argument("--benchmarks-root", default="tests/datasets/efficacy-benchmark", help="Path to benchmarks root")
+    run_benchmarks.add_argument("--efficacy-delta-min", type=float, default=0.10, help="Minimum efficacy delta (default: 0.10)")
+    run_benchmarks.add_argument("--normalized-gain-min", type=float, default=0.15, help="Minimum normalized gain (default: 0.15)")
+    run_benchmarks.set_defaults(func=efficacy_run_benchmarks)
 
     leakage = sub.add_parser("leakage", help="Leakage audit")
     leakage_sub = leakage.add_subparsers(dest="subcommand", required=True)

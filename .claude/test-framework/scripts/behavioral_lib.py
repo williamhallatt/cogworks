@@ -106,3 +106,56 @@ def compute_f1(tp: int, fp: int, fn: int) -> float:
         return 0.0
     return 2 * precision * recall / (precision + recall)
 
+
+def compute_efficacy_delta(baseline_success: float, with_skill_success: float) -> float:
+    """Compute absolute efficacy delta: success_with_skill - success_without_skill"""
+    return with_skill_success - baseline_success
+
+
+def compute_normalized_gain(baseline_success: float, with_skill_success: float) -> float:
+    """Compute normalized gain: delta / (1 - baseline_success)
+
+    This measures proportional improvement toward perfect performance.
+    Returns 0.0 if baseline is already at 1.0 or if gain is negative.
+    """
+    if baseline_success >= 1.0:
+        return 0.0
+    delta = with_skill_success - baseline_success
+    if delta <= 0:
+        return 0.0
+    return delta / (1.0 - baseline_success)
+
+
+def compute_efficacy_metrics(baseline_traces: List[Dict[str, Any]],
+                             skill_traces: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Compute efficacy metrics from baseline and with-skill traces.
+
+    Args:
+        baseline_traces: List of traces from baseline runs (no skill)
+        skill_traces: List of traces from runs with skill
+
+    Returns:
+        Dictionary with efficacy metrics including:
+        - baseline_success_rate
+        - with_skill_success_rate
+        - efficacy_delta
+        - normalized_gain
+    """
+    baseline_completed = sum(1 for t in baseline_traces if t.get("task_completed", False))
+    skill_completed = sum(1 for t in skill_traces if t.get("task_completed", False))
+
+    baseline_success = baseline_completed / len(baseline_traces) if baseline_traces else 0.0
+    skill_success = skill_completed / len(skill_traces) if skill_traces else 0.0
+
+    delta = compute_efficacy_delta(baseline_success, skill_success)
+    norm_gain = compute_normalized_gain(baseline_success, skill_success)
+
+    return {
+        "baseline_success_rate": baseline_success,
+        "with_skill_success_rate": skill_success,
+        "efficacy_delta": delta,
+        "normalized_gain": norm_gain,
+        "baseline_runs": len(baseline_traces),
+        "skill_runs": len(skill_traces),
+    }
+

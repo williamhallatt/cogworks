@@ -152,6 +152,80 @@ jobs:
           python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run \
             --skill-prefix cogworks-
 
+      - name: Efficacy validation (SkillsBench methodology)
+        run: |
+          # Check if efficacy benchmark dataset exists
+          if [ ! -d "tests/datasets/efficacy-benchmark" ]; then
+            echo "NOTE: Efficacy benchmark dataset not found; skipping efficacy validation"
+            echo "To enable efficacy validation, create benchmark tasks in tests/datasets/efficacy-benchmark/"
+            exit 0
+          fi
+
+          # Count benchmark tasks
+          TASK_COUNT=$(find tests/datasets/efficacy-benchmark -maxdepth 1 -type d -name "task-*" | wc -l)
+
+          if [ $TASK_COUNT -eq 0 ]; then
+            echo "NOTE: No benchmark tasks found; skipping efficacy validation"
+            exit 0
+          fi
+
+          echo "Found $TASK_COUNT efficacy benchmark task(s)"
+          echo ""
+
+          # For CI, we just validate that the benchmark structure is correct
+          # Actual efficacy testing requires generating skills and capturing traces
+          for task_dir in tests/datasets/efficacy-benchmark/task-*/; do
+            if [ -d "$task_dir" ]; then
+              task_name=$(basename "$task_dir")
+              echo "Validating benchmark task: $task_name"
+
+              # Check required files
+              if [ ! -f "$task_dir/metadata.json" ]; then
+                echo "ERROR: $task_name missing metadata.json"
+                exit 1
+              fi
+
+              if [ ! -f "$task_dir/instruction.md" ]; then
+                echo "ERROR: $task_name missing instruction.md"
+                exit 1
+              fi
+
+              if [ ! -d "$task_dir/sources" ]; then
+                echo "ERROR: $task_name missing sources/ directory"
+                exit 1
+              fi
+
+              if [ ! -d "$task_dir/baseline-traces" ]; then
+                echo "ERROR: $task_name missing baseline-traces/ directory"
+                exit 1
+              fi
+
+              # Check metadata structure
+              if ! python3 -c "import json; json.load(open('$task_dir/metadata.json'))" 2>/dev/null; then
+                echo "ERROR: $task_name metadata.json is invalid JSON"
+                exit 1
+              fi
+
+              # Count baseline traces
+              BASELINE_COUNT=$(find "$task_dir/baseline-traces" -name "*.json" | wc -l)
+              if [ $BASELINE_COUNT -eq 0 ]; then
+                echo "WARNING: $task_name has no baseline traces"
+              else
+                echo "  ✓ $BASELINE_COUNT baseline trace(s)"
+              fi
+
+              echo "  ✓ $task_name structure valid"
+            fi
+          done
+
+          echo ""
+          echo "✓ All efficacy benchmark tasks valid"
+          echo ""
+          echo "To run full efficacy validation:"
+          echo "  python3 .claude/test-framework/scripts/cogworks-test-framework.py efficacy run \\"
+          echo "    --generated-skill .claude/skills/my-skill \\"
+          echo "    --benchmarks-root tests/datasets/efficacy-benchmark"
+
       - name: Calibration gate
         run: |
           if [ -d "tests/calibration" ] && [ -d "tests/results/latest" ]; then

@@ -1,0 +1,37 @@
+{
+  "task_id": "task-004-testing-patterns",
+  "domain": "software-engineering",
+  "description": "Generate testing skill and write comprehensive test suite for authentication module",
+  "baseline_success_rate": 0.28,
+  "target_with_skill_rate": 0.80,
+  "baseline_runs": 10,
+  "difficulty": "medium",
+  "estimated_time_min": 12,
+  "success_criteria": [
+    "Unit tests for core functions",
+    "Integration tests for authentication flow",
+    "Edge case tests (empty, null, malformed input)",
+    "Error handling tests",
+    "Mocked external dependencies (database, email)",
+    "Security tests (SQL injection, XSS)",
+    "Clear and specific test descriptions"
+  ],
+  "common_baseline_failures": [
+    "Only happy path tests",
+    "No mocking of external dependencies",
+    "Missing edge cases",
+    "Vague test descriptions",
+    "No security testing",
+    "Missing integration tests"
+  ],
+  "module_to_test": {
+    "functions": [
+      "validatePassword(password)",
+      "hashPassword(password)",
+      "generateToken(userId)",
+      "verifyToken(token)",
+      "authenticateUser(email, password)"
+    ]
+  },
+  "notes": "Tests whether skill captures comprehensive testing patterns including AAA structure, mocking strategies, edge cases, and security testing. Baseline agents often write shallow happy-path-only tests."
+}
