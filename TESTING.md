@@ -46,6 +46,23 @@ Think of it as: "The framework tests skills. The tests directory tests the frame
 
 ---
 
+## Dependencies
+
+Layer 1 deterministic checks require:
+
+- `jq`
+- `python3` with `PyYAML` installed
+
+Example install commands:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install -y jq python3-pip
+python3 -m pip install pyyaml
+```
+
+---
+
 ## Level 1: Testing Skills (Normal Usage)
 
 ### What This Does
@@ -89,7 +106,7 @@ Validates that a cogworks-generated skill meets quality requirements through:
 1. Locates skill at `.claude/skills/my-new-skill/`
 2. Runs Layer 1 deterministic checks (~50ms)
 3. If Layer 1 passes, runs Layer 2 LLM-judge evaluation (inline, no external API)
-4. Writes results to `tests/results/{slug}-results.json`
+4. Writes results to `{skill_path}/.cogworks-results/{slug}-results.json` (and copies to `tests/results/` if it exists)
 5. Returns PASS/FAIL with scores and recommendations
 
 **Expected output**:

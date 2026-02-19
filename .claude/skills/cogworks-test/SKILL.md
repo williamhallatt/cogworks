@@ -13,11 +13,12 @@ Two-layer validation: fast structural checks (Layer 1) followed by semantic qual
 ## Invocation
 
 ```
-/cogworks-test {slug} [--sources {path}] [--json] [--layer1-only]
+/cogworks-test {slug} [--sources {path}] [--skill-path {path}] [--json] [--layer1-only]
 ```
 
-- `{slug}` — skill directory name (resolved from `.claude/skills/{slug}/` or `tests/test-data/{slug}/`)
+- `{slug}` — skill directory name (resolved from `.claude/skills/{slug}/`, `~/.claude/skills/{slug}/`, or `tests/test-data/{slug}/` unless `--skill-path` is provided)
 - `--sources {path}` — path to source material directory (defaults to `_sources/{slug}/`)
+- `--skill-path {path}` — explicit path to the skill directory (overrides slug resolution)
 - `--json` — output results as JSON
 - `--layer1-only` — skip Layer 2 semantic evaluation
 
@@ -26,8 +27,10 @@ Two-layer validation: fast structural checks (Layer 1) followed by semantic qual
 ### Step 1: Resolve Skill Path
 
 Look for the skill directory in this order:
-1. `.claude/skills/{slug}/`
-2. `tests/test-data/{slug}/`
+1. `--skill-path {path}` (if provided)
+2. `.claude/skills/{slug}/`
+3. `~/.claude/skills/{slug}/`
+4. `tests/test-data/{slug}/`
 
 If not found, report error and stop.
 
@@ -180,7 +183,11 @@ Determine recommendation:
 
 ### Step 8: Write Results
 
-Write JSON results to `tests/results/{slug}-results.json`:
+Write JSON results to `{skill_path}/.cogworks-results/{slug}-results.json`.
+
+If `tests/results/` exists, also write a copy to `tests/results/{slug}-results.json`.
+
+Example JSON:
 
 ```json
 {

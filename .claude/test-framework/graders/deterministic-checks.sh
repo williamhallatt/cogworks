@@ -26,15 +26,48 @@ SKILL_DIR="$1"
 JSON_OUTPUT="${2:-}"
 SKILL_FILE="${SKILL_DIR}/SKILL.md"
 
+# Citation patterns (strict):
+#   [Source N]
+#   (source:line) or (source-file:line)
+CITATION_REGEX='\[Source [0-9]+\]|\((source|source-[a-zA-Z0-9_-]+|[a-zA-Z0-9_/-]+\.[a-zA-Z0-9]+):[0-9]+\)'
+
 # Results tracking
 CRITICAL_FAILURES=()
 WARNINGS=()
 CHECKS_PASSED=()
+JQ_AVAILABLE=true
+PYTHON_AVAILABLE=true
 
 # Output functions
 log_pass() { CHECKS_PASSED+=("$1"); }
 log_warning() { WARNINGS+=("$1"); }
 log_critical() { CRITICAL_FAILURES+=("$1"); }
+
+# Check 0: Dependencies
+check_dependencies() {
+    if ! command -v python3 >/dev/null 2>&1; then
+        PYTHON_AVAILABLE=false
+        log_critical "Missing dependency: python3"
+        return 1
+    fi
+
+    # PyYAML required for frontmatter validation
+    if ! python3 -c "import yaml" >/dev/null 2>&1; then
+        log_critical "Missing dependency: PyYAML for python3 (pip install pyyaml)"
+        return 1
+    fi
+
+    # jq required only for JSON output
+    if [[ "$JSON_OUTPUT" == "--json" ]]; then
+        if ! command -v jq >/dev/null 2>&1; then
+            JQ_AVAILABLE=false
+            log_critical "Missing dependency: jq (required for --json output)"
+            return 1
+        fi
+    fi
+
+    log_pass "Dependencies available"
+}
 
 # Check 1: SKILL.md exists
 check_skill_file_exists() {
@@ -95,19 +128,50 @@ check_line_count() {
     log_pass "Line count within limit (${line_count}/500)"
 }
 
-# Check 5: Source citations present
+# Check 5: Source citations present (strict patterns, prefer supporting files)
 check_citations_present() {
-    # Look for citation patterns: [source], (source:line), etc.
-    local citation_count=$(grep -oE '\[(source|[a-zA-Z0-9_-]+\.md)\]|\([a-zA-Z0-9_/-]+\.[a-z]+:[0-9]+\)' "$SKILL_FILE" | wc -l)
+    local supporting_files=()
+    local supporting_count=0
+    local skill_citations=0
+    local supporting_citations=0
 
-    if (( citation_count == 0 )); then
-        log_critical "No source citations found"
-        return 1
-    elif (( citation_count < 3 )); then
-        log_warning "Very few citations found (${citation_count})"
+    for support_file in "${SKILL_DIR}/reference.md" "${SKILL_DIR}/patterns.md" "${SKILL_DIR}/examples.md"; do
+        if [[ -f "$support_file" ]]; then
+            supporting_files+=("$support_file")
+        fi
+    done
+
+    supporting_count=${#supporting_files[@]}
+
+    if (( supporting_count > 0 )); then
+        for support_file in "${supporting_files[@]}"; do
+            local count
+            count=$(grep -oE "$CITATION_REGEX" "$support_file" | wc -l)
+            supporting_citations=$((supporting_citations + count))
+        done
+
+        if (( supporting_citations == 0 )); then
+            log_critical "No source citations found in supporting files"
+            return 1
+        elif (( supporting_citations < 3 )); then
+            log_warning "Very few citations found in supporting files (${supporting_citations})"
+        fi
+
+        log_pass "Citations present in supporting files (${supporting_citations} found)"
+        return 0
     fi
 
-    log_pass "Citations present (${citation_count} found)"
+    # Fallback: no supporting files exist, check SKILL.md
+    skill_citations=$(grep -oE "$CITATION_REGEX" "$SKILL_FILE" | wc -l)
+
+    if (( skill_citations == 0 )); then
+        log_critical "No source citations found"
+        return 1
+    elif (( skill_citations < 3 )); then
+        log_warning "Very few citations found (${skill_citations})"
+    fi
+
+    log_pass "Citations present (${skill_citations} found)"
 }
 
 # Check 6: Forbidden patterns (reports all matches, not just first)
@@ -141,8 +205,8 @@ check_supporting_files() {
     for support_file in "${SKILL_DIR}/patterns.md" "${SKILL_DIR}/examples.md" "${SKILL_DIR}/reference.md"; do
         if [[ -f "$support_file" ]]; then
             local filename=$(basename "$support_file")
-            # Count entries (lines starting with ##)
-            local entry_count=$(grep -cE '^## ' "$support_file" || true)
+            # Count entries (lines starting with ## or ###)
+            local entry_count=$(grep -cE '^##{1,2} ' "$support_file" || true)
 
             if (( entry_count > 0 && entry_count < 3 )); then
                 log_warning "${filename} has <3 entries (${entry_count}) - should fold into reference.md"
@@ -291,7 +355,7 @@ check_supporting_file_substantiveness() {
             local section_words=0
 
             while IFS= read -r line; do
-                if [[ "$line" =~ ^##\  ]]; then
+                if [[ "$line" =~ ^##\  || "$line" =~ ^###\  ]]; then
                     # Process previous section
                     if $in_section; then
                         total_sections=$((total_sections + 1))
@@ -361,6 +425,12 @@ check_citation_format() {
 
 # Run all checks
 run_all_checks() {
+    check_dependencies || true
+    # If dependencies missing, skip remaining checks (they'd all fail)
+    if [[ ${#CRITICAL_FAILURES[@]} -gt 0 ]]; then
+        return 0
+    fi
+
     check_skill_file_exists || true
     # If SKILL.md is missing, skip remaining checks (they'd all fail)
     if [[ ${#CRITICAL_FAILURES[@]} -gt 0 ]]; then
@@ -385,37 +455,57 @@ run_all_checks() {
 # Generate output
 generate_output() {
     if [[ "$JSON_OUTPUT" == "--json" ]]; then
-        # JSON output for machine consumption (using jq for safe escaping)
         local status="pass"
         [[ ${#CRITICAL_FAILURES[@]} -gt 0 ]] && status="fail"
 
-        # Build arrays safely via jq to handle special characters
-        local cf_json="[]"
-        if [[ ${#CRITICAL_FAILURES[@]} -gt 0 ]]; then
-            cf_json=$(printf '%s\n' "${CRITICAL_FAILURES[@]}" | jq -R . | jq -s .)
-        fi
+        if $JQ_AVAILABLE; then
+            # JSON output for machine consumption (using jq for safe escaping)
+            local cf_json="[]"
+            if [[ ${#CRITICAL_FAILURES[@]} -gt 0 ]]; then
+                cf_json=$(printf '%s\n' "${CRITICAL_FAILURES[@]}" | jq -R . | jq -s .)
+            fi
 
-        local w_json="[]"
-        if [[ ${#WARNINGS[@]} -gt 0 ]]; then
-            w_json=$(printf '%s\n' "${WARNINGS[@]}" | jq -R . | jq -s .)
-        fi
+            local w_json="[]"
+            if [[ ${#WARNINGS[@]} -gt 0 ]]; then
+                w_json=$(printf '%s\n' "${WARNINGS[@]}" | jq -R . | jq -s .)
+            fi
 
-        local cp_json="[]"
-        if [[ ${#CHECKS_PASSED[@]} -gt 0 ]]; then
-            cp_json=$(printf '%s\n' "${CHECKS_PASSED[@]}" | jq -R . | jq -s .)
-        fi
+            local cp_json="[]"
+            if [[ ${#CHECKS_PASSED[@]} -gt 0 ]]; then
+                cp_json=$(printf '%s\n' "${CHECKS_PASSED[@]}" | jq -R . | jq -s .)
+            fi
 
-        jq -n \
-            --argjson critical_failures "$cf_json" \
-            --argjson warnings "$w_json" \
-            --argjson checks_passed "$cp_json" \
-            --arg status "$status" \
-            '{
-                critical_failures: $critical_failures,
-                warnings: $warnings,
-                checks_passed: $checks_passed,
-                status: $status
-            }'
+            jq -n \
+                --argjson critical_failures "$cf_json" \
+                --argjson warnings "$w_json" \
+                --argjson checks_passed "$cp_json" \
+                --arg status "$status" \
+                '{
+                    critical_failures: $critical_failures,
+                    warnings: $warnings,
+                    checks_passed: $checks_passed,
+                    status: $status
+                }'
+        elif $PYTHON_AVAILABLE; then
+            python3 - <<'PY'
+import json
+import os
+
+status = os.environ.get("CW_STATUS", "fail")
+critical = os.environ.get("CW_CRITICAL", "").split("\n") if os.environ.get("CW_CRITICAL") else []
+warnings = os.environ.get("CW_WARNINGS", "").split("\n") if os.environ.get("CW_WARNINGS") else []
+passed = os.environ.get("CW_PASSED", "").split("\n") if os.environ.get("CW_PASSED") else []
+
+print(json.dumps({
+    "critical_failures": [c for c in critical if c],
+    "warnings": [w for w in warnings if w],
+    "checks_passed": [p for p in passed if p],
+    "status": status
+}))
+PY
+        else
+            echo "{\"critical_failures\":[],\"warnings\":[],\"checks_passed\":[],\"status\":\"${status}\"}"
+        fi
     else
         # Human-readable output
         echo "=== Deterministic Checks Results ==="
@@ -450,6 +540,16 @@ generate_output() {
 # Main execution
 main() {
     run_all_checks
+
+    if [[ "$JSON_OUTPUT" == "--json" && ! $JQ_AVAILABLE ]]; then
+        local status="pass"
+        [[ ${#CRITICAL_FAILURES[@]} -gt 0 ]] && status="fail"
+        export CW_STATUS="$status"
+        export CW_CRITICAL="$(printf '%s\n' "${CRITICAL_FAILURES[@]}")"
+        export CW_WARNINGS="$(printf '%s\n' "${WARNINGS[@]}")"
+        export CW_PASSED="$(printf '%s\n' "${CHECKS_PASSED[@]}")"
+    fi
+
     generate_output
 
     # Exit with appropriate code
