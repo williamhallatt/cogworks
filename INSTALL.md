@@ -1,6 +1,6 @@
 # Installing Cogworks Agent & Skills
 
-This guide explains how to install the cogworks agent and its required skills into your Claude Code project.
+This guide explains how to install the cogworks agent and its required skills into your Claude Code project, plus the Codex skill workflow for OpenAI Codex users.
 
 ## Automated Installation (Recommended)
 
@@ -25,7 +25,7 @@ cd cogworks-{version}
 ```
 
 The script will:
-- Present a menu to choose installation location (local or global)
+- Present a menu to choose target (Claude or Codex) and installation scope (local or global)
 - Create necessary directories
 - Copy agent, skills, and test framework
 - Validate the installation
@@ -36,26 +36,80 @@ The script will:
 For automation or CI/CD:
 
 ```bash
-# Install to current project
+# Install to current project (Claude)
 ./install.sh --local
 
-# Install to personal directory
+# Install to current project (Codex)
+./install.sh --target codex --local
+
+# Install to personal directory (Claude)
 ./install.sh --global
+
+# Install to personal directory (Codex)
+./install.sh --target codex --global
 
 # Force overwrite existing files
 ./install.sh --global --force
 
 # Preview changes without modifying files
 ./install.sh --local --dry-run
+./install.sh --target codex --local --dry-run
 ```
 
 Run `./install.sh --help` for all options.
 
 ---
 
+## OpenAI Codex Installation
+
+Codex does not support Claude sub-agents. Use the Codex skill workflow instead:
+
+```bash
+./install.sh --target codex --local
+./install.sh --target codex --global
+# Legacy shorthand (global):
+./install.sh --codex
+```
+
+This installs the Codex skills into `./.agents/skills` (local) or `~/.agents/skills` (global).
+
+### Codex First Run (Recommended)
+
+After installing, try a small local source directory and run Layer 1 validation:
+
+```bash
+cogworks encode _sources/my-topic/ as my-topic --test
+```
+
+Then validate:
+
+```bash
+/cogworks-test my-topic --layer1-only
+```
+
+---
+
 ## Manual Installation
 
 If you prefer manual installation or need custom setup, follow these instructions.
+
+## Manual Installation (Codex)
+
+1. Create the Codex skills directory:
+
+```bash
+mkdir -p "./.agents/skills"
+# Or global:
+mkdir -p "$HOME/.agents/skills"
+```
+
+2. Copy Codex skills:
+
+```bash
+cp -r cogworks-{version}/codex/skills/* "./.agents/skills/"
+# Or global:
+cp -r cogworks-{version}/codex/skills/* "$HOME/.agents/skills/"
+```
 
 ## Quick Start
 
@@ -67,6 +121,9 @@ tar -xzf cogworks-{version}.tar.gz
 
 # Copy to your Claude Code project
 cp -r cogworks-{version}/.claude/* your-project/.claude/
+
+# If you extracted the release inside your project, you can install in-place
+# by running ./install.sh --local (it will treat the existing .claude/ as the target).
 ```
 
 ### Using zip (all platforms)
@@ -77,6 +134,9 @@ unzip cogworks-{version}.zip
 
 # Copy to your Claude Code project
 cp -r cogworks-{version}/.claude/* your-project/.claude/
+
+# If you extracted the release inside your project, you can install in-place
+# by running ./install.sh --local (it will treat the existing .claude/ as the target).
 ```
 
 ## Detailed Installation
@@ -162,7 +222,7 @@ your-project/
 
 ## Usage
 
-See [README.md](README.md) for instructions on using the `cogworks` agent and its skills in your Claude Code projects.
+See [README.md](README.md) for instructions on using the `cogworks` agent and its skills in your Claude Code projects, or the Codex skill workflow.
 
 ## Troubleshooting
 

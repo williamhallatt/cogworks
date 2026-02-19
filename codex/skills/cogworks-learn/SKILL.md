@@ -1,7 +1,6 @@
 ---
 name: cogworks-learn
 description: Expert knowledge on writing Claude Code skills - SKILL.md files, frontmatter configuration, invocation modes, context management, and best practices. Use when creating skills, designing slash commands, writing SKILL.md files, or optimizing skill discoverability and context efficiency.
-snapshot_date: "2026-02-19"
 ---
 
 # Skill Writer Expert
@@ -14,8 +13,6 @@ This expertise has been synthesized from 2 authoritative sources:
 
 1. Official Claude Code Skills Documentation
 2. Anthropic Best Practices for Skill Authoring
-
-> **Knowledge snapshot from:** 2026-02-19
 
 ## Knowledge Base Summary
 
