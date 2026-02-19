@@ -147,6 +147,19 @@ jobs:
           FILE_COUNT=$(find "$TEST_FRAMEWORK_DIR" -type f | wc -l)
           echo "✓ test-framework present ($FILE_COUNT file(s))"
 
+      - name: Behavioral tests (cogworks-*)
+        run: |
+          python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run \
+            --skill-prefix cogworks-
+
+      - name: Calibration gate
+        run: |
+          if [ -d "tests/calibration" ] && [ -d "tests/results/latest" ]; then
+            python3 .claude/test-framework/scripts/cogworks-test-framework.py calibration run
+          else
+            echo "Calibration data missing; skipping gate."
+          fi
+
       - name: Validate markdown syntax
         run: |
           set +e

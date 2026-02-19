@@ -1,0 +1,13 @@
+{
+  "skill_slug": "cogworks-test",
+  "case_id": "cogworks-test-neg-001",
+  "activated": false,
+  "tools_used": [],
+  "commands": [],
+  "files_modified": [],
+  "files_created": [],
+  "harness": "manual",
+  "model": "n/a",
+  "timestamp": "2026-02-19T00:00:00Z",
+  "notes": "Placeholder trace for behavioral gate. Replace with real traces when available."
+}
