@@ -257,6 +257,8 @@ Install the local hook so validation happens before push:
 bash scripts/install-git-hooks.sh
 ```
 
+Hooks are local to each clone. Run the installer in every repository clone you use.
+
 Validate the latest commit manually:
 
 ```bash
