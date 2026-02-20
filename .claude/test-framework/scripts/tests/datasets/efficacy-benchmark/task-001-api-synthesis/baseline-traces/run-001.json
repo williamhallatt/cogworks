@@ -1,7 +1,0 @@
-{
-  "run_id": 1,
-  "task_id": "task-001-api-synthesis",
-  "skill_active": false,
-  "task_completed": false,
-  "notes": "Missing error handling"
-}
