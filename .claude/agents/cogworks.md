@@ -196,7 +196,7 @@ Display:
 - Topic name and slug
 - **Skill location**: {skill_path}
 - How to invoke the new skill (`/{slug}`)
-- Validation results: Layer 1 status, Layer 2 scores per dimension, overall weighted score, and recommendation (PASS/FAIL)
+- Validation results: Layer 1 deterministic status and whether any auto-fixes were applied
 
 ## Variable Naming Convention
 
@@ -228,6 +228,5 @@ The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` refe
 1. `{skill_path}` directory created (location selected by user)
 2. Skill files generated following cogworks-learn expertise
 3. Layer 1 deterministic checks pass (no critical failures)
-4. Layer 2 weighted score >= 0.88 with no dimension below 3
-5. Results written to `tests/results/{slug}-results.json`
-6. Topic is invokable via `/{slug}`
+4. Prompt-quality rewrite pass completed after Layer 1 validation
+5. Topic is invokable via `/{slug}`
