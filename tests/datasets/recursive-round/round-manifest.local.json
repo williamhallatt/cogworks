@@ -1,0 +1,45 @@
+{
+  "round_id": "rr-2026-02-20-local",
+  "description": "Concrete local recursive round manifest with pinned test bundle and executable phase hooks.",
+  "test_bundle": {
+    "bundle_paths": [
+      "tests/test-suite/mvp-test-cases.jsonl",
+      "tests/behavioral"
+    ],
+    "expected_sha256": "909ee9acf3768b27717b0e1c31eaa2a67c91548dda2a70b9b38eb34bdb2c49e2"
+  },
+  "pipeline_paths": {
+    "claude_skills_root": ".claude/skills",
+    "codex_skills_root": ".agents/skills"
+  },
+  "skill_slugs": [
+    "cogworks-encode",
+    "cogworks-learn"
+  ],
+  "hooks": {
+    "pre_round": [
+      "bash scripts/run-recursive-hook.sh pre_round"
+    ],
+    "generate": [
+      "bash scripts/run-recursive-hook.sh generate"
+    ],
+    "improve": [
+      "bash scripts/run-recursive-hook.sh improve"
+    ],
+    "regenerate": [
+      "bash scripts/run-recursive-hook.sh regenerate"
+    ],
+    "post_round": [
+      "bash scripts/run-recursive-hook.sh post_round"
+    ]
+  },
+  "selection": {
+    "weights": {
+      "quality": 0.6,
+      "robustness": 0.25,
+      "cost": 0.15
+    },
+    "max_total_tokens": 20000,
+    "max_runtime_sec": 30
+  }
+}

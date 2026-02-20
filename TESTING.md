@@ -4,6 +4,7 @@ This repository has two testing workflows:
 
 - Testing the cogworks toolchain (cross-pipeline benchmark)
 - Testing generated skills (deterministic + behavioral)
+- Running recursive improvement rounds (test-first, outcome-gated)
 
 ## Prerequisites
 
@@ -98,6 +99,80 @@ Outputs:
 
 - `tests/results/pipeline-benchmark/{run_id}/benchmark-summary.json`
 - `tests/results/pipeline-benchmark/{run_id}/benchmark-report.md`
+
+## Run Recursive Improvement Round (TDD-First)
+
+Canonical runbook: `tests/datasets/recursive-round/README.md`
+
+1. Start from the example manifest:
+
+```bash
+cp tests/datasets/recursive-round/round-manifest.example.json \
+  tests/datasets/recursive-round/round-manifest.local.json
+```
+
+2. Freeze tests by writing `expected_sha256`:
+
+```bash
+bash scripts/pin-test-bundle-hash.sh \
+  tests/datasets/recursive-round/round-manifest.local.json
+```
+
+3. Load concrete defaults for hook + benchmark commands:
+
+```bash
+source scripts/recursive-env.example.sh
+```
+
+4. Run a fast round:
+
+```bash
+bash scripts/run-recursive-round.sh \
+  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --mode fast \
+  --run-id rr-20260220-fast1
+```
+
+5. Run a deep smoke round:
+
+```bash
+bash scripts/run-recursive-round.sh \
+  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --mode deep \
+  --smoke-only \
+  --run-id rr-20260220-deep-smoke1
+```
+
+6. Decision-grade deep round (set real backends):
+
+```bash
+export COGWORKS_RECURSIVE_BENCH_CLAUDE_REAL_CMD="<real claude benchmark command with {sources_path} and {out_dir}>"
+export COGWORKS_RECURSIVE_BENCH_CODEX_REAL_CMD="<real codex benchmark command with {sources_path} and {out_dir}>"
+bash scripts/run-recursive-round.sh \
+  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --mode deep \
+  --run-id rr-20260220-deep-real1
+```
+
+Hook execution is driven by `tests/datasets/recursive-round/round-manifest.local.json` via:
+
+- `bash scripts/run-recursive-hook.sh pre_round|generate|improve|regenerate|post_round`
+
+Round outputs:
+
+- `tests/results/meta-loop/{run_id}/round-summary.json`
+- `tests/results/meta-loop/{run_id}/round-report.md`
+
+Signal policy:
+
+- Deep mode with `signal_mode=real` and `ranking_eligible=true` is decision-grade.
+- `--smoke-only` deep mode is plumbing verification only.
+
+Validate docs consistency:
+
+```bash
+bash scripts/validate-recursive-docs.sh
+```
 
 ## Advanced Manual CLI
 

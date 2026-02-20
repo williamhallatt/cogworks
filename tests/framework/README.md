@@ -2,6 +2,8 @@
 
 Unified testing framework for both Claude and Codex pipelines.
 
+Canonical recursive round runbook: `tests/datasets/recursive-round/README.md`
+
 ## Scope
 
 This framework supports three test tracks:
@@ -30,6 +32,16 @@ Pipeline benchmark:
 
 ```bash
 bash scripts/test-cogworks-pipeline.sh --mode offline --run-id 20260220-ab1
+```
+
+Recursive TDD round:
+
+```bash
+source scripts/recursive-env.example.sh
+bash scripts/run-recursive-round.sh \
+  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --mode fast \
+  --run-id rr-20260220-fast1
 ```
 
 Real benchmark mode:

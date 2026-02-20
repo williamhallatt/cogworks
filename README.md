@@ -223,41 +223,46 @@ bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill --with
 
 ### Running Recursive Improvement Rounds
 
-Run test-first recursive rounds with a frozen test bundle and optional generation hooks:
+Canonical runbook: `tests/datasets/recursive-round/README.md`
+
+Run test-first recursive rounds with frozen tests and concrete hook/benchmark commands:
 
 ```bash
-# 1) Copy and edit manifest
+# 1) Create local manifest and pin frozen test hash
 cp tests/datasets/recursive-round/round-manifest.example.json \
   tests/datasets/recursive-round/round-manifest.local.json
+bash scripts/pin-test-bundle-hash.sh \
+  tests/datasets/recursive-round/round-manifest.local.json
 
-# 2) Compute and set expected_sha256 in manifest
-bash scripts/hash-test-bundle.sh \
-  tests/test-suite/mvp-test-cases.jsonl \
-  tests/behavioral
+# 2) Load concrete defaults for hooks + benchmark wrappers
+source scripts/recursive-env.example.sh
 
-# 3) Fast round
+# 3) Fast round (invariant + behavioral)
 bash scripts/run-recursive-round.sh \
   --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
   --mode fast \
   --run-id rr-20260220-fast1
 
-# 4) Deep round (decision-grade signal)
-export COGWORKS_BENCH_CLAUDE_CMD="your-claude-runner --sources '{sources_path}' --out '{out_dir}'"
-export COGWORKS_BENCH_CODEX_CMD="your-codex-runner --sources '{sources_path}' --out '{out_dir}'"
+# 4) Deep smoke round (plumbing only; non-decision-grade)
 bash scripts/run-recursive-round.sh \
   --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
   --mode deep \
-  --run-id rr-20260220-deep1
+  --smoke-only \
+  --run-id rr-20260220-deep-smoke1
 
-# 5) Optional: wire hook phases for generate/improve/regenerate
-export COGWORKS_RECURSIVE_GENERATE_CMD="echo generate candidates"
-export COGWORKS_RECURSIVE_IMPROVE_CMD="echo run improvement skills"
-export COGWORKS_RECURSIVE_REGENERATE_CMD="echo regenerate pipelines and skills"
+# 5) Decision-grade deep mode: set real backend commands
+export COGWORKS_RECURSIVE_BENCH_CLAUDE_REAL_CMD="<real claude benchmark command with {sources_path} and {out_dir}>"
+export COGWORKS_RECURSIVE_BENCH_CODEX_REAL_CMD="<real codex benchmark command with {sources_path} and {out_dir}>"
+bash scripts/run-recursive-round.sh \
+  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --mode deep \
+  --run-id rr-20260220-deep-real1
 ```
 
 Artifacts:
 
 - `tests/results/meta-loop/{run_id}/round-summary.json`
+- `tests/results/meta-loop/{run_id}/round-report.md`
 - `tests/results/meta-loop/{run_id}/round-report.md`
 
 ## OpenAI Codex Usage
