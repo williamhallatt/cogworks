@@ -22,15 +22,16 @@ The cogworks testing framework validates that generated skills meet quality requ
 # With JSON output
 /cogworks-test deployment-skill --json
 
-# Compare against golden sample
-/cogworks-test deployment-skill --compare-against tests/datasets/golden-samples/deployment-skill/
+# Layer 1 only (recommended default for Codex workflows)
+/cogworks-test deployment-skill --layer1-only
 ```
 
 ### Generate Skill with Testing
 
 ```bash
-# Integrated workflow (creates + tests)
-@cogworks encode _sources/my-topic/ --test
+# Generate, then validate
+@cogworks encode _sources/my-topic/
+/cogworks-test my-topic
 ```
 
 ### Test All Golden Samples
@@ -39,7 +40,7 @@ The cogworks testing framework validates that generated skills meet quality requ
 # Regression test suite
 for sample in tests/datasets/golden-samples/*/; do
     slug=$(basename "$sample")
-    /cogworks-test "$slug" --compare-against "$sample"
+    /cogworks-test "$slug"
 done
 ```
 
@@ -51,6 +52,12 @@ python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run
 
 # Only run for cogworks-* skills
 python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run --skill-prefix cogworks-
+
+# Run for a single skill slug
+python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run --skill cogworks-learn
+
+# Run against Codex-installed skills
+python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run --skills-root .agents/skills --skill my-skill
 ```
 
 ### Scaffold Behavioral Test Cases
@@ -238,7 +245,7 @@ Known-good skills that should always pass. Use for:
 4. Copy to expected-skill: `cp -r .claude/skills/{slug}/ expected-skill/`
 5. Create metadata.yaml with expected scores
 6. Create test-cases.jsonl
-7. Run test: `/cogworks-test {slug} --compare-against golden-samples/{slug}/`
+7. Run test: `/cogworks-test {slug}`
 
 ### Leakage Audit (Golden Samples)
 
@@ -449,13 +456,14 @@ bash .claude/test-framework/graders/deterministic-checks.sh .claude/skills/my-sk
 
 ### With Cogworks Workflow
 
-Automatically invoked when user runs:
+Run validation after generating a skill:
 
 ```bash
-@cogworks encode <sources> --test
+@cogworks encode <sources>
+/cogworks-test <slug>
 ```
 
-See `.claude/agents/cogworks.md` Step 6.5 for implementation.
+See `.claude/agents/cogworks.md` Step 6 for validation behavior.
 
 ### With CI/CD (Future)
 
@@ -469,7 +477,7 @@ jobs:
       - checkout
       - run: |
           for sample in tests/datasets/golden-samples/*/; do
-            /cogworks-test $(basename $sample) --compare-against $sample
+            /cogworks-test $(basename $sample)
           done
 ```
 
@@ -499,7 +507,7 @@ jobs:
 3. Generate skill
 4. Create metadata.yaml
 5. Create test-cases.jsonl
-6. Validate: `/cogworks-test {slug} --compare-against golden-samples/{slug}/`
+6. Validate: `/cogworks-test {slug}`
 
 ### Creating Negative Controls
 

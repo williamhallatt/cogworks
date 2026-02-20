@@ -5,7 +5,7 @@ description: Validates generated cogworks skills through structural checks and s
 
 # Cogworks Skill Validator
 
-**Codex note**: Layer 1 deterministic checks are fully supported. Layer 2 and behavioral gates require Claude-specific tooling and are not part of the default Codex workflow.
+**Codex note**: Layer 1 deterministic checks are fully supported and are the default Codex workflow. Layer 2, behavioral, and calibration gates are optional advanced checks.
 
 **Scope**: This skill validates generated skills only. Framework meta-tests live under `tests/` and are run separately (see `TESTING.md`).
 
@@ -179,15 +179,17 @@ weighted_score = (
 ```
 
 Determine recommendation:
-- **PASS**: weighted_score >= 0.85 AND no dimension scores below 3 AND behavioral gate passes AND calibration gate passes
-- **FAIL**: weighted_score < 0.85 OR any dimension below 3 OR behavioral gate fails OR calibration gate fails
+- **PASS**: weighted_score >= 0.85 AND no dimension scores below 3
+- **FAIL**: weighted_score < 0.85 OR any dimension below 3
+
+If behavioral and/or calibration gates are executed, they must also pass for the final recommendation to remain PASS.
 
 ### Step 8: Behavioral Gate (External)
 
 Run behavioral tests (activation + traces) and confirm the skill passes the behavioral gate:
 
 ```bash
-python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run
+python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run --skills-root .agents/skills
 ```
 
 Behavioral pass criteria:

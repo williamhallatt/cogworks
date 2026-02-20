@@ -265,6 +265,11 @@ check_existing_installation() {
                 existing_components+=("${skill} skill")
             fi
         done
+        local codex_framework_target
+        codex_framework_target="$(get_test_framework_target_path "$target_path")"
+        if [[ -d "$codex_framework_target" ]]; then
+            existing_components+=("test framework")
+        fi
     else
         if [[ -f "${target_path}/agents/${AGENT_FILE}" ]]; then
             existing_components+=("cogworks agent")
@@ -517,13 +522,8 @@ install_skills() {
 install_test_framework() {
     local target_path="$1"
     local source_dir="${CLAUDE_SOURCE_DIR}/${TEST_FRAMEWORK_DIR}"
-    local target_dir="${target_path}/${TEST_FRAMEWORK_DIR}"
-
-    if [[ "$INSTALL_TARGET" == "codex" ]]; then
-        print_dim "Codex installation does not include the Claude test framework"
-        echo
-        return 0
-    fi
+    local target_dir
+    target_dir="$(get_test_framework_target_path "$target_path")"
 
     if [[ ! -d "$source_dir" ]]; then
         print_dim "Test framework not found in archive"
@@ -547,14 +547,14 @@ install_test_framework() {
     fi
 
     if $DRY_RUN_MODE; then
-        print_info "[DRY RUN] Would install: test-framework/"
+        print_info "[DRY RUN] Would install: ${target_dir}"
     else
         # Create target directory if it doesn't exist
         mkdir -p "$target_dir"
         # Copy contents (not the directory itself)
         cp -r "$source_dir"/* "$target_dir"/
-        log_installed "${TEST_FRAMEWORK_DIR}/"
-        print_success "Installed: test-framework"
+        log_installed "${target_dir}"
+        print_success "Installed: ${target_dir}"
     fi
 
     echo
@@ -589,6 +589,17 @@ verify_installation() {
                 print_dim "Optional skill not installed: ${skill}"
             fi
         done
+
+        if [[ -d "${CLAUDE_SOURCE_DIR}/${TEST_FRAMEWORK_DIR}" ]]; then
+            local codex_framework_target
+            codex_framework_target="$(get_test_framework_target_path "$target_path")"
+            if [[ -f "${codex_framework_target}/graders/deterministic-checks.sh" ]]; then
+                print_success "Test framework installed: ${codex_framework_target}"
+            else
+                handle_error "Test framework not found: ${codex_framework_target}"
+                verification_passed=false
+            fi
+        fi
     else
         # Verify agent
         if [[ -f "${target_path}/agents/${AGENT_FILE}" ]]; then
@@ -755,6 +766,33 @@ get_installation_path() {
     esac
 }
 
+get_test_framework_target_path() {
+    local target_path="$1"
+
+    if [[ "$INSTALL_TARGET" != "codex" ]]; then
+        echo "${target_path}/${TEST_FRAMEWORK_DIR}"
+        return 0
+    fi
+
+    case "$INSTALL_SCOPE" in
+        local)
+            echo "$(pwd)/.claude/${TEST_FRAMEWORK_DIR}"
+            ;;
+        global)
+            echo "${HOME}/.claude/${TEST_FRAMEWORK_DIR}"
+            ;;
+        *)
+            if [[ "$target_path" =~ /?\.agents/skills/?$ ]]; then
+                local root_dir
+                root_dir="$(dirname "$(dirname "$target_path")")"
+                echo "${root_dir}/.claude/${TEST_FRAMEWORK_DIR}"
+            else
+                echo "$(dirname "$target_path")/.claude/${TEST_FRAMEWORK_DIR}"
+            fi
+            ;;
+    esac
+}
+
 show_installation_summary() {
     local target_path="$1"
 
@@ -772,6 +810,9 @@ show_installation_summary() {
                 echo "  - ${skill} skill (optional)"
             fi
         done
+        if [[ -d "${CLAUDE_SOURCE_DIR}/${TEST_FRAMEWORK_DIR}" ]]; then
+            echo "  - test-framework (installed to $(get_test_framework_target_path "$target_path"))"
+        fi
     else
         echo "  - cogworks agent (${AGENT_FILE})"
         for skill in "${REQUIRED_SKILLS[@]}"; do
