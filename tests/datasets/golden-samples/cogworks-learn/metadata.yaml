@@ -99,4 +99,4 @@ usage_notes: |
   - Maintains minimal but sufficient citations (3 ±1)
 
   Regression testing:
-  /cogworks-test cogworks-learn --compare-against tests/datasets/golden-samples/cogworks-learn/
+  bash scripts/test-generated-skill.sh --skill-path .claude/skills/cogworks-learn
