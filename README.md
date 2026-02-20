@@ -16,7 +16,7 @@ Provide sources (URLs, files, directories) → `cogworks` synthesises them via a
 
 My typical workflow:
 
-1. **Prepare sources** — I find authoritative content online and save it as markdown to `_sources/<topic>/` (e.g., `_sources/cc-docs/`, `_sources/advanced-prompting/`). Some documentation hubs already publish markdown, which makes this straightforward. You can also pass URLs directly instead of local files.
+1. **Prepare sources** — I find authoritative content online and save it as markdown to `_sources/<topic>/` (e.g., `_sources/cc-docs/`). Some documentation hubs already publish markdown, which makes this straightforward. You can also pass URLs directly instead of local files.
 
 2. **Encode** — I run the agent with something like:
 
