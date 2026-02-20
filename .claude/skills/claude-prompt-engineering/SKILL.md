@@ -1,6 +1,6 @@
 ---
 name: claude-prompt-engineering
-description: Optimize Claude Code prompts for Opus 4.6, Sonnet 4.5, and Haiku 4.5 using adaptive thinking, extended thinking, context management, multi-window workflows, subagent orchestration, tool parallelization, security defense-in-depth, and output control. Apply when designing system prompts, reviewing skill generation, tuning reasoning effort levels, configuring autonomy/safety balance, structuring research patterns, preventing prompt injection, or maximizing instruction following. Use for agentic workflows, long-horizon tasks, complex reasoning, skill generation pipelines, security-critical applications, and production deployments requiring Claude-specific optimization.
+description: Optimize Claude Code prompts for Opus 4.6, Sonnet 4.5, and Haiku 4.5 with model-aware reasoning settings, context control, safe tool use, and concise output shaping.
 ---
 
 # Claude Prompt Engineering
@@ -11,55 +11,34 @@ description: Optimize Claude Code prompts for Opus 4.6, Sonnet 4.5, and Haiku 4.
 
 ## Overview
 
-This skill provides expert guidance for optimizing Claude Code prompts across Opus 4.6, Sonnet 4.5, and Haiku 4.5 models. It synthesizes Claude-specific best practices with universal prompt engineering principles, covering adaptive thinking (the current default for Opus 4.6), extended thinking (legacy Sonnet 4.5 compatibility), context-aware design for multi-window workflows, strategic tool orchestration, security defense-in-depth, and output formatting control.
+This skill provides practical, Claude-specific prompt engineering guidance for Opus 4.6, Sonnet 4.5, and Haiku 4.5. It emphasizes fast model-aware decisions: reasoning mode selection, context management, safe autonomy, tool efficiency, and output control.
 
 ## When to Use This Skill
 
-Apply this skill when:
+Use this skill when you need to:
 
-- **Designing system prompts** for Claude Code skills or agents
-- **Reviewing generated skills** in skill generation pipelines
-- **Tuning reasoning parameters** (adaptive thinking effort levels, extended thinking budgets)
-- **Configuring autonomy/safety balance** for agentic workflows
-- **Structuring research patterns** requiring hypothesis tracking and multi-source verification
-- **Implementing security controls** to prevent prompt injection and jailbreaks
-- **Optimizing tool use** for parallel execution and efficiency
-- **Debugging Claude behavior** through thinking output inspection
-- **Migrating prompts** from extended thinking to adaptive thinking
-- **Building long-horizon tasks** spanning multiple context windows
+- Design or review Claude system prompts
+- Tune adaptive or extended thinking behavior
+- Improve tool orchestration and parallelization
+- Handle long-horizon or multi-window workflows
+- Add prompt-injection and data-leakage safeguards
+- Reduce verbosity while preserving answer quality
 
-## Key Topics Covered
+## Quick Decision Cheatsheet
 
-### Reasoning Configuration
-- **Adaptive Thinking**: Opus 4.6 default mode with effort parameter tuning (low/medium/high/max)
-- **Extended Thinking**: Sonnet 4.5 compatibility with token budget sizing (minimum 1024, batch >32K)
-- **Chain-of-Thought**: Traditional CoT prompting with XML tags for models without thinking features
+- **Opus 4.6**: Use adaptive thinking (`low|medium|high|max`) only when task complexity justifies it.
+- **Sonnet 4.5**: Use extended thinking for legacy workflows; minimum budget 1024 tokens.
+- **Simple tasks**: Prefer no explicit thinking config.
+- **Long tasks**: Persist state in files + git checkpoints.
+- **Independent reads/searches**: Run tool calls in parallel.
+- **Risky/irreversible actions**: Ask for confirmation first.
+- **Production exposure**: Apply defense-in-depth (input, architecture, output).
 
-### Context & Workflow Management
-- **Multi-Window Workflows**: State persistence, git checkpoints, memory tool integration
-- **Long-Horizon Reasoning**: Multi-turn execution, state tracking (JSON + git logs), test-driven patterns
-- **Context Compaction**: Token budget management, automatic summarization behavior
+## Supporting Docs
 
-### Architectural Patterns
-- **Subagent Orchestration**: When to delegate vs inline, preventing excessive spawning, parallel vs sequential execution
-- **Tool Parallelization**: Maximizing parallel tool calls for reads and searches, dependency management
-- **Autonomy/Safety Balance**: Reversibility considerations, when to confirm vs proceed, hook integration
-
-### Quality & Security
-- **Research Patterns**: Structured information gathering, hypothesis tracking, confidence calibration
-- **Security Defense-in-Depth**: Prompt injection prevention, input validation, output filtering, least privilege
-- **Output Control**: Markdown minimization, prose-first communication, platform quirks
-
-### Universal Foundations
-- **Few-Shot Prompting**: Example selection and structuring with Claude-specific features
-- **Instruction Following**: Explicitness, context provision, example vigilance
-- **Evaluation**: Iterative optimization, metaprompting, feedback loops
-
-## Supporting Documentation
-
-- **reference.md**: Complete knowledge base with TL;DR, core concepts, concept map, deep dives, quick reference, and sources
-- **patterns.md**: Transferable patterns applicable beyond prompt engineering
-- **examples.md**: Before/after comparisons showing naive vs expert approaches
+- `reference.md`: Canonical guidance, decision rules, anti-patterns, and sources
+- `patterns.md`: Reusable patterns and templates
+- `examples.md`: Compact before/after prompt examples
 
 ## Model Routing Contract
 
@@ -70,18 +49,14 @@ Apply this skill when:
   - synthesis/contradiction resolution: reasoning
   - final skill drafting: workhorse
 - **quality gates tied to capability**:
-  - reasoning: resolve contradictions and justify chosen interpretation
-  - workhorse: produce complete structure with citations and no stubs
+  - reasoning: resolve contradictions and justify the interpretation
+  - workhorse: complete structure with citations and no stubs
 - **runtime model resolution**:
   - map capability classes to provider/runtime defaults automatically
   - never ask the user to choose a model
 
 ## Invocation
 
-This skill is automatically loaded when relevant to Claude Code prompt optimization tasks. You can also invoke it explicitly:
-
-```
+```text
 /claude-prompt-engineering
 ```
-
-Or reference it in task descriptions when working on prompt design, skill generation, or agentic workflow optimization.
