@@ -922,10 +922,12 @@ show_success_message() {
         echo "  1. Start OpenAI Codex in your project directory"
         echo "  2. Use the cogworks skill to orchestrate: ${COLOR_BOLD}cogworks encode <sources>${COLOR_RESET}"
         echo "  3. Or invoke skills directly: ${COLOR_BOLD}cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}cogworks-learn${COLOR_RESET}"
+        echo "  4. Check for updates: ${COLOR_BOLD}bash scripts/check-cogworks-updates.sh${COLOR_RESET}"
     else
         echo "  1. Start Claude Code in your project directory"
         echo "  2. Use the cogworks agent: ${COLOR_BOLD}@cogworks encode <sources>${COLOR_RESET}"
         echo "  3. Or invoke skills directly: ${COLOR_BOLD}/cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}/cogworks-learn${COLOR_RESET}"
+        echo "  4. Check for updates: ${COLOR_BOLD}bash scripts/check-cogworks-updates.sh${COLOR_RESET}"
     fi
     echo
     echo "For documentation, see:"

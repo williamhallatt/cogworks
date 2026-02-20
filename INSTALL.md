@@ -60,6 +60,16 @@ ls your-project/.claude/skills/cogworks-learn/SKILL.md
 ls your-project/tests/framework/scripts/cogworks-eval.py
 ```
 
+## Check for Updates
+
+Run from the installed/extracted cogworks root:
+
+```bash
+bash scripts/check-cogworks-updates.sh
+```
+
+The checker compares your local packaged version (`install.sh`) with the latest GitHub release.
+
 ## Test Generated Skills
 
 ```bash

@@ -37,6 +37,7 @@ ls -la .claude/skills/cogworks-*/SKILL.md
 
 - `.claude/agents/cogworks.md` exists with valid YAML frontmatter
 - All `cogworks-*` skills have valid SKILL.md files with required fields
+- Codex orchestrator skill exists at `.agents/skills/cogworks/SKILL.md`
 
 ### Step 3: Create git tag and push
 
@@ -86,6 +87,14 @@ Each release package includes:
 
 ```bash
 cogworks-{version}/
+├── .agents/
+│   └── skills/
+│       ├── cogworks/               # Codex orchestrator
+│       │   └── SKILL.md
+│       ├── cogworks-encode/        # Codex synthesis skill
+│       │   └── SKILL.md, reference.md, ...
+│       └── cogworks-learn/         # Codex skill-authoring skill
+│           └── SKILL.md, patterns.md, examples.md, reference.md, ...
 ├── .claude/
 │   ├── agents/
 │   │   └── cogworks.md              # Main agent
@@ -94,16 +103,17 @@ cogworks-{version}/
 │   │   │   └── SKILL.md, reference.md, ...
 │   │   ├── cogworks-learn/          # Required
 │   │   │   └── SKILL.md, patterns.md, examples.md, reference.md, ...
-│   │   └── cogworks-test/           # Testing skill (Optional use, but included)
-│   │       └── SKILL.md, ...
-│   └── test-framework/              # Required by cogworks-test
-│       ├── config/
+├── tests/
+│   └── framework/                   # Shared framework used by testing scripts
 │       ├── graders/
 │       ├── scripts/
 │       └── templates/
 ├── README.md                         # Project overview
 ├── LICENSE                           # MIT License
-└── INSTALL.md                        # Installation instructions
+├── INSTALL.md                        # Installation instructions
+├── install.sh                        # Installer
+└── scripts/
+    └── check-cogworks-updates.sh     # Convenience update checker
 ```
 
 **Excluded from releases:**
@@ -111,7 +121,7 @@ cogworks-{version}/
 - `.git/` directory
 - `_sources/` (only needed for development)
 - `_plans/` (development planning)
-- `tests/` (test infrastructure, not user-facing)
+- Most of `tests/` (release includes `tests/framework/` only for script compatibility)
 - `.github/workflows/` (for maintainers only)
 - `RELEASES.md` (maintainer documentation)
 - `CLAUDE.md` (development guidance)
@@ -123,10 +133,12 @@ Before tagging a release, verify:
 - [ ] All commits for the release are pushed to `main`
 - [ ] `.claude/agents/cogworks.md` exists and is syntactically correct
 - [ ] All `.claude/skills/cogworks-*/` directories have valid SKILL.md files
+- [ ] All `.agents/skills/cogworks*` directories have valid SKILL.md files
 - [ ] SKILL.md files have proper YAML frontmatter with `name:`, `description:` fields
 - [ ] Agent declares dependencies on `cogworks-encode` and `cogworks-learn`
 - [ ] README.md is up to date
 - [ ] No broken internal links in .md files
+- [ ] `scripts/check-cogworks-updates.sh` is present in generated `.tar.gz` and `.zip` artifacts
 
 ## Release Notes (Auto-Generated Changelog)
 
@@ -214,17 +226,25 @@ If the GitHub Actions workflow fails, you can manually create a release:
 ```bash
 # Create the release directory structure
 ARTIFACT_NAME="cogworks-1.0.0"
+mkdir -p "${ARTIFACT_NAME}/.agents/skills"
 mkdir -p "${ARTIFACT_NAME}/.claude/agents"
 mkdir -p "${ARTIFACT_NAME}/.claude/skills"
+mkdir -p "${ARTIFACT_NAME}/tests/framework"
+mkdir -p "${ARTIFACT_NAME}/scripts"
 
 # Copy agent
 cp ".claude/agents/cogworks.md" "${ARTIFACT_NAME}/.claude/agents/"
 
 # Copy all cogworks-* skills
 cp -r .claude/skills/cogworks-* "${ARTIFACT_NAME}/.claude/skills/"
+cp -r .agents/skills/cogworks* "${ARTIFACT_NAME}/.agents/skills/"
+
+# Copy shared test framework and scripts
+cp -r tests/framework/* "${ARTIFACT_NAME}/tests/framework/"
+cp -r scripts/* "${ARTIFACT_NAME}/scripts/"
 
 # Copy documentation
-cp README.md LICENSE INSTALL.md "${ARTIFACT_NAME}/"
+cp README.md LICENSE INSTALL.md install.sh "${ARTIFACT_NAME}/"
 
 # Create archives
 tar -czf "${ARTIFACT_NAME}.tar.gz" "${ARTIFACT_NAME}/"
