@@ -56,6 +56,7 @@ bash scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1
 
 ```bash
 python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-
+python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks- --strict-provenance
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark scaffold --run-id 20260220-ab1
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark run --run-id 20260220-ab1 \
   --command-template "claude::./scripts/run-claude-benchmark.sh '{sources_path}' '{out_dir}'" \
@@ -71,9 +72,27 @@ tests/framework/
 │   └── deterministic-checks.sh
 ├── scripts/
 │   ├── behavioral_lib.py
+│   ├── capture_behavioral_trace.py
 │   ├── cogworks-eval.py
 │   └── pipeline_benchmark.py
 └── templates/
     ├── behavioral-test-case-template.jsonl
     └── behavioral-trace-template.json
+```
+
+## Trace Capture
+
+Normalize raw harness output to the behavioral trace contract:
+
+```bash
+bash scripts/capture-behavioral-trace-claude.sh <case_id> <skill_slug> <raw_trace.json> <out_trace.json>
+bash scripts/capture-behavioral-trace-codex.sh <case_id> <skill_slug> <raw_trace.json> <out_trace.json>
+```
+
+Refresh + strict-validate all behavioral traces:
+
+```bash
+export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="your-claude-capture --case {case_json_path} --out {raw_trace_path}"
+export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="your-codex-capture --case {case_json_path} --out {raw_trace_path}"
+bash scripts/refresh-behavioral-traces.sh --mode all
 ```

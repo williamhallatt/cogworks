@@ -4,7 +4,7 @@ import json
 import os
 import sys
 from datetime import UTC, datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from behavioral_lib import load_json, load_jsonl, validate_case, compute_f1
 from pipeline_benchmark import run_benchmark, scaffold_layout, summarize_benchmark
@@ -65,6 +65,65 @@ def _collect_skills(skills_root: str, prefixes: List[str]) -> List[str]:
     return sorted(skills)
 
 
+def _infer_pipeline_from_skills_root(skills_root: str) -> Optional[str]:
+    normalized = os.path.normpath(skills_root)
+    if normalized.endswith(os.path.normpath(".claude/skills")):
+        return "claude"
+    if normalized.endswith(os.path.normpath(".agents/skills")):
+        return "codex"
+    return None
+
+
+def _parse_timestamp(value: str) -> bool:
+    if not isinstance(value, str) or not value.strip():
+        return False
+    text = value.strip()
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    try:
+        datetime.fromisoformat(text)
+    except ValueError:
+        return False
+    return True
+
+
+def _validate_trace_provenance(
+    trace: Dict[str, Any], strict: bool, expected_pipeline: Optional[str] = None
+) -> List[str]:
+    issues: List[str] = []
+    pipeline = str(trace.get("pipeline", "")).strip().lower()
+    harness = str(trace.get("harness", "")).strip().lower()
+    model = str(trace.get("model", "")).strip().lower()
+    trace_source = str(trace.get("trace_source", "")).strip().lower()
+    captured_at = trace.get("captured_at")
+    placeholder_values = {"", "n/a", "na", "manual", "placeholder", "unknown"}
+
+    if strict:
+        for field in ("pipeline", "harness", "model", "trace_source", "captured_at"):
+            value = trace.get(field)
+            if value is None or (isinstance(value, str) and not value.strip()):
+                issues.append(f"missing required provenance field: {field}")
+
+    if expected_pipeline and pipeline and pipeline not in {expected_pipeline, "shared"}:
+        issues.append(f"pipeline mismatch (expected={expected_pipeline}, trace={pipeline})")
+
+    if strict:
+        if pipeline and pipeline not in {"claude", "codex", "shared"}:
+            issues.append(f"invalid pipeline value: {pipeline}")
+        if harness in placeholder_values:
+            issues.append(f"placeholder harness not allowed in strict mode: {trace.get('harness')}")
+        if model in placeholder_values:
+            issues.append(f"placeholder model not allowed in strict mode: {trace.get('model')}")
+        if trace_source != "captured":
+            issues.append(
+                f"trace_source must be 'captured' in strict mode (got: {trace.get('trace_source')})"
+            )
+        if not _parse_timestamp(str(captured_at) if captured_at is not None else ""):
+            issues.append(f"invalid captured_at timestamp: {captured_at}")
+
+    return issues
+
+
 def behavioral_run(args: argparse.Namespace) -> int:
     timestamp = args.timestamp or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     results_dir = os.path.join(args.results_root, timestamp)
@@ -79,6 +138,7 @@ def behavioral_run(args: argparse.Namespace) -> int:
 
     collected_skills = _collect_skills(args.skills_root, args.skill_prefix)
     requested_skills = set(args.skill or [])
+    expected_pipeline = _infer_pipeline_from_skills_root(args.skills_root)
 
     if requested_skills:
         selected = [skill for skill in collected_skills if skill in requested_skills]
@@ -154,6 +214,12 @@ def behavioral_run(args: argparse.Namespace) -> int:
 
             trace = load_json(trace_path)
             result = validate_case(case, trace)
+            provenance_issues = _validate_trace_provenance(
+                trace, strict=args.strict_provenance, expected_pipeline=expected_pipeline
+            )
+            if provenance_issues:
+                result["issues"].extend(provenance_issues)
+                result["pass"] = False
             case_results.append(result)
 
             should_activate = bool(case.get("should_activate"))
@@ -212,6 +278,12 @@ def behavioral_validate(args: argparse.Namespace) -> int:
 
     trace = load_json(args.trace)
     result = validate_case(case, trace)
+    provenance_issues = _validate_trace_provenance(
+        trace, strict=args.strict_provenance, expected_pipeline=args.expected_pipeline
+    )
+    if provenance_issues:
+        result["issues"].extend(provenance_issues)
+        result["pass"] = False
     if args.json:
         print(json.dumps(result, indent=2))
     else:
@@ -296,6 +368,7 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--skill", action="append", default=[], help="Specific skill slug (repeatable)")
     run.add_argument("--skill-prefix", action="append", default=[], help="Only include skills with this prefix (repeatable)")
     run.add_argument("--allow-missing-tests", action="store_true")
+    run.add_argument("--strict-provenance", action="store_true")
     run.set_defaults(func=behavioral_run)
 
     validate = behavioral_sub.add_parser("validate", help="Validate a single trace")
@@ -303,6 +376,8 @@ def build_parser() -> argparse.ArgumentParser:
     validate.add_argument("--case-id", required=True)
     validate.add_argument("--trace", required=True)
     validate.add_argument("--json", action="store_true")
+    validate.add_argument("--strict-provenance", action="store_true")
+    validate.add_argument("--expected-pipeline", choices=["claude", "codex"], default=None)
     validate.set_defaults(func=behavioral_validate)
 
     scaffold = behavioral_sub.add_parser("scaffold", help="Scaffold behavioral test cases")
