@@ -1,209 +1,107 @@
-# Skill Writer - Practical Examples
+# Skill Authoring Examples (Codex-First)
 
-Complete skill examples demonstrating various patterns and configurations.
+## Example 1: Entrypoint Scope
 
----
-
-## Table of Contents
-
-- [Example 1](#example-1-api-conventions-reference-skill) - API Conventions (Reference Skill)
-- [Example 2](#example-2-deploy-task-skill-with-side-effects) - Deploy (Task Skill with Side Effects)
-- [Example 3](#example-3-code-explainer-auto-invokable) - Code Explainer (Auto-Invokable)
-- [Example 4](#example-4-fix-github-issue) - Fix GitHub Issue
-- [Example 5](#example-5-pr-summary-with-live-data) - PR Summary with Live Data
-- [Example 6](#example-6-deep-research-forked-subagent) - Deep Research (Forked Subagent)
-- [Example 7](#example-7-component-migration-multi-argument) - Component Migration (Multi-Argument)
-- [Example 8](#example-8-session-logger) - Session Logger
-- [Example 9](#example-9-safe-reader-tool-restriction) - Safe Reader (Tool Restriction)
-- [Example 10](#example-10-legacy-system-context-background-knowledge) - Legacy System Context (Background Knowledge)
-- [Example 11](#example-11-codebase-visualizer-visual-output) - Codebase Visualizer (Visual Output)
-- [Example 12](#example-12-skill-with-overview--reference-split) - Skill with Overview + Reference Split
-
----
-
-## Example 1: API Conventions (Reference Skill)
-```yaml
----
-name: api-conventions
-description: API design patterns for this codebase. Use when writing endpoints, designing APIs, or reviewing API code.
----
-
-When writing API endpoints:
-- Use RESTful naming conventions
-- Return consistent error formats
-- Include request validation
+### Before (Bloated)
+```markdown
+SKILL.md includes full doctrine, long examples, and repeated checklists.
 ```
 
-## Example 2: Deploy (Task Skill with Side Effects)
-```yaml
----
-name: deploy
-description: Deploy the application to production
-context: fork
-disable-model-invocation: true
----
-
-Deploy the application:
-1. Run the test suite
-2. Build the application
-3. Push to the deployment target
+### After (Router)
+```markdown
+SKILL.md includes purpose, use-when, core rules, file guide, invocation.
+reference.md holds complete doctrine.
 ```
 
-## Example 3: Code Explainer (Auto-Invokable)
-```yaml
----
-name: explain-code
-description: Explains code with visual diagrams and analogies. Use when explaining how code works, teaching about a codebase, or when the user asks "how does this work?"
----
+## Example 2: Planning Schema
 
-When explaining code, always include:
-1. **Start with an analogy**: Compare to everyday life
-2. **Draw a diagram**: ASCII art for flow/structure
-3. **Walk through the code**: Step-by-step explanation
-4. **Highlight a gotcha**: Common mistake or misconception
+### Before (Invalid)
+```json
+{"tasks":[{"id":1,"desc":"Implement","status":"pending"}]}
 ```
 
-## Example 4: Fix GitHub Issue
-```yaml
----
-name: fix-issue
-description: Fix a GitHub issue
-disable-model-invocation: true
-argument-hint: [issue-number]
----
-
-Fix GitHub issue $ARGUMENTS following our coding standards.
-
-1. Read the issue description
-2. Understand the requirements
-3. Implement the fix
-4. Write tests
-5. Create a commit
+### After (Valid)
+```json
+{"plan":[{"step":"Implement","status":"in_progress"}]}
 ```
 
-## Example 5: PR Summary with Live Data
-```yaml
----
-name: pr-summary
-description: Summarize changes in a pull request
-context: fork
-agent: Explore
-allowed-tools: Bash(gh *)
----
+## Example 3: Shell Tool Naming
 
-## Pull request context
-- PR diff: !`gh pr diff`
-- PR comments: !`gh pr view --comments`
-- Changed files: !`gh pr diff --name-only`
-
-## Your task
-Summarize this pull request...
+### Before (Runtime Drift)
+```text
+Use shell_command for terminal commands.
 ```
 
-## Example 6: Deep Research (Forked Subagent)
-```yaml
----
-name: deep-research
-description: Research a topic thoroughly
-context: fork
-agent: Explore
----
-
-Research $ARGUMENTS thoroughly:
-
-1. Find relevant files using Glob and Grep
-2. Read and analyze the code
-3. Summarize findings with specific file references
+### After (Runtime-Correct)
+```text
+In this runtime, use exec_command for terminal commands.
 ```
 
-## Example 7: Component Migration (Multi-Argument)
-```yaml
----
-name: migrate-component
-description: Migrate a component from one framework to another
-argument-hint: [component] [from] [to]
----
+## Example 4: Supporting File Decision
 
-Migrate the $0 component from $1 to $2.
-Preserve all existing behavior and tests.
+### Before (Forced)
+```text
+Always generate patterns.md and examples.md.
 ```
 
-## Example 8: Session Logger
-```yaml
----
-name: session-logger
-description: Log activity for this session
----
-
-Log the following to logs/${CLAUDE_SESSION_ID}.log:
-
-$ARGUMENTS
+### After (Adaptive)
+```text
+Generate optional files only when they provide >=3 unique entries each.
+Otherwise fold into reference.md.
 ```
 
-## Example 9: Safe Reader (Tool Restriction)
-```yaml
----
-name: safe-reader
-description: Read files without making changes
-allowed-tools: Read, Grep, Glob
----
+## Example 5: Dedup
 
-Explore the codebase in read-only mode.
+### Before
+```text
+Same compactness and tool rules repeated in all files.
 ```
 
-## Example 10: Legacy System Context (Background Knowledge)
-```yaml
----
-name: legacy-system-context
-description: Context about the legacy billing system architecture
-user-invocable: false
----
-
-The legacy billing system uses...
-[detailed architecture documentation]
+### After
+```text
+Canonical rule lives in reference.md.
+patterns/examples reference it and add only net-new context.
 ```
 
-## Example 11: Codebase Visualizer (Visual Output)
-```yaml
----
-name: codebase-visualizer
-description: Generate an interactive collapsible tree visualization of your codebase. Use when exploring a new repo, understanding project structure, or identifying large files.
-allowed-tools: Bash(python *)
----
+## Example 6: Contradiction Handling
 
-# Codebase Visualizer
-
-Run the visualization script from your project root:
-
-```bash
-python ~/.claude/skills/codebase-visualizer/scripts/visualize.py .
+### Before
+```text
+Source A and B disagree; output silently follows B.
 ```
 
-This creates `codebase-map.html` and opens it in your browser.
+### After
+```text
+Conflict note:
+- A says X
+- B says Y
+- Choose Y for runtime v2 constraints and newer publication date
 ```
 
-## Example 12: Skill with Overview + Reference Split
-**SKILL.md:**
-```yaml
----
-name: api-design
-description: API design expertise for RESTful services
----
+## Example 7: Placeholder Hygiene
 
-# API Design Expert
-
-Core principles for API design in this codebase.
-
-## Quick Reference
-- Use nouns for resources, verbs for actions
-- Consistent error format across all endpoints
-- Version in URL path (/v1/, /v2/)
-
-## Full Documentation
-See [reference.md](reference.md) for:
-- Complete endpoint patterns
-- Error code catalog
-- Authentication flows
+### Before
+```markdown
+> **Knowledge snapshot from:** {YYYY-MM-DD}
 ```
 
-**reference.md:** [Full 500+ line API documentation]
+### After
+```markdown
+> **Knowledge snapshot from:** 2026-02-20
+```
+
+## Example 8: Compact Review Payload
+
+### Before
+```text
+Long review with repeated narrative and no gate status.
+```
+
+### After
+```text
+Review summary:
+- topic, source count, destination
+- selected file layout
+- contradictions + chosen interpretation
+- gate status: contract/dedup/compactness/fidelity/placeholders
+```
