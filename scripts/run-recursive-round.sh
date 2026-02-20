@@ -237,12 +237,14 @@ python3 "$EVAL_CLI" behavioral run \
   --skills-root "$ROOT_DIR/$CLAUDE_ROOT" \
   --tests-root "$ROOT_DIR/tests/behavioral" \
   --results-root "$RESULTS_DIR/behavioral-claude" \
+  --strict-provenance \
   "${BEHAVIORAL_ARGS[@]}"
 
 python3 "$EVAL_CLI" behavioral run \
   --skills-root "$ROOT_DIR/$CODEX_ROOT" \
   --tests-root "$ROOT_DIR/tests/behavioral" \
   --results-root "$RESULTS_DIR/behavioral-codex" \
+  --strict-provenance \
   "${BEHAVIORAL_ARGS[@]}"
 
 BENCHMARK_SUMMARY=""

@@ -11,8 +11,10 @@
   "task_completed": true,
   "quality_score": 0.92,
   "baseline_run": false,
+  "pipeline": "claude",
   "harness": "claude-code",
   "model": "claude-opus-4-6",
-  "timestamp": "2026-02-19T12:00:00Z",
-  "notes": "Captured manually"
+  "trace_source": "captured",
+  "captured_at": "2026-02-19T12:00:00Z",
+  "notes": "Captured from pipeline harness"
 }

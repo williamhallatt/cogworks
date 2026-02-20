@@ -26,6 +26,12 @@ Behavioral tests for repo skills:
 python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-
 ```
 
+Strict provenance mode (fails placeholder/manual traces):
+
+```bash
+python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks- --strict-provenance
+```
+
 ## Docs Attestation Validation
 
 Commits to trunk must include docs attestation trailers in commit messages.
@@ -78,6 +84,21 @@ Behavioral pass criteria:
 - `activation_f1 >= 0.85`
 - `false_positive_rate <= 0.05`
 - `negative_control_ratio >= 0.25`
+
+Capture normalized traces for each pipeline:
+
+```bash
+bash scripts/capture-behavioral-trace-claude.sh <case_id> <skill_slug> <raw_trace.json> <out_trace.json>
+bash scripts/capture-behavioral-trace-codex.sh <case_id> <skill_slug> <raw_trace.json> <out_trace.json>
+```
+
+Refresh traces for both pipelines and strict-validate:
+
+```bash
+export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="your-claude-capture --case {case_json_path} --out {raw_trace_path}"
+export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="your-codex-capture --case {case_json_path} --out {raw_trace_path}"
+bash scripts/refresh-behavioral-traces.sh --mode all
+```
 
 ## Test Cogworks Pipeline (A/B)
 
