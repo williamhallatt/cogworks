@@ -223,7 +223,7 @@ Testing is a separate step from encoding. After encoding a skill, run tests inde
 
 ## OpenAI Codex Usage
 
-Codex does not support Claude sub-agents, so the workflow is provided as a Codex skill instead. Codex discovers skills in `.agents/skills/` under your repo (local scope) or in `~/.agents/skills` (user scope).
+Codex does not support Claude sub-agents, so the workflow is provided as a Codex skill instead. Codex discovers skills in `.agents/skills/` under your repo (local scope) or in `~/.agents/skills` (user scope). The packaged release contains these skills in `.agents/skills/` for direct installation.
 
 1. Install Codex skills:
 
@@ -280,7 +280,7 @@ See `.claude/test-framework/README.md` for complete testing documentation.
 
 Related to this being a personal workflow tool (see [ROADMAP.md](ROADMAP.md) for planned work):
 
-- **Claude agent is Claude Code-specific** — The `@cogworks` agent relies on Claude Code features (subagent orchestration, Task tool, specific invocation patterns). For Codex, use the Codex skill orchestrator in `codex/skills/cogworks`, installed via `./install.sh --target codex --local|--global` (or legacy `./install.sh --codex`). Codex discovers skills in `.agents/skills/` (repo) or `~/.agents/skills` (user). **The skills cogworks generates ARE portable** — they follow the universal AgentSkills standard (SKILL.md format with minimal frontmatter) and work across Claude Code, GitHub Copilot, Cursor, and other tools supporting the standard.
+- **Claude agent is Claude Code-specific** — The `@cogworks` agent relies on Claude Code features (subagent orchestration, Task tool, specific invocation patterns). For Codex, use the Codex skill orchestrator in `.agents/skills/cogworks`, installed via `./install.sh --target codex --local|--global` (or legacy `./install.sh --codex`). Codex discovers skills in `.agents/skills/` (repo) or `~/.agents/skills` (user). **The skills cogworks generates ARE portable** — they follow the universal AgentSkills standard (SKILL.md format with minimal frontmatter) and work across Claude Code, GitHub Copilot, Cursor, and other tools supporting the standard.
 - **Not portable** — `cogworks` assumes Linux (Ubuntu), edit paths throughout agent and associated skills definitions accordingly
 - **Flexible destination** — encoded skills can be created in project scope (`.claude/skills/`), personal scope (`~/.claude/skills/`), or custom paths
 - **Agent generation not yet implemented** — `cogworks` for generating sub-agents is planned but not available
