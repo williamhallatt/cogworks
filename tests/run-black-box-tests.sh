@@ -1,5 +1,5 @@
 #!/bin/bash
-# Black-box test runner for cogworks-test framework
+# Black-box test runner for cogworks evaluation framework
 # Tests against documented promises, not implementation details
 
 set -euo pipefail
@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 TEST_CASES="$SCRIPT_DIR/test-suite/mvp-test-cases.jsonl"
 RESULTS_DIR="$SCRIPT_DIR/results/black-box-$(date +%Y%m%d-%H%M%S)"
-LAYER1_SCRIPT="$PROJECT_ROOT/.claude/test-framework/graders/deterministic-checks.sh"
+LAYER1_SCRIPT="$PROJECT_ROOT/tests/framework/graders/deterministic-checks.sh"
 
 # Create results directory
 mkdir -p "$RESULTS_DIR"
@@ -215,7 +215,7 @@ run_test() {
 # Main execution
 main() {
     echo "╔════════════════════════════════════════════════════════════════╗"
-    echo "║   Black-Box Test Suite for cogworks-test Framework            ║"
+    echo "║   Black-Box Test Suite for cogworks Evaluation Framework      ║"
     echo "╚════════════════════════════════════════════════════════════════╝"
     echo ""
     echo "Test cases: $TEST_CASES"
