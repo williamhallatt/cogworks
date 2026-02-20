@@ -20,8 +20,8 @@ Claude Code Skills are SKILL.md files that extend Claude's capabilities through 
 
 ## Related Files
 
-- [patterns.md](patterns.md) - 10 reusable patterns + 10 anti-patterns
-- [examples.md](examples.md) - 12 complete practical examples
+- [patterns.md](patterns.md) - Transferable patterns and anti-patterns
+- [examples.md](examples.md) - Practical usage scenarios
 
 ---
 
@@ -94,7 +94,7 @@ my-skill/
 **Task Content:** Step-by-step workflows for specific actions. Often invoked manually. May use `disable-model-invocation: true` to prevent auto-triggering.
 
 ### 6. Progressive Disclosure
-**Definition:** Keep SKILL.md focused (~100-500 lines) with detailed reference material in supporting files. Claude loads additional files on-demand when needed.
+**Definition:** Keep SKILL.md focused and concise (prefer 150-350 words) with detailed reference material in supporting files. Claude loads additional files on-demand when needed.
 
 **Why:** Context window is a public good. Large skills consume tokens that could go to user messages or other skills.
 
@@ -115,6 +115,35 @@ my-skill/
 - For complete API details, see [reference.md](reference.md)
 - For usage examples, see [examples.md](examples.md)
 ```
+
+### 6.1 Generated Skill Profile (Default)
+For generated skills, default to a compact decision-first contract unless source breadth requires expansion.
+
+**SKILL.md**
+- Overview
+- When to Use
+- Quick Decision Cheatsheet
+- Supporting Docs
+- Invocation
+
+**reference.md**
+- TL;DR
+- Decision Rules
+- Quality Gates
+- Anti-Patterns
+- Quick Reference
+- Source Scope
+- Sources
+
+**Supporting files**
+- `patterns.md` and `examples.md` are optional
+- Include only if they add unique information not present in `reference.md`
+- Begin each supporting file with: `Source IDs map to reference.md#sources.`
+
+**Source scope taxonomy**
+- Claude-native (normative)
+- Supporting foundations (normative when applicable)
+- Cross-model contrast (non-normative)
 
 ### 7. Dynamic Context Injection
 **Definition:** The `!`command`` syntax runs shell commands before skill content reaches Claude. Output replaces the placeholder.

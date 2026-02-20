@@ -46,7 +46,7 @@ For each source, build a mental model of what it contributes — its main topics
 
 Identify all concepts across sources, merge different terms for the same idea, and define each concept clearly (assuming no prior knowledge). Track which sources discuss each concept to enable citation later.
 
-**Output:** 5-10 core concepts with clear, standalone definitions
+**Output:** A minimal complete set of core concepts with clear, standalone definitions
 
 **Example:**
 
@@ -114,7 +114,7 @@ Good: "When X is true and Y is needed". Avoid: "When relevant" or "In appropriat
 {Code, diagram, or concrete demonstration}
 ```
 
-**Target:** 5-10 patterns minimum
+**Target:** Include patterns only when transferable approaches are supported by sources
 
 **Uniqueness rule:** Each pattern must describe a _transferable approach_ — something applicable beyond the specific domain being synthesized. If a "pattern" is just a domain procedure already documented in Core Concepts, it belongs there, not in Patterns. Test: could this pattern be applied to a different topic? If not, it's a concept, not a pattern.
 
@@ -141,7 +141,7 @@ For each anti-pattern:
 **Better alternative:** {Recommended approach instead}
 ```
 
-**Target:** 3-7 anti-patterns
+**Target:** Include anti-patterns only when they represent meaningful failure modes
 
 ### Phase 6: Conflict Detection and Resolution
 
@@ -227,149 +227,92 @@ Structure the synthesis logically:
 
 If a section just reformats content from another section, merge it into the original and delete the duplicate.
 
-## Output Format (REQUIRED)
+## Synthesis Output Contract (REQUIRED)
 
-**Length targets:**
+Use a decision-first compact structure. Do not optimize for section count or line count.
 
-- reference.md: 300-500 lines optimal
-- If exceeding 500 lines, consider splitting into multiple files (e.g., patterns.md, examples.md)
-- Table of Contents is REQUIRED for files over 100 lines
+**Default size targets (unless source breadth requires more):**
 
-**SKILL.md Requirements:**
+- SKILL.md: 220-380 words
+- reference.md: 600-1200 words
+- patterns.md: 250-700 words (optional)
+- examples.md: 250-700 words (optional)
+- Total across skill files: <=2500 words
 
-When creating the SKILL.md file, include a snapshot date immediately after the title to show when sources were synthesized:
+**Snapshot date requirements (unchanged):**
+
+When creating SKILL.md, include:
 
 ```markdown
 # {Skill Title}
 
 > **Knowledge snapshot from:** {YYYY-MM-DD}
-
-{Skill description and content}
 ```
 
-Use ISO 8601 format (YYYY-MM-DD) for the date. This represents when the knowledge was synthesized, helping users understand information freshness.
-
-Your synthesis MUST follow this structure exactly:
+In reference.md Sources section, include:
 
 ```markdown
-## TL;DR
-
-{3-5 key insights in 100-150 words. Insights are statements that would change how
-someone approaches the topic — surprising, actionable, or counter-intuitive.
-"This skill covers advanced prompting techniques" is an introduction.
-"Extended thinking has been superseded by adaptive thinking" is an insight.}
-
----
-
-## Table of Contents
-
-- [Core Concepts](#core-concepts) - Fundamental building blocks
-- [Concept Map](#concept-map) - Relationships between concepts
-- [Patterns](#patterns) - Reusable approaches
-- [Anti-Patterns](#anti-patterns) - What to avoid
-- [Practical Examples](#practical-examples) - Concrete demonstrations
-- [Deep Dives](#deep-dives) - Complex topics explained
-- [Quick Reference](#quick-reference) - Cheat sheet
-- [Sources](#sources) - Bibliography
-
----
-
-## Core Concepts
-
-{5-10 fundamental concepts with clear, standalone definitions}
-
-1. **Concept Name**: Definition and explanation
-
-2. **Another Concept**: Definition and how it relates to previous concepts
-
-## Concept Map
-
-{Explicit relationships between concepts - use → arrows}
-
-- Concept A → {relationship} → Concept B
-- Concept C → {relationship} → Concept D
-- {5-15 relationship statements minimum}
-
-## Patterns
-
-{Reusable approaches with when/why/how - 5-10 patterns}
-
-### Pattern 1: {Descriptive Name}
-
-**When to use:** {Context}
-
-**How:**
-{Steps or approach}
-
-**Why it works:** {Rationale}
-
-**Example from Source {N}:**
-{Concrete demonstration}
-
-## Anti-Patterns
-
-{What to avoid and why - 3-7 anti-patterns}
-
-### Anti-Pattern 1: {Problematic Approach}
-
-**Problem:** {What people try}
-
-**Why it's problematic:** {Issues that arise}
-
-**Better alternative:** {What to do instead}
-
-## Practical Examples
-
-{Concrete demonstrations with citations - 5-10 examples}
-
-**Example from Source {N}: {Title}**
-
-{Code, diagram, or demonstration}
-
-_Why this matters:_ {Relevance}
-
-## Deep Dives
-
-{Detailed explanations of complex areas - 2-5 deep dives}
-
-### {Complex Topic}
-
-{Multi-paragraph explanation with nuance, trade-offs, edge cases}
-
-## Quick Reference
-
-{Cheat sheet format for common tasks}
-
-**Task:** Action
-**Task:** Action
-{10-20 quick reference items}
-
 ## Sources
 
 > **Knowledge snapshot date:** {YYYY-MM-DD}
 >
 > These sources were fetched and synthesized on the date shown above.
 > Information may have changed since then.
-
-{Full bibliography with URLs where available}
-
-1. **{Source Title}** - {URL if available, otherwise "Internal documentation"}
-   - {Description of what this source provides}
-
-2. **{Source Title}** - {URL if available, otherwise "Internal documentation"}
-   - {Description}
 ```
+
+### Required sections
+
+**SKILL.md**
+- Overview
+- When to Use This Skill
+- Quick Decision Cheatsheet
+- Supporting Docs
+- Invocation
+
+**reference.md**
+- TL;DR
+- Decision Rules
+- Quality Gates
+- Anti-Patterns
+- Quick Reference
+- Source Scope
+- Sources
+
+### Conditional sections
+
+Add these only when they provide unique information not already present:
+
+- Core Concepts
+- Patterns
+- Practical Examples
+- Deep Dives
+
+### Supporting-file rules
+
+- `patterns.md` and `examples.md` are optional.
+- If present, each must begin with:
+  - `Source IDs map to reference.md#sources.`
+- If a supporting file only reformats reference.md content, merge it into reference.md and remove the file.
+- Keep one canonical location per fact; avoid restating thresholds, rules, or definitions across files.
+
+### Source scope taxonomy (required in reference.md)
+
+- **Claude-native**: normative guidance for Claude/Claude Code
+- **Supporting foundations**: normative when applicable (security, PE fundamentals)
+- **Cross-model contrast**: non-normative; contrast-only
+
+Cross-model sources must never be the sole support for Claude-specific normative claims.
 
 ## Quality Anchor
 
 A high-quality synthesis hits these specific attributes:
 
-- **Concept depth**: Core concepts with cross-source synthesis (not single-source summaries) — each concept integrates insights from multiple sources
-- **Relationship density**: 10-15 relationships in the concept map showing dependencies, contrasts, and compositions — not just "A relates to B"
-- **Pattern specificity**: Every pattern has when/why/how/example with source citations — each pattern describes a transferable approach applicable beyond the specific domain
-- **Deep dive nuance**: Deep dives analyse trade-offs and edge cases, not expanded restatements of concepts already covered
-- **Example quality**: Before/after comparisons or concrete demonstrations with source citations — examples that show the difference between naive and expert approaches
-- **Deduplication**: No content restated across supporting files — each file contributes unique information
+- **Decision density**: guidance is optimized for action, not encyclopedic coverage
+- **Token efficiency**: concise, high-signal prose with no section quota chasing
+- **Specificity**: rules and examples are concrete and testable
+- **Deduplication**: no content restated across files; each file adds unique value
+- **Source discipline**: source IDs are valid and scoped (normative vs contrast)
+- **Structural integrity**: markdown fences and formatting remain valid
 
 ## Overriding Principles
 
@@ -384,21 +327,21 @@ Before completing synthesis, verify:
 
 ### Concept Quality
 
-- [ ] 5-10 core concepts identified
+- [ ] Core concepts included only when they add unique value
 - [ ] Each concept has clear, standalone definition
 - [ ] Definitions don't assume prior knowledge
 - [ ] No circular definitions
 
 ### Relationship Quality
 
-- [ ] 10-15 relationships mapped
+- [ ] Relationship mapping included only when it clarifies decisions
 - [ ] Relationships are explicit (use arrows: →)
 - [ ] Relationship types are clear (depends on, enables, contrasts, etc.)
 - [ ] Relationships connect concepts meaningfully
 
 ### Pattern Quality
 
-- [ ] 5-10 patterns documented
+- [ ] Patterns included only when transferable guidance exists
 - [ ] Each pattern has when/why/how
 - [ ] Patterns cite source examples
 - [ ] Patterns are actionable
@@ -407,7 +350,7 @@ Before completing synthesis, verify:
 
 ### Anti-Pattern Quality
 
-- [ ] 3-7 anti-patterns documented
+- [ ] Anti-patterns cover meaningful failure modes from sources
 - [ ] Problems clearly explained
 - [ ] Better alternatives provided
 
@@ -423,6 +366,8 @@ Before completing synthesis, verify:
 - [ ] All examples cite their source: `[Example from Source N]`
 - [ ] Sources section lists all sources with URLs where available
 - [ ] No inline citations to local file paths (non-portable)
+- [ ] Source IDs in supporting files resolve against reference.md Sources
+- [ ] Cross-model sources are marked as contrast-only when used
 
 ### Narrative Quality
 
@@ -434,12 +379,11 @@ Before completing synthesis, verify:
 
 ### Completeness
 
-- [ ] All required sections present
-- [ ] TL;DR is 100-150 words
-- [ ] Table of Contents present after TL;DR
-- [ ] Total length under 500 lines (or split into files)
-- [ ] Quick reference has 10-20 items
-- [ ] Deep dives explain complex areas
+- [ ] All v2 required sections present
+- [ ] TL;DR captures high-impact insights concisely
+- [ ] Total length aligns with v2 compactness targets (or justified exception)
+- [ ] Quick reference is concise and execution-oriented
+- [ ] Conditional sections are included only when uniquely valuable
 - [ ] Sources fully documented with URLs where available
 
 ### Portability
@@ -447,6 +391,11 @@ Before completing synthesis, verify:
 - [ ] Sources section uses public URLs where available
 - [ ] No inline citations to local file paths (files won't exist when shared)
 - [ ] Internal docs cited as "{Title} - Internal documentation" (no path)
+
+### Structural Integrity
+
+- [ ] All markdown fences are balanced and renderable
+- [ ] No broken nested fenced blocks in examples
 
 ## Synthesis Principles (Internalize These)
 

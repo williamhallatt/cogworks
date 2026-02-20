@@ -101,11 +101,25 @@ Store the selected path as `{skill_path}`.
 
 **Capture the current date as `{snapshot_date}` using ISO 8601 format (YYYY-MM-DD).** This will be embedded in the generated skill files to show when sources were current.
 
-Synthesise all gathered source material into a unified knowledge base following the `cogworks-encode` 8-phase process. Find non-obvious connections between sources, resolve contradictions with nuanced analysis, and extract patterns that would not be apparent from reading any single source alone. The synthesis must produce all required output sections: TL;DR, Core Concepts, Concept Map, Patterns, Anti-Patterns, Practical Examples, Deep Dives, Quick Reference, and Sources.
+Synthesise all gathered source material into a unified knowledge base following the `cogworks-encode` synthesis process. Find non-obvious connections between sources, resolve contradictions with nuanced analysis, and extract decision-useful guidance.
+
+Apply the **Synthesis Output Contract**:
+
+- **Required sections**: TL;DR, Decision Rules, Anti-Patterns, Quick Reference, Sources
+- **Conditional sections**: Core Concepts, Patterns, Practical Examples, Deep Dives
+- Add conditional sections only when they contribute unique, non-redundant value beyond required sections
 
 **Quality guardrails for synthesis:**
 
-- Each supporting file (reference.md, patterns.md, examples.md) should contain substantive content, not thin stubs. If a file would have fewer than 3 distinct entries because the sources genuinely don't support more, fold its content into reference.md under a headed section instead of creating a separate file.
+- Do not optimize for section counts; optimize for decision utility per token.
+- Run a compression pass before finalizing: remove duplication, collapse repetitive prose, keep one canonical location per fact.
+- Supporting files (patterns.md, examples.md) are optional and should only be created when they add unique content not already present in reference.md.
+- If a supporting file would only reformat existing content, merge into reference.md instead.
+- Use source-scope labeling in reference.md:
+  - Claude-native (normative)
+  - Supporting foundations (normative when applicable)
+  - Cross-model contrast (non-normative)
+- Cross-model sources can sharpen trade-offs, but must never override Claude-native guidance.
 
 ### 4. User Review
 
@@ -120,7 +134,7 @@ Ask user to approve before creating skill files. If they decline, stop execution
 
 ### 5. Generate Skill Files
 
-Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.md with frontmatter and overview, reference.md with the full knowledge base, and supporting files (patterns.md, examples.md) only when they contain substantive unique content (3+ distinct entries each). Pass:
+Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.md with frontmatter and overview, reference.md as canonical guidance, and supporting files (patterns.md, examples.md) only when they contain substantive unique content. Pass:
 
 - `{skill_path}` — the full destination path for skill files
 - `{slug}` — the skill name and directory name
@@ -141,6 +155,13 @@ Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.m
    > Information may have changed since then.
    ```
 
+Use these structure requirements by default:
+
+- **SKILL.md** includes: Overview, When to Use This Skill, Quick Decision Cheatsheet, Supporting Docs, Invocation
+- **reference.md** includes: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
+- **patterns.md/examples.md** (if created) begin with a source-pointer line mapping source IDs to `reference.md#sources`
+- Keep content concise and decision-first. Default total size target is <=2500 words unless source breadth requires more.
+
 Pay particular attention to the SKILL.md description field: it must be keyword-rich, start with an action verb, include trigger phrases users would naturally say, list concrete use cases, and be written in third person. This single field determines whether the skill will be discovered and auto-loaded.
 
 Apply `cogworks-learn` expertise to determine the optimal content organization and validation approach.
@@ -157,21 +178,28 @@ Run automated validation on the generated skill:
 
 2. **Layer 2 — Semantic quality evaluation**:
    - Read all skill files from `{skill_path}`
-   - Evaluate each of the 5 quality dimensions using the rubrics from `.claude/test-framework/graders/llm-judge-rubrics.md`:
+   - Evaluate each of the 7 quality dimensions using the rubrics from `.claude/test-framework/graders/llm-judge-rubrics.md`:
      - Source Fidelity (weight 0.30): trace 10 claims to sources, check citations
-     - Self-Sufficiency (weight 0.25): verify all terms defined, no external dependencies
-     - Completeness (weight 0.20): check scope coverage against source material
-     - Specificity (weight 0.15): verify patterns have when/why/how and examples
-     - No Overlap (weight 0.10): confirm novel value beyond Claude's built-in knowledge
+     - Self-Sufficiency (weight 0.20): verify all terms defined, no external dependencies
+     - Completeness (weight 0.15): check scope coverage against source material
+     - Specificity (weight 0.10): verify rules and examples are actionable
+     - No Overlap (weight 0.10): confirm no redundant restatement across files
+     - Token Efficiency (weight 0.10): enforce decision-density and compactness
+     - Structural Integrity (weight 0.05): valid markdown fences, valid references, no broken formatting
    - Score each dimension 1-5 (score 5 should be rare; if uncertain, choose the lower score)
    - Compute weighted score: `sum(score * weight) / 5.0`
 
-3. **If weighted score < 0.85 or any dimension < 3**:
+3. **If weighted score < 0.88 or any dimension < 3**:
    - Identify the weakest dimension(s) from the evidence
    - Make targeted fixes to the skill files
    - Re-evaluate (max 1 retry)
 
-4. Write results to `tests/results/{slug}-results.json`.
+4. **Hard-fail conditions** (must fix regardless of score):
+   - Broken markdown fence structure
+   - Unresolved source IDs used in patterns/examples
+   - Cross-model source used as sole support for Claude-specific normative guidance
+
+5. Write results to `tests/results/{slug}-results.json`.
 
 ### 7. Confirm Success
 
@@ -212,6 +240,6 @@ The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` refe
 1. `{skill_path}` directory created (location selected by user)
 2. Skill files generated following cogworks-learn expertise
 3. Layer 1 deterministic checks pass (no critical failures)
-4. Layer 2 weighted score >= 0.85 with no dimension below 3
+4. Layer 2 weighted score >= 0.88 with no dimension below 3
 5. Results written to `tests/results/{slug}-results.json`
 6. Topic is invokable via `/{slug}`

@@ -46,15 +46,16 @@ Transform disparate source materials into a unified knowledge base that:
 ## Knowledge Base Summary
 
 - **8-phase synthesis process**: Content Analysis → Concept Extraction → Relationship Mapping → Pattern Extraction → Anti-Pattern Documentation → Conflict Detection → Example Collection → Narrative Construction
-- **Quality over quantity**: 5-10 core concepts, 5-10 patterns, 3-7 anti-patterns, all with clear citations
+- **Decision utility over section counts**: include only the sections and entries that improve execution quality
 - **Explicit relationships**: Use arrow notation (→) to show how concepts connect
 - **Conflict transparency**: Always flag disagreements between sources with both perspectives
 - **Citation requirements**: Every example, pattern, and anti-pattern must cite its source
+- **Source scope discipline**: Cross-model sources are contrast-only and never override Claude-native guidance
 
 ## The 8-Phase Process (Summary)
 
 1. **Content Analysis** - Map what each source contributes
-2. **Concept Extraction** - Find 5-10 fundamental building blocks
+2. **Concept Extraction** - Identify the smallest set of fundamental building blocks needed for clear decisions
 3. **Relationship Mapping** - Show dependencies, hierarchies, contrasts
 4. **Pattern Extraction** - Document reusable approaches (when/why/how)
 5. **Anti-Pattern Documentation** - What to avoid and why
@@ -76,7 +77,11 @@ See [reference.md](reference.md) for the complete synthesis methodology includin
 
 ## Output Structure
 
-See the **Output Format (REQUIRED)** section in [reference.md](reference.md) for the complete template. All synthesis must include these sections: TL;DR, Core Concepts, Concept Map, Patterns, Anti-Patterns, Practical Examples, Deep Dives, Quick Reference, Sources.
+See the **Synthesis Output Contract** section in [reference.md](reference.md) for the complete template.
+
+Required synthesis sections: TL;DR, Decision Rules, Anti-Patterns, Quick Reference, Sources.
+
+Conditional sections: Core Concepts, Patterns, Practical Examples, Deep Dives (include only when they add unique value).
 
 ## Common Mistakes
 
@@ -85,5 +90,6 @@ See the **Output Format (REQUIRED)** section in [reference.md](reference.md) for
 - **Hidden conflicts** - Silently picking one source over another without flagging disagreement
 - **Abstract patterns** - Patterns without when/why/how aren't actionable
 - **Assuming knowledge** - Definitions must stand alone, not assume reader context
+- **Section quota chasing** - Inflating section counts instead of improving decision quality
 
 See **Examples of Good vs Bad Synthesis** in [reference.md](reference.md) for concrete comparisons.
