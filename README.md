@@ -42,7 +42,7 @@ My typical workflow:
 
 ## Installation
 
-The packaged release includes the `cogworks` agent, its two required supporting skills (`cogworks-encode` and `cogworks-learn`), and the optional testing skill (`cogworks-test`) with associated testing infrastructure (`.claude/test-framework/`). The testing skill is not required for using `cogworks`, and it is **user‑initiated**: if you want to validate generated skills, you explicitly run `cogworks-test` and the test framework yourself.
+The packaged release includes the `cogworks` agent and its two required supporting skills (`cogworks-encode` and `cogworks-learn`). Testing is provided by repository scripts and the shared framework under `tests/framework/`.
 
 ### Quick Install (Recommended)
 
@@ -71,7 +71,7 @@ See [INSTALL.md](INSTALL.md) for detailed instructions and manual installation o
 
 ### Manual Installation
 
-Alternatively, copy the `cogworks` agent and its dependencies (`cogworks-encode` and `cogworks-learn`) directly from this repository. All three are required — the agent orchestrates the workflow, and the two skills provide the synthesis and skill-writing (`cogworks-test` is optional and only runs when you invoke it. If you want testing, also include `.claude/test-framework/`.)
+Alternatively, copy the `cogworks` agent and its dependencies (`cogworks-encode` and `cogworks-learn`) directly from this repository. All three are required — the agent orchestrates the workflow, and the two skills provide the synthesis and skill-writing.
 
 For OpenAI Codex users, install the Codex skills instead of the Claude agent:
 
@@ -97,16 +97,11 @@ your-project/
     │   │   ├── patterns.md
     │   │   ├── persuasion-principles.md
     │   │   └── examples.md
-    │   └── cogworks-test/           # Testing and validation
-    │       ├── SKILL.md
-    │       ├── reference.md
-    │       ├── patterns.md
-    │       └── examples.md
-    └── test-framework/              # Testing infrastructure
-        ├── config/
-        ├── graders/
-        ├── templates/
-        └── scripts/
+tests/
+└── framework/                       # Shared testing infrastructure
+    ├── graders/
+    ├── templates/
+    └── scripts/
 ```
 
 ## Quick Start
@@ -147,7 +142,7 @@ You approve or decline. If you decline, `cogworks` stops.
 
 **5. Skill generation** — On approval, `cogworks` writes the skill files to your chosen destination (SKILL.md, reference.md, patterns.md, examples.md).
 
-**6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing. If you want additional or repeatable validation later, run `cogworks-test` yourself (see `TESTING.md`).
+**6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing. For repeatable post-generation checks, run `bash scripts/test-generated-skill.sh --skill-path <path>` (see `TESTING.md`).
 
 **7. Done** — `cogworks` confirms the skill location and how to invoke it.
 
@@ -158,7 +153,7 @@ Your new skill is now available as `/{slug}` — Claude will auto-discover it wh
 The `cogworks` agent orchestrates a full end-to-end workflow, but you can also direct `cogworks-*` skills manually through direct invocation.
 
 - **The agent** (`@cogworks`) — runs the complete 7-step workflow (source gathering → synthesis → review → skill generation → validation). It automatically loads both skills.
-- **The skills** (`/cogworks-encode`, `/cogworks-learn`, `/cogworks-test`) — inject domain expertise into your conversation. You then direct Claude in natural language, applying that expertise however you need. They don't run workflows on their own.
+- **The skills** (`/cogworks-encode`, `/cogworks-learn`) — inject domain expertise into your conversation. You then direct Claude in natural language, applying that expertise however you need. They don't run workflows on their own.
 
 ### The cogworks agent
 
@@ -207,18 +202,13 @@ Loads expertise on writing Claude Code skills — SKILL.md files, frontmatter co
 /cogworks-learn prompt-optimisation from <reference_doc>
 ```
 
-### `/cogworks-test` — Testing and validation
+### Testing Generated Skills
 
-Validates generated skills through layered grading (deterministic checks, LLM-as-judge, optional human review). Tests synthesis quality, skill structure, source fidelity, and observable behaviour.
-
-Testing is a separate step from encoding. After encoding a skill, run tests independently:
+Testing is a separate step from encoding. After encoding a skill, run:
 
 ```bash
-# Test a skill after encoding it
-/cogworks-test my-skill
-
-# Other examples
-/cogworks-test my-skill --json
+bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
+bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill --with-behavioral
 ```
 
 ## OpenAI Codex Usage
@@ -244,37 +234,57 @@ cogworks encode <sources> as <skill_name>
 
 - `cogworks-encode`
 - `cogworks-learn`
-- `cogworks-test` (optional, Layer 1 by default)
+- Use `scripts/test-generated-skill.sh` for post-generation checks
 
-### Codex Testing (Recommended: Layer 1)
+### Codex Testing
 
-For Codex users, deterministic checks (Layer 1) are the supported default. Layer 2 and behavioral gates are optional advanced checks.
+For Codex users, deterministic checks are the baseline and behavioral tests are optional:
 
-The Codex installer also installs the shared test framework under `.claude/test-framework` (local) or `~/.claude/test-framework` (global), so Layer 1 checks work out of the box.
-
+```bash
+bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill
+bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill --with-behavioral
 ```
-/cogworks-test my-skill --layer1-only
+
+See `tests/framework/README.md` for complete testing documentation.
+
+## Trunk Commit Docs Attestation
+
+This repository enforces docs-impact attestation on commits pushed to `main`.
+
+Install the local hook so validation happens before push:
+
+```bash
+bash scripts/install-git-hooks.sh
 ```
 
-Testing runs three validation layers:
+Validate the latest commit manually:
 
-- **Layer 1**: Deterministic checks (structure, syntax, citations)
-- **Layer 2**: LLM-as-judge evaluation (5 quality dimensions)
-- **Layer 2.5**: Efficacy measurement (task performance with/without skill using SkillsBench methodology)
+```bash
+bash scripts/validate-docs-attestation.sh --commit HEAD
+```
 
-Generates a detailed validation report with scores and recommendations. Cost: ~$1.50 per skill.
+Required commit trailers:
 
-**Efficacy Validation**: The cogworks pipeline has been empirically validated to produce highly effective skills:
-- **4/4 benchmark tasks** passed with 100% success rate (20/20 runs)
-- **Average improvement**: +54.2pp over baseline (task completion without skill)
-- **3.3x more effective** than SkillsBench curated skills benchmark (+54.2pp vs +16.2pp)
-- Skills validated across software-engineering and devops-infrastructure domains
+```text
+Docs-Impact: updated|none|required-followup
+Docs-Updated: <csv-paths>|none
+Docs-Why-None: <required when Docs-Impact is none or required-followup>
+```
 
-See `_sources/skillsbench-implementation/ALL_BENCHMARKS_COMPLETE.md` for complete efficacy validation results (archived validation report).
+Example (`updated`):
 
-**When to use:** after encoding a new skill, after manual edits to an existing skill, for regression testing golden samples, or to check quality before production use.
+```text
+Docs-Impact: updated
+Docs-Updated: README.md, TESTING.md
+```
 
-See `.claude/test-framework/README.md` for complete testing documentation.
+Example (`none`):
+
+```text
+Docs-Impact: none
+Docs-Updated: none
+Docs-Why-None: Internal refactor only; no user-facing behavior changed.
+```
 
 ## Limitations
 

@@ -46,6 +46,8 @@
 - `./install.sh --target codex --local` installs Codex skills into `.agents/skills/`.
 - `bash tests/run-black-box-tests.sh` runs black-box meta-tests for the test framework.
 - `python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-` runs behavioral gates for repo skills.
+- `bash scripts/install-git-hooks.sh` installs local git hooks (including docs attestation `commit-msg` validation).
+- `bash scripts/validate-docs-attestation.sh --commit HEAD` validates docs attestation trailers on the latest commit.
 
 ## Coding Style & Naming Conventions
 - Prefer Markdown + Bash clarity: short sections, explicit headings, and executable examples.
@@ -60,6 +62,13 @@
 
 ## Git Rules
 - Follow the observed commit format: `<type>/ <summary>` (examples: `add/ ...`, `refactor/ ...`, `docs/ ...`, `chore/ ...`).
+- Every commit message must include docs attestation trailers:
+  - `Docs-Impact: updated|none|required-followup`
+  - `Docs-Updated: <csv-paths>|none`
+  - `Docs-Why-None: <text>` (required when `Docs-Impact` is `none` or `required-followup`)
+- `Docs-Impact: updated` requires `Docs-Updated` to list one or more docs files.
+- `Docs-Impact: none` requires `Docs-Updated: none` and a non-empty `Docs-Why-None`.
+- `Docs-Impact: required-followup` requires `Docs-Updated: none` and `Docs-Why-None` must include a follow-up date (`YYYY-MM-DD`) and owner handle (`@name`).
 - Keep commits focused by concern (agent, skills, tests, docs).
 - PRs targeting `main` that touch `.claude/**`, `README.md`, `INSTALL.md`, or `LICENSE` should pass `.github/workflows/pre-release-validation.yml`.
 - In PR descriptions, include: scope, affected paths, test commands run, and representative output snippets for failures/fixes.
