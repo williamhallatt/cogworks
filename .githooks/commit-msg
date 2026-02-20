@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+MSG_FILE="${1:-}"
+if [ -z "$MSG_FILE" ]; then
+  echo "ERROR: commit-msg hook expected a path to the commit message file."
+  exit 1
+fi
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$REPO_ROOT" ]; then
+  echo "ERROR: Unable to determine repository root."
+  exit 1
+fi
+VALIDATOR="$REPO_ROOT/scripts/validate-docs-attestation.sh"
+
+if [ ! -x "$VALIDATOR" ]; then
+  echo "ERROR: Validator not executable: $VALIDATOR"
+  echo "Run: chmod +x scripts/validate-docs-attestation.sh"
+  exit 1
+fi
+
+"$VALIDATOR" --message-file "$MSG_FILE"
