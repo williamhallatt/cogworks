@@ -180,8 +180,10 @@ weighted_score = (
 ```
 
 Determine recommendation:
-- **PASS**: weighted_score >= 0.85 AND no dimension scores below 3 AND behavioral gate passes AND calibration gate passes
-- **FAIL**: weighted_score < 0.85 OR any dimension below 3 OR behavioral gate fails OR calibration gate fails
+- **PASS**: weighted_score >= 0.85 AND no dimension scores below 3
+- **FAIL**: weighted_score < 0.85 OR any dimension below 3
+
+If behavioral and/or calibration gates are executed, they must also pass for the final recommendation to remain PASS.
 
 ### Step 8: Behavioral Gate (External)
 
@@ -267,7 +269,7 @@ If any dimension scored below the threshold, provide specific actionable guidanc
 
 The `tests/` directory validates that Layer 1 works correctly:
 
-- `tests/run-black-box-tests.sh` — runs 8 test cases
+- `tests/run-black-box-tests.sh` — runs 10 test cases
 - `tests/test-suite/mvp-test-cases.jsonl` — test definitions
 - `tests/test-data/` — frozen test fixtures
 
@@ -277,6 +279,6 @@ The `tests/` directory validates that Layer 1 works correctly:
 - `.claude/test-framework/graders/llm-judge-rubrics.md` — Layer 2 rubric specification (authoritative; this file condenses it for inline execution)
 - `.claude/test-framework/graders/human-review-guide.md` — Layer 3 guide (manual process)
 - `.claude/test-framework/scripts/calculate-agreement.py` — Calibration script
-- `.claude/test-framework/scripts/run-behavioral-tests.py` — Behavioral gate runner
+- `.claude/test-framework/scripts/cogworks-test-framework.py` — Behavioral/calibration/efficacy runner
 
 See [reference.md](reference.md) for scoring methodology, known biases, and troubleshooting.

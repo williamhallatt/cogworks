@@ -141,7 +141,18 @@ def behavioral_run(args: argparse.Namespace) -> int:
         "failures": [],
     }
 
-    for skill in _collect_skills(args.skills_root, args.skill_prefix):
+    collected_skills = _collect_skills(args.skills_root, args.skill_prefix)
+    requested_skills = set(args.skill or [])
+    if requested_skills:
+        selected_skills = [s for s in collected_skills if s in requested_skills]
+        missing = sorted(requested_skills - set(selected_skills))
+        if missing:
+            overall["status"] = "FAIL"
+            overall["failures"].append(f"requested skills not found under {args.skills_root}: {', '.join(missing)}")
+    else:
+        selected_skills = collected_skills
+
+    for skill in selected_skills:
         test_cases_path = os.path.join(args.tests_root, skill, "test-cases.jsonl")
         traces_dir = os.path.join(args.tests_root, skill, "traces")
 
@@ -855,6 +866,7 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--tests-root", default="tests/behavioral")
     run.add_argument("--results-root", default="tests/results/behavioral")
     run.add_argument("--timestamp", default=None)
+    run.add_argument("--skill", action="append", default=[], help="Only include this exact skill slug (repeatable)")
     run.add_argument("--skill-prefix", action="append", default=[], help="Only include skills with this prefix (repeatable)")
     run.add_argument("--allow-missing-tests", action="store_true")
     run.add_argument("--with-baseline", action="store_true", help="Compute efficacy metrics from baseline traces")
@@ -892,8 +904,20 @@ def build_parser() -> argparse.ArgumentParser:
     efficacy_sub = efficacy.add_subparsers(dest="subcommand", required=True)
 
     validate = efficacy_sub.add_parser("validate", help="Validate generated skill against benchmark task")
-    validate.add_argument("--generated-skill", required=True, help="Path to generated skill directory")
-    validate.add_argument("--benchmark-task", required=True, help="Path to benchmark task directory")
+    validate.add_argument(
+        "--generated-skill",
+        "--skill",
+        dest="generated_skill",
+        required=True,
+        help="Path to generated skill directory",
+    )
+    validate.add_argument(
+        "--benchmark-task",
+        "--task",
+        dest="benchmark_task",
+        required=True,
+        help="Path to benchmark task directory",
+    )
     validate.add_argument("--efficacy-delta-min", type=float, default=0.10, help="Minimum efficacy delta (default: 0.10)")
     validate.add_argument("--normalized-gain-min", type=float, default=0.15, help="Minimum normalized gain (default: 0.15)")
     validate.add_argument("--output", default=None, help="Output JSON results file")

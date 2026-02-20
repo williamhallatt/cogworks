@@ -13,7 +13,7 @@ It assumes no prior knowledge of this repo or toolkit.
 - **Generated skill testing**: Use `/cogworks-test` and the unified CLI in `.claude/test-framework/scripts/cogworks-test-framework.py`.
 - **Framework testing (meta-tests)**: Use `tests/run-black-box-tests.sh` and fixtures under `tests/test-data/`.
 
-> **Codex note**: Deterministic checks (Layer 1) work for Codex-generated skills when you pass the `.agents/skills/{slug}` path. Layer 2 and behavioral gates rely on Claude-specific tooling and are not part of the default Codex workflow.
+> **Codex note**: Deterministic checks (Layer 1) work for Codex-generated skills when you pass the `.agents/skills/{slug}` path. Layer 2 and behavioral gates are optional advanced checks and are not part of the default Codex workflow.
 
 ---
 
@@ -48,6 +48,13 @@ Run behavioral tests for repo skills:
 python3 .claude/test-framework/scripts/cogworks-test-framework.py behavioral run \
   --skill-prefix cogworks-
 ```
+
+## Workflow Matrix
+
+| Workflow | Skill location | Layer 1 | Layer 2 | Behavioral/Efficacy/Calibration |
+|----------|----------------|---------|---------|----------------------------------|
+| Claude (`@cogworks`) | `.claude/skills/{slug}` | Supported, recommended | Supported (manual rubric in `/cogworks-test`) | Supported via framework CLI |
+| Codex (`cogworks`) | `.agents/skills/{slug}` | Supported, recommended default | Optional advanced check | Optional advanced check (use `--skills-root .agents/skills`) |
 
 ---
 
@@ -210,8 +217,8 @@ The framework automatically assesses efficacy relative to domain expectations.
 
 ```bash
 python3 .claude/test-framework/scripts/cogworks-test-framework.py efficacy validate \
-  --skill .claude/skills/my-generated-skill \
-  --task tests/datasets/efficacy-benchmark/task-001-api-synthesis/
+  --generated-skill .claude/skills/my-generated-skill \
+  --benchmark-task tests/datasets/efficacy-benchmark/task-001-api-synthesis/
 ```
 
 ### 4) Calibration gate (Layer 3 prerequisite)

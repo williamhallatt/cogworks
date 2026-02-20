@@ -219,7 +219,7 @@ Testing is a separate step from encoding. After encoding a skill, run tests inde
 
 # Other examples
 /cogworks-test my-skill --json
-/cogworks-test my-skill --compare-against tests/datasets/golden-samples/my-skill/
+```
 
 ## OpenAI Codex Usage
 
@@ -248,11 +248,12 @@ cogworks encode <sources> as <skill_name>
 
 ### Codex Testing (Recommended: Layer 1)
 
-For Codex users, the deterministic checks (Layer 1) are the supported default. Layer 2 and behavioral gates require Claude-specific tooling.
+For Codex users, deterministic checks (Layer 1) are the supported default. Layer 2 and behavioral gates are optional advanced checks.
+
+The Codex installer also installs the shared test framework under `.claude/test-framework` (local) or `~/.claude/test-framework` (global), so Layer 1 checks work out of the box.
 
 ```
 /cogworks-test my-skill --layer1-only
-```
 ```
 
 Testing runs three validation layers:
