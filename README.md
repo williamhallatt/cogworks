@@ -1,6 +1,6 @@
 # Cogworks
 
-A clockwork engine for AI agents: encode knowledge from sources, automate the creation of skills and sub-agents.
+A clockwork engine for AI agents: encode knowledge from sources and automate creation of high-quality skills.
 
 ## What it does
 
@@ -68,6 +68,16 @@ For non-interactive installation:
 ```
 
 See [INSTALL.md](INSTALL.md) for detailed instructions and manual installation options.
+
+### Check for Updates
+
+From the extracted release directory (or repository root), run:
+
+```bash
+bash scripts/check-cogworks-updates.sh
+```
+
+The script compares your local `install.sh` version with the latest GitHub release tag and reports whether an update is available.
 
 ### Manual Installation
 
@@ -210,6 +220,45 @@ Testing is a separate step from encoding. After encoding a skill, run:
 bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
 bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill --with-behavioral
 ```
+
+### Running Recursive Improvement Rounds
+
+Run test-first recursive rounds with a frozen test bundle and optional generation hooks:
+
+```bash
+# 1) Copy and edit manifest
+cp tests/datasets/recursive-round/round-manifest.example.json \
+  tests/datasets/recursive-round/round-manifest.local.json
+
+# 2) Compute and set expected_sha256 in manifest
+bash scripts/hash-test-bundle.sh \
+  tests/test-suite/mvp-test-cases.jsonl \
+  tests/behavioral
+
+# 3) Fast round
+bash scripts/run-recursive-round.sh \
+  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --mode fast \
+  --run-id rr-20260220-fast1
+
+# 4) Deep round (decision-grade signal)
+export COGWORKS_BENCH_CLAUDE_CMD="your-claude-runner --sources '{sources_path}' --out '{out_dir}'"
+export COGWORKS_BENCH_CODEX_CMD="your-codex-runner --sources '{sources_path}' --out '{out_dir}'"
+bash scripts/run-recursive-round.sh \
+  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --mode deep \
+  --run-id rr-20260220-deep1
+
+# 5) Optional: wire hook phases for generate/improve/regenerate
+export COGWORKS_RECURSIVE_GENERATE_CMD="echo generate candidates"
+export COGWORKS_RECURSIVE_IMPROVE_CMD="echo run improvement skills"
+export COGWORKS_RECURSIVE_REGENERATE_CMD="echo regenerate pipelines and skills"
+```
+
+Artifacts:
+
+- `tests/results/meta-loop/{run_id}/round-summary.json`
+- `tests/results/meta-loop/{run_id}/round-report.md`
 
 ## OpenAI Codex Usage
 
