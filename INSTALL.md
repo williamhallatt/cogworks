@@ -106,9 +106,9 @@ mkdir -p "$HOME/.agents/skills"
 2. Copy Codex skills:
 
 ```bash
-cp -r cogworks-{version}/codex/skills/* "./.agents/skills/"
+cp -r cogworks-{version}/.agents/skills/* "./.agents/skills/"
 # Or global:
-cp -r cogworks-{version}/codex/skills/* "$HOME/.agents/skills/"
+cp -r cogworks-{version}/.agents/skills/* "$HOME/.agents/skills/"
 ```
 
 ## Quick Start

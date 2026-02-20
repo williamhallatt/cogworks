@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 - `.claude/agents/` contains the Claude orchestration agent (`cogworks.md`).
 - `.claude/skills/cogworks-*/` holds production skills; each skill must include `SKILL.md` plus supporting docs (`reference.md`, `patterns.md`, `examples.md` as needed).
-- `codex/skills/` mirrors skill workflows for Codex usage.
+- `.agents/skills/` contains Codex skill workflows.
 - `tests/` contains validation assets:
   - `tests/run-black-box-tests.sh` for framework meta-tests.
   - `tests/behavioral/` for behavioral cases and traces.

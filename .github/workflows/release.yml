@@ -139,12 +139,12 @@ jobs:
           cp INSTALL.md "${ARTIFACT_NAME}/" 2>/dev/null || echo "Note: INSTALL.md not found"
 
           # Copy Codex skills
-          if [ -d "codex/skills" ]; then
-            mkdir -p "${ARTIFACT_NAME}/codex"
-            cp -r codex/skills "${ARTIFACT_NAME}/codex/skills"
-            echo "Packaged: codex/skills"
+          if [ -d ".agents/skills" ]; then
+            mkdir -p "${ARTIFACT_NAME}/.agents"
+            cp -r .agents/skills "${ARTIFACT_NAME}/.agents/skills"
+            echo "Packaged: .agents/skills"
           else
-            echo "WARNING: codex/skills not found (Codex support unavailable)"
+            echo "WARNING: .agents/skills not found (Codex support unavailable)"
           fi
 
           # Copy installation script
@@ -165,8 +165,8 @@ jobs:
           done
           echo "" >> release-contents.txt
           echo "### Codex Skills Included" >> release-contents.txt
-          if [ -d "codex/skills" ]; then
-            for skill_dir in codex/skills/*/; do
+          if [ -d ".agents/skills" ]; then
+            for skill_dir in .agents/skills/*/; do
               skill_name=$(basename "$skill_dir")
               echo "- ${skill_name}" >> release-contents.txt
             done

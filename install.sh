@@ -34,7 +34,7 @@ readonly MODE_CODEX_LOCAL="./.agents/skills"
 readonly MODE_CODEX_GLOBAL="${HOME}/.agents/skills"
 
 readonly CLAUDE_SOURCE_DIR="${SCRIPT_DIR}/.claude"
-readonly CODEX_SOURCE_DIR="${SCRIPT_DIR}/codex/skills"
+readonly CODEX_SOURCE_DIR="${SCRIPT_DIR}/.agents/skills"
 
 # Color codes for output
 readonly COLOR_RESET='\033[0m'

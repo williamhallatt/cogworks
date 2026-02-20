@@ -35,7 +35,7 @@ This roadmap tracks planned work to address current known limitations in no part
 
 **Delivered**:
 
-- Codex-native workflow via `codex/skills/cogworks`
+- Codex-native workflow via `.agents/skills/cogworks`
 - Codex-compatible skill copies for `cogworks-encode`, `cogworks-learn`, and `cogworks-test`
 - Installer support via `./install.sh --target codex --local|--global` (installs to `./.agents/skills` or `~/.agents/skills`)
 
