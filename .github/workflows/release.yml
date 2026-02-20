@@ -114,6 +114,7 @@ jobs:
           mkdir -p "${ARTIFACT_NAME}/.claude/agents"
           mkdir -p "${ARTIFACT_NAME}/.claude/skills"
           mkdir -p "${ARTIFACT_NAME}/tests/framework"
+          mkdir -p "${ARTIFACT_NAME}/scripts"
 
           # Copy agent
           cp ".claude/agents/cogworks.md" "${ARTIFACT_NAME}/.claude/agents/"
@@ -151,6 +152,15 @@ jobs:
           cp install.sh "${ARTIFACT_NAME}/"
           chmod +x "${ARTIFACT_NAME}/install.sh"
           echo "Packaged: install.sh"
+
+          # Copy convenience update checker
+          if [ -f "scripts/check-cogworks-updates.sh" ]; then
+            cp "scripts/check-cogworks-updates.sh" "${ARTIFACT_NAME}/scripts/"
+            chmod +x "${ARTIFACT_NAME}/scripts/check-cogworks-updates.sh"
+            echo "Packaged: scripts/check-cogworks-updates.sh"
+          else
+            echo "WARNING: scripts/check-cogworks-updates.sh not found"
+          fi
 
           # Generate file list for release notes
           echo "## Release Contents" > release-contents.txt
@@ -304,6 +314,12 @@ jobs:
             echo "./install.sh --target codex --local"
             echo "./install.sh --target codex --global"
             echo "./install.sh --codex  # legacy global"
+            echo "\`\`\`"
+            echo ""
+            echo "Check for updates:"
+            echo ""
+            echo "\`\`\`bash"
+            echo "bash scripts/check-cogworks-updates.sh"
             echo "\`\`\`"
             echo ""
             echo "See [INSTALL.md](https://github.com/williamhallatt/cogworks/blob/main/INSTALL.md) for manual installation instructions."
