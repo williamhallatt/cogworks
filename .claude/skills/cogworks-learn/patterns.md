@@ -7,7 +7,7 @@ Reusable patterns and common pitfalls for writing Claude Code skills.
 ## Table of Contents
 
 - [Patterns](#patterns) - 10 reusable patterns with when/why/how guidance
-- [Anti-Patterns](#anti-patterns) - 10 documented pitfalls to avoid
+- [Anti-Patterns](#anti-patterns) - Documented pitfalls to avoid
 - [Skill Generation Guidance](#skill-generation-guidance) - Verification gates, quality modifiers, and persuasion levels for generated skills
 
 ---
@@ -225,6 +225,12 @@ packages/
 **Why it fails:** Claude may only preview nested files with partial reads (`head -100`), missing critical content
 **Alternative:** All supporting files must be linked directly from SKILL.md (one level deep). If reference.md needs to cite another file, that file must also appear in SKILL.md's file index.
 
+### 11. Section Quota Chasing
+
+**Problem:** Forcing fixed counts (for example, always generating 10 patterns and 12 examples) regardless of source density
+**Why it fails:** Inflates token cost, increases redundancy, and lowers decision quality by adding filler
+**Alternative:** Include only uniquely valuable sections and entries; optimize for decision utility per token
+
 ---
 
 ## Skill Generation Guidance
@@ -302,5 +308,13 @@ description: What this skill does...
 - [ ] Snapshot date present in reference.md (at Sources section)
 - [ ] Date uses ISO 8601 format (YYYY-MM-DD)
 - [ ] Date represents synthesis time, not individual fetch times
+- [ ] SKILL.md follows compact decision-first structure (overview, when-to-use, cheatsheet, docs, invocation)
+- [ ] reference.md includes Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
+- [ ] `patterns.md` and `examples.md` are optional and created only for unique value
+- [ ] Supporting files begin with `Source IDs map to reference.md#sources.`
+- [ ] Source scope taxonomy present (Claude-native, supporting foundations, cross-model contrast)
+- [ ] Cross-model sources are contrast-only and not sole support for Claude-specific normative claims
+- [ ] Markdown fences are balanced (no broken nested code blocks)
+- [ ] No section quota chasing; content count is driven by source evidence and decision value
 
 **Note:** Manually created skills don't require snapshot dates. This is specifically for skills generated from external sources where freshness matters.
