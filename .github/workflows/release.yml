@@ -113,7 +113,7 @@ jobs:
           # Create temporary directory structure
           mkdir -p "${ARTIFACT_NAME}/.claude/agents"
           mkdir -p "${ARTIFACT_NAME}/.claude/skills"
-          mkdir -p "${ARTIFACT_NAME}/.claude/test-framework"
+          mkdir -p "${ARTIFACT_NAME}/tests/framework"
 
           # Copy agent
           cp ".claude/agents/cogworks.md" "${ARTIFACT_NAME}/.claude/agents/"
@@ -125,12 +125,12 @@ jobs:
             echo "Packaged: $skill_name"
           done
 
-          # Copy test-framework (dependency for cogworks-test skill)
-          if [ -d ".claude/test-framework" ]; then
-            cp -r .claude/test-framework/* "${ARTIFACT_NAME}/.claude/test-framework/"
-            echo "Packaged: test-framework (cogworks-test dependency)"
+          # Copy shared testing framework
+          if [ -d "tests/framework" ]; then
+            cp -r tests/framework/* "${ARTIFACT_NAME}/tests/framework/"
+            echo "Packaged: tests/framework"
           else
-            echo "WARNING: test-framework not found (required by cogworks-test)"
+            echo "WARNING: tests/framework not found"
           fi
 
           # Copy documentation and licensing
@@ -273,8 +273,6 @@ jobs:
               case "$skill_name" in
                 cogworks-encode|cogworks-learn)
                   echo "- **${skill_name}** skill (required)" ;;
-                cogworks-test)
-                  echo "- **${skill_name}** skill + test-framework (optional)" ;;
                 *)
                   echo "- **${skill_name}** skill" ;;
               esac
