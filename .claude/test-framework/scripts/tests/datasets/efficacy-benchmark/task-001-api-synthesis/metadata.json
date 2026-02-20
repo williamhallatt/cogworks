@@ -1,9 +1,0 @@
-{
-  "task_id": "task-001-api-synthesis",
-  "domain": "software-engineering",
-  "description": "Generate API skill and implement authentication endpoint",
-  "baseline_success_rate": 0.22,
-  "target_with_skill_rate": 0.85,
-  "baseline_runs": 10,
-  "difficulty": "medium"
-}

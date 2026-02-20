@@ -172,34 +172,9 @@ Run automated validation on the generated skill:
 
 1. **Layer 1 — Deterministic checks**:
    ```bash
-   bash .claude/test-framework/graders/deterministic-checks.sh {skill_path} --json
+   bash tests/framework/graders/deterministic-checks.sh {skill_path} --json
    ```
    If critical failures: fix the issues, then re-run (max 1 retry).
-
-2. **Layer 2 — Semantic quality evaluation**:
-   - Read all skill files from `{skill_path}`
-   - Evaluate each of the 7 quality dimensions using the rubrics from `.claude/test-framework/graders/llm-judge-rubrics.md`:
-     - Source Fidelity (weight 0.30): trace 10 claims to sources, check citations
-     - Self-Sufficiency (weight 0.20): verify all terms defined, no external dependencies
-     - Completeness (weight 0.15): check scope coverage against source material
-     - Specificity (weight 0.10): verify rules and examples are actionable
-     - No Overlap (weight 0.10): confirm no redundant restatement across files
-     - Token Efficiency (weight 0.10): enforce decision-density and compactness
-     - Structural Integrity (weight 0.05): valid markdown fences, valid references, no broken formatting
-   - Score each dimension 1-5 (score 5 should be rare; if uncertain, choose the lower score)
-   - Compute weighted score: `sum(score * weight) / 5.0`
-
-3. **If weighted score < 0.88 or any dimension < 3**:
-   - Identify the weakest dimension(s) from the evidence
-   - Make targeted fixes to the skill files
-   - Re-evaluate (max 1 retry)
-
-4. **Hard-fail conditions** (must fix regardless of score):
-   - Broken markdown fence structure
-   - Unresolved source IDs used in patterns/examples
-   - Cross-model source used as sole support for Claude-specific normative guidance
-
-5. Write results to `tests/results/{slug}-results.json`.
 
 ### 7. Confirm Success
 

@@ -124,7 +124,7 @@ Run only when user passed `--test`.
 
 Layer 1 deterministic checks:
 ```bash
-bash .claude/test-framework/graders/deterministic-checks.sh {skill_path} --json
+bash tests/framework/graders/deterministic-checks.sh {skill_path} --json
 ```
 
 If critical failures occur, fix and retry once.
