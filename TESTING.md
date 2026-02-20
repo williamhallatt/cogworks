@@ -35,6 +35,8 @@ Install local hooks:
 bash scripts/install-git-hooks.sh
 ```
 
+Hooks are local to each clone. Re-run the installer for every clone.
+
 Validate a single commit:
 
 ```bash
