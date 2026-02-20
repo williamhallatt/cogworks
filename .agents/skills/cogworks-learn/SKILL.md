@@ -19,6 +19,22 @@ When invoked, produce or review skills to this quality standard:
 4. Runtime tool names and schemas must match target runtime.
 5. Duplicate restatements across files are not allowed.
 
+## Integrated Prompt Quality Gates (Required)
+
+For generated skills, all five gates must pass:
+
+1. **Instruction clarity**: directives are explicit and actionable; avoid vague suggestions.
+2. **Source-faithful reasoning**: normative guidance is source-backed and contradictions are resolved explicitly.
+3. **Runtime contract correctness**: tools and schemas match runtime requirements.
+4. **Canonical placement**: each rule is documented once; no cross-file restatement.
+5. **Token-dense quality**: content is concise without dropping critical constraints.
+
+After drafting, run an **instruction quality rewrite pass**:
+- tighten weak phrasing into concrete directives
+- remove duplicate doctrine
+- preserve all hard constraints while compressing
+- re-check gates after rewrite
+
 ## Runtime Correctness Baseline
 
 In this repository runtime:
@@ -40,6 +56,7 @@ In this repository runtime:
 - `patterns.md`: transferable patterns and anti-patterns
 - `examples.md`: concise, runtime-correct before/after examples
 - `persuasion-principles.md`: optional compatibility reading
+- `../codex-prompt-engineering/reference.md`: canonical Codex prompt-engineering reference used to maintain these gates
 
 ## Checklist Before Finalizing
 
@@ -48,5 +65,6 @@ In this repository runtime:
 - Is `reference.md` canonical and complete?
 - Are supporting files unique and necessary?
 - Are sources and freshness markers present for generated-from-sources skills?
+- Did all integrated prompt quality gates pass after rewrite?
 
 See `reference.md` for full standards and acceptance gates.

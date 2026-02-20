@@ -86,6 +86,12 @@ All gates must pass before writing files.
 - contradictions are explicitly resolved
 - unresolved uncertainty is explicitly stated
 
+5. Prompt-quality gate (integrated via `cogworks-learn`)
+- instruction wording is explicit and actionable
+- no vague normative language in required behaviors
+- canonical placement is enforced (no cross-file rule restatement)
+- compactness preserves constraints (no quality loss during compression)
+
 ### 5) User Review
 
 Before writing, present:
@@ -114,6 +120,13 @@ Run a static lint pass on generated files:
 - invalid planning schema examples
 - unresolved placeholders
 - obvious duplication markers
+- weak normative phrasing that should be direct directives
+
+Run `cogworks-learn` rewrite pass guidance before finalizing:
+- tighten ambiguous wording
+- remove duplicate doctrine
+- preserve hard constraints while compressing
+- re-check prompt-quality gate
 
 If lint fails, auto-repair once and re-lint.
 If still failing, report failure clearly.

@@ -22,6 +22,7 @@ This expertise has been synthesized from 2 authoritative sources:
 - **Description is your discovery contract**: Claude uses this single field to decide when to auto-load from potentially 100+ skills - keyword precision determines triggering
 - **Match specificity to task fragility**: High-stakes workflows need explicit steps, verification gates, and rationalization resistance; low-stakes guidelines can be principles-based
 - **Generated-skill default**: Optimize for decision utility per token, not section count
+- **Integrated prompt-quality enforcement**: Apply mandatory prompt quality gates and a rewrite pass before finalizing generated skills
 
 ## Core Expertise Areas
 
@@ -67,6 +68,23 @@ Patterns and examples in separate files (loaded on-demand):
 - [patterns.md](patterns.md) - reusable patterns and anti-patterns to avoid
 - [examples.md](examples.md) - practical examples with citations
 - [persuasion-principles.md](persuasion-principles.md) - Persuasion psychology for discipline-enforcing skills
+- [../claude-prompt-engineering/reference.md](../claude-prompt-engineering/reference.md) - canonical Claude prompt-engineering reference used to maintain integrated quality gates
+
+## Integrated Prompt Quality Gates (Required)
+
+For generated skills, all gates must pass:
+
+1. **Instruction clarity** - normative steps are explicit, actionable, and unambiguous.
+2. **Source-faithful reasoning** - normative guidance is source-backed and contradictions are resolved explicitly.
+3. **Runtime contract correctness** - tools and examples match Claude runtime expectations.
+4. **Canonical placement** - each rule lives in one canonical location, with no cross-file restatement.
+5. **Token-dense quality** - preserve critical constraints while removing low-value verbosity.
+
+After drafting, run an **instruction quality rewrite pass**:
+- tighten weak wording into concrete directives
+- remove duplicated doctrine
+- compress filler without dropping hard requirements
+- re-check all gates before completion
 
 ## Writing Checklist
 
@@ -80,6 +98,7 @@ Before finalizing any skill:
 6. Does `name` use only lowercase letters, numbers, and hyphens (max 64 chars)?
 7. Is `description` under 1024 characters with no XML tags?
 8. Is each fact documented in one canonical file location (no restated duplication)?
+9. Did all integrated prompt quality gates pass after rewrite?
 
 ## Generated Skill Profile (Default)
 
