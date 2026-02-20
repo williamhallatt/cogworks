@@ -28,6 +28,8 @@
 - **Require reproducible evals for quality claims** - claims like “more robust”, “cheaper”, or “higher quality” must be backed by benchmark runs and saved artifacts, not single samples.
 - **Standardize benchmark artifacts** - keep machine-readable summaries and human-readable reports for pipeline comparisons (for example `benchmark-summary.json` and `benchmark-report.md`).
 - **Report done vs outstanding** - after implementing an accepted plan, explicitly list what was completed and what remains.
+- **Treat `_plans/` as historical context, not authority** - derive implementation decisions from current repo artifacts and accepted in-thread decisions, not prior plan files.
+- **Enforce prompt-engineering quality through `cogworks-learn`** - keep `*-prompt-engineering` skills as canonical references, and apply their doctrine via integrated gates in `cogworks-learn` during generation.
 
 ## Project Structure & Module Organization
 - `.claude/agents/` contains the Claude orchestration agent (`cogworks.md`).

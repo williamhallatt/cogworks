@@ -12,6 +12,7 @@ Claude Code Skills are SKILL.md files that extend Claude's capabilities through 
 
 ## Table of Contents
 
+- [Prompt Quality Gates](#prompt-quality-gates-for-generated-skills-required) - Mandatory integrated prompt-quality checks
 - [Core Concepts](#core-concepts) - Architecture, frontmatter, invocation, scope, content types
 - [Concept Map](#concept-map) - 15 relationships between concepts
 - [Deep Dives](#deep-dives) - Context budget, discovery, specificity, rationalization resistance
@@ -22,6 +23,49 @@ Claude Code Skills are SKILL.md files that extend Claude's capabilities through 
 
 - [patterns.md](patterns.md) - Transferable patterns and anti-patterns
 - [examples.md](examples.md) - Practical usage scenarios
+- [../claude-prompt-engineering/reference.md](../claude-prompt-engineering/reference.md) - Canonical Claude prompt-engineering doctrine
+
+---
+
+## Prompt Quality Gates for Generated Skills (Required)
+
+When this skill is used by `cogworks` to generate skills, these gates are mandatory:
+
+1. **Instruction Clarity**
+- Required behaviors are written as concrete directives.
+- Normative sections avoid soft phrasing that weakens compliance.
+- Hard constraints are explicit and testable.
+
+2. **Source-Faithful Reasoning**
+- Normative claims are source-backed.
+- Source contradictions are surfaced and resolved with rationale.
+- Uncertainty is stated explicitly rather than filled with unsupported inference.
+
+3. **Runtime Contract Correctness**
+- Tool names and command/schema examples match runtime behavior.
+- Guidance avoids runtime-invalid examples.
+- Safety boundaries for side-effectful actions remain explicit.
+
+4. **Canonical Placement**
+- Each rule has one canonical home.
+- Supporting files add net-new context, not restated doctrine.
+- Reference remains the source of truth.
+
+5. **Token-Dense Quality**
+- Remove ornamental prose and section bloat.
+- Preserve critical constraints while compressing wording.
+- Optimize for decision utility per token, not section count.
+
+### Instruction Quality Rewrite Pass (Required)
+
+After draft generation:
+
+1. Rewrite vague language into explicit directives.
+2. Remove duplicated doctrine across files.
+3. Compress low-information prose without dropping hard constraints.
+4. Re-run all five prompt quality gates.
+
+A generated skill is incomplete until rewrite and gate re-check both pass.
 
 ---
 

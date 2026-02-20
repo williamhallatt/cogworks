@@ -166,6 +166,13 @@ Pay particular attention to the SKILL.md description field: it must be keyword-r
 
 Apply `cogworks-learn` expertise to determine the optimal content organization and validation approach.
 
+Apply integrated prompt-quality gates from `cogworks-learn` before writing completion:
+- instruction clarity (explicit, actionable directives)
+- source-faithful reasoning with explicit contradiction handling
+- runtime contract correctness for normative examples
+- canonical placement (no cross-file doctrinal restatement)
+- token-dense quality (compress without dropping hard constraints)
+
 ### 6. Validate Generated Output (Automated)
 
 Run automated validation on the generated skill:
@@ -175,6 +182,12 @@ Run automated validation on the generated skill:
    bash tests/framework/graders/deterministic-checks.sh {skill_path} --json
    ```
    If critical failures: fix the issues, then re-run (max 1 retry).
+
+2. **Prompt-quality rewrite pass (required)**:
+   - Rewrite weak or ambiguous normative wording into direct instructions
+   - Remove duplicated doctrine across files
+   - Preserve non-negotiable constraints while tightening text
+   - Re-check integrated prompt-quality gates after rewrite
 
 ### 7. Confirm Success
 

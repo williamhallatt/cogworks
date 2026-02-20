@@ -81,6 +81,46 @@ Create optional files only when each contributes unique, non-redundant content.
 - [ ] No unresolved placeholders
 - [ ] Snapshot markers included for generated-from-sources skills
 
+## Prompt Quality Gates for Generated Skills (Required)
+
+These gates are mandatory when `cogworks` uses `cogworks-learn` to generate a skill.
+
+### Gate 1: Instruction Clarity
+- Use direct, actionable wording for required behavior.
+- Replace vague language ("consider", "maybe", "if relevant") in normative steps.
+- State non-optional constraints explicitly.
+
+### Gate 2: Source-Faithful Reasoning
+- Every normative claim must be source-backed.
+- Conflicts between sources must be called out and resolved with rationale.
+- Unknowns must be left explicit; do not infer unsupported facts.
+
+### Gate 3: Runtime Contract Correctness
+- Tool names and payload schemas must match runtime exactly.
+- Planning payloads use `{"plan":[{"step":"...","status":"..."}]}` only.
+- Remove runtime-invalid examples from normative guidance.
+
+### Gate 4: Canonical Placement
+- Each rule appears once in one canonical location.
+- `reference.md` remains source of truth for doctrine.
+- Supporting files may add context, but cannot restate canonical rules.
+
+### Gate 5: Token-Dense Quality
+- Keep decision-relevant constraints; remove ornamental narrative.
+- Preserve critical safety and correctness requirements while compressing.
+- Avoid fixed section quotas that add filler.
+
+## Instruction Quality Rewrite Pass (Required)
+
+After draft generation and before completion:
+
+1. Rewrite weak or ambiguous directives into concrete actions.
+2. Remove duplicate doctrine and cross-file repetition.
+3. Compress low-value prose while preserving hard constraints.
+4. Re-run all five prompt quality gates.
+
+A generated skill is not complete until the rewrite pass and gate re-check both succeed.
+
 ## Generated-From-Sources Freshness Markers
 
 In `SKILL.md`:
@@ -109,3 +149,4 @@ In `reference.md` Sources section:
 1. Codex prompting guidance and tool usage docs.
 2. Cogworks synthesis workflow and validation practices.
 3. Prompt quality/evaluation flywheel references.
+4. `../codex-prompt-engineering/reference.md` (canonical prompt-engineering doctrine for gate maintenance).
