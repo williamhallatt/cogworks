@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code when working with this repository.
 
+**Base Guidelines**: See [AGENTS.md](AGENTS.md) for project structure, build commands, coding style, testing guidelines, and commit conventions that apply to all tools.
+
+This file contains Claude Code-specific extensions and overrides.
+
 ## Related Documentation
 
 - [README.md](README.md) - Project overview and quick start
