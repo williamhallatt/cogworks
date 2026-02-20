@@ -137,6 +137,16 @@ Before tagging a release, verify:
 - [ ] SKILL.md files have proper YAML frontmatter with `name:`, `description:` fields
 - [ ] Agent declares dependencies on `cogworks-encode` and `cogworks-learn`
 - [ ] README.md is up to date
+- [ ] Recursive runbook is up to date: `tests/datasets/recursive-round/README.md`
+- [ ] Recursive scripts are present and executable:
+  - `scripts/run-recursive-round.sh`
+  - `scripts/run-recursive-hook.sh`
+  - `scripts/hash-test-bundle.sh`
+  - `scripts/pin-test-bundle-hash.sh`
+  - `scripts/recursive-env.example.sh`
+  - `scripts/recursive-bench-claude.sh`
+  - `scripts/recursive-bench-codex.sh`
+  - `scripts/validate-recursive-docs.sh`
 - [ ] No broken internal links in .md files
 - [ ] `scripts/check-cogworks-updates.sh` is present in generated `.tar.gz` and `.zip` artifacts
 

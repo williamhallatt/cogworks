@@ -26,10 +26,14 @@ bash scripts/test-cogworks-pipeline.sh --mode offline --run-id 20260220-ab1
 Real mode:
 
 ```bash
-export COGWORKS_BENCH_CLAUDE_CMD="your-claude-runner --sources '{sources_path}' --out '{out_dir}'"
-export COGWORKS_BENCH_CODEX_CMD="your-codex-runner --sources '{sources_path}' --out '{out_dir}'"
+export COGWORKS_BENCH_CLAUDE_CMD="bash scripts/recursive-bench-claude.sh '{sources_path}' '{out_dir}'"
+export COGWORKS_BENCH_CODEX_CMD="bash scripts/recursive-bench-codex.sh '{sources_path}' '{out_dir}'"
 bash scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1
 ```
+
+Decision-grade note:
+- Set `COGWORKS_RECURSIVE_BENCH_CLAUDE_REAL_CMD` and `COGWORKS_RECURSIVE_BENCH_CODEX_REAL_CMD` to real benchmark backends.
+- Without those, wrapper scripts emit smoke metrics for reproducibility.
 
 ## Raw CLI
 

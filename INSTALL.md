@@ -91,6 +91,22 @@ export COGWORKS_BENCH_CODEX_CMD="your-codex-runner --sources '{sources_path}' --
 bash scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1
 ```
 
+## Recursive Improvement Round
+
+Canonical runbook: `tests/datasets/recursive-round/README.md`
+
+```bash
+cp tests/datasets/recursive-round/round-manifest.example.json \
+  tests/datasets/recursive-round/round-manifest.local.json
+bash scripts/pin-test-bundle-hash.sh \
+  tests/datasets/recursive-round/round-manifest.local.json
+source scripts/recursive-env.example.sh
+bash scripts/run-recursive-round.sh \
+  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --mode fast \
+  --run-id rr-20260220-fast1
+```
+
 ## Troubleshooting
 
 - Missing `jq` or `PyYAML`: install dependencies then re-run tests.

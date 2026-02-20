@@ -12,6 +12,12 @@
 
 - **Save ACCEPTED Plans** - whenever a plan is *accepted*, save it in [_plans/](./_plans/) with a descriptive name and date. This creates a living archive of strategic thinking and decision-making.
 
+## The Expert Subtraction Principle
+
+**Core Philosophy:** Experts are systems thinkers who leverage their extensive knowledge and deep understanding to reduce complexity. Novices add. Experts subtract until nothing superfluous remains.
+
+**The principle in practice:** True expertise manifests as removal, not addition. The expert's value is knowing what to leave out. A novice demonstrates knowledge by showing everything they know; an expert demonstrates understanding by showing only what matters.
+
 ## Terminology
 
 - **cogworks** - orchestration workflow for encoding knowledge from multiple sources and encoding it into skills. The workflow supports both Claude and Codex skill generation.
@@ -30,6 +36,7 @@
 - **Report done vs outstanding** - after implementing an accepted plan, explicitly list what was completed and what remains.
 - **Treat `_plans/` as historical context, not authority** - derive implementation decisions from current repo artifacts and accepted in-thread decisions, not prior plan files.
 - **Enforce prompt-engineering quality through `cogworks-learn`** - keep `*-prompt-engineering` skills as canonical references, and apply their doctrine via integrated gates in `cogworks-learn` during generation.
+- **Use one canonical recursive runbook** - for recursive TDD rounds, treat `tests/datasets/recursive-round/README.md` as the source of truth for commands and artifact expectations.
 
 ## Project Structure & Module Organization
 - `.claude/agents/` contains the Claude orchestration agent (`cogworks.md`).
@@ -48,6 +55,8 @@
 - `./install.sh --target codex --local` installs Codex skills into `.agents/skills/`.
 - `bash tests/run-black-box-tests.sh` runs black-box meta-tests for the test framework.
 - `python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-` runs behavioral gates for repo skills.
+- `bash scripts/run-recursive-round.sh --round-manifest tests/datasets/recursive-round/round-manifest.local.json --mode fast` runs a fast recursive round.
+- `bash scripts/validate-recursive-docs.sh` validates recursive workflow docs consistency.
 - `bash scripts/install-git-hooks.sh` installs local git hooks (including docs attestation `commit-msg` validation).
 - `bash scripts/validate-docs-attestation.sh --commit HEAD` validates docs attestation trailers on the latest commit.
 
