@@ -1,0 +1,42 @@
+name: Docs Attestation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validate-docs-attestation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate docs attestation trailers
+        run: |
+          chmod +x scripts/validate-docs-attestation.sh
+
+          BEFORE_SHA="${{ github.event.before }}"
+          AFTER_SHA="${{ github.sha }}"
+
+          ZERO_SHA="0000000000000000000000000000000000000000"
+
+          if [ "$BEFORE_SHA" = "$ZERO_SHA" ]; then
+            echo "No 'before' SHA available; validating pushed commit only."
+            scripts/validate-docs-attestation.sh --commit "$AFTER_SHA"
+            exit 0
+          fi
+
+          if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            echo "Before SHA not found locally; validating pushed commit only."
+            scripts/validate-docs-attestation.sh --commit "$AFTER_SHA"
+            exit 0
+          fi
+
+          RANGE="${BEFORE_SHA}..${AFTER_SHA}"
+          echo "Validating commit range: $RANGE"
+          scripts/validate-docs-attestation.sh --range "$RANGE"
