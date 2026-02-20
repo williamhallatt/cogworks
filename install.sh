@@ -22,10 +22,10 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Required components
 readonly AGENT_FILE="cogworks.md"
 readonly REQUIRED_SKILLS=("cogworks-encode" "cogworks-learn")
-readonly OPTIONAL_SKILLS=("cogworks-test")
+readonly OPTIONAL_SKILLS=()
 readonly REQUIRED_SKILLS_CODEX=("cogworks" "cogworks-encode" "cogworks-learn")
-readonly OPTIONAL_SKILLS_CODEX=("cogworks-test")
-readonly TEST_FRAMEWORK_DIR="test-framework"
+readonly OPTIONAL_SKILLS_CODEX=()
+readonly TEST_FRAMEWORK_DIR="tests/framework"
 
 # Installation modes
 readonly MODE_CLAUDE_LOCAL=".claude"
@@ -235,10 +235,10 @@ validate_source_archive() {
         done
 
         # Check test framework
-        if [[ ! -d "${CLAUDE_SOURCE_DIR}/${TEST_FRAMEWORK_DIR}" ]]; then
-            log_warning "Test framework not found (required by cogworks-test)"
+        if [[ ! -d "${SCRIPT_DIR}/${TEST_FRAMEWORK_DIR}" ]]; then
+            log_warning "Testing framework not found: ${TEST_FRAMEWORK_DIR}"
         else
-            print_success "Found test framework"
+            print_success "Found testing framework"
         fi
     fi
 
@@ -281,7 +281,9 @@ check_existing_installation() {
             fi
         done
 
-        if [[ -d "${target_path}/${TEST_FRAMEWORK_DIR}" ]]; then
+        local framework_target
+        framework_target="$(get_test_framework_target_path "$target_path")"
+        if [[ -d "${framework_target}" ]]; then
             existing_components+=("test framework")
         fi
     fi
@@ -370,7 +372,6 @@ create_directory_structure() {
             "${target_path}"
             "${target_path}/agents"
             "${target_path}/skills"
-            "${target_path}/${TEST_FRAMEWORK_DIR}"
         )
     fi
 
@@ -521,7 +522,7 @@ install_skills() {
 
 install_test_framework() {
     local target_path="$1"
-    local source_dir="${CLAUDE_SOURCE_DIR}/${TEST_FRAMEWORK_DIR}"
+    local source_dir="${SCRIPT_DIR}/${TEST_FRAMEWORK_DIR}"
     local target_dir
     target_dir="$(get_test_framework_target_path "$target_path")"
 
@@ -590,7 +591,7 @@ verify_installation() {
             fi
         done
 
-        if [[ -d "${CLAUDE_SOURCE_DIR}/${TEST_FRAMEWORK_DIR}" ]]; then
+        if [[ -d "${SCRIPT_DIR}/${TEST_FRAMEWORK_DIR}" ]]; then
             local codex_framework_target
             codex_framework_target="$(get_test_framework_target_path "$target_path")"
             if [[ -f "${codex_framework_target}/graders/deterministic-checks.sh" ]]; then
@@ -768,26 +769,21 @@ get_installation_path() {
 
 get_test_framework_target_path() {
     local target_path="$1"
-
-    if [[ "$INSTALL_TARGET" != "codex" ]]; then
-        echo "${target_path}/${TEST_FRAMEWORK_DIR}"
-        return 0
-    fi
-
     case "$INSTALL_SCOPE" in
-        local)
-            echo "$(pwd)/.claude/${TEST_FRAMEWORK_DIR}"
-            ;;
         global)
-            echo "${HOME}/.claude/${TEST_FRAMEWORK_DIR}"
+            echo "${HOME}/${TEST_FRAMEWORK_DIR}"
             ;;
         *)
             if [[ "$target_path" =~ /?\.agents/skills/?$ ]]; then
                 local root_dir
                 root_dir="$(dirname "$(dirname "$target_path")")"
-                echo "${root_dir}/.claude/${TEST_FRAMEWORK_DIR}"
+                echo "${root_dir}/${TEST_FRAMEWORK_DIR}"
+            elif [[ "$target_path" =~ /?\.claude/?$ ]]; then
+                local root_dir
+                root_dir="$(dirname "$target_path")"
+                echo "${root_dir}/${TEST_FRAMEWORK_DIR}"
             else
-                echo "$(dirname "$target_path")/.claude/${TEST_FRAMEWORK_DIR}"
+                echo "$(pwd)/${TEST_FRAMEWORK_DIR}"
             fi
             ;;
     esac
@@ -810,7 +806,7 @@ show_installation_summary() {
                 echo "  - ${skill} skill (optional)"
             fi
         done
-        if [[ -d "${CLAUDE_SOURCE_DIR}/${TEST_FRAMEWORK_DIR}" ]]; then
+        if [[ -d "${SCRIPT_DIR}/${TEST_FRAMEWORK_DIR}" ]]; then
             echo "  - test-framework (installed to $(get_test_framework_target_path "$target_path"))"
         fi
     else
@@ -823,7 +819,7 @@ show_installation_summary() {
                 echo "  - ${skill} skill (optional)"
             fi
         done
-        if [[ -d "${CLAUDE_SOURCE_DIR}/${TEST_FRAMEWORK_DIR}" ]]; then
+        if [[ -d "${SCRIPT_DIR}/${TEST_FRAMEWORK_DIR}" ]]; then
             echo "  - test-framework (optional)"
         fi
     fi
