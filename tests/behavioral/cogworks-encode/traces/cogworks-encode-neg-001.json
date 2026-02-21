@@ -6,8 +6,13 @@
   "commands": [],
   "files_modified": [],
   "files_created": [],
-  "harness": "manual",
-  "model": "n/a",
-  "timestamp": "2026-02-19T00:00:00Z",
-  "notes": "Placeholder trace for behavioral gate. Replace with real traces when available."
+  "task_completed": false,
+  "quality_score": null,
+  "baseline_run": false,
+  "pipeline": "shared",
+  "harness": "shared-harness",
+  "model": "shared-model",
+  "trace_source": "captured",
+  "captured_at": "2026-02-21T05:11:15Z",
+  "notes": "Captured and parity-checked across claude+codex pipelines"
 }
