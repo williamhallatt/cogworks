@@ -56,6 +56,21 @@ Create optional files only when each contributes unique, non-redundant content.
 4. Remove sections that add format but no new information.
 5. Prefer checklists over long narrative repetition.
 
+## Skill Discovery Contract (CSO)
+
+`description` is primarily a trigger contract, not a workflow summary.
+
+Rules:
+- Start with `Use when ...` and describe triggering conditions.
+- Include user-language symptoms and synonyms that improve discoverability.
+- Keep process details in the skill body; do not compress multi-step flow into `description`.
+- Write in third person only.
+
+Anti-patterns:
+- workflow summaries in `description` that become shortcut instructions
+- vague descriptions with no concrete trigger language
+- first-person or second-person point-of-view in frontmatter
+
 ## Authoring QA Rubric (Pass/Fail)
 
 ### A. Runtime Contract Correctness
