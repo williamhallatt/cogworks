@@ -8,6 +8,8 @@
 #   ./install.sh --global     # Install to ~/.claude/ (default target: Claude)
 #   ./install.sh --target codex --local   # Install to ./.agents/skills
 #   ./install.sh --target codex --global  # Install to ~/.agents/skills
+#   ./install.sh --target both --local    # Install Claude + Codex locally
+#   ./install.sh --target both --global   # Install Claude + Codex globally
 #   ./install.sh --codex      # Install to ~/.agents/skills (legacy shorthand)
 #   ./install.sh --force      # Skip overwrite confirmations
 #   ./install.sh --dry-run    # Preview changes without modifying files
@@ -54,6 +56,9 @@ INSTALL_TARGET="claude"
 INSTALL_SCOPE=""
 TARGET_SPECIFIED=false
 IN_PLACE_INSTALL=false
+INSTALL_BOTH=false
+INSTALL_PATH_CLAUDE=""
+INSTALL_PATH_CODEX=""
 
 # Results tracking
 ERRORS=()
@@ -177,7 +182,19 @@ validate_source_archive() {
         valid=false
     fi
 
-    if [[ "$INSTALL_TARGET" == "codex" ]]; then
+    local validate_claude=false
+    local validate_codex=false
+
+    if $INSTALL_BOTH; then
+        validate_claude=true
+        validate_codex=true
+    elif [[ "$INSTALL_TARGET" == "codex" ]]; then
+        validate_codex=true
+    else
+        validate_claude=true
+    fi
+
+    if $validate_codex; then
         # Check required skills exist (Codex)
         for skill in "${REQUIRED_SKILLS_CODEX[@]}"; do
             if [[ ! -d "${CODEX_SOURCE_DIR}/${skill}" ]]; then
@@ -201,7 +218,9 @@ validate_source_archive() {
                 print_success "Found optional Codex skill: ${skill}"
             fi
         done
-    else
+    fi
+
+    if $validate_claude; then
         # Check agent file exists
         if [[ ! -f "${CLAUDE_SOURCE_DIR}/agents/${AGENT_FILE}" ]]; then
             handle_error "Agent file not found: .claude/agents/${AGENT_FILE}"
@@ -651,11 +670,12 @@ show_installation_menu() {
         echo
         echo "  1) Claude Code"
         echo "  2) OpenAI Codex"
-        echo "  3) Exit"
+        echo "  3) Both (Claude + Codex)"
+        echo "  4) Exit"
         echo
         local choice
         while true; do
-            read -p "Enter your choice [1-3]: " choice
+            read -p "Enter your choice [1-4]: " choice
             case "$choice" in
                 1)
                     INSTALL_TARGET="claude"
@@ -666,11 +686,15 @@ show_installation_menu() {
                     break
                     ;;
                 3)
+                    INSTALL_BOTH=true
+                    break
+                    ;;
+                4)
                     echo "Installation cancelled."
                     exit 0
                     ;;
                 *)
-                    echo "Invalid choice. Please enter 1, 2, or 3."
+                    echo "Invalid choice. Please enter 1, 2, 3, or 4."
                     ;;
             esac
         done
@@ -679,7 +703,13 @@ show_installation_menu() {
     echo
     echo "Choose an installation scope:"
     echo
-    if [[ "$INSTALL_TARGET" == "codex" ]]; then
+    if $INSTALL_BOTH; then
+        echo "  1) Local (project)   - Install to ${MODE_CLAUDE_LOCAL} and ${MODE_CODEX_LOCAL}"
+        echo "     Use this for repo-local installation"
+        echo
+        echo "  2) Global (personal) - Install to ${MODE_CLAUDE_GLOBAL} and ${MODE_CODEX_GLOBAL}"
+        echo "     Use this for user-wide installation"
+    elif [[ "$INSTALL_TARGET" == "codex" ]]; then
         echo "  1) Local (project)   - Install to ${MODE_CODEX_LOCAL}"
         echo "     Use this for repo-local Codex skills"
         echo
@@ -703,19 +733,40 @@ show_installation_menu() {
         case "$choice" in
             1)
                 INSTALL_SCOPE="local"
-                INSTALL_PATH="$(get_installation_path "$INSTALL_TARGET" "$INSTALL_SCOPE")"
+                if $INSTALL_BOTH; then
+                    INSTALL_PATH_CLAUDE="$(get_installation_path "claude" "$INSTALL_SCOPE")"
+                    INSTALL_PATH_CODEX="$(get_installation_path "codex" "$INSTALL_SCOPE")"
+                else
+                    INSTALL_PATH="$(get_installation_path "$INSTALL_TARGET" "$INSTALL_SCOPE")"
+                fi
                 return 0
                 ;;
             2)
                 INSTALL_SCOPE="global"
-                INSTALL_PATH="$(get_installation_path "$INSTALL_TARGET" "$INSTALL_SCOPE")"
+                if $INSTALL_BOTH; then
+                    INSTALL_PATH_CLAUDE="$(get_installation_path "claude" "$INSTALL_SCOPE")"
+                    INSTALL_PATH_CODEX="$(get_installation_path "codex" "$INSTALL_SCOPE")"
+                else
+                    INSTALL_PATH="$(get_installation_path "$INSTALL_TARGET" "$INSTALL_SCOPE")"
+                fi
                 return 0
                 ;;
             3)
-                read -p "Enter custom installation path: " INSTALL_PATH
-                if [[ -z "$INSTALL_PATH" ]]; then
-                    echo "Invalid path. Please try again."
-                    continue
+                INSTALL_SCOPE="custom"
+                if $INSTALL_BOTH; then
+                    read -p "Enter project root path: " custom_root
+                    if [[ -z "$custom_root" ]]; then
+                        echo "Invalid path. Please try again."
+                        continue
+                    fi
+                    INSTALL_PATH_CLAUDE="${custom_root}/.claude"
+                    INSTALL_PATH_CODEX="${custom_root}/.agents/skills"
+                else
+                    read -p "Enter custom installation path: " INSTALL_PATH
+                    if [[ -z "$INSTALL_PATH" ]]; then
+                        echo "Invalid path. Please try again."
+                        continue
+                    fi
                 fi
                 return 0
                 ;;
@@ -773,6 +824,9 @@ get_test_framework_target_path() {
         global)
             echo "${HOME}/${TEST_FRAMEWORK_DIR}"
             ;;
+        local)
+            echo "./${TEST_FRAMEWORK_DIR}"
+            ;;
         *)
             if [[ "$target_path" =~ /?\.agents/skills/?$ ]]; then
                 local root_dir
@@ -825,8 +879,8 @@ show_installation_summary() {
     fi
     echo
 
-    # Check for existing installation
-    if check_existing_installation "$target_path"; then
+    # Check for existing installation (skip for in-place installs)
+    if ! $IN_PLACE_INSTALL && check_existing_installation "$target_path"; then
         if $FORCE_MODE; then
             print_info "Existing files will be overwritten (--force mode)"
         else
@@ -868,7 +922,8 @@ run_installation() {
 
     # Run installation steps
     if $IN_PLACE_INSTALL; then
-        print_dim "Skipping copy steps for in-place install"
+        print_info "Source directory is the installation target — verifying existing files."
+        verify_installation "$target_path"
     else
         create_directory_structure "$target_path"
         install_agent "$target_path"
@@ -917,8 +972,26 @@ show_success_message() {
 
     print_success "cogworks is ready to use!"
     echo
+
+    # When installing both, suppress next steps after the first (claude) run
+    if $INSTALL_BOTH && [[ "$INSTALL_TARGET" == "claude" ]]; then
+        return 0
+    fi
+
     echo "Next steps:"
-    if [[ "$INSTALL_TARGET" == "codex" ]]; then
+    if $INSTALL_BOTH; then
+        echo "  Claude Code:"
+        echo "    1. Start Claude Code in your project directory"
+        echo "    2. Use the cogworks agent: ${COLOR_BOLD}@cogworks encode <sources>${COLOR_RESET}"
+        echo "    3. Or invoke skills directly: ${COLOR_BOLD}/cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}/cogworks-learn${COLOR_RESET}"
+        echo
+        echo "  OpenAI Codex:"
+        echo "    1. Start OpenAI Codex in your project directory"
+        echo "    2. Use the cogworks skill to orchestrate: ${COLOR_BOLD}cogworks encode <sources>${COLOR_RESET}"
+        echo "    3. Or invoke skills directly: ${COLOR_BOLD}cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}cogworks-learn${COLOR_RESET}"
+        echo
+        echo "  Check for updates: ${COLOR_BOLD}bash scripts/check-cogworks-updates.sh${COLOR_RESET}"
+    elif [[ "$INSTALL_TARGET" == "codex" ]]; then
         echo "  1. Start OpenAI Codex in your project directory"
         echo "  2. Use the cogworks skill to orchestrate: ${COLOR_BOLD}cogworks encode <sources>${COLOR_RESET}"
         echo "  3. Or invoke skills directly: ${COLOR_BOLD}cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}cogworks-learn${COLOR_RESET}"
@@ -944,7 +1017,7 @@ Usage:
   ./install.sh [OPTIONS]
 
 Options:
-  --target     Installation target: claude or codex (default: claude)
+  --target     Installation target: claude, codex, or both (default: claude)
   --local      Install to project directory (Claude: ./.claude/, Codex: ./.agents/skills)
   --global     Install to personal directory (Claude: ~/.claude/, Codex: ~/.agents/skills)
   --codex      Legacy shorthand for: --target codex --global
@@ -959,6 +1032,8 @@ Examples:
   ./install.sh --global --force # Install to personal directory, overwrite existing
   ./install.sh --target codex --local   # Install Codex skills locally
   ./install.sh --target codex --global  # Install Codex skills globally
+  ./install.sh --target both --local    # Install Claude + Codex locally
+  ./install.sh --target both --global   # Install Claude + Codex globally
   ./install.sh --codex                  # Install Codex skills globally (legacy)
 
 Interactive Mode (default):
@@ -998,8 +1073,12 @@ parse_arguments() {
                         INSTALL_TARGET="$1"
                         TARGET_SPECIFIED=true
                         ;;
+                    both)
+                        INSTALL_BOTH=true
+                        TARGET_SPECIFIED=true
+                        ;;
                     *)
-                        die "Invalid --target value: $1 (use claude or codex)"
+                        die "Invalid --target value: $1 (use claude, codex, or both)"
                         ;;
                 esac
                 shift
@@ -1042,7 +1121,13 @@ parse_arguments() {
     done
 
     if [[ -n "$scope" ]]; then
-        INSTALL_PATH="$(get_installation_path "$INSTALL_TARGET" "$scope")"
+        INSTALL_SCOPE="$scope"
+        if $INSTALL_BOTH; then
+            INSTALL_PATH_CLAUDE="$(get_installation_path "claude" "$scope")"
+            INSTALL_PATH_CODEX="$(get_installation_path "codex" "$scope")"
+        else
+            INSTALL_PATH="$(get_installation_path "$INSTALL_TARGET" "$scope")"
+        fi
     fi
 }
 
@@ -1053,13 +1138,34 @@ main() {
     # Validate source archive
     validate_source_archive
 
-    # Interactive menu if no mode specified
-    if [[ -z "$INSTALL_PATH" ]]; then
-        show_installation_menu
-    fi
+    if $INSTALL_BOTH; then
+        # Interactive menu if no paths computed yet
+        if [[ -z "$INSTALL_PATH_CLAUDE" ]]; then
+            show_installation_menu
+        fi
 
-    # Run installation
-    run_installation "$INSTALL_PATH"
+        # Install Claude target
+        INSTALL_TARGET="claude"
+        run_installation "$INSTALL_PATH_CLAUDE"
+
+        # Reset state for second run
+        ERRORS=()
+        WARNINGS=()
+        INSTALLED_FILES=()
+        IN_PLACE_INSTALL=false
+
+        # Install Codex target
+        INSTALL_TARGET="codex"
+        run_installation "$INSTALL_PATH_CODEX"
+    else
+        # Interactive menu if no mode specified
+        if [[ -z "$INSTALL_PATH" ]]; then
+            show_installation_menu
+        fi
+
+        # Run installation
+        run_installation "$INSTALL_PATH"
+    fi
 }
 
 # Execute main function

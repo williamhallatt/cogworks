@@ -20,6 +20,15 @@ Non-interactive examples:
 ./install.sh --dry-run
 ```
 
+## Both Targets (Claude + Codex)
+
+Install Claude and Codex components in a single run:
+
+```bash
+./install.sh --target both --local
+./install.sh --target both --global
+```
+
 ## Codex Installation
 
 Codex uses skills under `.agents/skills`:
