@@ -32,6 +32,13 @@ Strict provenance mode (fails placeholder/manual traces):
 python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks- --strict-provenance
 ```
 
+Fast trigger smoke tests:
+
+```bash
+bash scripts/run-trigger-smoke-tests.sh claude
+bash scripts/run-trigger-smoke-tests.sh codex
+```
+
 ## Docs Attestation Validation
 
 Commits to trunk must include docs attestation trailers in commit messages.
@@ -84,6 +91,7 @@ Behavioral pass criteria:
 - `activation_f1 >= 0.85`
 - `false_positive_rate <= 0.05`
 - `negative_control_ratio >= 0.25`
+- strict provenance requires `activation_source=skill_tool` for positive activation cases
 
 Capture normalized traces for each pipeline:
 
@@ -100,6 +108,13 @@ export COGWORKS_BEHAVIORAL_CODEX_REAL_CMD="bash scripts/run-behavioral-case-code
 export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="bash scripts/behavioral-capture-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
 export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
 bash scripts/refresh-behavioral-traces.sh --mode all
+```
+
+For slower environments, run per skill to reduce runtime and context/token burn:
+
+```bash
+bash scripts/refresh-behavioral-traces.sh --mode all --skill cogworks-learn
+bash scripts/refresh-behavioral-traces.sh --mode all --skill cogworks-encode
 ```
 
 You can load the same defaults from:
