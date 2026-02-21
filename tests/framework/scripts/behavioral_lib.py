@@ -43,6 +43,39 @@ def _check_ordered_subsequence(expected_cmds: List[str], actual_cmds: List[str])
     return (len(issues) == 0, issues)
 
 
+def _check_tool_order_assertions(assertions: List[Dict[str, Any]], tool_events: List[str]) -> List[str]:
+    issues: List[str] = []
+    lowered_events = [str(t).strip().lower() for t in tool_events]
+    for assertion in assertions:
+        if not isinstance(assertion, dict):
+            issues.append(f"invalid order assertion (must be object): {assertion}")
+            continue
+        if str(assertion.get("type", "")).strip() != "tool_before_tool":
+            issues.append(f"unsupported order assertion type: {assertion.get('type')}")
+            continue
+        first = str(assertion.get("first", "")).strip().lower()
+        second = str(assertion.get("second", "")).strip().lower()
+        if not first or not second:
+            issues.append(f"tool_before_tool requires first and second: {assertion}")
+            continue
+        try:
+            first_idx = lowered_events.index(first)
+        except ValueError:
+            issues.append(f"order assertion missing first tool '{first}' in tool_events")
+            continue
+        try:
+            second_idx = lowered_events.index(second)
+        except ValueError:
+            issues.append(f"order assertion missing second tool '{second}' in tool_events")
+            continue
+        if first_idx > second_idx:
+            issues.append(
+                f"order assertion failed: expected '{first}' before '{second}' "
+                f"(first_index={first_idx}, second_index={second_idx})"
+            )
+    return issues
+
+
 def validate_case(case: Dict[str, Any], trace: Dict[str, Any]) -> Dict[str, Any]:
     issues = []
     case_id = case.get("id")
@@ -54,6 +87,13 @@ def validate_case(case: Dict[str, Any], trace: Dict[str, Any]) -> Dict[str, Any]
     activated = bool(trace.get("activated"))
     if should_activate != activated:
         issues.append(f"activation mismatch (should_activate={should_activate}, activated={activated})")
+    activation_evidence = str(case.get("activation_evidence", "allow_fallback")).strip().lower()
+    activation_source = str(trace.get("activation_source", "none")).strip().lower()
+    if should_activate and activation_evidence == "tool_call_only" and activation_source != "skill_tool":
+        issues.append(
+            "activation evidence mismatch: expected explicit skill tool call "
+            f"(activation_source={activation_source})"
+        )
 
     expected_tools = case.get("expected_tools") or []
     tools_used = trace.get("tools_used") or []
@@ -92,6 +132,14 @@ def validate_case(case: Dict[str, Any], trace: Dict[str, Any]) -> Dict[str, Any]
         if path not in files_created:
             issues.append(f"expected created file missing: {path}")
 
+    order_assertions = case.get("order_assertions") or []
+    if order_assertions:
+        tool_events = trace.get("tool_events") or []
+        if not isinstance(tool_events, list):
+            issues.append("trace.tool_events must be a list when order_assertions are provided")
+        else:
+            issues.extend(_check_tool_order_assertions(order_assertions, tool_events))
+
     return {
         "case_id": case_id,
         "pass": len(issues) == 0,
@@ -105,5 +153,4 @@ def compute_f1(tp: int, fp: int, fn: int) -> float:
     if precision + recall == 0:
         return 0.0
     return 2 * precision * recall / (precision + recall)
-
 

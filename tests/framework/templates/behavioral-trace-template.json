@@ -2,7 +2,9 @@
   "skill_slug": "deployment-skill",
   "case_id": "invocability-001",
   "activated": true,
+  "activation_source": "skill_tool",
   "tools_used": ["Bash"],
+  "tool_events": ["Skill", "Bash"],
   "commands": [
     {"cmd": "git status", "exit_code": 0}
   ],

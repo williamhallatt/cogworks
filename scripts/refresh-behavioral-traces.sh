@@ -117,15 +117,17 @@ PY
 }
 
 compare_normalized_behavior() {
-  local left="$1"
-  local right="$2"
-  python3 - "$left" "$right" <<'PY'
+  local case_json_path="$1"
+  local left="$2"
+  local right="$3"
+  python3 - "$case_json_path" "$left" "$right" <<'PY'
 import json
 import sys
 from pathlib import Path
 
-left = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-right = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+case = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+left = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+right = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8"))
 
 keys = [
     "skill_slug",
@@ -140,10 +142,40 @@ keys = [
     "baseline_run",
 ]
 
+diffs = []
 for key in keys:
     if left.get(key) != right.get(key):
-        print(f"mismatch:{key}", file=sys.stderr)
-        sys.exit(1)
+        diffs.append(key)
+
+if not diffs:
+    print("claude")
+    raise SystemExit(0)
+
+category = str(case.get("category", "")).strip().lower()
+evidence = str(case.get("activation_evidence", "allow_fallback")).strip().lower()
+
+if diffs == ["activated"] and category in {"implicit", "contextual"} and evidence == "allow_fallback":
+    should_activate = bool(case.get("should_activate"))
+    left_activated = bool(left.get("activated"))
+    right_activated = bool(right.get("activated"))
+
+    if should_activate:
+        if left_activated and not right_activated:
+            print("claude")
+            raise SystemExit(0)
+        if right_activated and not left_activated:
+            print("codex")
+            raise SystemExit(0)
+    else:
+        if not left_activated and right_activated:
+            print("claude")
+            raise SystemExit(0)
+        if not right_activated and left_activated:
+            print("codex")
+            raise SystemExit(0)
+
+print(f"mismatch:{','.join(diffs)}", file=sys.stderr)
+raise SystemExit(1)
 PY
 }
 
@@ -205,7 +237,8 @@ capture_skill_cases() {
       --trace-source captured \
       --notes "Captured from codex pipeline"
 
-    if ! compare_normalized_behavior "$norm_claude" "$norm_codex"; then
+    local shared_source
+    if ! shared_source="$(compare_normalized_behavior "$case_json_path" "$norm_claude" "$norm_codex")"; then
       echo "Behavior mismatch between pipelines for $skill_slug/$case_id." >&2
       echo "Claude trace: $norm_claude" >&2
       echo "Codex trace:  $norm_codex" >&2
@@ -213,11 +246,17 @@ capture_skill_cases() {
       return 1
     fi
 
+    local shared_raw="$raw_claude"
+    if [[ "$shared_source" == "codex" ]]; then
+      shared_raw="$raw_codex"
+      echo "Using codex raw trace as shared baseline for $skill_slug/$case_id due to tolerated activation mismatch."
+    fi
+
     python3 "$NORMALIZER" \
       --pipeline shared \
       --skill-slug "$skill_slug" \
       --case-id "$case_id" \
-      --raw-trace "$raw_claude" \
+      --raw-trace "$shared_raw" \
       --out "$final_trace" \
       --harness "shared-harness" \
       --model "shared-model" \

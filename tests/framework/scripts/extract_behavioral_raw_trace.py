@@ -116,14 +116,14 @@ def _load_skill_description(skill_slug: str) -> str:
 
 def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tuple[Dict[str, Any], str]:
     tools_used: List[str] = []
+    tool_events: List[str] = []
     commands: List[str] = []
     files_modified: List[str] = []
     files_created: List[str] = []
-    activation_signals = 0
+    skill_tool_seen = False
     text_fragments: List[str] = []
 
     skill_slug_lower = skill_slug.lower()
-    skill_pattern = re.compile(rf"\b{re.escape(skill_slug_lower)}\b|/{re.escape(skill_slug_lower)}\b")
 
     for event in events:
         event_type = str(event.get("type", "")).strip()
@@ -135,9 +135,11 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
             if payload_type == "function_call":
                 name = str(payload.get("name", "")).strip()
                 if name:
-                    tools_used.append(_normalize_tool_name(name))
+                    normalized = _normalize_tool_name(name)
+                    tools_used.append(normalized)
+                    tool_events.append(normalized)
                     if name.lower() == "skill":
-                        activation_signals += 1
+                        skill_tool_seen = True
                 args = _parse_json_object(str(payload.get("arguments", ""))) or {}
                 cmd = args.get("cmd")
                 if isinstance(cmd, str) and cmd.strip():
@@ -145,9 +147,11 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
             elif payload_type == "custom_tool_call":
                 name = str(payload.get("name", "")).strip()
                 if name:
-                    tools_used.append(_normalize_tool_name(name))
+                    normalized = _normalize_tool_name(name)
+                    tools_used.append(normalized)
+                    tool_events.append(normalized)
                     if name.lower() == "skill":
-                        activation_signals += 1
+                        skill_tool_seen = True
                 tool_input = payload.get("input")
                 if name == "apply_patch" and isinstance(tool_input, str):
                     created, modified = _extract_paths_from_patch(tool_input)
@@ -161,14 +165,13 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
                 item_kind = str(item.get("type", "")).strip().lower()
                 if item_kind == "command_execution":
                     tools_used.append("exec_command")
+                    tool_events.append("exec_command")
                     cmd = item.get("command")
                     if isinstance(cmd, str) and cmd.strip():
-                        command_text = cmd.strip()
-                        commands.append(command_text)
-                        if skill_slug_lower in command_text.lower():
-                            activation_signals += 1
+                        commands.append(cmd.strip())
                 elif item_kind == "file_change":
                     tools_used.append("apply_patch")
+                    tool_events.append("apply_patch")
                     changes = item.get("changes")
                     if isinstance(changes, list):
                         for ch in changes:
@@ -188,8 +191,6 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
                     text = item.get("text")
                     if isinstance(text, str):
                         text_fragments.append(text)
-                        if skill_pattern.search(text.lower()):
-                            activation_signals += 1
 
         # Claude stream-json often emits explicit tool-use names in nested blocks.
         for item in _walk_json(event):
@@ -200,9 +201,11 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
             if str(item.get("type", "")).strip().lower() == "tool_use":
                 name = str(item.get("name", "")).strip()
                 if name:
-                    tools_used.append(_normalize_tool_name(name))
+                    normalized = _normalize_tool_name(name)
+                    tools_used.append(normalized)
+                    tool_events.append(normalized)
                     if name.lower() == "skill":
-                        activation_signals += 1
+                        skill_tool_seen = True
                 tool_input = item.get("input", {})
                 if isinstance(tool_input, dict):
                     command = tool_input.get("command") or tool_input.get("cmd")
@@ -219,27 +222,16 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
             text = item.get("text")
             if isinstance(text, str):
                 text_fragments.append(text)
-                if skill_pattern.search(text.lower()):
-                    activation_signals += 1
 
         # Claude init event lists available skills/slash commands; ignore it as activation evidence.
         if event_type == "system" and str(event.get("subtype", "")) == "init":
             continue
 
-        # For direct user prompt lines in stream-json, detect explicit slash invocations only.
-        if event_type == "user":
-            message = event.get("message")
-            if isinstance(message, dict):
-                for block in message.get("content", []) or []:
-                    if not isinstance(block, dict):
-                        continue
-                    text = block.get("text")
-                    if isinstance(text, str) and f"/{skill_slug_lower}" in text.lower():
-                        activation_signals += 1
-
     result = {
-        "activated": activation_signals > 0 or any(t.lower() == "skill" for t in tools_used),
+        "activated": skill_tool_seen,
+        "activation_source": "skill_tool" if skill_tool_seen else "none",
         "tools_used": _stable_unique(tools_used),
+        "tool_events": tool_events,
         "commands": _stable_unique(commands),
         "files_modified": _stable_unique(files_modified),
         "files_created": _stable_unique(files_created),
@@ -271,9 +263,13 @@ def main() -> int:
         raise FileNotFoundError(f"events JSONL file not found: {events_path}")
 
     result, text_blob = extract_from_events(_iter_jsonl(events_path), args.skill_slug)
+    activation_evidence = str(case.get("activation_evidence", "allow_fallback")).strip().lower()
+    if activation_evidence not in {"tool_call_only", "allow_fallback"}:
+        activation_evidence = "allow_fallback"
 
-    # Fallback activation inference for runtimes that do not emit explicit skill tool calls.
-    if not result.get("activated", False):
+    # Fallback activation inference remains available for datasets where runtime
+    # telemetry does not expose explicit Skill tool calls.
+    if activation_evidence == "allow_fallback" and not result.get("activated", False):
         description = _load_skill_description(args.skill_slug)
         desc_tokens = _tokenize(description)
         text_tokens = _tokenize(text_blob)
@@ -282,32 +278,44 @@ def main() -> int:
             min_overlap = 1 if category == "implicit" else 2
             if len(desc_tokens & text_tokens) >= min_overlap:
                 result["activated"] = True
+                result["activation_source"] = "description_token_overlap"
 
     # Secondary fallback for implicit/contextual cases:
     # if the model output strongly overlaps the user request phrasing, treat as activation.
-    if not result.get("activated", False):
+    if activation_evidence == "allow_fallback" and not result.get("activated", False):
         category = str(case.get("category", "")).strip().lower()
         if category in {"implicit", "contextual"}:
             user_request = str(case.get("user_request", ""))
+            if not user_request and isinstance(case.get("conversation_turns"), list):
+                turns = [t for t in case.get("conversation_turns") if isinstance(t, str)]
+                if turns:
+                    user_request = turns[-1]
             req_tokens = _tokenize(user_request)
             text_tokens = _tokenize(text_blob)
             if len(req_tokens & text_tokens) >= 3:
                 result["activated"] = True
+                result["activation_source"] = "request_token_overlap"
 
     # Explicit invocation cases should be deterministic: if the test case itself
     # explicitly names this skill, treat activation as true even if provider-specific
     # event text is sparse or generalized.
-    if not result.get("activated", False):
+    if activation_evidence == "allow_fallback" and not result.get("activated", False):
         category = str(case.get("category", "")).strip().lower()
         user_request = str(case.get("user_request", "")).lower()
+        if not user_request and isinstance(case.get("conversation_turns"), list):
+            turns = [t for t in case.get("conversation_turns") if isinstance(t, str)]
+            if turns:
+                user_request = turns[-1].lower()
         if category == "explicit":
             if f"/{args.skill_slug.lower()}" in user_request or args.skill_slug.lower() in user_request:
                 result["activated"] = True
+                result["activation_source"] = "explicit_request_match"
 
     # Keep parity focused on fields a case actually constrains.
     # Activation is always required; command/file/tool arrays are only retained when
     # the case contract explicitly references them.
     expected_tools = case.get("expected_tools") or []
+    order_assertions = case.get("order_assertions") or []
     expected_commands = case.get("expected_commands") or []
     forbidden_commands = case.get("forbidden_commands") or []
     expected_files_modified = case.get("expected_files_modified") or []
@@ -315,6 +323,8 @@ def main() -> int:
 
     if not expected_tools:
         result["tools_used"] = []
+    if not order_assertions:
+        result["tool_events"] = []
     if not expected_commands and not forbidden_commands:
         result["commands"] = []
     if not expected_files_modified:
