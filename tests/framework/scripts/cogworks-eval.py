@@ -99,7 +99,7 @@ def _validate_trace_provenance(
     placeholder_values = {"", "n/a", "na", "manual", "placeholder", "unknown"}
 
     if strict:
-        for field in ("pipeline", "harness", "model", "trace_source", "captured_at"):
+        for field in ("pipeline", "harness", "model", "trace_source", "captured_at", "activation_source"):
             value = trace.get(field)
             if value is None or (isinstance(value, str) and not value.strip()):
                 issues.append(f"missing required provenance field: {field}")
@@ -217,6 +217,14 @@ def behavioral_run(args: argparse.Namespace) -> int:
             provenance_issues = _validate_trace_provenance(
                 trace, strict=args.strict_provenance, expected_pipeline=expected_pipeline
             )
+            if args.strict_provenance and bool(case.get("should_activate")):
+                evidence_mode = str(case.get("activation_evidence", "allow_fallback")).strip().lower()
+                activation_source = str(trace.get("activation_source", "none")).strip().lower()
+                if evidence_mode == "tool_call_only" and activation_source != "skill_tool":
+                    provenance_issues.append(
+                        "strict-provenance requires activation_source=skill_tool "
+                        f"(got: {trace.get('activation_source')})"
+                    )
             if provenance_issues:
                 result["issues"].extend(provenance_issues)
                 result["pass"] = False

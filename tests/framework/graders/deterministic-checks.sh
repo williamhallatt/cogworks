@@ -232,6 +232,28 @@ check_description_keywords() {
     log_pass "Description has sufficient content"
 }
 
+# Check 8b: Description should not summarize workflow steps
+check_description_workflow_leakage() {
+    local frontmatter
+    frontmatter=$(awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found{print}' "$SKILL_FILE")
+    local description
+    description=$(echo "$frontmatter" | grep "^description:" | cut -d: -f2- | tr -d '"' | tr -d "'")
+
+    if [[ -z "$description" ]]; then
+        log_pass "Description workflow leakage (no description to evaluate)"
+        return 0
+    fi
+
+    local lower
+    lower=$(echo "$description" | tr '[:upper:]' '[:lower:]')
+
+    if [[ "$lower" =~ (^|[[:space:]])(first|then|after|before|step|steps|workflow|pipeline|dispatch)([[:space:]]|$) ]]; then
+        log_warning "Description appears to summarize workflow steps; prefer trigger-focused 'Use when ...' wording"
+    fi
+
+    log_pass "Description workflow leakage check complete"
+}
+
 # Check 9: No duplicate section headers
 check_no_duplicate_headers() {
     local headers=$(grep -E '^##+ ' "$SKILL_FILE" | sort)
@@ -548,6 +570,7 @@ run_all_checks() {
     check_forbidden_patterns || true
     check_supporting_files || true
     check_description_keywords || true
+    check_description_workflow_leakage || true
     check_no_duplicate_headers || true
     check_markdown_syntax || true
     check_cross_file_heading_duplication || true
