@@ -2,7 +2,9 @@
   "skill_slug": "cogworks-learn",
   "case_id": "cogworks-learn-neg-001",
   "activated": false,
+  "activation_source": "none",
   "tools_used": [],
+  "tool_events": [],
   "commands": [],
   "files_modified": [],
   "files_created": [],
@@ -13,6 +15,6 @@
   "harness": "shared-harness",
   "model": "shared-model",
   "trace_source": "captured",
-  "captured_at": "2026-02-21T05:01:39Z",
+  "captured_at": "2026-02-21T06:56:13Z",
   "notes": "Captured and parity-checked across claude+codex pipelines"
 }

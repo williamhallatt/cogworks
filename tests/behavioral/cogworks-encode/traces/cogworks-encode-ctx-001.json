@@ -2,7 +2,9 @@
   "skill_slug": "cogworks-encode",
   "case_id": "cogworks-encode-ctx-001",
   "activated": true,
+  "activation_source": "description_token_overlap",
   "tools_used": [],
+  "tool_events": [],
   "commands": [],
   "files_modified": [],
   "files_created": [],
@@ -13,6 +15,6 @@
   "harness": "shared-harness",
   "model": "shared-model",
   "trace_source": "captured",
-  "captured_at": "2026-02-21T05:11:01Z",
+  "captured_at": "2026-02-21T07:10:35Z",
   "notes": "Captured and parity-checked across claude+codex pipelines"
 }
