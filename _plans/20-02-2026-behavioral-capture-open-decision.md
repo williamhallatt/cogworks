@@ -1,5 +1,26 @@
 # Behavioral Trace Capture: Open Decision Log (2026-02-20)
 
+## Status
+
+Resolved on 2026-02-20.
+
+Implemented command wrappers:
+- `scripts/behavioral-capture-claude.sh`
+- `scripts/behavioral-capture-codex.sh`
+- `scripts/run-behavioral-case-claude.sh`
+- `scripts/run-behavioral-case-codex.sh`
+
+Canonical templates:
+
+```bash
+export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="bash scripts/behavioral-capture-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+```
+
+Wrappers require:
+- `COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD`
+- `COGWORKS_BEHAVIORAL_CODEX_REAL_CMD`
+
 ## User Question
 
 "Why aren't they configured yet?"

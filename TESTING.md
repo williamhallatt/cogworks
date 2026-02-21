@@ -95,10 +95,26 @@ bash scripts/capture-behavioral-trace-codex.sh <case_id> <skill_slug> <raw_trace
 Refresh traces for both pipelines and strict-validate:
 
 ```bash
-export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="your-claude-capture --case {case_json_path} --out {raw_trace_path}"
-export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="your-codex-capture --case {case_json_path} --out {raw_trace_path}"
+export COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD="bash scripts/run-behavioral-case-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_CODEX_REAL_CMD="bash scripts/run-behavioral-case-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="bash scripts/behavioral-capture-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
 bash scripts/refresh-behavioral-traces.sh --mode all
 ```
+
+You can load the same defaults from:
+
+```bash
+source scripts/behavioral-env.example.sh
+```
+
+Prerequisites for decision-grade capture:
+- `codex` and `claude` CLIs are installed and authenticated
+- network access to model backends is available during capture
+
+If capture fails, inspect pipeline event logs under:
+- `/tmp/cogworks-behavioral-raw/<skill_slug>/<case_id>.codex.events.jsonl`
+- `/tmp/cogworks-behavioral-raw/<skill_slug>/<case_id>.claude.events.jsonl`
 
 ## Test Cogworks Pipeline (A/B)
 

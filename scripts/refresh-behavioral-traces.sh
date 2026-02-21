@@ -95,7 +95,8 @@ run_capture_cmd() {
   cmd="${cmd//\{case_json_path\}/$case_json_path}"
   cmd="${cmd//\{raw_trace_path\}/$raw_trace_path}"
 
-  bash -lc "$cmd"
+  # Prevent capture commands from consuming the case iterator stdin.
+  bash -lc "$cmd" </dev/null
 }
 
 extract_case_lines() {
