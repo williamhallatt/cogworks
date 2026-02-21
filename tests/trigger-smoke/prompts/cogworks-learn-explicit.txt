@@ -1,0 +1,1 @@
+Use /cogworks-learn and explain how you would structure a SKILL.md before running commands.

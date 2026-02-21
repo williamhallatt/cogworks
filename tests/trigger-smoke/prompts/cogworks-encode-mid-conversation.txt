@@ -1,0 +1,5 @@
+We have docs from three different teams and they contradict each other in places.
+
+I need one source-faithful synthesis with explicit conflict notes.
+
+/cogworks-encode please.
