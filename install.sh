@@ -327,8 +327,15 @@ validate_target_path() {
         target_path="$(pwd)/${target_path}"
     fi
 
-    # Normalize paths for comparison
-    local normalized_target="$(cd "$(dirname "$target_path")" 2>/dev/null && pwd)/$(basename "$target_path")"
+    # Normalize paths for comparison — handle non-existent parents
+    local normalized_target
+    if [[ -d "$(dirname "$target_path")" ]]; then
+        normalized_target="$(cd "$(dirname "$target_path")" && pwd)/$(basename "$target_path")"
+    else
+        # Parent doesn't exist yet; use the absolute path as-is (already resolved above)
+        normalized_target="$target_path"
+    fi
+
     local normalized_source
     if [[ "$INSTALL_TARGET" == "codex" ]]; then
         normalized_source="${CODEX_SOURCE_DIR}"
