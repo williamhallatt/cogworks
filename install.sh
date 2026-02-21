@@ -855,7 +855,7 @@ show_installation_summary() {
 
     print_header "Installation Summary"
 
-    echo "Installation path: ${COLOR_BOLD}${target_path}${COLOR_RESET}"
+    echo -e "Installation path: ${COLOR_BOLD}${target_path}${COLOR_RESET}"
     echo
     echo "Components to install:"
     if [[ "$INSTALL_TARGET" == "codex" ]]; then
@@ -956,7 +956,7 @@ show_success_message() {
 
     if [[ ${#INSTALLED_FILES[@]} -gt 0 ]]; then
         echo "Successfully installed ${#INSTALLED_FILES[@]} component(s) to:"
-        echo "  ${COLOR_BOLD}${target_path}${COLOR_RESET}"
+        echo -e "  ${COLOR_BOLD}${target_path}${COLOR_RESET}"
         echo
     fi
 
@@ -989,25 +989,25 @@ show_success_message() {
     if $INSTALL_BOTH; then
         echo "  Claude Code:"
         echo "    1. Start Claude Code in your project directory"
-        echo "    2. Use the cogworks agent: ${COLOR_BOLD}@cogworks encode <sources>${COLOR_RESET}"
-        echo "    3. Or invoke skills directly: ${COLOR_BOLD}/cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}/cogworks-learn${COLOR_RESET}"
+        echo -e "    2. Use the cogworks agent: ${COLOR_BOLD}@cogworks encode <sources>${COLOR_RESET}"
+        echo -e "    3. Or invoke skills directly: ${COLOR_BOLD}/cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}/cogworks-learn${COLOR_RESET}"
         echo
         echo "  OpenAI Codex:"
         echo "    1. Start OpenAI Codex in your project directory"
-        echo "    2. Use the cogworks skill to orchestrate: ${COLOR_BOLD}cogworks encode <sources>${COLOR_RESET}"
-        echo "    3. Or invoke skills directly: ${COLOR_BOLD}cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}cogworks-learn${COLOR_RESET}"
+        echo -e "    2. Use the cogworks skill to orchestrate: ${COLOR_BOLD}cogworks encode <sources>${COLOR_RESET}"
+        echo -e "    3. Or invoke skills directly: ${COLOR_BOLD}cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}cogworks-learn${COLOR_RESET}"
         echo
-        echo "  Check for updates: ${COLOR_BOLD}bash scripts/check-cogworks-updates.sh${COLOR_RESET}"
+        echo -e "  Check for updates: ${COLOR_BOLD}bash scripts/check-cogworks-updates.sh${COLOR_RESET}"
     elif [[ "$INSTALL_TARGET" == "codex" ]]; then
         echo "  1. Start OpenAI Codex in your project directory"
-        echo "  2. Use the cogworks skill to orchestrate: ${COLOR_BOLD}cogworks encode <sources>${COLOR_RESET}"
-        echo "  3. Or invoke skills directly: ${COLOR_BOLD}cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}cogworks-learn${COLOR_RESET}"
-        echo "  4. Check for updates: ${COLOR_BOLD}bash scripts/check-cogworks-updates.sh${COLOR_RESET}"
+        echo -e "  2. Use the cogworks skill to orchestrate: ${COLOR_BOLD}cogworks encode <sources>${COLOR_RESET}"
+        echo -e "  3. Or invoke skills directly: ${COLOR_BOLD}cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}cogworks-learn${COLOR_RESET}"
+        echo -e "  4. Check for updates: ${COLOR_BOLD}bash scripts/check-cogworks-updates.sh${COLOR_RESET}"
     else
         echo "  1. Start Claude Code in your project directory"
-        echo "  2. Use the cogworks agent: ${COLOR_BOLD}@cogworks encode <sources>${COLOR_RESET}"
-        echo "  3. Or invoke skills directly: ${COLOR_BOLD}/cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}/cogworks-learn${COLOR_RESET}"
-        echo "  4. Check for updates: ${COLOR_BOLD}bash scripts/check-cogworks-updates.sh${COLOR_RESET}"
+        echo -e "  2. Use the cogworks agent: ${COLOR_BOLD}@cogworks encode <sources>${COLOR_RESET}"
+        echo -e "  3. Or invoke skills directly: ${COLOR_BOLD}/cogworks-encode${COLOR_RESET} or ${COLOR_BOLD}/cogworks-learn${COLOR_RESET}"
+        echo -e "  4. Check for updates: ${COLOR_BOLD}bash scripts/check-cogworks-updates.sh${COLOR_RESET}"
     fi
     echo
     echo "For documentation, see:"
@@ -1142,15 +1142,23 @@ main() {
     # Parse command line arguments
     parse_arguments "$@"
 
-    # Validate source archive
-    validate_source_archive
-
+    # Interactive menu if no paths computed yet (must run BEFORE validation
+    # so we know the actual target when the user selects interactively)
     if $INSTALL_BOTH; then
-        # Interactive menu if no paths computed yet
         if [[ -z "$INSTALL_PATH_CLAUDE" ]]; then
             show_installation_menu
         fi
+    else
+        if [[ -z "$INSTALL_PATH" ]]; then
+            show_installation_menu
+        fi
+    fi
 
+    # Validate source archive (after menu, so INSTALL_BOTH / INSTALL_TARGET
+    # reflect the user's interactive choice)
+    validate_source_archive
+
+    if $INSTALL_BOTH; then
         # Install Claude target
         INSTALL_TARGET="claude"
         run_installation "$INSTALL_PATH_CLAUDE"
@@ -1165,11 +1173,6 @@ main() {
         INSTALL_TARGET="codex"
         run_installation "$INSTALL_PATH_CODEX"
     else
-        # Interactive menu if no mode specified
-        if [[ -z "$INSTALL_PATH" ]]; then
-            show_installation_menu
-        fi
-
         # Run installation
         run_installation "$INSTALL_PATH"
     fi
