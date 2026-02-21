@@ -1,0 +1,5 @@
+I just finished outlining a new skill and saved rough notes.
+
+Now I want to tighten the SKILL.md architecture and frontmatter.
+
+/cogworks-learn please.

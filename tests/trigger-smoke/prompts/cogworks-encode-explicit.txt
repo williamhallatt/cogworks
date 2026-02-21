@@ -1,0 +1,1 @@
+Use /cogworks-encode to synthesize multiple sources into one coherent skill knowledge base.
