@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PYTHONPATH="$ROOT_DIR/scripts:${PYTHONPATH:-}"
 CLI="$ROOT_DIR/tests/framework/scripts/cogworks-eval.py"
 
 RUN_ID="ab-$(date +%Y%m%d-%H%M%S)"

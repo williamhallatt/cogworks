@@ -6,18 +6,10 @@ Canonical recursive round runbook: `tests/datasets/recursive-round/README.md`
 
 ## Scope
 
-This framework supports three test tracks:
+This framework supports two test tracks:
 
 - Layer 1 deterministic checks for generated skills
 - Behavioral activation tests
-- Cross-pipeline A/B benchmark (Claude vs Codex)
-
-Removed from baseline:
-
-- `cogworks-test` skill abstraction
-- LLM-judge conversational grading
-- Calibration CLI and leakage CLI
-- Efficacy benchmark CLI
 
 ## Primary Commands
 
@@ -26,12 +18,6 @@ Generated skill tests:
 ```bash
 bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
 bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill --with-behavioral
-```
-
-Pipeline benchmark:
-
-```bash
-bash scripts/test-cogworks-pipeline.sh --mode offline --run-id 20260220-ab1
 ```
 
 Recursive TDD round:
@@ -44,24 +30,11 @@ bash scripts/run-recursive-round.sh \
   --run-id rr-20260220-fast1
 ```
 
-Real benchmark mode:
-
-```bash
-export COGWORKS_BENCH_CLAUDE_CMD="your-claude-runner --sources '{sources_path}' --out '{out_dir}'"
-export COGWORKS_BENCH_CODEX_CMD="your-codex-runner --sources '{sources_path}' --out '{out_dir}'"
-bash scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1
-```
-
 ## Advanced CLI
 
 ```bash
 python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-
 python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks- --strict-provenance
-python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark scaffold --run-id 20260220-ab1
-python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark run --run-id 20260220-ab1 \
-  --command-template "claude::./scripts/run-claude-benchmark.sh '{sources_path}' '{out_dir}'" \
-  --command-template "codex::./scripts/run-codex-benchmark.sh '{sources_path}' '{out_dir}'"
-python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark summarize --run-id 20260220-ab1
 bash scripts/run-trigger-smoke-tests.sh claude
 bash scripts/run-trigger-smoke-tests.sh codex
 ```
@@ -75,8 +48,7 @@ tests/framework/
 ├── scripts/
 │   ├── behavioral_lib.py
 │   ├── capture_behavioral_trace.py
-│   ├── cogworks-eval.py
-│   └── pipeline_benchmark.py
+│   └── cogworks-eval.py
 └── templates/
     ├── behavioral-test-case-template.jsonl
     └── behavioral-trace-template.json

@@ -228,7 +228,10 @@ bash scripts/validate-recursive-docs.sh
 
 ## Advanced Manual CLI
 
+The `pipeline-benchmark` subcommand requires `scripts/` on PYTHONPATH. Use `scripts/test-cogworks-pipeline.sh` as the recommended entry point, or set PYTHONPATH manually:
+
 ```bash
+export PYTHONPATH="$PWD/scripts:${PYTHONPATH:-}"
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark scaffold --run-id 20260220-ab1
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark run --run-id 20260220-ab1 \
   --command-template "claude::./scripts/run-claude-benchmark.sh '{sources_path}' '{out_dir}'" \

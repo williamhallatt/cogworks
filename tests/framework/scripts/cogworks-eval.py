@@ -7,7 +7,6 @@ from datetime import UTC, datetime
 from typing import Any, Dict, List, Optional
 
 from behavioral_lib import load_json, load_jsonl, validate_case, compute_f1
-from pipeline_benchmark import run_benchmark, scaffold_layout, summarize_benchmark
 
 
 def _write_json(path: str, payload: Dict[str, Any]) -> None:
@@ -350,14 +349,17 @@ def behavioral_scaffold(args: argparse.Namespace) -> int:
 
 
 def pipeline_benchmark_scaffold(args: argparse.Namespace) -> int:
+    from pipeline_benchmark import scaffold_layout
     return scaffold_layout(args)
 
 
 def pipeline_benchmark_run(args: argparse.Namespace) -> int:
+    from pipeline_benchmark import run_benchmark
     return run_benchmark(args)
 
 
 def pipeline_benchmark_summarize(args: argparse.Namespace) -> int:
+    from pipeline_benchmark import summarize_benchmark
     return summarize_benchmark(args)
 
 
