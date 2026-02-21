@@ -108,6 +108,21 @@ my-skill/
 | `name` | Max 64 characters. Lowercase letters, numbers, and hyphens only. No XML tags. Cannot contain reserved words: "anthropic", "claude". |
 | `description` | Required (non-empty). Max 1024 characters. No XML tags. |
 
+**Skill Discovery Contract (CSO):**
+
+`description` is primarily a trigger contract, not a workflow summary.
+
+Rules:
+- Start with `Use when ...` and describe triggering conditions.
+- Include user-language symptoms and synonyms that improve discoverability.
+- Keep process details in the skill body; do not compress multi-step flow into `description`.
+- Write in third person only.
+
+Anti-patterns:
+- Workflow summaries in `description` that become shortcut instructions.
+- Vague descriptions with no concrete trigger language.
+- First-person or second-person point-of-view in frontmatter.
+
 ### 3. Invocation Duality
 **Definition:** Skills have two invocation paths: automatic (Claude decides based on description match) and manual (user types /skill-name). This duality is controlled by frontmatter.
 
