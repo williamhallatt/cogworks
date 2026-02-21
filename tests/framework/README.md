@@ -62,6 +62,8 @@ python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark run --run-id
   --command-template "claude::./scripts/run-claude-benchmark.sh '{sources_path}' '{out_dir}'" \
   --command-template "codex::./scripts/run-codex-benchmark.sh '{sources_path}' '{out_dir}'"
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark summarize --run-id 20260220-ab1
+bash scripts/run-trigger-smoke-tests.sh claude
+bash scripts/run-trigger-smoke-tests.sh codex
 ```
 
 ## Framework Layout
@@ -88,6 +90,10 @@ Normalize raw harness output to the behavioral trace contract:
 bash scripts/capture-behavioral-trace-claude.sh <case_id> <skill_slug> <raw_trace.json> <out_trace.json>
 bash scripts/capture-behavioral-trace-codex.sh <case_id> <skill_slug> <raw_trace.json> <out_trace.json>
 ```
+
+Key strict-mode fields:
+- `activation_source` (`skill_tool` required for positive cases in strict provenance mode)
+- `tool_events` (ordered tool timeline for `order_assertions`)
 
 Refresh + strict-validate all behavioral traces:
 
