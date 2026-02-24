@@ -1,6 +1,10 @@
 ---
 name: cogworks-learn
 description: Expert knowledge on writing agent skills - SKILL.md files, frontmatter configuration, invocation modes, context management, and best practices. Use when creating skills, designing slash commands, writing SKILL.md files, or optimizing skill discoverability and context efficiency.
+license: MIT
+metadata:
+  author: cogworks
+  version: v3.0.0
 ---
 
 # Skill Writer Expert
