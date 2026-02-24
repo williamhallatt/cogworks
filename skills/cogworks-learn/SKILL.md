@@ -68,7 +68,7 @@ Patterns and examples in separate files (loaded on-demand):
 
 For generated skills, all gates must pass:
 
-1. **Instruction clarity** - normative steps are explicit, actionable, and unambiguous.
+1. **Instruction clarity** - normative steps are explicit, actionable, unambiguous, and include rationale ("Do X because Y").
 2. **Source-faithful reasoning** - normative guidance is source-backed and contradictions are resolved explicitly.
 3. **Runtime contract correctness** - tools and examples match the target agent's runtime expectations.
 4. **Canonical placement** - each rule lives in one canonical location, with no cross-file restatement.

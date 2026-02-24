@@ -95,6 +95,8 @@ Store the selected path as `{skill_path}`.
 
 **Capture the current date as `{snapshot_date}` using ISO 8601 format (YYYY-MM-DD).** This will be embedded in the generated skill files to show when sources were current.
 
+**Capture source provenance as `{source_manifest}`** — a list of objects recording each source's type (`url` or `file`), URI/path, and (for fetched-then-saved files) the original URI. This enables regeneration without manual source recall.
+
 Synthesise all gathered source material into a unified knowledge base following the `cogworks-encode` synthesis process. Find non-obvious connections between sources, resolve contradictions with nuanced analysis, and extract decision-useful guidance.
 
 Apply the **Synthesis Output Contract**:
@@ -156,6 +158,21 @@ Use these structure requirements by default:
 - **patterns.md/examples.md** (if created) begin with a source-pointer line mapping source IDs to `reference.md#sources`
 - Keep content concise and decision-first. Default total size target is <=2500 words unless source breadth requires more.
 
+**Generate `metadata.json`** in `{skill_path}` as a machine-readable regeneration manifest:
+
+```json
+{
+  "slug": "{slug}",
+  "version": "1.0.0",
+  "snapshot_date": "{snapshot_date}",
+  "cogworks_version": "1.0.0",
+  "topic": "{topic_name}",
+  "sources": ["{source_manifest entries}"]
+}
+```
+
+Each entry in `sources` is an object with `type` (`url` or `file`), `uri` (the URL or relative path), and optionally `original_uri` (for files fetched from URLs). See the Synthesis Output Contract in `cogworks-encode` for field definitions.
+
 Pay particular attention to the SKILL.md description field: it must be keyword-rich, start with an action verb, include trigger phrases users would naturally say, list concrete use cases, and be written in third person. This single field determines whether the skill will be discovered and auto-loaded.
 
 Apply `cogworks-learn` expertise to determine the optimal content organization and validation approach.
@@ -191,6 +208,7 @@ Display:
 - **Skill location**: {skill_path}
 - How to invoke the new skill (`/{slug}`)
 - Validation results: Layer 1 deterministic status and whether any auto-fixes were applied
+- metadata.json: regeneration manifest written
 
 ## Variable Naming Convention
 
@@ -200,6 +218,7 @@ Throughout the workflow, use these variables consistently:
 - `{slug}` - Skill name/identifier derived from topic name
 - `{topic_name}` - Human-readable topic name provided by user
 - `{snapshot_date}` - ISO 8601 date (YYYY-MM-DD) when sources were synthesized
+- `{source_manifest}` - List of source provenance objects (type, uri, original_uri) for metadata.json
 
 The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` references.
 
@@ -224,3 +243,4 @@ The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` refe
 3. Layer 1 deterministic checks pass (no critical failures)
 4. Prompt-quality rewrite pass completed after Layer 1 validation
 5. Topic is invokable via `/{slug}`
+6. `metadata.json` written with valid schema, slug matching directory name, and non-empty sources

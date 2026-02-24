@@ -549,6 +549,71 @@ check_model_frontmatter_for_claude_target() {
     return 1
 }
 
+# Check 18: metadata.json validation for generated skills
+check_metadata_json() {
+    local metadata_file="${SKILL_DIR}/metadata.json"
+
+    if [[ ! -f "$metadata_file" ]]; then
+        # Warn only for skills that appear cogworks-generated (have snapshot date in SKILL.md)
+        if grep -q "^> \*\*Knowledge snapshot from:\*\*" "$SKILL_FILE" 2>/dev/null; then
+            log_warning "metadata.json missing (generated skills should include metadata.json for regeneration)"
+        else
+            log_pass "metadata.json (not applicable - not a generated skill)"
+        fi
+        return 0
+    fi
+
+    # Validate: must be valid JSON
+    if ! python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$metadata_file" 2>/dev/null; then
+        log_critical "metadata.json is not valid JSON"
+        return 1
+    fi
+
+    # Validate required fields and slug match
+    local validation_result
+    validation_result=$(python3 - "$metadata_file" "$SKILL_DIR" <<'PYEOF'
+import json, sys, os
+
+meta_path = sys.argv[1]
+skill_dir = sys.argv[2]
+dir_name = os.path.basename(os.path.normpath(skill_dir))
+
+with open(meta_path) as f:
+    data = json.load(f)
+
+errors = []
+required = ["slug", "version", "snapshot_date", "cogworks_version", "topic", "sources"]
+for field in required:
+    if field not in data:
+        errors.append(f"missing required field: {field}")
+
+if "slug" in data and data["slug"] != dir_name:
+    errors.append(f"slug '{data['slug']}' does not match directory name '{dir_name}'")
+
+if "sources" in data:
+    if not isinstance(data["sources"], list) or len(data["sources"]) == 0:
+        errors.append("sources must be a non-empty array")
+    else:
+        for i, src in enumerate(data["sources"]):
+            if not isinstance(src, dict):
+                errors.append(f"sources[{i}] is not an object")
+            elif "type" not in src or "uri" not in src:
+                errors.append(f"sources[{i}] missing type or uri")
+
+print("\n".join(errors) if errors else "OK")
+PYEOF
+    )
+
+    if [[ "$validation_result" == "OK" ]]; then
+        log_pass "metadata.json valid"
+    else
+        while IFS= read -r err; do
+            log_critical "metadata.json: ${err}"
+        done <<< "$validation_result"
+        return 1
+    fi
+}
+
 # Run all checks
 run_all_checks() {
     check_dependencies || true
@@ -580,6 +645,7 @@ run_all_checks() {
     check_snapshot_date_present || true
     check_model_routing_contract || true
     check_model_frontmatter_for_claude_target || true
+    check_metadata_json || true
 }
 
 # Generate output

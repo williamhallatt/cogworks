@@ -35,6 +35,7 @@ When this skill is used by `cogworks` to generate skills, these gates are mandat
 - Required behaviors are written as concrete directives.
 - Normative sections avoid soft phrasing that weakens compliance.
 - Hard constraints are explicit and testable.
+- Directives include rationale ("Do X because Y") — bare directives are followed literally; rationale enables generalization.
 
 2. **Source-Faithful Reasoning**
 - Normative claims are source-backed.
@@ -194,6 +195,7 @@ For generated skills, default to a compact decision-first contract unless source
 - `patterns.md` and `examples.md` are optional
 - Include only if they add unique information not present in `reference.md`
 - Begin each supporting file with: `Source IDs map to reference.md#sources.`
+- `metadata.json`: machine-readable regeneration manifest (slug, version, snapshot_date, sources)
 
 **Source scope taxonomy**
 - Primary platform (normative)

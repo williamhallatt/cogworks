@@ -1,0 +1,12 @@
+{
+  "slug": "snapshot-cogworks-learn",
+  "version": "1.0.0",
+  "snapshot_date": "2026-02-19",
+  "cogworks_version": "1.0.0",
+  "topic": "Skill Writer Expert",
+  "sources": [
+    { "type": "url", "uri": "https://agentskills.io/specification" },
+    { "type": "url", "uri": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices" },
+    { "type": "url", "uri": "https://developers.openai.com/codex/skills" }
+  ]
+}

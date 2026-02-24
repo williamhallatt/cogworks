@@ -217,6 +217,7 @@ Structure the synthesis logically:
 - Use consistent terminology throughout
 - Add transitions between sections
 - Create connections between ideas
+- Attach rationale to every directive ("Do X because Y") — agents generalize from rationale to handle unstated edge cases, while bare directives are followed literally and brittly
 
 **Deduplication principle:** Each section must contribute unique information. Before finalizing, verify that:
 
@@ -237,6 +238,7 @@ Use a decision-first compact structure. Do not optimize for section count or lin
 - reference.md: 600-1200 words
 - patterns.md: 250-700 words (optional)
 - examples.md: 250-700 words (optional)
+- metadata.json: machine-readable (not counted toward word targets)
 - Total across skill files: <=2500 words
 
 **Snapshot date requirements (unchanged):**
@@ -278,6 +280,40 @@ In reference.md Sources section, include:
 - Source Scope
 - Sources
 
+### reference.md section templates
+
+Use these structures as starting points — adapt headings and depth to the topic.
+
+**Decision Rules entry:**
+```markdown
+### {Rule Name}
+
+**When:** {triggering condition}
+**Do:** {concrete action}
+**Because:** {rationale — why this rule exists}
+```
+
+**Anti-Pattern entry:**
+```markdown
+### Anti-Pattern: {What People Try}
+
+**Problem:** {what goes wrong and why}
+**Instead:** {recommended alternative with rationale}
+```
+
+**Quick Reference entry:**
+```markdown
+| Situation | Action | Rationale |
+|-----------|--------|-----------|
+| {trigger} | {what to do} | {why} |
+```
+
+**Sources entry:**
+```markdown
+N. **{Title}** - {URL}
+   - {scope label}: {1-line description of what this source contributes}
+```
+
 ### Conditional sections
 
 Add these only when they provide unique information not already present:
@@ -294,6 +330,35 @@ Add these only when they provide unique information not already present:
   - `Source IDs map to reference.md#sources.`
 - If a supporting file only reformats reference.md content, merge it into reference.md and remove the file.
 - Keep one canonical location per fact; avoid restating thresholds, rules, or definitions across files.
+
+### metadata.json (required for generated skills)
+
+Machine-readable regeneration manifest — enables re-running cogworks without recalling source URLs/files.
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `slug` | string | Skill directory name (must match containing directory) |
+| `version` | string | Semantic version of this skill generation (`"1.0.0"` for initial) |
+| `snapshot_date` | string | ISO 8601 date when sources were synthesized |
+| `cogworks_version` | string | Version of cogworks that generated this skill |
+| `topic` | string | Human-readable topic name |
+| `sources` | array | Non-empty list of source objects |
+
+**Source object fields:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `type` | yes | `"url"` or `"file"` |
+| `uri` | yes | The URL or `_sources/`-relative path |
+| `original_uri` | no | Original URL for files fetched then saved locally |
+
+**Validation rules:**
+- Must be valid JSON
+- `slug` must match the skill directory name
+- `sources` must be a non-empty array
+- Each source must have `type` and `uri`
 
 ### Source scope taxonomy (required in reference.md)
 
@@ -313,6 +378,7 @@ A high-quality synthesis hits these specific attributes:
 - **Deduplication**: no content restated across files; each file adds unique value
 - **Source discipline**: source IDs are valid and scoped (normative vs contrast)
 - **Structural integrity**: markdown fences and formatting remain valid
+- **Motivated directives**: every "Do X" includes "because Y" — rationale enables generalization beyond stated rules
 
 ## Overriding Principles
 
@@ -347,12 +413,14 @@ Before completing synthesis, verify:
 - [ ] Patterns are actionable
 - [ ] Each pattern generalizes beyond the specific domain (transferable to other topics)
 - [ ] No pattern restates a Core Concept as a procedure
+- [ ] Each directive includes rationale ("Do X because Y")
 
 ### Anti-Pattern Quality
 
 - [ ] Anti-patterns cover meaningful failure modes from sources
 - [ ] Problems clearly explained
 - [ ] Better alternatives provided
+- [ ] Each "why it's problematic" explains the causal mechanism, not just "it's bad"
 
 ### Conflict Handling
 
