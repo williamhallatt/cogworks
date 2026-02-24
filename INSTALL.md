@@ -59,6 +59,16 @@ ls your-project/.claude/skills/cogworks-encode/SKILL.md
 ls your-project/.claude/skills/cogworks-learn/SKILL.md
 ```
 
+## Invoking Skills
+
+After installation, invoke skills using your agent's command prefix:
+
+| Agent | Prefix | Example |
+|-------|--------|---------|
+| Claude Code | `/` | `/cogworks encode ...` |
+| Codex CLI | `$` | `$cogworks encode ...` |
+| Other agents | varies | consult agent documentation |
+
 ## Available Skills
 
 | Skill                       | Purpose                                   | Required |
