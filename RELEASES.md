@@ -82,3 +82,43 @@ Symlinks in `.claude/skills/` must point to `../../skills/<name>`. Verify:
 ```bash
 ls -la .claude/skills/
 ```
+
+## Generating Release Notes Locally
+
+Preview release notes before tagging by running the script directly:
+
+```bash
+bash scripts/generate-release-notes.sh \
+  --tag v3.1.0 \
+  --previous-tag v3.0.0
+```
+
+Write to a file instead of stdout with `--output`:
+
+```bash
+bash scripts/generate-release-notes.sh \
+  --tag v3.1.0 \
+  --previous-tag v3.0.0 \
+  --output /tmp/release-preview.md
+```
+
+For the first release (no previous tag), pass an empty string:
+
+```bash
+bash scripts/generate-release-notes.sh \
+  --tag v1.0.0 \
+  --previous-tag ""
+```
+
+### Commit-type to section mapping
+
+| Commit prefix | Section |
+|---|---|
+| `add/` | New Features |
+| `fix/` | Bug Fixes |
+| `refactor/` | Refactors |
+| `docs/` | Documentation |
+| `chore/`, `release/` | *(omitted)* |
+| anything else | Other Changes |
+
+Sections with no commits are omitted from the output. The **Skills Updated** section appears only when `Docs-Updated:` trailers reference paths under `skills/`.
