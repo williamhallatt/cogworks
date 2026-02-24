@@ -139,6 +139,13 @@ Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.m
    > Information may have changed since then.
    ```
 
+**IMPORTANT:** Add `[Source N]` citations in reference.md to attribute normative claims to their source. Every Decision Rule, Anti-Pattern, and factual claim must include at least one `[Source N]` citation where N matches the numbered entry in the Sources section. The deterministic validation gate requires a minimum of 3 citations across supporting files and will fail the skill if none are found. Example:
+
+```markdown
+**Do:** Keep prompts simple and direct. [Source 1]
+**Instead:** Use the Responses API with `store: true`. [Source 2]
+```
+
 Use these structure requirements by default:
 
 - **SKILL.md** includes: Overview, When to Use This Skill, Quick Decision Cheatsheet, Supporting Docs, Invocation
