@@ -314,13 +314,15 @@ When skills share names across scopes:
 ---
 name: skill-name              # /slash-command name
 description: What and when    # Discovery keywords
+license: none                 # SPDX license identifier
 allowed-tools: Read, Grep     # Tool restrictions
 compatibility:                # Compatible agents
   - claude-code
   - codex
   - github-copilot
 metadata:                     # Custom key-value pairs
-  version: "1.0"
+  author: your-name
+  version: "1.0.0"
 ---
 ```
 

@@ -614,6 +614,54 @@ PYEOF
     fi
 }
 
+# Check 19: License and metadata fields in generated skills
+check_license_and_metadata_fields() {
+    # Only apply to generated skills (those with snapshot date or metadata.json)
+    if ! grep -q "^> \*\*Knowledge snapshot from:\*\*" "$SKILL_FILE" 2>/dev/null && \
+       [[ ! -f "${SKILL_DIR}/metadata.json" ]]; then
+        log_pass "License/metadata fields (not applicable - not a generated skill)"
+        return 0
+    fi
+
+    local frontmatter
+    frontmatter=$(awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found{print}' "$SKILL_FILE")
+
+    # Check for license field
+    if ! echo "$frontmatter" | grep -q "^license:"; then
+        log_warning "Missing frontmatter field: license (generated skills should include SPDX license identifier)"
+    fi
+
+    # Check for metadata block with author and version
+    local has_metadata=false
+    local has_author=false
+    local has_version=false
+
+    if echo "$frontmatter" | grep -q "^metadata:"; then
+        has_metadata=true
+    fi
+
+    if echo "$frontmatter" | grep -qE "^  author:"; then
+        has_author=true
+    fi
+
+    if echo "$frontmatter" | grep -qE "^  version:"; then
+        has_version=true
+    fi
+
+    if ! $has_metadata; then
+        log_warning "Missing frontmatter block: metadata (generated skills should include metadata with author and version)"
+    else
+        if ! $has_author; then
+            log_warning "Missing metadata.author in frontmatter (generated skills should include author)"
+        fi
+        if ! $has_version; then
+            log_warning "Missing metadata.version in frontmatter (generated skills should include version)"
+        fi
+    fi
+
+    log_pass "License/metadata fields check complete"
+}
+
 # Run all checks
 run_all_checks() {
     check_dependencies || true
@@ -646,6 +694,7 @@ run_all_checks() {
     check_model_routing_contract || true
     check_model_frontmatter_for_claude_target || true
     check_metadata_json || true
+    check_license_and_metadata_fields || true
 }
 
 # Generate output
