@@ -18,5 +18,5 @@ if ! command -v npx &>/dev/null; then
 fi
 
 echo "Installing generated skills from $STAGING_DIR/ to detected agents..."
-npx skills add "$STAGING_DIR" -y
+npx skills add "$STAGING_DIR"
 echo "Done. Skills installed to detected agents."

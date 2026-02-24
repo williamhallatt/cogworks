@@ -97,9 +97,7 @@ You approve or decline. If you decline, `cogworks` stops.
 
 **6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing.
 
-**7. Installation** — `cogworks` installs the generated skill to detected agents via `npx skills add`. If `npx` is unavailable, it tells you how to install manually.
-
-**8. Done** — `cogworks` confirms the skill location, which agents received it, and how to invoke it.
+**7. Done** — `cogworks` confirms the skill location and gives you the install command. Run `npx skills add _generated-skills` in your terminal to install to your agents — the CLI walks you through agent selection and installation options interactively.
 
 Your new skill is now available as `/{slug}` — the agent will auto-discover it whenever the topic comes up, or you can invoke it directly.
 
@@ -107,7 +105,7 @@ Your new skill is now available as `/{slug}` — the agent will auto-discover it
 
 The `cogworks` skill orchestrates a full end-to-end workflow, but you can also use the supporting skills directly.
 
-- **The orchestrator** (`/cogworks`) — runs the complete 8-step workflow (source gathering -> synthesis -> review -> skill generation -> validation -> installation). It references both supporting skills.
+- **The orchestrator** (`/cogworks`) — runs the complete 7-step workflow (source gathering -> synthesis -> review -> skill generation -> validation -> install prompt). It references both supporting skills.
 - **The skills** (`/cogworks-encode`, `/cogworks-learn`) — inject domain expertise into your conversation. You then direct the agent in natural language, applying that expertise however you need. They don't run workflows on their own.
 
 ### `/cogworks-encode` — Synthesis expertise

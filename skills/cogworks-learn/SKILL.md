@@ -112,8 +112,12 @@ For generated skills (for example via cogworks), use this baseline profile unles
 
 ## Post-Generation Installation
 
-After all quality gates pass and skill files are written to `{skill_path}`, install to detected agents:
+After all quality gates pass and skill files are written to `{skill_path}`, prompt the user to install to their agents. The `skills` CLI provides an interactive TUI for agent selection, so the user must run it in their terminal:
 
-1. Run `bash skills/cogworks-learn/scripts/install-to-agents.sh` (pass the staging directory as the first argument, e.g. `_generated-skills`)
-2. If the script fails, surface its error output directly — it contains the user's next steps (typically installing Node.js 18+)
-3. This is the final step in the skill generation pipeline
+```
+npx skills add {skill_path_parent}
+```
+
+Alternatively, users can run the bundled script directly: `bash skills/cogworks-learn/scripts/install-to-agents.sh {skill_path_parent}`
+
+Do not run installation automatically — the interactive prompts (agent selection, symlink vs copy, global vs local) require user input.

@@ -188,24 +188,22 @@ Run automated validation on the generated skill:
    - Preserve non-negotiable constraints while tightening text
    - Re-check integrated prompt-quality gates after rewrite
 
-### 7. Install to Agents
-
-After validation passes, install the generated skill to detected agents:
-
-1. Run `bash skills/cogworks-learn/scripts/install-to-agents.sh {skill_path}` (pass the staging directory, not the slug subdirectory — for the default this is `_generated-skills`)
-2. If installation succeeds: display which agents received the skill and how to invoke it (`/{slug}`)
-3. If installation fails (npx unavailable): surface the script's error output — it contains the user's next steps. Note that skill files are ready at `{skill_path}` for manual installation.
-
-### 8. Confirm Success
+### 7. Confirm Success and Prompt Installation
 
 Display:
 
 - Topic name and slug
 - **Skill files**: {skill_path}
-- **Installation**: which agents received the skill, or remediation steps if installation failed
-- How to invoke the new skill (`/{slug}`)
 - Validation results: Layer 1 deterministic status and whether any auto-fixes were applied
 - metadata.json: regeneration manifest written
+
+Then prompt the user to install the generated skill to their agents. The installation is interactive (agent selection, symlink vs copy, global vs local) and must be run by the user in their terminal:
+
+```
+npx skills add {skill_path_parent}
+```
+
+Where `{skill_path_parent}` is the staging directory (e.g. `_generated-skills` for the default, or the custom path's parent). Present this as the next step. Do not run the install command automatically — the `skills` CLI provides an interactive TUI that requires user input to select agents and installation options.
 
 ## Variable Naming Convention
 
@@ -240,4 +238,4 @@ The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` refe
 3. Layer 1 deterministic checks pass (no critical failures)
 4. Prompt-quality rewrite pass completed after Layer 1 validation
 5. `metadata.json` written with valid schema, slug matching directory name, and non-empty sources
-6. Installation attempted; skill installed to detected agents (or clear remediation if npx unavailable)
+6. User prompted with `npx skills add` command to install to their agents
