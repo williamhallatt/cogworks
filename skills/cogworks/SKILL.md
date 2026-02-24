@@ -207,10 +207,10 @@ Display:
 Then prompt the user to install the generated skill to their agents. The installation is interactive (agent selection, symlink vs copy, global vs local) and must be run by the user in their terminal:
 
 ```
-npx skills add {skill_path_parent}
+npx skills add ./{skill_path_parent}
 ```
 
-Where `{skill_path_parent}` is the staging directory (e.g. `_generated-skills` for the default, or the custom path's parent). Present this as the next step. Do not run the install command automatically — the `skills` CLI provides an interactive TUI that requires user input to select agents and installation options.
+Where `{skill_path_parent}` is the staging directory (e.g. `_generated-skills` for the default, or the custom path's parent). The `./` prefix is required so the CLI recognizes it as a local path. Present this as the next step. Do not run the install command automatically — the `skills` CLI provides an interactive TUI that requires user input to select agents and installation options.
 
 ## Variable Naming Convention
 

@@ -97,7 +97,7 @@ You approve or decline. If you decline, `cogworks` stops.
 
 **6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing.
 
-**7. Done** — `cogworks` confirms the skill location and gives you the install command. Run `npx skills add _generated-skills` in your terminal to install to your agents — the CLI walks you through agent selection and installation options interactively.
+**7. Done** — `cogworks` confirms the skill location and gives you the install command. Run `npx skills add ./_generated-skills` in your terminal to install to your agents — the CLI walks you through agent selection and installation options interactively.
 
 Your new skill is now available as `/{slug}` — the agent will auto-discover it whenever the topic comes up, or you can invoke it directly.
 

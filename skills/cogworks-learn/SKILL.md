@@ -115,7 +115,7 @@ For generated skills (for example via cogworks), use this baseline profile unles
 After all quality gates pass and skill files are written to `{skill_path}`, prompt the user to install to their agents. The `skills` CLI provides an interactive TUI for agent selection, so the user must run it in their terminal:
 
 ```
-npx skills add {skill_path_parent}
+npx skills add ./{skill_path_parent}
 ```
 
 Alternatively, users can run the bundled script directly: `bash skills/cogworks-learn/scripts/install-to-agents.sh {skill_path_parent}`
