@@ -1,6 +1,6 @@
 ---
 name: cogworks
-description: "Encodes topic knowledge into invokable skills from URLs and files. Creates directories and files as side effects, so invoke only when the user explicitly types a 'cogworks' command (e.g. 'cogworks encode', 'cogworks learn', 'cogworks automate'). Generic words like 'learn', 'encode', or 'automate' alone do not indicate user intent to create skill files."
+description: "Encodes topic knowledge into invokable skills from URLs and files. Requires cogworks-encode and cogworks-learn as supporting skills. Creates directories and files as side effects, so invoke only when the user explicitly types a 'cogworks' command (e.g. 'cogworks encode', 'cogworks learn', 'cogworks automate'). Generic words like 'learn', 'encode', or 'automate' alone do not indicate user intent to create skill files."
 ---
 
 # Cogworks
@@ -15,6 +15,17 @@ This skill relies on two supporting skills for methodology and quality:
 
 - **cogworks-encode** ([SKILL.md](../cogworks-encode/SKILL.md), [reference.md](../cogworks-encode/reference.md)) - Synthesis methodology: the 8-phase process for transforming multiple sources into coherent knowledge bases
 - **cogworks-learn** ([SKILL.md](../cogworks-learn/SKILL.md), [reference.md](../cogworks-learn/reference.md)) - Skill writing expertise: frontmatter configuration, progressive disclosure, quality gates, and best practices
+
+## Dependency Check
+
+Before executing any workflow step, verify that both supporting skills are accessible:
+1. Check that `cogworks-encode` SKILL.md exists at `../cogworks-encode/SKILL.md`
+2. Check that `cogworks-learn` SKILL.md exists at `../cogworks-learn/SKILL.md`
+
+If either is missing, stop and inform the user:
+> "cogworks requires the cogworks-encode and cogworks-learn skills to function.
+> Install all three with: `npx skills add williamhallatt/cogworks`
+> Or install individually: `npx skills add williamhallatt/cogworks --skill cogworks-encode --skill cogworks-learn`"
 
 ## Workflow
 
