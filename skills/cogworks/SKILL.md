@@ -9,6 +9,12 @@ description: "Encodes topic knowledge into invokable skills from URLs and files.
 
 You combine the analytical rigor of a research scientist with the systems thinking of a software architect. Your job is to absorb complex information from diverse sources, distil it into structured knowledge, and encode that understanding into invokable agent skills that work immediately with no additional context.
 
+## User Guide
+
+If the user asks how cogworks works, what it does, how to get started, or how
+the three skills relate to each other, read and present the relevant sections
+from [README.md](README.md).
+
 ## Supporting Skills
 
 This skill relies on two supporting skills for methodology and quality:
@@ -58,6 +64,16 @@ If not specified:
 
 If any sources fail to load, inform the user and ask whether to continue with available content.
 
+**Detect metadata defaults:**
+
+After collecting sources, detect sensible defaults for skill metadata:
+
+- `{license}` — If a `LICENSE` file exists in the repo root, infer the SPDX identifier (e.g. `MIT`, `Apache-2.0`). Otherwise default to `none`.
+- `{author}` — Read from `git config user.name`. If unavailable, use `none`.
+- `{version}` — Default `1.0.0` for new skills. When overwriting an existing skill, read `version` from the existing `metadata.json` and suggest a patch bump (e.g. `1.0.0` → `1.0.1`).
+
+These values will be confirmed with the user during Step 4.
+
 ### 2. Generate Slug
 
 Create a URL-safe slug from the topic name:
@@ -78,6 +94,8 @@ If `{destination_provided}` is false (user didn't specify a custom destination):
 If `{destination_provided}` is true, use the parsed `{skill_path}` from Step 1.
 
 **In both cases**, check if `{skill_path}` already exists and ask the user to confirm overwriting.
+
+If overwriting and `{skill_path}/metadata.json` exists, read its `version` field and compute a patch bump (increment the last numeric segment). Store the bumped value as `{version}`. This replaces the default `1.0.0`.
 
 ### 3. Synthesize Content
 
@@ -111,8 +129,13 @@ Present the synthesis summary to the user:
 
 - Topic name and source count
 - **Destination**: {skill_path}
+- **License**: {license}
+- **Author**: {author}
+- **Version**: {version}
 - TL;DR section
 - Statistics (concept/pattern/example counts)
+
+The user can override any of the detected metadata values at this point.
 
 Ask user to approve before creating skill files. If they decline, stop execution.
 
@@ -124,6 +147,9 @@ Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.m
 - `{slug}` - the skill name and directory name
 - `{topic_name}` - the topic being encoded
 - `{snapshot_date}` - the date when sources were synthesized (YYYY-MM-DD format)
+- `{license}` - SPDX license identifier confirmed by user
+- `{author}` - author name confirmed by user
+- `{version}` - version string (default `1.0.0` for new skills; patch-bumped on regeneration)
 - The synthesis output - the structured knowledge from Step 3
 
 **IMPORTANT:** Add the snapshot date in two locations:
@@ -148,6 +174,19 @@ Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.m
 
 Use these structure requirements by default:
 
+**SKILL.md frontmatter must include `license` and `metadata` fields:**
+
+```yaml
+---
+name: {slug}
+description: ...
+license: {license}
+metadata:
+  author: {author}
+  version: '{version}'
+---
+```
+
 - **SKILL.md** includes: Overview, When to Use This Skill, Quick Decision Cheatsheet, Supporting Docs, Invocation
 - **reference.md** includes: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
 - **patterns.md/examples.md** (if created) begin with a source-pointer line mapping source IDs to `reference.md#sources`
@@ -158,10 +197,12 @@ Use these structure requirements by default:
 ```json
 {
   "slug": "{slug}",
-  "version": "1.0.0",
+  "version": "{version}",
   "snapshot_date": "{snapshot_date}",
   "cogworks_version": "1.0.0",
   "topic": "{topic_name}",
+  "author": "{author}",
+  "license": "{license}",
   "sources": ["{source_manifest entries}"]
 }
 ```
@@ -221,6 +262,9 @@ Throughout the workflow, use these variables consistently:
 - `{topic_name}` - Human-readable topic name provided by user
 - `{snapshot_date}` - ISO 8601 date (YYYY-MM-DD) when sources were synthesized
 - `{source_manifest}` - List of source provenance objects (type, uri, original_uri) for metadata.json
+- `{license}` - SPDX license identifier (detected from repo LICENSE file or default MIT, confirmed by user)
+- `{author}` - Author name (detected from git config, confirmed by user)
+- `{version}` - Skill version string (default `1.0.0` for new skills; patch-bumped from existing `metadata.json` on regeneration)
 
 The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` references.
 
