@@ -1,6 +1,6 @@
 # Skill Writer - Patterns & Anti-Patterns
 
-Reusable patterns and common pitfalls for writing Claude Code skills.
+Reusable patterns and common pitfalls for writing agent skills.
 
 ---
 
@@ -50,7 +50,7 @@ Deploy to production:
 ### 3. Keyword-Rich Description
 
 **When:** Always
-**Why:** Claude uses description to decide auto-loading from 100+ skills
+**Why:** Agents use description to decide auto-loading from 100+ skills
 **How:**
 
 ```yaml
@@ -61,7 +61,7 @@ Include: action verbs, trigger phrases, use cases
 
 ### 4. Background Knowledge Skill
 
-**When:** Context Claude should know but isn't actionable as command
+**When:** Context the agent should know but isn't actionable as command
 **Why:** `/legacy-system-context` isn't meaningful for users to type
 **How:**
 
@@ -141,7 +141,7 @@ Invoked: `/migrate-component SearchBar React Vue`
 
 **When:** Data exploration, reports, visualizations
 **Why:** Browser-based output exceeds terminal capabilities
-**How:** Bundle Python/Node script in `scripts/`, SKILL.md instructs Claude to run it, script generates and opens HTML
+**How:** Bundle Python/Node script in `scripts/`, SKILL.md instructs the agent to run it, script generates and opens HTML
 
 ### 10. Monorepo Package Skills
 
@@ -162,7 +162,7 @@ packages/
 
 ### 1. Vague Description
 
-**Problem:** "Helps with code" - Claude can't distinguish from other skills
+**Problem:** "Helps with code" - the agent can't distinguish from other skills
 **Why it fails:** No keywords to match user intent
 **Alternative:** "Refactors Python functions to reduce cyclomatic complexity. Use when functions are too complex, have too many branches, or need simplification."
 
@@ -175,7 +175,7 @@ packages/
 ### 3. Auto-Invoke for Side Effects
 
 **Problem:** Deploy skill without `disable-model-invocation`
-**Why it fails:** Claude might deploy because code "looks ready"
+**Why it fails:** The agent might deploy because code "looks ready"
 **Alternative:** Always use `disable-model-invocation: true` for deployments, commits, external API calls
 
 ### 4. Guidelines in Forked Context
@@ -188,7 +188,7 @@ packages/
 
 **Problem:** 20-step checklist for writing a log message
 **Why it fails:** Excessive rigidity for tasks that don't need it
-**Alternative:** Principles-based guidance, let Claude adapt to context
+**Alternative:** Principles-based guidance, let the agent adapt to context
 
 ### 6. Under-Specific Steps for High-Stakes Tasks
 
@@ -200,7 +200,7 @@ packages/
 
 **Problem:** `user-invocable: false` on a deploy skill
 **Why it fails:** Users can't invoke when they need to
-**Alternative:** Use `disable-model-invocation: true` instead to hide from Claude while keeping user access
+**Alternative:** Use `disable-model-invocation: true` instead to hide from the agent while keeping user access
 
 ### 8. Overly Broad Triggering
 
@@ -222,7 +222,7 @@ packages/
 ### 10. Deeply Nested References
 
 **Problem:** SKILL.md → reference.md → details.md — content is two hops from the entrypoint
-**Why it fails:** Claude may only preview nested files with partial reads (`head -100`), missing critical content
+**Why it fails:** Agents may only preview nested files with partial reads, missing critical content
 **Alternative:** All supporting files must be linked directly from SKILL.md (one level deep). If reference.md needs to cite another file, that file must also appear in SKILL.md's file index.
 
 ### 11. Section Quota Chasing
@@ -249,7 +249,7 @@ High-fragility skills should resist rationalization: use commitment language, ex
 
 ### Quality Modifiers by Task Type
 
-Match the intensity of quality modifiers to what the skill asks Claude to do:
+Match the intensity of quality modifiers to what the skill asks the agent to do:
 
 | Task Type      | Quality Modifier Pattern                        | Example                                                                          |
 | -------------- | ----------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -270,7 +270,7 @@ Map source material characteristics to appropriate persuasion intensity in gener
 | **Medium fragility** — best practices, team conventions, quality standards | Moderate         | Moderate Authority (imperative phrasing without ALL CAPS) + Unity ("our codebase")                          |
 | **Low fragility** — reference, conventions, style guides                   | Minimal          | Clarity only — no persuasion techniques. Let the content speak for itself.                                  |
 
-Overusing persuasion in low-fragility skills causes overtriggering on newer models (Opus 4.6+), where Authority language like "No exceptions" can make Claude overly rigid in contexts that genuinely warrant flexibility. See [persuasion-principles.md](persuasion-principles.md) for the full framework.
+Overusing persuasion in low-fragility skills causes overtriggering on newer models, where Authority language like "No exceptions" can make agents overly rigid in contexts that genuinely warrant flexibility. See [persuasion-principles.md](persuasion-principles.md) for the full framework.
 
 ### Generated Skill Format Requirements
 
@@ -312,8 +312,8 @@ description: What this skill does...
 - [ ] reference.md includes Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
 - [ ] `patterns.md` and `examples.md` are optional and created only for unique value
 - [ ] Supporting files begin with `Source IDs map to reference.md#sources.`
-- [ ] Source scope taxonomy present (Claude-native, supporting foundations, cross-model contrast)
-- [ ] Cross-model sources are contrast-only and not sole support for Claude-specific normative claims
+- [ ] Source scope taxonomy present (primary platform, supporting foundations, cross-platform contrast)
+- [ ] Cross-platform sources are contrast-only and not sole support for primary-platform normative claims
 - [ ] Markdown fences are balanced (no broken nested code blocks)
 - [ ] No section quota chasing; content count is driven by source evidence and decision value
 

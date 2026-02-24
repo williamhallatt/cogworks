@@ -1,25 +1,26 @@
 ---
 name: cogworks-learn
-description: Expert knowledge on writing Claude Code skills - SKILL.md files, frontmatter configuration, invocation modes, context management, and best practices. Use when creating skills, designing slash commands, writing SKILL.md files, or optimizing skill discoverability and context efficiency.
+description: Expert knowledge on writing agent skills - SKILL.md files, frontmatter configuration, invocation modes, context management, and best practices. Use when creating skills, designing slash commands, writing SKILL.md files, or optimizing skill discoverability and context efficiency.
 ---
 
 # Skill Writer Expert
 
-When invoked, you operate with specialized knowledge in **writing Claude Code skills**.
+When invoked, you operate with specialized knowledge in **writing agent skills**.
 
-Your goal is to produce skills that score 4+ on every quality dimension: source fidelity, self-sufficiency, completeness, specificity, and no overlap with Claude's built-in knowledge. Every generated skill should be immediately actionable by a user who has never seen the source material.
+Your goal is to produce skills that score 4+ on every quality dimension: source fidelity, self-sufficiency, completeness, specificity, and no overlap with the agent's built-in knowledge. Every generated skill should be immediately actionable by a user who has never seen the source material.
 
-This expertise has been synthesized from 2 authoritative sources:
+This expertise has been synthesized from authoritative sources across the Agent Skills ecosystem:
 
-1. Official Claude Code Skills Documentation
-2. Anthropic Best Practices for Skill Authoring
+1. [Agent Skills Specification](https://agentskills.io/specification)
+2. [Anthropic Skill Authoring Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
+3. [OpenAI Codex Skills](https://developers.openai.com/codex/skills)
 
 ## Knowledge Base Summary
 
 - **Skills are SKILL.md files** with YAML frontmatter (configuration) and markdown content (instructions), living in directory structures that support additional files
-- **Two content types serve different purposes**: Reference skills add knowledge Claude applies continuously; Task skills provide step-by-step workflows for explicit invocation
+- **Two content types serve different purposes**: Reference skills add knowledge the agent applies continuously; Task skills provide step-by-step workflows for explicit invocation
 - **Context window is a public good**: Keep SKILL.md concise (prefer 150-350 words), use progressive disclosure with supporting files loaded on-demand
-- **Description is your discovery contract**: Claude uses this single field to decide when to auto-load from potentially 100+ skills - keyword precision determines triggering
+- **Description is your discovery contract**: Agents use this single field to decide when to auto-load from potentially 100+ skills - keyword precision determines triggering
 - **Match specificity to task fragility**: High-stakes workflows need explicit steps, verification gates, and rationalization resistance; low-stakes guidelines can be principles-based
 - **Generated-skill default**: Optimize for decision utility per token, not section count
 - **Integrated prompt-quality enforcement**: Apply mandatory prompt quality gates and a rewrite pass before finalizing generated skills
@@ -27,21 +28,19 @@ This expertise has been synthesized from 2 authoritative sources:
 ## Core Expertise Areas
 
 1. **Skill Architecture** - Directory-based system with SKILL.md entrypoint and supporting files
-2. **Frontmatter Configuration** - name, description, disable-model-invocation, allowed-tools, context, agent
-3. **Invocation Duality** - Auto-loading (Claude decides) vs manual /slash-command (user decides)
-4. **Scope Hierarchy** - Enterprise > Personal (~/.claude/skills/) > Project (.claude/skills/) > Plugin
+2. **Frontmatter Configuration** - Standard fields: `name`, `description`, `metadata`, `compatibility`, `allowed-tools`
+3. **Invocation Modes** - Auto-loading (agent decides) vs manual /slash-command (user decides)
+4. **Scope Hierarchy** - Enterprise > Personal > Project > Plugin
 5. **Reference vs Task Content** - Guidelines for continuous application vs workflows for explicit execution
 6. **Progressive Disclosure** - SKILL.md as overview, reference.md for depth, loaded on-demand
-7. **Dynamic Context Injection** - Real-time data via `!command` syntax
-8. **Subagent Execution** - Isolated contexts with `context: fork` and agent types
-9. **Argument Interpolation** - $ARGUMENTS, $ARGUMENTS[N], $N placeholders
-10. **Tool Restriction** - allowed-tools for safety boundaries
+7. **Argument Interpolation** - $ARGUMENTS, $ARGUMENTS[N], $N placeholders
+8. **Tool Restriction** - allowed-tools for safety boundaries
 
 ## Quick Decision Framework
 
-**Should Claude auto-invoke this skill?**
+**Should the agent auto-invoke this skill?**
 
-- Yes (default): Knowledge Claude should apply when relevant
+- Yes (default): Knowledge the agent should apply when relevant
 - No (`disable-model-invocation: true`): Side effects, deployments, user-controlled timing
 
 **Should users see this in the / menu?**
@@ -49,17 +48,12 @@ This expertise has been synthesized from 2 authoritative sources:
 - Yes (default): Actionable commands users would invoke
 - No (`user-invocable: false`): Background knowledge, not a meaningful action
 
-**Where should it run?**
-
-- Inline (default): Needs conversation context, applies knowledge to current work
-- Forked (`context: fork`): Isolated task, no conversation history needed
-
 ## Full Knowledge Base
 
 Core knowledge in [reference.md](reference.md):
 
-- **Core Concepts** - 10 detailed definitions with source citations
-- **Concept Map** - 15 explicit relationships between concepts
+- **Core Concepts** - Detailed definitions with source citations
+- **Concept Map** - Explicit relationships between concepts
 - **Deep Dives** - Context budget economy, description as discovery interface, specificity calibration
 - **Quick Reference** - Frontmatter fields, string substitutions, scope locations
 
@@ -68,7 +62,7 @@ Patterns and examples in separate files (loaded on-demand):
 - [patterns.md](patterns.md) - reusable patterns and anti-patterns to avoid
 - [examples.md](examples.md) - practical examples with citations
 - [persuasion-principles.md](persuasion-principles.md) - Persuasion psychology for discipline-enforcing skills
-- [../claude-prompt-engineering/reference.md](../claude-prompt-engineering/reference.md) - canonical Claude prompt-engineering reference used to maintain integrated quality gates
+- [../claude-prompt-engineering/reference.md](../claude-prompt-engineering/reference.md) - canonical prompt-engineering reference used to maintain integrated quality gates
 
 ## Integrated Prompt Quality Gates (Required)
 
@@ -76,7 +70,7 @@ For generated skills, all gates must pass:
 
 1. **Instruction clarity** - normative steps are explicit, actionable, and unambiguous.
 2. **Source-faithful reasoning** - normative guidance is source-backed and contradictions are resolved explicitly.
-3. **Runtime contract correctness** - tools and examples match Claude runtime expectations.
+3. **Runtime contract correctness** - tools and examples match the target agent's runtime expectations.
 4. **Canonical placement** - each rule lives in one canonical location, with no cross-file restatement.
 5. **Token-dense quality** - preserve critical constraints while removing low-value verbosity.
 
@@ -108,10 +102,10 @@ For generated skills (for example via cogworks), use this baseline profile unles
 - **reference.md**: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
 - **patterns.md/examples.md**: optional, only when uniquely valuable
 - **Source scope taxonomy**:
-  - Claude-native (normative)
+  - Primary platform (normative)
   - Supporting foundations (normative when applicable)
-  - Cross-model contrast (non-normative)
+  - Cross-platform contrast (non-normative)
 - **Integrity checks**:
   - source IDs resolve to `reference.md#sources`
   - markdown fences are balanced
-  - cross-model sources do not act as sole support for Claude-specific normative claims
+  - cross-platform sources do not act as sole support for primary-platform normative claims

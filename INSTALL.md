@@ -1,123 +1,82 @@
-# Installing Cogworks Agent & Skills
+# Installing Cogworks Skills
 
-This guide covers Claude and Codex installation plus the unified testing workflow.
+## Quick Install (Recommended)
 
-## Automated Installation (Recommended)
-
-```bash
-tar -xzf cogworks-{version}.tar.gz
-cd cogworks-{version}
-./install.sh
-```
-
-Non-interactive examples:
+Use the [`npx skills`](https://www.npmjs.com/package/skills) CLI to add all cogworks skills with one command:
 
 ```bash
-./install.sh --local
-./install.sh --global
-./install.sh --target codex --local
-./install.sh --target codex --global
-./install.sh --dry-run
+npx skills add williamhallatt/cogworks
 ```
 
-## Both Targets (Claude + Codex)
+This installs all cogworks skills to detected agents using symlinks.
 
-Install Claude and Codex components in a single run:
+## Installation Options
 
 ```bash
-./install.sh --target both --local
-./install.sh --target both --global
+# Install specific skills only (NOTE: standaloe cogworks will not work without cogworks-encode and cogworks-learn!)
+npx skills add williamhallatt/cogworks --skill cogworks-encode --skill cogworks-learn
+
+# Install to specific agents
+npx skills add williamhallatt/cogworks -a claude-code -a codex
+
+# Install globally (across all projects)
+npx skills add williamhallatt/cogworks -g
+
+# Copy files instead of symlinks
+npx skills add williamhallatt/cogworks --copy
+
+# List available skills without installing
+npx skills add williamhallatt/cogworks --list
 ```
 
-## Codex Installation
-
-Codex uses skills under `.agents/skills`:
-
-```bash
-./install.sh --target codex --local
-./install.sh --target codex --global
-./install.sh --codex
-```
+To update, or remove, please see [npx skills documentation](https://www.npmjs.com/package/skills) for available commands:
 
 ## Manual Installation
 
-Copy Claude components:
+Clone the repository and copy skills directly:
 
 ```bash
-cp -r cogworks-{version}/.claude/agents your-project/.claude/
-cp -r cogworks-{version}/.claude/skills/cogworks-* your-project/.claude/skills/
+git clone https://github.com/williamhallatt/cogworks.git
+cp -r cogworks/skills/cogworks your-project/.claude/skills/
+cp -r cogworks/skills/cogworks-encode your-project/.claude/skills/
+cp -r cogworks/skills/cogworks-learn your-project/.claude/skills/
 ```
 
-Copy Codex components:
+The three skills above are the minimum required set. Optional skills:
 
 ```bash
-cp -r cogworks-{version}/.agents/skills/* your-project/.agents/skills/
-```
-
-Testing framework is shared and path-neutral:
-
-```bash
-cp -r cogworks-{version}/tests/framework your-project/tests/
+cp -r cogworks/skills/claude-prompt-engineering your-project/.claude/skills/
+cp -r cogworks/skills/skill-evaluation your-project/.claude/skills/
 ```
 
 ## Verify Installation
 
 ```bash
-ls your-project/.claude/agents/cogworks.md
+ls your-project/.claude/skills/cogworks/SKILL.md
 ls your-project/.claude/skills/cogworks-encode/SKILL.md
 ls your-project/.claude/skills/cogworks-learn/SKILL.md
-ls your-project/tests/framework/scripts/cogworks-eval.py
 ```
 
-## Check for Updates
+## Available Skills
 
-Run from the installed/extracted cogworks root:
-
-```bash
-bash scripts/check-cogworks-updates.sh
-```
-
-The checker compares your local packaged version (`install.sh`) with the latest GitHub release.
+| Skill                       | Purpose                                   | Required |
+| --------------------------- | ----------------------------------------- | -------- |
+| `cogworks`                  | Orchestrator - full encode workflow       | Yes      |
+| `cogworks-encode`           | Synthesis methodology (8-phase process)   | Yes      |
+| `cogworks-learn`            | Skill writing expertise and quality gates | Yes      |
+| `claude-prompt-engineering` | Claude prompt optimisation guidance       | No       |
+| `codex-prompt-engineering`  | Codex prompt optimisation guidance        | No       |
+| `skill-evaluation`          | Skill evaluation methodology              | No       |
 
 ## Test Generated Skills
 
 ```bash
 bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
-bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill --with-behavioral
-```
-
-## Pipeline Benchmark
-
-```bash
-bash scripts/test-cogworks-pipeline.sh --mode offline --run-id 20260220-ab1
-```
-
-Real mode:
-
-```bash
-export COGWORKS_BENCH_CLAUDE_CMD="your-claude-runner --sources '{sources_path}' --out '{out_dir}'"
-export COGWORKS_BENCH_CODEX_CMD="your-codex-runner --sources '{sources_path}' --out '{out_dir}'"
-bash scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1
-```
-
-## Recursive Improvement Round
-
-Canonical runbook: `tests/datasets/recursive-round/README.md`
-
-```bash
-cp tests/datasets/recursive-round/round-manifest.example.json \
-  tests/datasets/recursive-round/round-manifest.local.json
-bash scripts/pin-test-bundle-hash.sh \
-  tests/datasets/recursive-round/round-manifest.local.json
-source scripts/recursive-env.example.sh
-bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
-  --mode fast \
-  --run-id rr-20260220-fast1
+bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill --with-behavioral
 ```
 
 ## Troubleshooting
 
-- Missing `jq` or `PyYAML`: install dependencies then re-run tests.
-- Missing benchmark metrics: ensure pipeline runner writes `<out_dir>/metrics.json`.
-- Missing behavioral traces: scaffold with `python3 tests/framework/scripts/cogworks-eval.py behavioral scaffold --skill <slug>`.
+- **Skills not discovered**: Verify SKILL.md exists in each skill directory and symlinks resolve
+- **Missing dependencies**: `npx skills` requires Node.js 18+
+- **Symlink issues on Windows**: Use `--copy` flag instead

@@ -1,274 +1,84 @@
 # Cogworks Release Process
 
-This document describes how to create and automate releases of the cogworks agent and skills.
-
 ## Release Strategy
 
 Releases use **semantic versioning** with git tags: `v{major}.{minor}.{patch}`
 
-Examples: `v0.1.0`, `v1.0.0`, `v1.2.3`
-
-Git tags are the sole source of truth for version numbers.
+Git tags are the sole source of truth for version numbers. The `skills` CLI installs directly from the repository — no archives to build or upload.
 
 ## Creating a Release
 
-### Step 1: Run pre-release validation (optional but recommended)
-
-Before tagging a release, validate the repository state using the pre-release validation workflow:
-
-**Option A: Automatic on pull request**
-
-- Create a PR with changes to `.claude/`
-- The `.github/workflows/pre-release-validation.yml` workflow runs automatically
-- Review the validation results before merging
-
-**Option B: Manual validation**
+### Step 1: Validate
 
 ```bash
-# Run validation checks locally
-# Verify agent exists
-ls -la .claude/agents/cogworks.md
-
-# Verify all cogworks-* skills exist
-ls -la .claude/skills/cogworks-*/SKILL.md
-```
-
-**What validation checks:**
-
-- `.claude/agents/cogworks.md` exists with valid YAML frontmatter
-- All `cogworks-*` skills have valid SKILL.md files with required fields
-- Codex orchestrator skill exists at `.agents/skills/cogworks/SKILL.md`
-
-### Step 3: Create git tag and push
-
-```bash
-# Create annotated tag with release message
-git tag -a v1.0.0 -m "Release cogworks v1.0.0"
-
-# Push tag to GitHub (triggers release workflow)
-git push origin v1.0.0
-```
-
-### Step 4: Automated workflow
-
-Once the tag is pushed:
-
-1. GitHub Actions automatically triggers the `.github/workflows/release.yml` workflow
-2. Workflow validates:
-   - cogworks agent exists at `.claude/agents/cogworks.md`
-   - All `cogworks-*` skills present in `.claude/skills/`
-   - Each skill has a valid `SKILL.md` with proper frontmatter
-   - Agent declares required dependencies
-3. Workflow creates release artifacts:
-   - `cogworks-{version}.tar.gz` (for Linux/macOS)
-   - `cogworks-{version}.zip` (for Windows)
-4. GitHub Release is automatically created with:
-   - Both archive formats attached
-   - Auto-generated changelog grouped by commit type (`add/`, `fix/`, `refactor/`, etc.)
-   - Release contents summary and link to installation instructions
-
-### Step 5: Verify release
-
-Check that the release was created successfully:
-
-```bash
-# View release details (requires GitHub CLI)
-gh release view v1.0.0
-
-# Verify assets were uploaded
-gh release view v1.0.0 --json assets
-```
-
-Navigate to <https://github.com/williamhallatt/cogworks/releases> to verify in browser.
-
-## What Gets Released
-
-Each release package includes:
-
-```bash
-cogworks-{version}/
-├── .agents/
-│   └── skills/
-│       ├── cogworks/               # Codex orchestrator
-│       │   └── SKILL.md
-│       ├── cogworks-encode/        # Codex synthesis skill
-│       │   └── SKILL.md, reference.md, ...
-│       └── cogworks-learn/         # Codex skill-authoring skill
-│           └── SKILL.md, patterns.md, examples.md, reference.md, ...
-├── .claude/
-│   ├── agents/
-│   │   └── cogworks.md              # Main agent
-│   ├── skills/
-│   │   ├── cogworks-encode/         # Required
-│   │   │   └── SKILL.md, reference.md, ...
-│   │   ├── cogworks-learn/          # Required
-│   │   │   └── SKILL.md, patterns.md, examples.md, reference.md, ...
-├── tests/
-│   └── framework/                   # Shared framework used by testing scripts
-│       ├── graders/
-│       ├── scripts/
-│       └── templates/
-├── README.md                         # Project overview
-├── LICENSE                           # MIT License
-├── INSTALL.md                        # Installation instructions
-├── install.sh                        # Installer
-└── scripts/
-    └── check-cogworks-updates.sh     # Convenience update checker
-```
-
-**Excluded from releases:**
-
-- `.git/` directory
-- `_sources/` (only needed for development)
-- `_plans/` (development planning)
-- Most of `tests/` (release includes `tests/framework/` only for script compatibility)
-- `.github/workflows/` (for maintainers only)
-- `RELEASES.md` (maintainer documentation)
-- `CLAUDE.md` (development guidance)
-
-## Release Validation Checklist
-
-Before tagging a release, verify:
-
-- [ ] All commits for the release are pushed to `main`
-- [ ] `.claude/agents/cogworks.md` exists and is syntactically correct
-- [ ] All `.claude/skills/cogworks-*/` directories have valid SKILL.md files
-- [ ] All `.agents/skills/cogworks*` directories have valid SKILL.md files
-- [ ] SKILL.md files have proper YAML frontmatter with `name:`, `description:` fields
-- [ ] Agent declares dependencies on `cogworks-encode` and `cogworks-learn`
-- [ ] README.md is up to date
-- [ ] Recursive runbook is up to date: `tests/datasets/recursive-round/README.md`
-- [ ] Recursive scripts are present and executable:
-  - `scripts/run-recursive-round.sh`
-  - `scripts/run-recursive-hook.sh`
-  - `scripts/hash-test-bundle.sh`
-  - `scripts/pin-test-bundle-hash.sh`
-  - `scripts/recursive-env.example.sh`
-  - `scripts/recursive-bench-claude.sh`
-  - `scripts/recursive-bench-codex.sh`
-  - `scripts/validate-recursive-docs.sh`
-- [ ] No broken internal links in .md files
-- [ ] `scripts/check-cogworks-updates.sh` is present in generated `.tar.gz` and `.zip` artifacts
-
-## Release Notes (Auto-Generated Changelog)
-
-Release notes are automatically generated from commit messages between tags. The workflow parses the `{type}/ {description}` commit prefix convention and groups changes into categories:
-
-| Commit Prefix | Release Heading |
-| ------------- | --------------- |
-| `add/`        | New Features    |
-| `update/`     | Enhancements    |
-| `fix/`        | Bug Fixes       |
-| `refactor/`   | Refactoring     |
-| `docs/`       | Documentation   |
-| `test/`       | Testing         |
-| (other)       | Other Changes   |
-
-Empty categories are omitted. The release notes also include a "Release Contents" section (built dynamically from the packaged skills) and a full changelog comparison link.
-
-**Writing good commit messages for changelogs:**
-
-- Use the correct prefix — it determines which section the change appears under
-- Write the description as a user-facing summary, e.g. `add/ eval-based skill testing workflow`
-- Keep descriptions concise — they appear as-is in the changelog (first letter auto-capitalised)
-
-## Troubleshooting Release Issues
-
-### Workflow fails: "cogworks agent not found"
-
-**Cause:** `.claude/agents/cogworks.md` doesn't exist or was moved.
-
-**Solution:**
-
-```bash
-# Verify agent location
-ls -la .claude/agents/cogworks.md
-
-# If missing, restore from backup or fix commit
-git log --oneline -- .claude/agents/cogworks.md
-```
-
-### Workflow fails: "SKILL.md not found in cogworks-\*"
-
-**Cause:** A cogworks skill directory exists but lacks SKILL.md file.
-
-**Solution:**
-
-```bash
-# Check which skills are missing SKILL.md
-for skill in .claude/skills/cogworks-*/; do
+# Verify all skills have SKILL.md
+for skill in skills/*/; do
   [ ! -f "$skill/SKILL.md" ] && echo "Missing: $skill/SKILL.md"
 done
 
-# Add SKILL.md to the skill directory and commit before releasing
+# Verify symlinks resolve
+for link in .claude/skills/*; do
+  [ -L "$link" ] && [ ! -e "$link/SKILL.md" ] && echo "Broken: $link"
+done
+
+# Run tests
+bash tests/run-black-box-tests.sh
 ```
 
-### Release created but assets not attached
-
-**Cause:** Workflow encountered an error during archive creation.
-
-**Solution:**
-
-1. Check workflow logs: <https://github.com/williamhallatt/cogworks/actions>
-2. Look for error messages in the "Create release artifact" step
-3. Fix the issue and rerun with a new tag version (can't reuse tags)
-
-### Can't push tag
-
-**Cause:** Tag already exists locally or remotely.
-
-**Solution:**
+### Step 2: Tag and push
 
 ```bash
-# Create a new tag with a different version
-git tag -a v1.0.1 -m "Release cogworks v1.0.1"
-git push origin v1.0.1
-
-# If you need to delete old tag
-git tag -d v1.0.0                  # Delete locally
-git push origin --delete v1.0.0    # Delete remotely (use with caution)
+git tag -a v1.0.0 -m "Release cogworks v1.0.0"
+git push origin v1.0.0
 ```
 
-## Manual Release (if automation fails)
+### Step 3: Automated workflow
 
-If the GitHub Actions workflow fails, you can manually create a release:
+Pushing a tag triggers `.github/workflows/release.yml`, which:
+
+1. Validates all skills have SKILL.md with valid frontmatter
+2. Validates symlinks resolve
+3. Generates a changelog from commits
+4. Creates a GitHub Release with installation instructions
+
+## What Gets Released
+
+The entire `skills/` directory is the release. The `skills` CLI clones the repo and discovers skills automatically. No archives needed.
+
+```
+skills/
+├── cogworks/                    # Orchestrator
+├── cogworks-encode/             # Synthesis methodology
+├── cogworks-learn/              # Skill writing expertise
+├── claude-prompt-engineering/   # Claude prompt guidance
+├── codex-prompt-engineering/    # Codex prompt guidance
+└── skill-evaluation/            # Evaluation methodology
+```
+
+## Release Validation Checklist
+
+- [ ] All commits pushed to `main`
+- [ ] All `skills/*/SKILL.md` files exist with valid frontmatter
+- [ ] `.claude/skills/` symlinks resolve
+- [ ] Tests pass: `bash tests/run-black-box-tests.sh`
+- [ ] README.md and INSTALL.md are up to date
+
+## Troubleshooting
+
+### Workflow fails: "SKILL.md not found"
+
+A skill directory exists but lacks SKILL.md. Check with:
 
 ```bash
-# Create the release directory structure
-ARTIFACT_NAME="cogworks-1.0.0"
-mkdir -p "${ARTIFACT_NAME}/.agents/skills"
-mkdir -p "${ARTIFACT_NAME}/.claude/agents"
-mkdir -p "${ARTIFACT_NAME}/.claude/skills"
-mkdir -p "${ARTIFACT_NAME}/tests/framework"
-mkdir -p "${ARTIFACT_NAME}/scripts"
-
-# Copy agent
-cp ".claude/agents/cogworks.md" "${ARTIFACT_NAME}/.claude/agents/"
-
-# Copy all cogworks-* skills
-cp -r .claude/skills/cogworks-* "${ARTIFACT_NAME}/.claude/skills/"
-cp -r .agents/skills/cogworks* "${ARTIFACT_NAME}/.agents/skills/"
-
-# Copy shared test framework and scripts
-cp -r tests/framework/* "${ARTIFACT_NAME}/tests/framework/"
-cp -r scripts/* "${ARTIFACT_NAME}/scripts/"
-
-# Copy documentation
-cp README.md LICENSE INSTALL.md install.sh "${ARTIFACT_NAME}/"
-
-# Create archives
-tar -czf "${ARTIFACT_NAME}.tar.gz" "${ARTIFACT_NAME}/"
-zip -r "${ARTIFACT_NAME}.zip" "${ARTIFACT_NAME}/"
-
-# Manually upload to: https://github.com/williamhallatt/cogworks/releases
+for skill in skills/*/; do
+  [ ! -f "$skill/SKILL.md" ] && echo "Missing: $skill/SKILL.md"
+done
 ```
 
-## Future Enhancements
+### Broken symlinks
 
-Planned improvements to the release process:
+Symlinks in `.claude/skills/` must point to `../../skills/<name>`. Verify:
 
-- [x] Automated changelog generation from commit messages
-- [ ] Pre-release validation workflow (runs on branch PRs)
-- [ ] Skill quality checks (syntax, link validation, frontmatter validation)
-- [ ] Cross-platform validation (Windows, macOS, Linux)
-- [ ] Integration with skill marketplace/registry
+```bash
+ls -la .claude/skills/
+```

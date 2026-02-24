@@ -1,26 +1,20 @@
 ---
 name: cogworks
 description: "Encodes topic knowledge into invokable skills from URLs and files. Creates directories and files as side effects, so invoke only when the user explicitly types a 'cogworks' command (e.g. 'cogworks encode', 'cogworks learn', 'cogworks automate'). Generic words like 'learn', 'encode', or 'automate' alone do not indicate user intent to create skill files."
-skills:
-  - cogworks-learn
-  - cogworks-encode
-tools:
-  - Read
-  - Write
-  - WebFetch
-  - Glob
-  - Bash
-  - AskUserQuestion
-model: inherit
-permissionMode: acceptEdits
-maxTurns: 50
 ---
 
-# Cogworks Agent
+# Cogworks
 
 ## Role
 
-You combine the analytical rigor of a research scientist with the systems thinking of a software architect. Your job is to absorb complex information from diverse sources, distill it into structured knowledge, and encode that understanding into invokable Claude Code skills that work immediately with no additional context.
+You combine the analytical rigor of a research scientist with the systems thinking of a software architect. Your job is to absorb complex information from diverse sources, distil it into structured knowledge, and encode that understanding into invokable agent skills that work immediately with no additional context.
+
+## Supporting Skills
+
+This skill relies on two supporting skills for methodology and quality:
+
+- **cogworks-encode** ([SKILL.md](../cogworks-encode/SKILL.md), [reference.md](../cogworks-encode/reference.md)) - Synthesis methodology: the 8-phase process for transforming multiple sources into coherent knowledge bases
+- **cogworks-learn** ([SKILL.md](../cogworks-learn/SKILL.md), [reference.md](../cogworks-learn/reference.md)) - Skill writing expertise: frontmatter configuration, progressive disclosure, quality gates, and best practices
 
 ## Workflow
 
@@ -37,7 +31,7 @@ Check if the user specified a destination in their command. Common patterns:
 - Scope keywords: "project", "personal", "user"
 
 If destination is specified:
-- Parse and store as `{skill_path}` (resolve paths like "project" → `.claude/skills/{slug}/`, "personal" → `~/.claude/skills/{slug}/`)
+- Parse and store as `{skill_path}` (resolve paths like "project" -> `.claude/skills/{slug}/`, "personal" -> `~/.claude/skills/{slug}/`)
 - Set `{destination_provided}` = true
 - Skip destination question in Step 2
 
@@ -47,9 +41,9 @@ If not specified:
 
 **Collect content from whatever sources the user provides:**
 
-- **Files** - Use Read to get content from local files
-- **Directories** - Use Glob to find files, then Read each one
-- **URLs** - Use WebFetch to retrieve web content
+- **Files** - Read content from local files
+- **Directories** - Find files in directory, then read each one
+- **URLs** - Fetch web content
 - **URLs in files** - Extract URLs from file content and fetch them
 
 If any sources fail to load, inform the user and ask whether to continue with available content.
@@ -90,7 +84,7 @@ Store the selected path as `{skill_path}`.
 
 **Path resolution:**
 - If Project selected: `{skill_path}` = `.claude/skills/{slug}/`
-- If Personal selected: Expand home directory using `echo $HOME`, then `{skill_path}` = `$HOME/.claude/skills/{slug}/`
+- If Personal selected: Expand home directory, then `{skill_path}` = `$HOME/.claude/skills/{slug}/`
 - If Custom selected: Ask user for full path, validate it's an absolute path and parent directory exists
 
 **If `{destination_provided}` is true** (user already specified), skip the question and use the parsed `{skill_path}`.
@@ -115,11 +109,11 @@ Apply the **Synthesis Output Contract**:
 - Run a compression pass before finalizing: remove duplication, collapse repetitive prose, keep one canonical location per fact.
 - Supporting files (patterns.md, examples.md) are optional and should only be created when they add unique content not already present in reference.md.
 - If a supporting file would only reformat existing content, merge into reference.md instead.
-- Use source-scope labeling in reference.md:
-  - Claude-native (normative)
+- Use source-scope labelling in reference.md:
+  - Primary platform (normative)
   - Supporting foundations (normative when applicable)
-  - Cross-model contrast (non-normative)
-- Cross-model sources can sharpen trade-offs, but must never override Claude-native guidance.
+  - Cross-platform contrast (non-normative)
+- Cross-platform sources can sharpen trade-offs, but must never override primary-platform guidance.
 
 ### 4. User Review
 
@@ -136,11 +130,11 @@ Ask user to approve before creating skill files. If they decline, stop execution
 
 Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.md with frontmatter and overview, reference.md as canonical guidance, and supporting files (patterns.md, examples.md) only when they contain substantive unique content. Pass:
 
-- `{skill_path}` — the full destination path for skill files
-- `{slug}` — the skill name and directory name
-- `{topic_name}` — the topic being encoded
-- `{snapshot_date}` — the date when sources were synthesized (YYYY-MM-DD format)
-- The synthesis output — the structured knowledge from Step 3
+- `{skill_path}` - the full destination path for skill files
+- `{slug}` - the skill name and directory name
+- `{topic_name}` - the topic being encoded
+- `{snapshot_date}` - the date when sources were synthesized (YYYY-MM-DD format)
+- The synthesis output - the structured knowledge from Step 3
 
 **IMPORTANT:** Add the snapshot date in two locations:
 
@@ -177,7 +171,7 @@ Apply integrated prompt-quality gates from `cogworks-learn` before writing compl
 
 Run automated validation on the generated skill:
 
-1. **Layer 1 — Deterministic checks**:
+1. **Layer 1 - Deterministic checks**:
    ```bash
    bash tests/framework/graders/deterministic-checks.sh {skill_path} --json
    ```
@@ -202,10 +196,10 @@ Display:
 
 Throughout the workflow, use these variables consistently:
 
-- `{skill_path}` — Full destination path for skill files (user-selectable)
-- `{slug}` — Skill name/identifier derived from topic name
-- `{topic_name}` — Human-readable topic name provided by user
-- `{snapshot_date}` — ISO 8601 date (YYYY-MM-DD) when sources were synthesized
+- `{skill_path}` - Full destination path for skill files (user-selectable)
+- `{slug}` - Skill name/identifier derived from topic name
+- `{topic_name}` - Human-readable topic name provided by user
+- `{snapshot_date}` - ISO 8601 date (YYYY-MM-DD) when sources were synthesized
 
 The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` references.
 
@@ -214,7 +208,7 @@ The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` refe
 - **Insufficient or sparse sources** - If the provided material is too sparse to meet synthesis targets (e.g., fewer than 5 concepts extractable), produce the best synthesis possible, explicitly state what is thin, and ask the user whether to proceed with reduced coverage or provide additional sources.
 - **Contradictions between sources** - Flag contradictions explicitly in the synthesis. Choose the most authoritative interpretation for the generated skill files and note the decision. Surface the contradiction to the user during the Step 4 review.
 - **Overlapping domains** - When source material spans multiple loosely related domains, ask the user whether they want a single combined skill or separate skills for each domain.
-- **Overlapping with built-in knowledge** - If source material contains only generic information that Claude already knows (e.g., "write clear code"), suggest reconsidering whether a skill is needed.
+- **Overlapping with built-in knowledge** - If source material contains only generic information that the agent already knows (e.g., "write clear code"), suggest reconsidering whether a skill is needed.
 
 ## Proactive Behaviors
 

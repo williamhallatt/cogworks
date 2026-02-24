@@ -4,11 +4,11 @@ A clockwork engine for AI agents: encode knowledge from sources and automate cre
 
 ## What it does
 
-`cogworks` transforms URLs and files into invokable Claude `skills` through systematic synthesis — extracting core concepts, mapping relationships between them, detecting conflicts across sources, and producing structured knowledge you can query and build on.
+`cogworks` transforms URLs and files into invokable agent skills through systematic synthesis — extracting core concepts, mapping relationships between them, detecting conflicts across sources, and producing structured knowledge you can query and build on.
 
 ## How it works
 
-Provide sources (URLs, files, directories) → `cogworks` synthesises them via an 8-phase process (content analysis, concept extraction, relationship mapping, pattern extraction, anti-pattern documentation, conflict detection, example collection, narrative construction) → outputs a multi-file skill package → the skill becomes auto-discoverable and invokable via `/{slug}`.
+Provide sources (URLs, files, directories) -> `cogworks` synthesises them via an 8-phase process (content analysis, concept extraction, relationship mapping, pattern extraction, anti-pattern documentation, conflict detection, example collection, narrative construction) -> outputs a multi-file skill package -> the skill becomes auto-discoverable and invokable via `/{slug}`.
 
 ## How I use it
 
@@ -18,15 +18,15 @@ My typical workflow:
 
 1. **Prepare sources** — I find authoritative content online and save it as markdown to `_sources/<topic>/` (e.g., `_sources/cc-docs/`). Some documentation hubs already publish markdown, which makes this straightforward. You can also pass URLs directly instead of local files.
 
-2. **Encode** — I run the agent with something like:
+2. **Encode** — I run the skill with something like:
 
    ```bash
-   @cogworks encode advanced-prompting from _sources/advanced-prompting/
+   /cogworks encode advanced-prompting from _sources/advanced-prompting/
    ```
 
    This kicks off the full pipeline: source gathering through to skill generation and validation.
 
-3. **Skills used alone** — If I want to, say, only run knowledge synthesis (skipping the full agent workflow), I invoke the encode skill directly:
+3. **Skills used alone** — If I want to, say, only run knowledge synthesis (skipping the full workflow), I invoke the encode skill directly:
 
    ```bash
    /cogworks-encode _sources/my-topic/ and output your synthesis to _sources/my-topic/ as synthesis.md
@@ -36,100 +36,42 @@ My typical workflow:
 
 ## Prerequisites
 
-- **Claude Code** — installed and working ([docs](https://docs.anthropic.com/en/docs/claude-code))
-- **OpenAI Codex (optional)** — use the Codex skill workflow instead of the Claude agent (see below)
+- **An agent that supports skills** — Claude Code, Codex, GitHub Copilot, Cursor, or any agent supporting the [Agent Skills standard](https://agentskills.io)
 - **A project repository** — `cogworks` creates skills in your chosen location (project scope `.claude/skills/`, personal scope `~/.claude/skills/`, or a custom path)
 
 ## Installation
 
-The packaged release includes the `cogworks` agent and its two required supporting skills (`cogworks-encode` and `cogworks-learn`). Testing is provided by repository scripts and the shared framework under `tests/framework/`.
-
-### Quick Install (Recommended)
-
-Download the latest release from [GitHub Releases](https://github.com/williamhallatt/cogworks/releases) and run the installation script:
-
 ```bash
-# Extract and install
-tar -xzf cogworks-{version}.tar.gz
-cd cogworks-{version}
-./install.sh
+npx skills add williamhallatt/cogworks
 ```
 
-The script provides an interactive menu to choose between local (project) or global (personal) installation, handles directory creation, and validates the installation.
-
-For non-interactive installation:
-
-```bash
-# Install to current project
-./install.sh --local
-
-# Install to personal directory
-./install.sh --global
-```
-
-See [INSTALL.md](INSTALL.md) for detailed instructions and manual installation options.
-
-### Check for Updates
-
-From the extracted release directory (or repository root), run:
-
-```bash
-bash scripts/check-cogworks-updates.sh
-```
-
-The script compares your local `install.sh` version with the latest GitHub release tag and reports whether an update is available.
+This installs all cogworks skills to detected agents. See [INSTALL.md](INSTALL.md) for options including specific skills, specific agents, global scope, and manual installation.
 
 ### Manual Installation
 
-Alternatively, copy the `cogworks` agent and its dependencies (`cogworks-encode` and `cogworks-learn`) directly from this repository. All three are required — the agent orchestrates the workflow, and the two skills provide the synthesis and skill-writing.
-
-For OpenAI Codex users, install the Codex skills instead of the Claude agent:
-
-```
-./install.sh --target codex --local
-./install.sh --target codex --global
-# Legacy shorthand (global):
-./install.sh --codex
-```
+Clone the repository and copy the three required skills:
 
 ```bash
-your-project/
-└── .claude/
-    ├── agents/
-    │   └── cogworks.md              # Orchestrating agent
-    ├── skills/
-    │   ├── cogworks-encode/         # Synthesis methodology
-    │   │   ├── SKILL.md
-    │   │   └── reference.md
-    │   ├── cogworks-learn/          # Skill-writing expertise
-    │   │   ├── SKILL.md
-    │   │   ├── reference.md
-    │   │   ├── patterns.md
-    │   │   ├── persuasion-principles.md
-    │   │   └── examples.md
-tests/
-└── framework/                       # Shared testing infrastructure
-    ├── graders/
-    ├── templates/
-    └── scripts/
+git clone https://github.com/williamhallatt/cogworks.git
+cp -r cogworks/skills/cogworks your-project/.claude/skills/
+cp -r cogworks/skills/cogworks-encode your-project/.claude/skills/
+cp -r cogworks/skills/cogworks-learn your-project/.claude/skills/
 ```
 
 ## Quick Start
 
-Start Claude Code in your project directory and run some version of the following command in the chat interface:
+Start your agent in your project directory and invoke:
 
 ```bash
-@cogworks <command> <sources> as <skill_name>
+/cogworks encode <sources> as <skill_name>
 ```
 
-Where `<command>` could be `encode`, `learn`, or `automate`, `<sources>` can be a mix of URLs, local files, directories, and files containing URLs, and `as <skill_name>` is optional (if not provided, `cogworks` generates a slug from the source topic).
-
-> Note: Claude Code doesn't let you prevent sub-agents from firing on their own. The `cogworks` agent prompt tries to soft-block this, but it's not foolproof. If `cogworks` fires when you don't want it to, open an issue so I can tighten the prompt.
+Where `<sources>` can be a mix of URLs, local files, directories, and files containing URLs, and `as <skill_name>` is optional (if not provided, `cogworks` generates a slug from the source topic).
 
 ### Example: encoding knowledge from a URL
 
 ```bash
-@cogworks encode https://example.com/some-guide
+/cogworks encode https://example.com/some-guide
 ```
 
 Here's what happens step by step:
@@ -139,7 +81,7 @@ Here's what happens step by step:
 **2. Slug generation and destination selection** — if not provided, `cogworks` picks a URL-safe slug from the source topic (e.g., `eating-pizza`). You can specify a destination in your command (e.g., "to personal" or "to project"), or `cogworks` will ask where to create the skill (project, personal, or custom path). If the destination already exists, it asks you to confirm overwriting.
 
 **3. Synthesis** — `cogworks` runs the 8-phase synthesis process on the gathered content:
-content analysis → concept extraction → relationship mapping → pattern extraction → anti-pattern documentation → conflict detection → example collection → narrative construction
+content analysis -> concept extraction -> relationship mapping -> pattern extraction -> anti-pattern documentation -> conflict detection -> example collection -> narrative construction
 
 **4. Review** — `cogworks` presents a summary for your review:
 
@@ -152,33 +94,22 @@ You approve or decline. If you decline, `cogworks` stops.
 
 **5. Skill generation** — On approval, `cogworks` writes the skill files to your chosen destination (SKILL.md, reference.md, patterns.md, examples.md).
 
-**6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing. For repeatable post-generation checks, run `bash scripts/test-generated-skill.sh --skill-path <path>` (see `TESTING.md`).
+**6. Validation** — `cogworks` reviews the generated files for source fidelity, self-sufficiency, completeness, specificity, and overlap. It fixes any problems before finishing.
 
 **7. Done** — `cogworks` confirms the skill location and how to invoke it.
 
-Your new skill is now available as `/{slug}` — Claude will auto-discover it whenever the topic comes up, or you can invoke it directly.
+Your new skill is now available as `/{slug}` — the agent will auto-discover it whenever the topic comes up, or you can invoke it directly.
 
-## Using `@cogworks`
+## Using cogworks
 
-The `cogworks` agent orchestrates a full end-to-end workflow, but you can also direct `cogworks-*` skills manually through direct invocation.
+The `cogworks` skill orchestrates a full end-to-end workflow, but you can also use the supporting skills directly.
 
-- **The agent** (`@cogworks`) — runs the complete 7-step workflow (source gathering → synthesis → review → skill generation → validation). It automatically loads both skills.
-- **The skills** (`/cogworks-encode`, `/cogworks-learn`) — inject domain expertise into your conversation. You then direct Claude in natural language, applying that expertise however you need. They don't run workflows on their own.
-
-### The cogworks agent
-
-Invoke by typing a `@cogworks` command in natural language:
-
-```bash
-@cogworks encode <sources> as <skill_name>
-@cogworks automate <description of what to automate> from <sources>
-```
-
-This is what I need and use 99% of the time, but the agent is basically a fancy wrapper for the skills, so if you want to do something more custom or run the synthesis without generating a skill (or create a skill without the need to synthesise any information) you can invoke the skills directly.
+- **The orchestrator** (`/cogworks`) — runs the complete 7-step workflow (source gathering -> synthesis -> review -> skill generation -> validation). It references both supporting skills.
+- **The skills** (`/cogworks-encode`, `/cogworks-learn`) — inject domain expertise into your conversation. You then direct the agent in natural language, applying that expertise however you need. They don't run workflows on their own.
 
 ### `/cogworks-encode` — Synthesis expertise
 
-Loads the 8-phase synthesis methodology into Claude's context:
+Loads the 8-phase synthesis methodology:
 
 1. Content Analysis
 2. Concept Extraction
@@ -200,7 +131,7 @@ Loads the 8-phase synthesis methodology into Claude's context:
 
 ### `/cogworks-learn` — Skill-writing expertise
 
-Loads expertise on writing Claude Code skills — SKILL.md files, frontmatter configuration, invocation modes, context management, and best practices.
+Loads expertise on writing agent skills — SKILL.md files, frontmatter configuration, invocation modes, context management, and best practices.
 
 **When to use independently:** when writing or reviewing skills manually, designing skill architecture, understanding invocation modes, or optimising skill discoverability and context efficiency.
 
@@ -209,7 +140,6 @@ Loads expertise on writing Claude Code skills — SKILL.md files, frontmatter co
 ```bash
 /cogworks-learn I've written a deployment skill. Should it use disable-model-invocation?
 /cogworks-learn Review this SKILL.md frontmatter and suggest improvements.
-/cogworks-learn prompt-optimisation from <reference_doc>
 ```
 
 ### Testing Generated Skills
@@ -218,14 +148,12 @@ Testing is a separate step from encoding. After encoding a skill, run:
 
 ```bash
 bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
-bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill --with-behavioral
+bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill --with-behavioral
 ```
 
 ### Running Recursive Improvement Rounds
 
 Canonical runbook: `tests/datasets/recursive-round/README.md`
-
-Run test-first recursive rounds with frozen tests and concrete hook/benchmark commands:
 
 ```bash
 # 1) Create local manifest and pin frozen test hash
@@ -242,64 +170,7 @@ bash scripts/run-recursive-round.sh \
   --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
   --mode fast \
   --run-id rr-20260220-fast1
-
-# 4) Deep smoke round (plumbing only; non-decision-grade)
-bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
-  --mode deep \
-  --smoke-only \
-  --run-id rr-20260220-deep-smoke1
-
-# 5) Decision-grade deep mode: set real backend commands
-export COGWORKS_RECURSIVE_BENCH_CLAUDE_REAL_CMD="<real claude benchmark command with {sources_path} and {out_dir}>"
-export COGWORKS_RECURSIVE_BENCH_CODEX_REAL_CMD="<real codex benchmark command with {sources_path} and {out_dir}>"
-bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
-  --mode deep \
-  --run-id rr-20260220-deep-real1
 ```
-
-Artifacts:
-
-- `tests/results/meta-loop/{run_id}/round-summary.json`
-- `tests/results/meta-loop/{run_id}/round-report.md`
-- `tests/results/meta-loop/{run_id}/round-report.md`
-
-## OpenAI Codex Usage
-
-Codex does not support Claude sub-agents, so the workflow is provided as a Codex skill instead. Codex discovers skills in `.agents/skills/` under your repo (local scope) or in `~/.agents/skills` (user scope). The packaged release contains these skills in `.agents/skills/` for direct installation.
-
-1. Install Codex skills:
-
-```
-./install.sh --target codex --local
-./install.sh --target codex --global
-# Legacy shorthand (global):
-./install.sh --codex
-```
-
-2. Invoke the Codex skill orchestrator:
-
-```
-cogworks encode <sources> as <skill_name>
-```
-
-3. Or use the skills directly:
-
-- `cogworks-encode`
-- `cogworks-learn`
-- Use `scripts/test-generated-skill.sh` for post-generation checks
-
-### Codex Testing
-
-For Codex users, deterministic checks are the baseline and behavioral tests are optional:
-
-```bash
-bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill
-bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill --with-behavioral
-```
-
-See `tests/framework/README.md` for complete testing documentation.
 
 ## Trunk Commit Docs Attestation
 
@@ -311,14 +182,6 @@ Install the local hook so validation happens before push:
 bash scripts/install-git-hooks.sh
 ```
 
-Hooks are local to each clone. Run the installer in every repository clone you use.
-
-Validate the latest commit manually:
-
-```bash
-bash scripts/validate-docs-attestation.sh --commit HEAD
-```
-
 Required commit trailers:
 
 ```text
@@ -327,34 +190,18 @@ Docs-Updated: <csv-paths>|none
 Docs-Why-None: <required when Docs-Impact is none or required-followup>
 ```
 
-Example (`updated`):
-
-```text
-Docs-Impact: updated
-Docs-Updated: README.md, TESTING.md
-```
-
-Example (`none`):
-
-```text
-Docs-Impact: none
-Docs-Updated: none
-Docs-Why-None: Internal refactor only; no user-facing behavior changed.
-```
-
 ## Limitations
 
 Related to this being a personal workflow tool (see [ROADMAP.md](ROADMAP.md) for planned work):
 
-- **Claude agent is Claude Code-specific** — The `@cogworks` agent relies on Claude Code features (subagent orchestration, Task tool, specific invocation patterns). For Codex, use the Codex skill orchestrator in `.agents/skills/cogworks`, installed via `./install.sh --target codex --local|--global` (or legacy `./install.sh --codex`). Codex discovers skills in `.agents/skills/` (repo) or `~/.agents/skills` (user). **The skills cogworks generates ARE portable** — they follow the universal AgentSkills standard (SKILL.md format with minimal frontmatter) and work across Claude Code, GitHub Copilot, Cursor, and other tools supporting the standard.
-- **Not portable** — `cogworks` assumes Linux (Ubuntu), edit paths throughout agent and associated skills definitions accordingly
+- **Not portable** — `cogworks` assumes Linux (Ubuntu), edit paths throughout skills accordingly
 - **Flexible destination** — encoded skills can be created in project scope (`.claude/skills/`), personal scope (`~/.claude/skills/`), or custom paths
-- **Agent generation not yet implemented** — `cogworks` for generating sub-agents is planned but not available
+- **Universal skills** — skills generated by cogworks follow the [Agent Skills standard](https://agentskills.io) and work across Claude Code, Codex, GitHub Copilot, Cursor, and other compatible agents
 
 Limitations I'm not planning on addressing:
 
 - **No authenticated sources** — WebFetch cannot access anything behind a login
-- **Context window ceiling** — all sources must fit in Claude's context during synthesis
+- **Context window ceiling** — all sources must fit in the agent's context during synthesis
 - **Snapshot knowledge** — synthesis captures sources at a point in time; no automated updates if the source changes
 
 ## License

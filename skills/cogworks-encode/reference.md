@@ -36,7 +36,7 @@ Follow this process systematically:
 
 **Objective:** Understand what each source contains
 
-For each source, build a mental model of what it contributes — its main topics, key concepts, tone and authority level (tutorial, reference, opinion, research), and potential conflicts with other sources.
+For each source, build a mental model of what it contributes - its main topics, key concepts, tone and authority level (tutorial, reference, opinion, research), and potential conflicts with other sources.
 
 **Output:** A clear picture of what each source brings to the synthesis and where sources might disagree.
 
@@ -75,10 +75,10 @@ Identify relationship types:
 ```markdown
 ## Concept Map
 
-- Concept A → depends on → Concept B
-- Concept C → enables → Concept D
-- Plain text format → allows → Version control integration
-- Simple syntax → reduces → Learning curve
+- Concept A -> depends on -> Concept B
+- Concept C -> enables -> Concept D
+- Plain text format -> allows -> Version control integration
+- Simple syntax -> reduces -> Learning curve
 ```
 
 **Critical:** Make relationships explicit, not assumed.
@@ -116,7 +116,7 @@ Good: "When X is true and Y is needed". Avoid: "When relevant" or "In appropriat
 
 **Target:** Include patterns only when transferable approaches are supported by sources
 
-**Uniqueness rule:** Each pattern must describe a _transferable approach_ — something applicable beyond the specific domain being synthesized. If a "pattern" is just a domain procedure already documented in Core Concepts, it belongs there, not in Patterns. Test: could this pattern be applied to a different topic? If not, it's a concept, not a pattern.
+**Uniqueness rule:** Each pattern must describe a _transferable approach_ - something applicable beyond the specific domain being synthesized. If a "pattern" is just a domain procedure already documented in Core Concepts, it belongs there, not in Patterns. Test: could this pattern be applied to a different topic? If not, it's a concept, not a pattern.
 
 ### Phase 5: Anti-Pattern Documentation
 
@@ -212,7 +212,7 @@ Structure the synthesis logically:
 
 **Flow principles:**
 
-- Build progressively (simple → complex)
+- Build progressively (simple -> complex)
 - Reference earlier concepts when building on them
 - Use consistent terminology throughout
 - Add transitions between sections
@@ -297,11 +297,11 @@ Add these only when they provide unique information not already present:
 
 ### Source scope taxonomy (required in reference.md)
 
-- **Claude-native**: normative guidance for Claude/Claude Code
+- **Primary platform**: normative guidance for the target agent platform
 - **Supporting foundations**: normative when applicable (security, PE fundamentals)
-- **Cross-model contrast**: non-normative; contrast-only
+- **Cross-platform contrast**: non-normative; contrast-only
 
-Cross-model sources must never be the sole support for Claude-specific normative claims.
+Cross-platform sources must never be the sole support for primary-platform normative claims.
 
 ## Quality Anchor
 
@@ -316,10 +316,10 @@ A high-quality synthesis hits these specific attributes:
 
 ## Overriding Principles
 
-Generated skills become part of Claude's operational context — fabricated claims will be treated as ground truth during all future invocations, with no mechanism for the user to distinguish fabricated from accurate claims. These principles take precedence over all other guidance in this skill:
+Generated skills become part of an agent's operational context - fabricated claims will be treated as ground truth during all future invocations, with no mechanism for the user to distinguish fabricated from accurate claims. These principles take precedence over all other guidance in this skill:
 
 1. **Never fabricate domain knowledge.** If sources are ambiguous or incomplete, say so explicitly. Do not invent information to fill gaps. Cross-source synthesis (inferring connections between sources) is encouraged; only unsupported invention is prohibited. This rule overrides all others.
-2. **Prefer precision over coverage.** Every line must earn its context budget — a focused, accurate synthesis is better than a broad, shallow one. It is better to document fewer concepts thoroughly than many concepts superficially.
+2. **Prefer precision over coverage.** Every line must earn its context budget - a focused, accurate synthesis is better than a broad, shallow one. It is better to document fewer concepts thoroughly than many concepts superficially.
 
 ## Quality Standards (Self-Check Before Completing)
 
@@ -335,7 +335,7 @@ Before completing synthesis, verify:
 ### Relationship Quality
 
 - [ ] Relationship mapping included only when it clarifies decisions
-- [ ] Relationships are explicit (use arrows: →)
+- [ ] Relationships are explicit (use arrows: ->)
 - [ ] Relationship types are clear (depends on, enables, contrasts, etc.)
 - [ ] Relationships connect concepts meaningfully
 
@@ -367,7 +367,7 @@ Before completing synthesis, verify:
 - [ ] Sources section lists all sources with URLs where available
 - [ ] No inline citations to local file paths (non-portable)
 - [ ] Source IDs in supporting files resolve against reference.md Sources
-- [ ] Cross-model sources are marked as contrast-only when used
+- [ ] Cross-platform sources are marked as contrast-only when used
 
 ### Narrative Quality
 
@@ -379,9 +379,9 @@ Before completing synthesis, verify:
 
 ### Completeness
 
-- [ ] All v2 required sections present
+- [ ] All required sections present
 - [ ] TL;DR captures high-impact insights concisely
-- [ ] Total length aligns with v2 compactness targets (or justified exception)
+- [ ] Total length aligns with compactness targets (or justified exception)
 - [ ] Quick reference is concise and execution-oriented
 - [ ] Conditional sections are included only when uniquely valuable
 - [ ] Sources fully documented with URLs where available
@@ -403,13 +403,13 @@ Before completing synthesis, verify:
 
 - **Find connections** between sources that aren't explicit
 - **Build new understanding** by combining insights
-- **Integrate ideas across sources** — write as a unified voice, not "Source 1 says... Source 2 says..."
-- **Define terms clearly** even if "everyone knows" — write for learners who need complete context
+- **Integrate ideas across sources** - write as a unified voice, not "Source 1 says... Source 2 says..."
+- **Define terms clearly** even if "everyone knows" - write for learners who need complete context
 - **Flag all conflicts** with citations and both perspectives documented
-- **Credit sources** — maintain Sources section with URLs where available; every example references its source
-- **Be specific** — concrete examples over abstractions, patterns with when/why/how
+- **Credit sources** - maintain Sources section with URLs where available; every example references its source
+- **Be specific** - concrete examples over abstractions, patterns with when/why/how
 - **Show relationships** explicitly with arrows and explanations
-- **Verify each section contributes unique information** — if Patterns repeats Core Concepts as procedures, or Examples walks through documented workflows, merge or delete the duplicate
+- **Verify each section contributes unique information** - if Patterns repeats Core Concepts as procedures, or Examples walks through documented workflows, merge or delete the duplicate
 - **Follow the required output format exactly**
 
 ### Common Mistakes
@@ -441,9 +441,9 @@ Markdown can be used for documentation...
 
 ## Concept Map
 
-- Lightweight markup → enables → Human readability
-- Human readability → reduces → Learning curve
-- Simple syntax → allows → Fast writing
+- Lightweight markup -> enables -> Human readability
+- Human readability -> reduces -> Learning curve
+- Simple syntax -> allows -> Fast writing
 
 ## Pattern: README Documentation
 

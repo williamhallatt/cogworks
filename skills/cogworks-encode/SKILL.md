@@ -1,7 +1,6 @@
 ---
 name: cogworks-encode
 description: Use when synthesizing multiple sources into coherent knowledge bases, performing multi-source analysis, or creating topic expertise from URLs and files. Also use when encountering content integration tasks requiring connections across disparate materials.
-user-invocable: true
 ---
 
 # Topic Synthesis Expertise
@@ -20,7 +19,7 @@ Transform disparate source materials into a unified knowledge base that:
 6. Provides practical examples with citations
 7. Creates a coherent narrative flow
 
-**Critical:** The downstream consumer is an LLM that treats skill content as authoritative instructions. True synthesis creates new understanding that Claude cannot derive on its own — connections between sources, resolved contradictions, and actionable patterns with when/why/how context. Apply the Expert Subtraction Principle throughout.
+**Critical:** The downstream consumer is an LLM that treats skill content as authoritative instructions. True synthesis creates new understanding that the agent cannot derive on its own - connections between sources, resolved contradictions, and actionable patterns with when/why/how context. Apply the Expert Subtraction Principle throughout.
 
 ### Overriding Principles
 
@@ -45,12 +44,12 @@ Transform disparate source materials into a unified knowledge base that:
 
 ## Knowledge Base Summary
 
-- **8-phase synthesis process**: Content Analysis → Concept Extraction → Relationship Mapping → Pattern Extraction → Anti-Pattern Documentation → Conflict Detection → Example Collection → Narrative Construction
+- **8-phase synthesis process**: Content Analysis -> Concept Extraction -> Relationship Mapping -> Pattern Extraction -> Anti-Pattern Documentation -> Conflict Detection -> Example Collection -> Narrative Construction
 - **Decision utility over section counts**: include only the sections and entries that improve execution quality
-- **Explicit relationships**: Use arrow notation (→) to show how concepts connect
+- **Explicit relationships**: Use arrow notation (->) to show how concepts connect
 - **Conflict transparency**: Always flag disagreements between sources with both perspectives
 - **Citation requirements**: Every example, pattern, and anti-pattern must cite its source
-- **Source scope discipline**: Cross-model sources are contrast-only and never override Claude-native guidance
+- **Source scope discipline**: Cross-platform sources are contrast-only and never override primary-platform guidance
 
 ## The 8-Phase Process (Summary)
 

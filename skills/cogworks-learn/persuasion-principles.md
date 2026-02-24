@@ -164,7 +164,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 
 Authority language ("YOU MUST", "No exceptions") is effective for high-fragility discipline enforcement — deployment gates, data-destructive operations, and safety-critical workflows where rationalization must be blocked.
 
-However, on Opus 4.6+ models, aggressive emphasis in reference and guidance skills causes overtriggering: Claude applies bright-line rules rigidly in contexts that genuinely warrant flexibility. The result is worse overall compliance because the model either follows the rule when it shouldn't, or internally rationalises ignoring it entirely.
+However, on newer models, aggressive emphasis in reference and guidance skills causes overtriggering: the agent applies bright-line rules rigidly in contexts that genuinely warrant flexibility. The result is worse overall compliance because the agent either follows the rule when it shouldn't, or internally rationalises ignoring it entirely.
 
 **For high-fragility discipline enforcement:**
 
