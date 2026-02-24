@@ -96,3 +96,37 @@ Conditional sections: Core Concepts, Patterns, Practical Examples, Deep Dives (i
 - **Section quota chasing** - Inflating section counts instead of improving decision quality
 
 See **Examples of Good vs Bad Synthesis** in [reference.md](reference.md) for concrete comparisons.
+
+## Self-Verification (Required Before Output)
+
+After completing synthesis, verify your output against this checklist before presenting it:
+
+**Fidelity:**
+- Core concepts from sources are preserved without distortion
+- Key distinctions are explicit, not collapsed into generic guidance
+- Contradictions between sources are flagged and resolved with rationale, not silently merged
+
+**Operational density:**
+- Decision Rules contain operational guidance ("when X, do Y in this context"), not restated source summaries
+- A synthesis that only paraphrases is a summary, not an implementation — the gap between these is the primary quality signal
+
+**Citations:**
+- Every Decision Rule and Anti-Pattern carries a [Source N] citation
+- Minimum 3 citations across the output
+- No fabricated or placeholder citations
+
+**Structure:**
+- Required sections present: TL;DR, Decision Rules, Anti-Patterns, Quick Reference, Sources
+- Optional sections (Core Concepts, Patterns, Examples, Deep Dives) included only when adding unique decision value
+- One canonical location per fact — no section quota inflation
+
+**Truthfulness baseline:**
+- Do not fabricate facts, sources, metrics, or standard details
+- State uncertainty explicitly rather than filling gaps with unsupported inference
+- Keep outputs within the declared scope
+
+**Deterministic validation:**
+If available, run the portable validation script:
+```bash
+bash scripts/validate-synthesis.sh {output_path}
+```

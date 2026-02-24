@@ -614,6 +614,59 @@ PYEOF
     fi
 }
 
+# Check 20: Required section presence in SKILL.md
+check_skill_section_presence() {
+    local required_sections=("When to Use" "Quick Decision|Cheatsheet" "Invocation")
+    local content
+    content=$(cat "$SKILL_FILE")
+    local missing=()
+
+    for section in "${required_sections[@]}"; do
+        local found=false
+        IFS='|' read -ra alts <<< "$section"
+        for alt in "${alts[@]}"; do
+            if echo "$content" | grep -qi "^#\{1,4\} .*${alt}"; then
+                found=true
+                break
+            fi
+        done
+        if ! $found; then
+            missing+=("${alts[0]}")
+        fi
+    done
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        log_warning "SKILL.md missing recommended sections: $(IFS=', '; echo "${missing[*]}")"
+    else
+        log_pass "SKILL.md recommended sections present"
+    fi
+}
+
+# Check 21: Required section presence in reference.md
+check_reference_section_presence() {
+    if [[ ! -f "${SKILL_DIR}/reference.md" ]]; then
+        log_pass "Reference section presence (not applicable - no reference.md)"
+        return 0
+    fi
+
+    local required_sections=("TL;DR" "Decision Rules" "Anti-Patterns" "Quick Reference" "Sources")
+    local content
+    content=$(cat "${SKILL_DIR}/reference.md")
+    local missing=()
+
+    for section in "${required_sections[@]}"; do
+        if ! echo "$content" | grep -qi "^#\{1,4\} .*${section}"; then
+            missing+=("$section")
+        fi
+    done
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        log_warning "reference.md missing recommended sections: $(IFS=', '; echo "${missing[*]}")"
+    else
+        log_pass "reference.md recommended sections present"
+    fi
+}
+
 # Check 19: License and metadata fields in generated skills
 check_license_and_metadata_fields() {
     # Only apply to generated skills (those with snapshot date or metadata.json)
@@ -695,6 +748,8 @@ run_all_checks() {
     check_model_frontmatter_for_claude_target || true
     check_metadata_json || true
     check_license_and_metadata_fields || true
+    check_skill_section_presence || true
+    check_reference_section_presence || true
 }
 
 # Generate output
