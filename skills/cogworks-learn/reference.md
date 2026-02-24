@@ -195,7 +195,20 @@ For generated skills, default to a compact decision-first contract unless source
 - `patterns.md` and `examples.md` are optional
 - Include only if they add unique information not present in `reference.md`
 - Begin each supporting file with: `Source IDs map to reference.md#sources.`
-- `metadata.json`: machine-readable regeneration manifest (slug, version, snapshot_date, sources)
+- `metadata.json`: machine-readable regeneration manifest:
+  ```json
+  {
+    "slug": "{slug}",
+    "version": "{version}",
+    "snapshot_date": "{snapshot_date}",
+    "cogworks_version": "1.0.0",
+    "topic": "{topic_name}",
+    "author": "{author}",
+    "license": "{license}",
+    "sources": ["{source_manifest entries}"]
+  }
+  ```
+  Each `sources` entry: `{ type: "url"|"file", uri: "...", original_uri?: "..." }`.
 
 **Source scope taxonomy**
 - Primary platform (normative)

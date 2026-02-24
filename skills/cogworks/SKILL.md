@@ -64,14 +64,7 @@ If not specified:
 
 If any sources fail to load, inform the user and ask whether to continue with available content.
 
-**Detect metadata defaults:**
-
-After collecting sources, detect sensible defaults for skill metadata:
-
-- `{license}` — If a `LICENSE` file exists in the repo root, infer the SPDX identifier (e.g. `MIT`, `Apache-2.0`). Otherwise default to `none`.
-- `{author}` — Read from `git config user.name`. If unavailable, use `none`.
-- `{version}` — Default `1.0.0` for new skills. When overwriting an existing skill, read `version` from the existing `metadata.json` and suggest a patch bump (e.g. `1.0.0` → `1.0.1`).
-
+Detect metadata defaults following cogworks-learn guidelines (license, author, version).
 These values will be confirmed with the user during Step 4.
 
 ### 2. Generate Slug
@@ -95,7 +88,7 @@ If `{destination_provided}` is true, use the parsed `{skill_path}` from Step 1.
 
 **In both cases**, check if `{skill_path}` already exists and ask the user to confirm overwriting.
 
-If overwriting and `{skill_path}/metadata.json` exists, read its `version` field and compute a patch bump (increment the last numeric segment). Store the bumped value as `{version}`. This replaces the default `1.0.0`.
+If overwriting, detect version bump per cogworks-learn metadata rules.
 
 ### 3. Synthesize Content
 
@@ -152,62 +145,14 @@ Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.m
 - `{version}` - version string (default `1.0.0` for new skills; patch-bumped on regeneration)
 - The synthesis output - the structured knowledge from Step 3
 
-**IMPORTANT:** Add the snapshot date in two locations:
-
-1. **In SKILL.md**: Add `> **Knowledge snapshot from:** {snapshot_date}` immediately after the H1 title
-2. **In reference.md**: Add snapshot metadata at the start of the Sources section:
-   ```markdown
-   ## Sources
-
-   > **Knowledge snapshot date:** {snapshot_date}
-   >
-   > These sources were fetched and synthesized on the date shown above.
-   > Information may have changed since then.
-   ```
-
-**IMPORTANT:** Add `[Source N]` citations in reference.md to attribute normative claims to their source. Every Decision Rule, Anti-Pattern, and factual claim must include at least one `[Source N]` citation where N matches the numbered entry in the Sources section. The deterministic validation gate requires a minimum of 3 citations across supporting files and will fail the skill if none are found. Example:
-
-```markdown
-**Do:** Keep prompts simple and direct. [Source 1]
-**Instead:** Use the Responses API with `store: true`. [Source 2]
-```
+Apply cogworks-learn Generated Skill Profile for frontmatter format, metadata.json schema, snapshot dates, and source citations.
 
 Use these structure requirements by default:
-
-**SKILL.md frontmatter must include `license` and `metadata` fields:**
-
-```yaml
----
-name: {slug}
-description: ...
-license: {license}
-metadata:
-  author: {author}
-  version: '{version}'
----
-```
 
 - **SKILL.md** includes: Overview, When to Use This Skill, Quick Decision Cheatsheet, Supporting Docs, Invocation
 - **reference.md** includes: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
 - **patterns.md/examples.md** (if created) begin with a source-pointer line mapping source IDs to `reference.md#sources`
 - Keep content concise and decision-first. Default total size target is <=2500 words unless source breadth requires more.
-
-**Generate `metadata.json`** in `{skill_path}` as a machine-readable regeneration manifest:
-
-```json
-{
-  "slug": "{slug}",
-  "version": "{version}",
-  "snapshot_date": "{snapshot_date}",
-  "cogworks_version": "1.0.0",
-  "topic": "{topic_name}",
-  "author": "{author}",
-  "license": "{license}",
-  "sources": ["{source_manifest entries}"]
-}
-```
-
-Each entry in `sources` is an object with `type` (`url` or `file`), `uri` (the URL or relative path), and optionally `original_uri` (for files fetched from URLs). See the Synthesis Output Contract in `cogworks-encode` for field definitions.
 
 Pay particular attention to the SKILL.md description field: it must be keyword-rich, start with an action verb, include trigger phrases users would naturally say, list concrete use cases, and be written in third person. This single field determines whether the skill will be discovered and auto-loaded.
 
@@ -262,9 +207,9 @@ Throughout the workflow, use these variables consistently:
 - `{topic_name}` - Human-readable topic name provided by user
 - `{snapshot_date}` - ISO 8601 date (YYYY-MM-DD) when sources were synthesized
 - `{source_manifest}` - List of source provenance objects (type, uri, original_uri) for metadata.json
-- `{license}` - SPDX license identifier (detected from repo LICENSE file or default MIT, confirmed by user)
-- `{author}` - Author name (detected from git config, confirmed by user)
-- `{version}` - Skill version string (default `1.0.0` for new skills; patch-bumped from existing `metadata.json` on regeneration)
+- `{license}` - SPDX license identifier
+- `{author}` - Author name
+- `{version}` - Skill version string
 
 The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` references.
 

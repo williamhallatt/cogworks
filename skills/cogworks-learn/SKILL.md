@@ -98,6 +98,45 @@ Before finalizing any skill:
 
 For generated skills (for example via cogworks), use this baseline profile unless source complexity requires expansion:
 
+**SKILL.md frontmatter must include `license` and `metadata` fields:**
+
+```yaml
+---
+name: {slug}
+description: ...
+license: {license}
+metadata:
+  author: {author}
+  version: '{version}'
+---
+```
+
+**Metadata defaults detection:**
+- `{license}` — infer SPDX from repo root `LICENSE` file; default `none`
+- `{author}` — read from `git config user.name`; default `none`
+- `{version}` — `1.0.0` for new skills; patch-bump from existing `metadata.json` on regeneration
+
+**metadata.json** — generate in skill directory as regeneration manifest:
+```json
+{
+  "slug": "{slug}",
+  "version": "{version}",
+  "snapshot_date": "{snapshot_date}",
+  "cogworks_version": "1.0.0",
+  "topic": "{topic_name}",
+  "author": "{author}",
+  "license": "{license}",
+  "sources": ["{source_manifest entries}"]
+}
+```
+Each `sources` entry: `{ type: "url"|"file", uri: "...", original_uri?: "..." }`.
+
+**Snapshot date** — embed in two locations:
+1. SKILL.md: `> **Knowledge snapshot from:** {snapshot_date}` after H1
+2. reference.md Sources section header with date and staleness note
+
+**Source citations** — every Decision Rule, Anti-Pattern, and factual claim in reference.md must include `[Source N]` citations (minimum 3 across files).
+
 - **SKILL.md**: Overview, When to Use, Quick Decision Cheatsheet, Supporting Docs, Invocation
 - **reference.md**: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
 - **patterns.md/examples.md**: optional, only when uniquely valuable
