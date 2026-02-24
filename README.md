@@ -48,6 +48,8 @@ npx skills add williamhallatt/cogworks
 
 This installs all cogworks skills to detected agents. See [INSTALL.md](INSTALL.md) for options including specific skills, specific agents, global scope, and manual installation.
 
+> **Tip:** A user guide ships with the installed skills. After installation, ask your agent "how does cogworks work?" or see [`skills/cogworks/README.md`](skills/cogworks/README.md) directly.
+
 ### Manual Installation
 
 Clone the repository and copy the three required skills:

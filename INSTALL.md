@@ -8,7 +8,11 @@ Use the [`npx skills`](https://www.npmjs.com/package/skills) CLI to add all cogw
 npx skills add williamhallatt/cogworks
 ```
 
-This installs all cogworks skills to detected agents using symlinks.
+For the full toolchain, select `cogworks`, `cogworks-encode`, and `cogworks-learn` skills. Optional skills can be added as needed.
+
+> NOTE: you can use `cogworks-encode` and `cogworks-learn` independently, but the full `cogworks` skill requires both to function properly.
+
+To update, or remove, please see [npx skills documentation](https://www.npmjs.com/package/skills) for available commands.
 
 ## Installation Options
 
@@ -28,8 +32,6 @@ npx skills add williamhallatt/cogworks --copy
 # List available skills without installing
 npx skills add williamhallatt/cogworks --list
 ```
-
-To update, or remove, please see [npx skills documentation](https://www.npmjs.com/package/skills) for available commands:
 
 ## Manual Installation
 
