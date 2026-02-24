@@ -1,0 +1,16 @@
+{
+  "slug": "skill-evaluation-rubric",
+  "version": "1.0.0",
+  "snapshot_date": "2026-02-24",
+  "cogworks_version": "3.0.1",
+  "topic": "Skill Evaluation Rubric",
+  "author": "William Hallatt",
+  "license": "none",
+  "sources": [
+    {
+      "type": "conversation",
+      "uri": "session://2026-02-24/skill-evaluation-criteria",
+      "description": "Opus 4.6 consolidated assessment criteria for comparing skill implementations, derived from critique of Sonnet 4.6 initial framework"
+    }
+  ]
+}
