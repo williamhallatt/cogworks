@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "claude-prompt-engineering": {
+      "source": "/home/williamh/code/cogworks/skills",
+      "sourceType": "local",
+      "computedHash": "8b932d1559de888e2f00bae1b6c9b23b6f6ad147f108984cdeb8bca0f684df7b"
+    },
+    "codex-prompt-engineering": {
+      "source": "/home/williamh/code/cogworks/skills",
+      "sourceType": "local",
+      "computedHash": "b99a9ba98fbcb2ca191cc2b24fe47524fdf291ee9741adc3c703652529921699"
+    },
+    "cogworks": {
+      "source": "/home/williamh/code/cogworks/skills",
+      "sourceType": "local",
+      "computedHash": "39c792449052cff436ff9c76e5ba572f2c78449feb03e7faa1a340fc805e0e82"
+    },
+    "cogworks-encode": {
+      "source": "/home/williamh/code/cogworks/skills",
+      "sourceType": "local",
+      "computedHash": "80a54cb0391a2178b259eeabd1aaaf3777450e7fd73759ed39c221a1ba7c4e6a"
+    },
+    "cogworks-learn": {
+      "source": "/home/williamh/code/cogworks/skills",
+      "sourceType": "local",
+      "computedHash": "ef8d46876368ec2e2cde8bf71a12af5cd2006427b7b01e57d5fd38ca62e8c93d"
+    },
+    "skill-evaluation": {
+      "source": "/home/williamh/code/cogworks/skills",
+      "sourceType": "local",
+      "computedHash": "b03f158142882b97a6b72f1baa755bc6ee17aa45023c3d09d5a06451dd9d7ef5"
+    }
+  }
+}
