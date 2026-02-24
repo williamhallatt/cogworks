@@ -21,7 +21,11 @@ My typical workflow:
 2. **Encode** — I run the skill with something like:
 
    ```bash
+   # Claude Code
    /cogworks encode advanced-prompting from _sources/advanced-prompting/
+
+   # Codex CLI
+   $cogworks encode advanced-prompting from _sources/advanced-prompting/
    ```
 
    This kicks off the full pipeline: source gathering through to skill generation and validation.
@@ -29,7 +33,11 @@ My typical workflow:
 3. **Skills used alone** — If I want to, say, only run knowledge synthesis (skipping the full workflow), I invoke the encode skill directly:
 
    ```bash
+   # Claude Code
    /cogworks-encode _sources/my-topic/ and output your synthesis to _sources/my-topic/ as synthesis.md
+
+   # Codex CLI
+   $cogworks-encode _sources/my-topic/ and output your synthesis to _sources/my-topic/ as synthesis.md
    ```
 
 (The `_sources/` directory is local-only and excluded from releases.)
@@ -65,8 +73,14 @@ cp -r cogworks/skills/cogworks-learn your-project/.claude/skills/
 
 Start your agent in your project directory and invoke:
 
+> **Note:** The skill prefix is agent-specific. Examples use `/` (Claude Code) and `$` (Codex CLI). Other agents may use a different prefix — consult your agent's documentation.
+
 ```bash
+# Claude Code
 /cogworks encode <sources> as <skill_name>
+
+# Codex CLI
+$cogworks encode <sources> as <skill_name>
 ```
 
 Where `<sources>` can be a mix of URLs, local files, directories, and files containing URLs, and `as <skill_name>` is optional (if not provided, `cogworks` generates a slug from the source topic).
@@ -74,7 +88,11 @@ Where `<sources>` can be a mix of URLs, local files, directories, and files cont
 ### Example: encoding knowledge from a URL
 
 ```bash
+# Claude Code
 /cogworks encode https://example.com/some-guide
+
+# Codex CLI
+$cogworks encode https://example.com/some-guide
 ```
 
 Here's what happens step by step:
@@ -101,7 +119,7 @@ You approve or decline. If you decline, `cogworks` stops.
 
 **7. Done** — `cogworks` confirms the skill location and gives you the install command. Run `npx skills add ./_generated-skills` in your terminal to install to your agents — the CLI walks you through agent selection and installation options interactively.
 
-Your new skill is now available as `/{slug}` — the agent will auto-discover it whenever the topic comes up, or you can invoke it directly.
+Your new skill is now available as `/{slug}` (prefix is agent-specific: `/` in Claude Code, `$` in Codex CLI) — the agent will auto-discover it whenever the topic comes up, or you can invoke it directly.
 
 ## Using cogworks
 
@@ -128,8 +146,13 @@ Loads the 8-phase synthesis methodology:
 **Example invocations:**
 
 ```bash
+# Claude Code
 /cogworks-encode I have three API docs open. Help me synthesise them into a unified reference.
 /cogworks-encode product management best practices from <source_dir> and output results to <output_dir>.
+
+# Codex CLI
+$cogworks-encode I have three API docs open. Help me synthesise them into a unified reference.
+$cogworks-encode product management best practices from <source_dir> and output results to <output_dir>.
 ```
 
 ### `/cogworks-learn` — Skill-writing expertise
@@ -141,8 +164,13 @@ Loads expertise on writing agent skills — SKILL.md files, frontmatter configur
 **Example invocations:**
 
 ```bash
+# Claude Code
 /cogworks-learn I've written a deployment skill. Should it use disable-model-invocation?
 /cogworks-learn Review this SKILL.md frontmatter and suggest improvements.
+
+# Codex CLI
+$cogworks-learn I've written a deployment skill. Should it use disable-model-invocation?
+$cogworks-learn Review this SKILL.md frontmatter and suggest improvements.
 ```
 
 ### Testing Generated Skills
