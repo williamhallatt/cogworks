@@ -75,6 +75,20 @@ bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
 bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill --with-behavioral
 ```
 
+## Installing Generated Skills
+
+When you use `cogworks encode`, generated skills are written to the `_generated-skills/` staging directory. The workflow automatically installs them to detected agents via `npx skills add`.
+
+If automatic installation fails (e.g. Node.js not available), you can install manually:
+
+```bash
+npx skills add ./_generated-skills
+```
+
+**Prerequisites**: Node.js 18+ is required for the `skills` CLI. Install from [nodejs.org](https://nodejs.org/).
+
+For more on the skills CLI, see the [skills package documentation](https://www.npmjs.com/package/skills).
+
 ## Troubleshooting
 
 - **Skills not discovered**: Verify SKILL.md exists in each skill directory and symlinks resolve

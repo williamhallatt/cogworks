@@ -16,6 +16,9 @@ __pycache__/
 *.swo
 *~
 
+# Generated skills staging (installed to agents via npx skills add)
+_generated-skills/
+
 # OS files
 .DS_Store
 Thumbs.db

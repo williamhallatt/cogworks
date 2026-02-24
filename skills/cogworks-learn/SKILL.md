@@ -109,3 +109,11 @@ For generated skills (for example via cogworks), use this baseline profile unles
   - source IDs resolve to `reference.md#sources`
   - markdown fences are balanced
   - cross-platform sources do not act as sole support for primary-platform normative claims
+
+## Post-Generation Installation
+
+After all quality gates pass and skill files are written to `{skill_path}`, install to detected agents:
+
+1. Run `bash skills/cogworks-learn/scripts/install-to-agents.sh` (pass the staging directory as the first argument, e.g. `_generated-skills`)
+2. If the script fails, surface its error output directly — it contains the user's next steps (typically installing Node.js 18+)
+3. This is the final step in the skill generation pipeline

@@ -33,22 +33,21 @@ If either is missing, stop and inform the user:
 
 **Parse destination from user invocation:**
 
-Check if the user specified a destination in their command. Common patterns:
+Check if the user specified a custom destination in their command. Common patterns:
 - "cogworks encode {topic} to {destination}"
 - "cogworks encode {topic} in {destination}"
 - "cogworks encode {topic} at {destination}"
 - "cogworks learn {topic} to {destination}"
-- Explicit paths: ".claude/skills/", "~/.claude/skills/", "/custom/path/"
-- Scope keywords: "project", "personal", "user"
+- Explicit paths: "./custom/path/", "/absolute/path/"
 
-If destination is specified:
-- Parse and store as `{skill_path}` (resolve paths like "project" -> `.claude/skills/{slug}/`, "personal" -> `~/.claude/skills/{slug}/`)
+If a custom destination is specified:
+- Parse and store as `{skill_path}`
 - Set `{destination_provided}` = true
-- Skip destination question in Step 2
+- Skip default staging directory in Step 2
 
 If not specified:
 - Set `{destination_provided}` = false
-- Will ask in Step 2
+- Default `{skill_path}` = `_generated-skills/{slug}/` (set in Step 2 after slug generation)
 
 **Collect content from whatever sources the user provides:**
 
@@ -72,33 +71,11 @@ slug = trim leading/trailing hyphens
 
 **Determine skill destination:**
 
-If `{destination_provided}` is false (user didn't specify destination), ask using AskUserQuestion:
+If `{destination_provided}` is false (user didn't specify a custom destination):
+- Set `{skill_path}` = `_generated-skills/{slug}/`
+- Inform the user: "Skill files will be generated in `_generated-skills/{slug}/`. After generation and validation, the skill will be installed to detected agents via `npx skills add`."
 
-**Question**: "Where would you like to create the '{slug}' skill?"
-
-**Options**:
-- **Project scope (Recommended)** - `.claude/skills/{slug}/`
-  - Shared with your team through version control
-  - Available when working in this project
-  - Best for team workflows and project-specific patterns
-
-- **Personal scope** - `~/.claude/skills/{slug}/`
-  - Private to your user account
-  - Available across all projects
-  - Best for personal workflows and preferences
-
-- **Custom path** - Specify a custom directory
-  - For plugin locations or non-standard deployments
-  - User provides the full destination path
-
-Store the selected path as `{skill_path}`.
-
-**Path resolution:**
-- If Project selected: `{skill_path}` = `.claude/skills/{slug}/`
-- If Personal selected: Expand home directory, then `{skill_path}` = `$HOME/.claude/skills/{slug}/`
-- If Custom selected: Ask user for full path, validate it's an absolute path and parent directory exists
-
-**If `{destination_provided}` is true** (user already specified), skip the question and use the parsed `{skill_path}`.
+If `{destination_provided}` is true, use the parsed `{skill_path}` from Step 1.
 
 **In both cases**, check if `{skill_path}` already exists and ask the user to confirm overwriting.
 
@@ -211,12 +188,21 @@ Run automated validation on the generated skill:
    - Preserve non-negotiable constraints while tightening text
    - Re-check integrated prompt-quality gates after rewrite
 
-### 7. Confirm Success
+### 7. Install to Agents
+
+After validation passes, install the generated skill to detected agents:
+
+1. Run `bash skills/cogworks-learn/scripts/install-to-agents.sh {skill_path}` (pass the staging directory, not the slug subdirectory — for the default this is `_generated-skills`)
+2. If installation succeeds: display which agents received the skill and how to invoke it (`/{slug}`)
+3. If installation fails (npx unavailable): surface the script's error output — it contains the user's next steps. Note that skill files are ready at `{skill_path}` for manual installation.
+
+### 8. Confirm Success
 
 Display:
 
 - Topic name and slug
-- **Skill location**: {skill_path}
+- **Skill files**: {skill_path}
+- **Installation**: which agents received the skill, or remediation steps if installation failed
 - How to invoke the new skill (`/{slug}`)
 - Validation results: Layer 1 deterministic status and whether any auto-fixes were applied
 - metadata.json: regeneration manifest written
@@ -225,7 +211,7 @@ Display:
 
 Throughout the workflow, use these variables consistently:
 
-- `{skill_path}` - Full destination path for skill files (user-selectable)
+- `{skill_path}` - Full destination path for skill files (default: `_generated-skills/{slug}/`, overridable via explicit path in command)
 - `{slug}` - Skill name/identifier derived from topic name
 - `{topic_name}` - Human-readable topic name provided by user
 - `{snapshot_date}` - ISO 8601 date (YYYY-MM-DD) when sources were synthesized
@@ -249,9 +235,9 @@ The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` refe
 
 ## Success Criteria
 
-1. `{skill_path}` directory created (location selected by user)
+1. `{skill_path}` directory created with skill files
 2. Skill files generated following cogworks-learn expertise
 3. Layer 1 deterministic checks pass (no critical failures)
 4. Prompt-quality rewrite pass completed after Layer 1 validation
-5. Topic is invokable via `/{slug}`
-6. `metadata.json` written with valid schema, slug matching directory name, and non-empty sources
+5. `metadata.json` written with valid schema, slug matching directory name, and non-empty sources
+6. Installation attempted; skill installed to detected agents (or clear remediation if npx unavailable)

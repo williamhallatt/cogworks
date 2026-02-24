@@ -45,6 +45,7 @@
   - `tests/framework/` for shared deterministic + behavioral + benchmark tooling.
   - `tests/behavioral/` for behavioral cases and traces.
   - `tests/datasets/` for benchmark manifests and golden/control fixtures.
+- `_generated-skills/` is the neutral staging directory for skills produced by `cogworks encode`, installed to agents via `npx skills add`.
 - `_sources/` and `_plans/` are working materials and research artifacts.
 
 ## Build, Test, and Development Commands
