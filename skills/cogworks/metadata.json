@@ -1,0 +1,11 @@
+{
+  "slug": "cogworks",
+  "version": "3.0.0",
+  "snapshot_date": "2026-02-24",
+  "topic": "Cogworks",
+  "author": "cogworks",
+  "license": "MIT",
+  "sources": [
+    { "type": "url", "uri": "https://github.com/williamhallatt/cogworks" }
+  ]
+}
