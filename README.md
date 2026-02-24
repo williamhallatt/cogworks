@@ -10,6 +10,28 @@ A clockwork engine for AI agents: encode knowledge from sources and automate cre
 
 Provide sources (URLs, files, directories) -> `cogworks` synthesises them via an 8-phase process (content analysis, concept extraction, relationship mapping, pattern extraction, anti-pattern documentation, conflict detection, example collection, narrative construction) -> outputs a multi-file skill package -> the skill becomes auto-discoverable and invokable via `/{slug}`.
 
+## Quality across agents and models
+
+Skill quality varies depending on which agent runs the workflow and which model powers it. The root cause is structural: synthesis and contradiction resolution are reasoning-heavy tasks, and models differ in how reliably they follow abstract quality instructions. A reasoning-tier model on Claude Code may produce noticeably better output than a workhorse-tier model on a different agent, even with identical sources.
+
+**Model capability requirements:**
+
+| Provider | Reasoning tier (recommended for synthesis) | Workhorse tier (format assembly only) |
+|----------|---------------------------------------------|---------------------------------------|
+| Claude | Opus, Sonnet | Haiku |
+| OpenAI | GPT-4o, GPT-4.1, o3 | GPT-3.5, o1-mini |
+| Gemini | 1.5 Pro, 2.0 Flash Thinking | 1.5 Flash |
+
+If your agent is running a workhorse-tier model, expect reduced synthesis depth — the structural output will be correct, but cross-source connections, contradiction resolution, and operational density in decision rules may be thinner.
+
+**Mitigations built into the workflow:**
+
+- Each skill carries an explicit self-verification checklist that the agent must evaluate against its own output before presenting results (embedded in `cogworks-encode` and `cogworks-learn` SKILL.md files)
+- Portable validation scripts (`scripts/validate-synthesis.sh` in cogworks-encode, `scripts/validate-skill.sh` in cogworks-learn) provide mechanical enforcement of section presence, citation counts, and structural integrity — these ship with the skills and require only standard unix tools
+- The orchestrator (`cogworks`) delegates verification to these per-skill gates rather than relying on a single vague "rewrite pass"
+
+These mitigations narrow the gap but do not eliminate it. For best results, use a reasoning-tier model.
+
 ## How I use it
 
 `cogworks` is a personal workflow tool. It does what I need well, but it isn't fully productionised — see [ROADMAP.md](ROADMAP.md) for known limitations and planned work.

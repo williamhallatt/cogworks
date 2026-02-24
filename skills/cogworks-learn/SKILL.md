@@ -98,6 +98,38 @@ Before finalizing any skill:
 8. Is each fact documented in one canonical file location (no restated duplication)?
 9. Did all integrated prompt quality gates pass after rewrite?
 
+## Self-Verification for Generated Skills (Required Before Completion)
+
+After generating skill files, verify against this checklist:
+
+**Structure:**
+- SKILL.md contains: Overview, When to Use, Quick Decision Cheatsheet, Supporting Docs, Invocation
+- reference.md contains: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
+- patterns.md/examples.md present only when contributing unique content not in reference.md
+
+**Frontmatter & metadata:**
+- `name`: lowercase + hyphens only, ≤ 64 chars, matches directory name
+- `description`: starts with action verb, third-person, ≤ 1024 chars, no XML tags, trigger-rich
+- `metadata.json`: valid JSON, slug matches directory, sources array non-empty, snapshot_date is ISO 8601
+
+**Content quality:**
+- SKILL.md ≤ 500 lines; deep doctrine lives in reference files
+- Every Decision Rule and Anti-Pattern in reference.md carries a [Source N] citation (min 3 across files)
+- Decision Rules contain operational guidance ("when X, do Y"), not restated source summaries
+- No doctrinal duplication across files — each fact has one canonical home
+- Markdown fences balanced, YAML frontmatter parseable
+
+**Deterministic validation:**
+If available, run the portable validation script:
+```bash
+bash scripts/validate-skill.sh {skill_path}
+```
+
+**Truthfulness baseline:**
+- Do not fabricate facts, sources, metrics, or standard details
+- State uncertainty explicitly
+- Keep within declared scope
+
 ## Generated Skill Profile (Default)
 
 For generated skills (for example via cogworks), use this baseline profile unless source complexity requires expansion:
