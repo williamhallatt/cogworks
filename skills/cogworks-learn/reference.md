@@ -23,7 +23,6 @@ Agent skills are SKILL.md files that extend agent capabilities through YAML fron
 
 - [patterns.md](patterns.md) - Transferable patterns and anti-patterns
 - [examples.md](examples.md) - Practical usage scenarios
-- [../claude-prompt-engineering/reference.md](../claude-prompt-engineering/reference.md) - Canonical prompt-engineering doctrine
 
 ---
 
