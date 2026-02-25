@@ -92,7 +92,7 @@ my-skill/
 **Standard fields (per agentskills.io):**
 | Field | Purpose |
 |-------|---------|
-| `name` | Display name, becomes /slash-command. Defaults to directory name. |
+| `name` | Display name, becomes /slash-command. Defaults to directory name. The prefix is agent-specific (e.g. `/` in Claude Code, `$` in Codex CLI). |
 | `description` | What skill does and when to use it. Agent uses for auto-loading decisions. |
 | `license` | License identifier (e.g., MIT, Apache-2.0). |
 | `compatibility` | List of compatible agent targets. |
@@ -121,7 +121,7 @@ Anti-patterns:
 - First-person or second-person point-of-view in frontmatter.
 
 ### 3. Invocation Modes
-**Definition:** Skills have two invocation paths: automatic (agent decides based on description match) and manual (user types /skill-name). This duality is controlled by frontmatter.
+**Definition:** Skills have two invocation paths: automatic (agent decides based on description match) and manual (user types the skill command (e.g. `/skill-name` in Claude Code, `$skill-name` in Codex CLI)). This duality is controlled by frontmatter.
 
 **Matrix:**
 | Frontmatter | User can invoke | Agent can invoke | When loaded |

@@ -4,7 +4,7 @@ description: "Encodes topic knowledge into invokable skills from URLs and files.
 license: MIT
 metadata:
   author: cogworks
-  version: v3.0.0
+  version: v3.1.1
 ---
 
 # Cogworks
@@ -36,6 +36,18 @@ If either is missing, stop and inform the user:
 > "cogworks requires the cogworks-encode and cogworks-learn skills to function.
 > Install all three with: `npx skills add williamhallatt/cogworks`
 > Or install individually: `npx skills add williamhallatt/cogworks --skill cogworks-encode --skill cogworks-learn`"
+
+## Model Capability Requirements
+
+Skill generation quality depends on model capability. Synthesis and contradiction resolution require a reasoning-tier model:
+
+| Provider | Reasoning tier (required for synthesis) | Workhorse tier (format assembly only) |
+|----------|----------------------------------------|---------------------------------------|
+| Claude | Opus, Sonnet | Haiku |
+| OpenAI | GPT-4o, GPT-4.1, o3 | GPT-3.5, o1-mini |
+| Gemini | 1.5 Pro, 2.0 Flash Thinking | 1.5 Flash |
+
+If running on a workhorse-tier model, warn the user before starting synthesis that quality may be reduced.
 
 ## Workflow
 
@@ -179,11 +191,11 @@ Run automated validation on the generated skill:
    ```
    If critical failures: fix the issues, then re-run (max 1 retry).
 
-2. **Prompt-quality rewrite pass (required)**:
-   - Rewrite weak or ambiguous normative wording into direct instructions
-   - Remove duplicated doctrine across files
-   - Preserve non-negotiable constraints while tightening text
-   - Re-check integrated prompt-quality gates after rewrite
+2. **Self-verification pass (required)**:
+   - cogworks-encode self-verification: fidelity, operational density, citations, structure (see cogworks-encode SKILL.md)
+   - cogworks-learn self-verification: section presence, frontmatter, content quality, metadata (see cogworks-learn SKILL.md)
+   - If cogworks-learn ships `scripts/validate-skill.sh`, run it as a deterministic check
+   - Fix any failures, then re-verify
 
 ### 7. Confirm Success and Prompt Installation
 
