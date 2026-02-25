@@ -225,24 +225,6 @@ bash scripts/run-recursive-round.sh \
   --run-id rr-20260220-fast1
 ```
 
-## Trunk Commit Docs Attestation
-
-This repository enforces docs-impact attestation on commits pushed to `main`.
-
-Install the local hook so validation happens before push:
-
-```bash
-bash scripts/install-git-hooks.sh
-```
-
-Required commit trailers:
-
-```text
-Docs-Impact: updated|none|required-followup
-Docs-Updated: <csv-paths>|none
-Docs-Why-None: <required when Docs-Impact is none or required-followup>
-```
-
 ## Limitations
 
 Related to this being a personal workflow tool (see [ROADMAP.md](ROADMAP.md) for planned work):

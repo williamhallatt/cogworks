@@ -39,38 +39,6 @@ bash scripts/run-trigger-smoke-tests.sh claude
 bash scripts/run-trigger-smoke-tests.sh codex
 ```
 
-## Docs Attestation Validation
-
-Commits to trunk must include docs attestation trailers in commit messages.
-
-Install local hooks:
-
-```bash
-bash scripts/install-git-hooks.sh
-```
-
-Hooks are local to each clone. Re-run the installer for every clone.
-
-Validate a single commit:
-
-```bash
-bash scripts/validate-docs-attestation.sh --commit HEAD
-```
-
-Validate a commit range:
-
-```bash
-bash scripts/validate-docs-attestation.sh --range <base_sha>..<head_sha>
-```
-
-Trailer contract:
-
-```text
-Docs-Impact: updated|none|required-followup
-Docs-Updated: <csv-paths>|none
-Docs-Why-None: <required when Docs-Impact is none or required-followup>
-```
-
 ## Test Generated Skills
 
 Layer 1 deterministic checks:

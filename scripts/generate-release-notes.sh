@@ -112,39 +112,17 @@ strip_type_prefix() {
 
 # ---------------------------------------------------------------------------
 # extract_body_lines <body>
-# Strips Docs-* trailers and blank lines; returns up to 3 lines
+# Strips blank lines; returns up to 3 lines
 # ---------------------------------------------------------------------------
 
 extract_body_lines() {
   local body="$1"
   local result
   result="$(printf '%s\n' "$body" \
-    | grep -v '^Docs-' \
     | grep -v '^[[:space:]]*$' \
     | head -n 3 \
     || true)"
   printf '%s' "$result"
-}
-
-# ---------------------------------------------------------------------------
-# extract_skills_from_trailers
-# Reads Docs-Updated lines from the full commit range, filters skills/ paths,
-# extracts skill name (second path component), deduplicates
-# ---------------------------------------------------------------------------
-
-extract_skills_from_trailers() {
-  local range
-  range="$(commit_range)"
-  git log --format='%b' "$range" \
-    | grep -E '^Docs-Updated:' \
-    | sed 's/^Docs-Updated:[[:space:]]*//' \
-    | grep -v '^none$' \
-    | tr ',' '\n' \
-    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
-    | grep '^skills/' \
-    | sed 's|^skills/||; s|/.*||' \
-    | sort -u \
-    || true
 }
 
 # ---------------------------------------------------------------------------
@@ -222,18 +200,6 @@ render_notes() {
   render_section "Refactors" "$refactors"
   render_section "Documentation" "$docs_items"
   render_section "Other Changes" "$others"
-
-  # Skills Updated section
-  local skills
-  skills="$(extract_skills_from_trailers)"
-  if [ -n "$skills" ]; then
-    printf '## Skills Updated\n\n'
-    while IFS= read -r skill; do
-      [ -z "$skill" ] && continue
-      printf -- '- %s\n' "$skill"
-    done <<< "$skills"
-    printf '\n'
-  fi
 
   # Installation block
   printf '## Installation\n\n'

@@ -59,8 +59,38 @@ esac
 echo ""
 read -p "Enter release message for $NEW_VERSION: " RELEASE_MSG
 
-# Create the annotated tag (only if not dry-run)
+BARE_VERSION="${NEW_VERSION#v}"
+
+METADATA_FILES=(
+    "skills/cogworks/metadata.json"
+    "skills/cogworks-encode/metadata.json"
+    "skills/cogworks-learn/metadata.json"
+)
+
+SKILL_FILES=(
+    "skills/cogworks/SKILL.md"
+    "skills/cogworks-encode/SKILL.md"
+    "skills/cogworks-learn/SKILL.md"
+)
+
+# Bump skill metadata versions and create a commit, then tag
 if [ "$DRY_RUN" -eq 1 ]; then
+    echo ""
+    echo "DRY RUN: Would execute the following version bump commands:"
+    for f in "${METADATA_FILES[@]}"; do
+        echo "  sed -i 's/\"version\": \"[0-9.]*\"/\"version\": \"$BARE_VERSION\"/' $f"
+    done
+    for f in "${SKILL_FILES[@]}"; do
+        echo "  sed -i \"0,/^---\$/!b; /version: v/s/version: v[0-9.]*/version: $NEW_VERSION/\" $f"
+    done
+    echo ""
+    echo "DRY RUN: Would stage:"
+    for f in "${METADATA_FILES[@]}" "${SKILL_FILES[@]}"; do
+        echo "  git add $f"
+    done
+    echo ""
+    echo "DRY RUN: Would commit:"
+    echo "  git commit -m \"chore/ bump skill metadata to $NEW_VERSION\""
     echo ""
     echo "DRY RUN: Would execute:"
     echo "  git tag -a \"$NEW_VERSION\" -m \"$RELEASE_MSG\""
@@ -72,10 +102,21 @@ if [ "$DRY_RUN" -eq 1 ]; then
     echo "./scripts/create-release-tag.sh"
     echo ""
 else
+    for f in "${METADATA_FILES[@]}"; do
+        sed -i "s/\"version\": \"[0-9.]*\"/\"version\": \"$BARE_VERSION\"/" "$f"
+    done
+    for f in "${SKILL_FILES[@]}"; do
+        sed -i "0,/^---$/!b; /version: v/s/version: v[0-9.]*/version: $NEW_VERSION/" "$f"
+    done
+
+    git add "${METADATA_FILES[@]}" "${SKILL_FILES[@]}"
+    git commit -m "chore/ bump skill metadata to $NEW_VERSION"
+
     git tag -a "$NEW_VERSION" -m "$RELEASE_MSG"
 
     if [ $? -eq 0 ]; then
         echo ""
+        echo "✓ Skill metadata bumped to $NEW_VERSION"
         echo "✓ Tag created: $NEW_VERSION"
     else
         echo "Error creating tag. Exiting."

@@ -121,4 +121,4 @@ bash scripts/generate-release-notes.sh \
 | `chore/`, `release/` | *(omitted)* |
 | anything else | Other Changes |
 
-Sections with no commits are omitted from the output. The **Skills Updated** section appears only when `Docs-Updated:` trailers reference paths under `skills/`.
+Sections with no commits are omitted from the output.
