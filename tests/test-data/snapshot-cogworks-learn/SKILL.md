@@ -2,6 +2,10 @@
 name: cogworks-learn
 description: Expert knowledge on writing Claude Code skills - SKILL.md files, frontmatter configuration, invocation modes, context management, and best practices. Use when creating skills, designing slash commands, writing SKILL.md files, or optimizing skill discoverability and context efficiency.
 snapshot_date: "2026-02-19"
+license: MIT
+metadata:
+  author: cogworks
+  version: "1.0.0"
 ---
 
 # Skill Writer Expert
@@ -81,3 +85,16 @@ Before finalizing any skill:
 5. Does scope match the intended audience?
 6. Does `name` use only lowercase letters, numbers, and hyphens (max 64 chars)?
 7. Is `description` under 1024 characters with no XML tags?
+
+## When to Use
+
+Use this skill when:
+- Creating a new SKILL.md from scratch
+- Designing a slash command for a project or user scope
+- Reviewing whether an existing skill meets quality standards
+- Deciding between reference vs task skill types
+- Optimizing a skill's description for discovery
+
+## Invocation
+
+Invoke explicitly via `/cogworks-learn` for deliberate skill authoring sessions.

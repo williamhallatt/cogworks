@@ -158,7 +158,7 @@ packages/
 
 ---
 
-## Anti-Patterns
+## Pitfalls to Avoid
 
 ### 1. Vague Description
 
