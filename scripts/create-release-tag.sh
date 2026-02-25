@@ -94,8 +94,10 @@ if [ "$DRY_RUN" -eq 1 ]; then
     echo ""
     echo "DRY RUN: Would execute:"
     echo "  git tag -a \"$NEW_VERSION\" -m \"$RELEASE_MSG\""
+    echo "  git push origin main"
+    echo "  git push origin \"$NEW_VERSION\""
     echo ""
-    echo "✓ DRY RUN: Tag would be created: $NEW_VERSION"
+    echo "✓ DRY RUN: Tag would be created and pushed: $NEW_VERSION"
     echo ""
     echo "To actually create this tag, run the script without --dry-run:"
     echo ""
@@ -106,7 +108,7 @@ else
         sed -i "s/\"version\": \"[0-9.]*\"/\"version\": \"$BARE_VERSION\"/" "$f"
     done
     for f in "${SKILL_FILES[@]}"; do
-        sed -i "0,/^---$/!b; /version: v/s/version: v[0-9.]*/version: $NEW_VERSION/" "$f"
+        sed -i "1,/^---$/!b; /version: v/s/version: v[0-9.]*/version: $NEW_VERSION/" "$f"
     done
 
     git add "${METADATA_FILES[@]}" "${SKILL_FILES[@]}"
@@ -122,10 +124,18 @@ else
         echo "Error creating tag. Exiting."
         exit 1
     fi
-fi
 
-echo ""
-echo "To push this tag upstream, run:"
-echo ""
-echo "git push origin $NEW_VERSION"
-echo ""
+    git push origin main
+    git push origin "$NEW_VERSION"
+
+    if [ $? -eq 0 ]; then
+        echo ""
+        echo "✓ Pushed main and tag $NEW_VERSION to origin"
+    else
+        echo "Error pushing to origin. Push manually:"
+        echo ""
+        echo "  git push origin main && git push origin $NEW_VERSION"
+        echo ""
+        exit 1
+    fi
+fi
