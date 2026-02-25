@@ -4,7 +4,7 @@ description: Use when synthesizing multiple sources into coherent knowledge base
 license: MIT
 metadata:
   author: cogworks
-  version: v3.1.5
+  version: v3.2.0
 ---
 
 # Topic Synthesis Expertise
