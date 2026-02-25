@@ -19,6 +19,10 @@ __pycache__/
 # Generated skills staging (installed to agents via npx skills add)
 _generated-skills/
 
+# Agent skill install targets (managed by npx skills add, not tracked in repo)
+.agents/skills/
+.claude/skills/
+
 # OS files
 .DS_Store
 Thumbs.db
