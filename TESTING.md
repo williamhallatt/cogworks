@@ -71,6 +71,14 @@ export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture.sh
 bash scripts/refresh-behavioral-traces.sh --mode all
 ```
 
+To normalize an existing raw trace without running a full capture:
+
+```bash
+bash scripts/capture-behavioral-trace.sh <claude|codex> <case-id> <skill-slug> <raw-trace.json> <out-trace.json>
+```
+
+Sample data for manual testing: `tests/test-data/behavioral-capture/`
+
 For slower environments, run per skill to reduce runtime and context/token burn:
 
 ```bash

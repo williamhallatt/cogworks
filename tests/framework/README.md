@@ -56,6 +56,18 @@ tests/framework/
 
 ## Trace Capture
 
+Normalize a single raw trace file into the behavioral trace contract (when you already have a raw trace):
+
+```bash
+bash scripts/capture-behavioral-trace.sh <claude|codex> <case-id> <skill-slug> <raw-trace.json> <out-trace.json>
+```
+
+Key strict-mode fields:
+- `activation_source` (`skill_tool` required for positive cases in strict provenance mode)
+- `tool_events` (ordered tool timeline for `order_assertions`)
+
+Sample data: `tests/test-data/behavioral-capture/`
+
 Refresh + strict-validate all behavioral traces:
 
 ```bash
