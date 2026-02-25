@@ -44,12 +44,7 @@ cp -r cogworks/skills/cogworks-encode your-project/.claude/skills/
 cp -r cogworks/skills/cogworks-learn your-project/.claude/skills/
 ```
 
-The three skills above are the minimum required set. Optional skills:
-
-```bash
-cp -r cogworks/skills/claude-prompt-engineering your-project/.claude/skills/
-cp -r cogworks/skills/skill-evaluation your-project/.claude/skills/
-```
+The three skills above are the minimum required set.
 
 ## Verify Installation
 
@@ -76,9 +71,6 @@ After installation, invoke skills using your agent's command prefix:
 | `cogworks`                  | Orchestrator - full encode workflow       | Yes      |
 | `cogworks-encode`           | Synthesis methodology (8-phase process)   | Yes      |
 | `cogworks-learn`            | Skill writing expertise and quality gates | Yes      |
-| `claude-prompt-engineering` | Claude prompt optimisation guidance       | No       |
-| `codex-prompt-engineering`  | Codex prompt optimisation guidance        | No       |
-| `skill-evaluation`          | Skill evaluation methodology              | No       |
 
 ## Test Generated Skills
 

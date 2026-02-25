@@ -66,7 +66,6 @@ Patterns and examples in separate files (loaded on-demand):
 - [patterns.md](patterns.md) - reusable patterns and anti-patterns to avoid
 - [examples.md](examples.md) - practical examples with citations
 - [persuasion-principles.md](persuasion-principles.md) - Persuasion psychology for discipline-enforcing skills
-- [../claude-prompt-engineering/reference.md](../claude-prompt-engineering/reference.md) - canonical prompt-engineering reference used to maintain integrated quality gates
 
 ## Integrated Prompt Quality Gates (Required)
 

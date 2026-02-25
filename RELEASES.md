@@ -50,9 +50,6 @@ skills/
 ├── cogworks/                    # Orchestrator
 ├── cogworks-encode/             # Synthesis methodology
 ├── cogworks-learn/              # Skill writing expertise
-├── claude-prompt-engineering/   # Claude prompt guidance
-├── codex-prompt-engineering/    # Codex prompt guidance
-└── skill-evaluation/            # Evaluation methodology
 ```
 
 ## Release Validation Checklist
