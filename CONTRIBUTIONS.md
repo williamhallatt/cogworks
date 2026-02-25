@@ -1,12 +1,61 @@
-# Cogworks Release Process
+# Contributing to cogworks
 
-## Release Strategy
+## Development setup
+
+```bash
+git clone https://github.com/williamhallatt/cogworks.git
+cd cogworks
+```
+
+Requires Node.js 18+. Uses [`npx skills`](https://github.com/vercel-labs/skills) for installation.
+
+To install your local copy for development (run from root):
+
+```bash
+npx skills add ./skills
+```
+
+## Running tests
+
+```bash
+# Framework meta-tests
+bash tests/run-black-box-tests.sh
+
+# Behavioral gates for repo skills
+python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-
+
+# Fast recursive improvement round
+bash scripts/run-recursive-round.sh \
+  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --mode fast
+```
+
+See [TESTING.md](TESTING.md) for the full test runbook, including recursive improvement rounds and generated-skill testing.
+
+## Coding conventions
+
+- Skill directories and slugs use kebab-case (e.g., `cogworks-learn`, `deployment-workflow-benchmark`)
+- Shell scripts use strict mode (`set -euo pipefail`) and descriptive function names (`print_success`, `validate_source_archive`)
+- Commit format: `<type>/ <summary>` (e.g., `add/ ...`, `refactor/ ...`, `docs/ ...`, `chore/ ...`)
+- Keep commits atomic: list each file path explicitly when staging
+
+## Submitting changes
+
+PR checklist:
+
+- [ ] Changes to `skills/**` or `.claude/**` include updated or passing behavioral tests
+- [ ] Shell scripts pass shellcheck
+- [ ] README.md and INSTALL.md updated if user-facing behavior changed
+- [ ] Commit messages follow the `<type>/ <summary>` format
+- [ ] PRs touching `skills/**`, `.claude/**`, `README.md`, `INSTALL.md`, or `LICENSE` pass `.github/workflows/pre-release-validation.yml`
+
+## Releasing
+
+### Release strategy
 
 Releases use **semantic versioning** with git tags: `v{major}.{minor}.{patch}`
 
 Git tags are the sole source of truth for version numbers. The `skills` CLI installs directly from the repository — no archives to build or upload.
-
-## Creating a Release
 
 ### Step 1: Validate
 
@@ -41,7 +90,7 @@ Pushing a tag triggers `.github/workflows/release.yml`, which:
 3. Generates a changelog from commits
 4. Creates a GitHub Release with installation instructions
 
-## What Gets Released
+### What gets released
 
 The entire `skills/` directory is the release. The `skills` CLI clones the repo and discovers skills automatically. No archives needed.
 
@@ -52,7 +101,7 @@ skills/
 ├── cogworks-learn/              # Skill writing expertise
 ```
 
-## Release Validation Checklist
+### Release validation checklist
 
 - [ ] All commits pushed to `main`
 - [ ] All `skills/*/SKILL.md` files exist with valid frontmatter
@@ -60,9 +109,9 @@ skills/
 - [ ] Tests pass: `bash tests/run-black-box-tests.sh`
 - [ ] README.md and INSTALL.md are up to date
 
-## Troubleshooting
+### Troubleshooting
 
-### Workflow fails: "SKILL.md not found"
+**Workflow fails: "SKILL.md not found"**
 
 A skill directory exists but lacks SKILL.md. Check with:
 
@@ -72,7 +121,7 @@ for skill in skills/*/; do
 done
 ```
 
-### Broken symlinks
+**Broken symlinks**
 
 Symlinks in `.claude/skills/` must point to `../../skills/<name>`. Verify:
 
@@ -80,7 +129,7 @@ Symlinks in `.claude/skills/` must point to `../../skills/<name>`. Verify:
 ls -la .claude/skills/
 ```
 
-## Generating Release Notes Locally
+### Generating release notes locally
 
 Preview release notes before tagging by running the script directly:
 
@@ -107,7 +156,7 @@ bash scripts/generate-release-notes.sh \
   --previous-tag ""
 ```
 
-### Commit-type to section mapping
+**Commit-type to section mapping:**
 
 | Commit prefix | Section |
 |---|---|

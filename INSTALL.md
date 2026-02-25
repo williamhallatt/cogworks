@@ -8,16 +8,14 @@ Use the [`npx skills`](https://www.npmjs.com/package/skills) CLI to add all cogw
 npx skills add williamhallatt/cogworks
 ```
 
-For the full toolchain, select `cogworks`, `cogworks-encode`, and `cogworks-learn` skills. Optional skills can be added as needed.
+> NOTE: `cogworks-encode` and `cogworks-learn` can be used independently, but the full `cogworks` skill requires both to function properly.
 
-> NOTE: you can use `cogworks-encode` and `cogworks-learn` independently, but the full `cogworks` skill requires both to function properly.
-
-To update, or remove, please see [npx skills documentation](https://www.npmjs.com/package/skills) for available commands.
+To update or remove, see the [npx skills documentation](https://www.npmjs.com/package/skills).
 
 ## Installation Options
 
 ```bash
-# Install specific skills only (NOTE: standaloe cogworks will not work without cogworks-encode and cogworks-learn!)
+# Install specific skills only
 npx skills add williamhallatt/cogworks --skill cogworks-encode --skill cogworks-learn
 
 # Install to specific agents
@@ -72,29 +70,22 @@ After installation, invoke skills using your agent's command prefix:
 | `cogworks-encode`           | Synthesis methodology (8-phase process)   | Yes      |
 | `cogworks-learn`            | Skill writing expertise and quality gates | Yes      |
 
-## Test Generated Skills
-
-```bash
-bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
-bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill --with-behavioral
-```
-
 ## Installing Generated Skills
 
 When you use `cogworks encode`, generated skills are written to the `_generated-skills/` staging directory. The workflow automatically installs them to detected agents via `npx skills add`.
 
-If automatic installation fails (e.g. Node.js not available), you can install manually:
+If automatic installation fails (e.g. Node.js not available), install manually:
 
 ```bash
 npx skills add ./_generated-skills
 ```
 
-**Prerequisites**: Node.js 18+ is required for the `skills` CLI. Install from [nodejs.org](https://nodejs.org/).
-
-For more on the skills CLI, see the [skills package documentation](https://www.npmjs.com/package/skills).
+Node.js 18+ is required for the `skills` CLI. Install from [nodejs.org](https://nodejs.org/).
 
 ## Troubleshooting
 
 - **Skills not discovered**: Verify SKILL.md exists in each skill directory and symlinks resolve
 - **Missing dependencies**: `npx skills` requires Node.js 18+
 - **Symlink issues on Windows**: Use `--copy` flag instead
+
+For testing generated skills, see [TESTING.md](TESTING.md).
