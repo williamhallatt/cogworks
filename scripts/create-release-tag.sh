@@ -81,7 +81,7 @@ if [ "$DRY_RUN" -eq 1 ]; then
         echo "  sed -i 's/\"version\": \"[0-9.]*\"/\"version\": \"$BARE_VERSION\"/' $f"
     done
     for f in "${SKILL_FILES[@]}"; do
-        echo "  sed -i \"0,/^---\$/!b; /version: v/s/version: v[0-9.]*/version: $NEW_VERSION/\" $f"
+        echo "  sed -i \"1,/^---\$/!b; /version: v/s/version: v[0-9.]*/version: $NEW_VERSION/\" $f"
     done
     echo ""
     echo "DRY RUN: Would stage:"
