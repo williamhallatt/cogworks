@@ -110,6 +110,8 @@ Good: "When X is true and Y is needed". Avoid: "When relevant" or "In appropriat
 
 **Why it works:** {Rationale and benefits}
 
+**Boundary conditions:** {When does this pattern NOT apply? What assumption does it make that, if false, would make it wrong or counterproductive?}
+
 **Example from Source {N}:**
 {Code, diagram, or concrete demonstration}
 ```
@@ -322,6 +324,7 @@ Add these only when they provide unique information not already present:
 - Patterns
 - Practical Examples
 - Deep Dives
+- Tacit Knowledge Boundary (include when the domain relies heavily on expert judgment that documents cannot fully capture; briefly identify where synthesis has a ceiling so skill consumers know where to verify rather than trust)
 
 ### Supporting-file rules
 
@@ -379,6 +382,7 @@ A high-quality synthesis hits these specific attributes:
 - **Source discipline**: source IDs are valid and scoped (normative vs contrast)
 - **Structural integrity**: markdown fences and formatting remain valid
 - **Motivated directives**: every "Do X" includes "because Y" — rationale enables generalization beyond stated rules
+- **Boundary articulation**: patterns document not only when they apply but when they don't — this is where expert judgment lives and where brittle skills fail
 
 ## Overriding Principles
 
@@ -414,6 +418,7 @@ Before completing synthesis, verify:
 - [ ] Each pattern generalizes beyond the specific domain (transferable to other topics)
 - [ ] No pattern restates a Core Concept as a procedure
 - [ ] Each directive includes rationale ("Do X because Y")
+- [ ] Each pattern identifies its boundary conditions (when it does NOT apply and why)
 
 ### Anti-Pattern Quality
 
