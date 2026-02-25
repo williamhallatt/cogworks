@@ -4,7 +4,7 @@ description: "Encodes topic knowledge into invokable skills from URLs and files.
 license: MIT
 metadata:
   author: cogworks
-  version: v3.1.5
+  version: v3.2.0
 ---
 
 # Cogworks
