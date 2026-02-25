@@ -60,8 +60,8 @@ export COGWORKS_RECURSIVE_BENCH_CODEX_REAL_CMD="<real codex benchmark command th
 2. Keep benchmark env vars pointed at concrete wrappers:
 
 ```bash
-export COGWORKS_BENCH_CLAUDE_CMD="bash scripts/recursive-bench-claude.sh '{sources_path}' '{out_dir}'"
-export COGWORKS_BENCH_CODEX_CMD="bash scripts/recursive-bench-codex.sh '{sources_path}' '{out_dir}'"
+export COGWORKS_BENCH_CLAUDE_CMD="bash scripts/recursive-bench.sh claude '{sources_path}' '{out_dir}'"
+export COGWORKS_BENCH_CODEX_CMD="bash scripts/recursive-bench.sh codex '{sources_path}' '{out_dir}'"
 ```
 
 3. Run deep mode (no `--smoke-only`):

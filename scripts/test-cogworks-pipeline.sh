@@ -140,8 +140,8 @@ python3 "$CLI" pipeline-benchmark run \
   "${VARIANT_ARGS[@]}" \
   "${FORCE_ARGS[@]}" \
   "${RUN_ARGS[@]}" \
-  --command-template "claude::$ROOT_DIR/scripts/run-claude-benchmark.sh '{sources_path}' '{out_dir}'" \
-  --command-template "codex::$ROOT_DIR/scripts/run-codex-benchmark.sh '{sources_path}' '{out_dir}'"
+  --command-template "claude::$ROOT_DIR/scripts/run-benchmark.sh claude '{sources_path}' '{out_dir}'" \
+  --command-template "codex::$ROOT_DIR/scripts/run-benchmark.sh codex '{sources_path}' '{out_dir}'"
 
 if [[ "$DRY_RUN" -eq 1 ]]; then
   echo "Dry-run complete. Skipping summarize by design."
