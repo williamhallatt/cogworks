@@ -4,9 +4,8 @@
 
 - [README.md](README.md) - Project overview and quick start
 - [TESTING.md](TESTING.md) - Testing guidelines and framework
-- [RELEASES.md](RELEASES.md) - Release process and troubleshooting
+- [CONTRIBUTIONS.md](CONTRIBUTIONS.md) - Development setup, conventions, and release process
 - [INSTALL.md](INSTALL.md) - End-user installation instructions
-- [ROADMAP.md](ROADMAP.md) - Future feature planning
 
 ## Collaboration Principles
 
