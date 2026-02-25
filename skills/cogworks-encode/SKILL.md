@@ -4,7 +4,7 @@ description: Use when synthesizing multiple sources into coherent knowledge base
 license: MIT
 metadata:
   author: cogworks
-  version: v3.1.4
+  version: v3.1.5
 ---
 
 # Topic Synthesis Expertise
@@ -60,7 +60,7 @@ Transform disparate source materials into a unified knowledge base that:
 1. **Content Analysis** - Map what each source contributes
 2. **Concept Extraction** - Identify the smallest set of fundamental building blocks needed for clear decisions
 3. **Relationship Mapping** - Show dependencies, hierarchies, contrasts
-4. **Pattern Extraction** - Document reusable approaches (when/why/how)
+4. **Pattern Extraction** - Document reusable approaches (when/why/how/boundary conditions)
 5. **Anti-Pattern Documentation** - What to avoid and why
 6. **Conflict Detection** - Flag and contextualize disagreements
 7. **Example Collection** - Concrete demonstrations with citations
@@ -92,6 +92,7 @@ Conditional sections: Core Concepts, Patterns, Practical Examples, Deep Dives (i
 - **Missing citations** - Every pattern/example needs a source reference
 - **Hidden conflicts** - Silently picking one source over another without flagging disagreement
 - **Abstract patterns** - Patterns without when/why/how aren't actionable
+- **Missing boundary conditions** - Patterns that only say when to apply, never when not to, create brittle skills that apply rules where they don't belong
 - **Assuming knowledge** - Definitions must stand alone, not assume reader context
 - **Section quota chasing** - Inflating section counts instead of improving decision quality
 

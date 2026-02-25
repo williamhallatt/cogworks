@@ -4,7 +4,7 @@ description: "Encodes topic knowledge into invokable skills from URLs and files.
 license: MIT
 metadata:
   author: cogworks
-  version: v3.1.4
+  version: v3.1.5
 ---
 
 # Cogworks
@@ -132,6 +132,25 @@ Apply the **Synthesis Output Contract**:
   - Cross-platform contrast (non-normative)
 - Cross-platform sources can sharpen trade-offs, but must never override primary-platform guidance.
 
+### 3.5. Extract Decision Skeleton
+
+Before presenting the synthesis for user review, extract the **Decision Skeleton** — the minimal decision tree a skill consumer needs to make correct choices in this domain.
+
+For each of the 5-7 most important decisions the synthesis reveals:
+
+| Field | Content |
+|-------|---------|
+| **Trigger** | When does this decision arise? What situation calls it up? |
+| **Options** | What are the plausible choices at this decision point? |
+| **Right call** | What does the synthesis say to do, and in what context? |
+| **Failure mode** | What goes wrong if you choose incorrectly? |
+
+The Decision Skeleton serves two purposes:
+1. It is the organizing backbone of the skill — Step 5 builds the skill around the Decision Skeleton, not around the synthesis structure
+2. It maps directly to the output structure: Decision Skeleton entries → `Decision Rules` in reference.md; the highest-priority entries → `Quick Decision Cheatsheet` in SKILL.md
+
+**Why this step matters:** Synthesis is organized around knowledge structure (what is known about the domain). Skills must be organized around decision structure (what choices the consumer needs to make correctly). The Decision Skeleton is the transformation between these two forms.
+
 ### 4. User Review
 
 Present the synthesis summary to the user:
@@ -160,13 +179,14 @@ Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.m
 - `{author}` - author name confirmed by user
 - `{version}` - version string (default `1.0.0` for new skills; patch-bumped on regeneration)
 - The synthesis output - the structured knowledge from Step 3
+- The Decision Skeleton - the ordered decision tree from Step 3.5 (use this as the organizing backbone of the skill)
 
 Apply cogworks-learn Generated Skill Profile for frontmatter format, metadata.json schema, snapshot dates, and source citations.
 
 Use these structure requirements by default:
 
-- **SKILL.md** includes: Overview, When to Use This Skill, Quick Decision Cheatsheet, Supporting Docs, Invocation
-- **reference.md** includes: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
+- **SKILL.md** includes: Overview, When to Use This Skill, Quick Decision Cheatsheet, Supporting Docs, Invocation — *Quick Decision Cheatsheet entries come directly from the top Decision Skeleton items*
+- **reference.md** includes: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources — *Decision Rules entries map 1:1 from the Decision Skeleton*
 - **patterns.md/examples.md** (if created) begin with a source-pointer line mapping source IDs to `reference.md#sources`
 - Keep content concise and decision-first. Default total size target is <=2500 words unless source breadth requires more.
 
@@ -196,6 +216,9 @@ Run automated validation on the generated skill:
    - cogworks-learn self-verification: section presence, frontmatter, content quality, metadata (see cogworks-learn SKILL.md)
    - If cogworks-learn ships `scripts/validate-skill.sh`, run it as a deterministic check
    - Fix any failures, then re-verify
+
+3. **Generalization probe (recommended for judgment-heavy domains)**:
+   Generate 3-5 novel scenarios not explicitly covered in the source material — edge cases or combinations the sources didn't address directly. Apply the generated skill to each. If responses are brittle (example-recall rather than principled application of the Decision Skeleton), revise the relevant Decision Rules to express the underlying principle more clearly. Note: not required for reference or specification skills where the domain is fully explicit.
 
 ### 7. Confirm Success and Prompt Installation
 
