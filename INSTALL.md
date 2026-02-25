@@ -70,6 +70,13 @@ After installation, invoke skills using your agent's command prefix:
 | `cogworks-encode`           | Synthesis methodology (8-phase process)   | Yes      |
 | `cogworks-learn`            | Skill writing expertise and quality gates | Yes      |
 
+## Test Generated Skills
+
+```bash
+bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
+bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill --with-behavioral
+```
+
 ## Installing Generated Skills
 
 When you use `cogworks encode`, generated skills are written to the `_generated-skills/` staging directory. The workflow automatically installs them to detected agents via `npx skills add`.
