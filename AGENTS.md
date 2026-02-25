@@ -10,6 +10,7 @@
 ## Collaboration Principles
 
 - **Save ACCEPTED Plans** - whenever a plan is *accepted*, save it in [_plans/](./_plans/) with a descriptive name and date. This creates a living archive of strategic thinking and decision-making.
+- **Archive plans on close** - when a plan is accepted and its work completed, extract its core decision into `_plans/DECISIONS.md`, move the plan to `_plans/archive/`, and update the `audited_through` date. These three steps are atomic — archiving without extracting is not a close.
 
 ## The Expert Subtraction Principle
 
@@ -32,7 +33,7 @@
 - **Require reproducible evals for quality claims** - claims like "more robust", "cheaper", or "higher quality" must be backed by benchmark runs and saved artifacts, not single samples.
 - **Standardize benchmark artifacts** - keep machine-readable summaries and human-readable reports for comparisons (for example `benchmark-summary.json` and `benchmark-report.md`).
 - **Report done vs outstanding** - after implementing an accepted plan, explicitly list what was completed and what remains.
-- **Treat `_plans/` as historical context, not authority** - derive implementation decisions from current repo artifacts and accepted in-thread decisions, not prior plan files.
+- **`DECISIONS.md` is the agent context surface for `_plans/`** — load `_plans/DECISIONS.md` for settled decisions; check `_plans/*.md` (root only) for active in-flight plans; treat `_plans/archive/` as human-readable history only.
 - **Enforce prompt-engineering quality through `cogworks-learn`** - keep `*-prompt-engineering` skills as canonical references, and apply their doctrine via integrated gates in `cogworks-learn` during generation.
 - **Use one canonical recursive runbook** - for recursive TDD rounds, treat `tests/datasets/recursive-round/README.md` as the source of truth for commands and artifact expectations.
 
