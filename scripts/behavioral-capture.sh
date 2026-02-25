@@ -3,12 +3,13 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF' >&2
-Usage: scripts/behavioral-capture-claude.sh <skill_slug> <case_id> <case_json_path> <raw_trace_path>
+Usage: scripts/behavioral-capture.sh <claude|codex> <skill_slug> <case_id> <case_json_path> <raw_trace_path>
 
-Required environment:
-  COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD
+Required environment (pipeline-specific):
+  COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD  (when pipeline=claude)
+  COGWORKS_BEHAVIORAL_CODEX_REAL_CMD   (when pipeline=codex)
 
-Template placeholders supported in COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD:
+Template placeholders supported in the env var:
   {skill_slug} {case_id} {case_json_path} {raw_trace_path}
 EOF
 }
@@ -56,20 +57,32 @@ for key, expected_type in required.items():
 PY
 }
 
-if [[ $# -ne 4 ]]; then
+if [[ $# -ne 5 ]]; then
   usage
   exit 2
 fi
 
-skill_slug="$1"
-case_id="$2"
-case_json_path="$3"
-raw_trace_path="$4"
+pipeline="$1"
+skill_slug="$2"
+case_id="$3"
+case_json_path="$4"
+raw_trace_path="$5"
 
-template="${COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD:-}"
+if [[ "$pipeline" == "claude" ]]; then
+  template="${COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD:-}"
+  env_var="COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD"
+elif [[ "$pipeline" == "codex" ]]; then
+  template="${COGWORKS_BEHAVIORAL_CODEX_REAL_CMD:-}"
+  env_var="COGWORKS_BEHAVIORAL_CODEX_REAL_CMD"
+else
+  echo "Pipeline must be 'claude' or 'codex', got: $pipeline" >&2
+  usage
+  exit 2
+fi
+
 if [[ -z "$template" ]]; then
-  echo "COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD is required." >&2
-  echo "Example: export COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD=\"my-claude-capture --skill '{skill_slug}' --case '{case_id}' --case-json '{case_json_path}' --out '{raw_trace_path}'\"" >&2
+  echo "$env_var is required." >&2
+  echo "Example: export $env_var=\"my-capture --skill '{skill_slug}' --case '{case_id}' --case-json '{case_json_path}' --out '{raw_trace_path}'\"" >&2
   exit 2
 fi
 

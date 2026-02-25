@@ -2,8 +2,8 @@
 # shellcheck disable=SC2034
 
 # Benchmark command contracts consumed by scripts/test-cogworks-pipeline.sh
-export COGWORKS_BENCH_CLAUDE_CMD="bash scripts/recursive-bench-claude.sh '{sources_path}' '{out_dir}'"
-export COGWORKS_BENCH_CODEX_CMD="bash scripts/recursive-bench-codex.sh '{sources_path}' '{out_dir}'"
+export COGWORKS_BENCH_CLAUDE_CMD="bash scripts/recursive-bench.sh claude '{sources_path}' '{out_dir}'"
+export COGWORKS_BENCH_CODEX_CMD="bash scripts/recursive-bench.sh codex '{sources_path}' '{out_dir}'"
 
 # Optional real backend commands consumed by recursive benchmark wrappers.
 # If unset, wrappers emit deterministic smoke metrics with a warning.

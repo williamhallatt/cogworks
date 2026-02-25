@@ -56,24 +56,13 @@ tests/framework/
 
 ## Trace Capture
 
-Normalize raw harness output to the behavioral trace contract:
-
-```bash
-bash scripts/capture-behavioral-trace-claude.sh <case_id> <skill_slug> <raw_trace.json> <out_trace.json>
-bash scripts/capture-behavioral-trace-codex.sh <case_id> <skill_slug> <raw_trace.json> <out_trace.json>
-```
-
-Key strict-mode fields:
-- `activation_source` (`skill_tool` required for positive cases in strict provenance mode)
-- `tool_events` (ordered tool timeline for `order_assertions`)
-
 Refresh + strict-validate all behavioral traces:
 
 ```bash
 export COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD="bash scripts/run-behavioral-case-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
 export COGWORKS_BEHAVIORAL_CODEX_REAL_CMD="bash scripts/run-behavioral-case-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="bash scripts/behavioral-capture-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="bash scripts/behavioral-capture.sh claude '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture.sh codex '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
 bash scripts/refresh-behavioral-traces.sh --mode all
 ```
 

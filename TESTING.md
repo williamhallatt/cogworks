@@ -61,20 +61,13 @@ Behavioral pass criteria:
 - `negative_control_ratio >= 0.25`
 - strict provenance requires `activation_source=skill_tool` for positive activation cases
 
-Capture normalized traces for each pipeline:
-
-```bash
-bash scripts/capture-behavioral-trace-claude.sh <case_id> <skill_slug> <raw_trace.json> <out_trace.json>
-bash scripts/capture-behavioral-trace-codex.sh <case_id> <skill_slug> <raw_trace.json> <out_trace.json>
-```
-
 Refresh traces for both pipelines and strict-validate:
 
 ```bash
 export COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD="bash scripts/run-behavioral-case-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
 export COGWORKS_BEHAVIORAL_CODEX_REAL_CMD="bash scripts/run-behavioral-case-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="bash scripts/behavioral-capture-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="bash scripts/behavioral-capture.sh claude '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture.sh codex '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
 bash scripts/refresh-behavioral-traces.sh --mode all
 ```
 
@@ -202,8 +195,8 @@ The `pipeline-benchmark` subcommand requires `scripts/` on PYTHONPATH. Use `scri
 export PYTHONPATH="$PWD/scripts:${PYTHONPATH:-}"
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark scaffold --run-id 20260220-ab1
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark run --run-id 20260220-ab1 \
-  --command-template "claude::./scripts/run-claude-benchmark.sh '{sources_path}' '{out_dir}'" \
-  --command-template "codex::./scripts/run-codex-benchmark.sh '{sources_path}' '{out_dir}'"
+  --command-template "claude::./scripts/run-benchmark.sh claude '{sources_path}' '{out_dir}'" \
+  --command-template "codex::./scripts/run-benchmark.sh codex '{sources_path}' '{out_dir}'"
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark summarize --run-id 20260220-ab1
 ```
 

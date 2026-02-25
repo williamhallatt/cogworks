@@ -10,8 +10,7 @@ REPORT_MD="$RESULTS_ROOT/$RUN_ID/benchmark-report.md"
 
 for required_script in \
   "$ROOT_DIR/scripts/test-cogworks-pipeline.sh" \
-  "$ROOT_DIR/scripts/run-claude-benchmark.sh" \
-  "$ROOT_DIR/scripts/run-codex-benchmark.sh"; do
+  "$ROOT_DIR/scripts/run-benchmark.sh"; do
   if [[ ! -x "$required_script" ]]; then
     echo "Missing or non-executable benchmark script: $required_script" >&2
     exit 1

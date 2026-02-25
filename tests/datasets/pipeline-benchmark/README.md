@@ -26,8 +26,8 @@ bash scripts/test-cogworks-pipeline.sh --mode offline --run-id 20260220-ab1
 Real mode:
 
 ```bash
-export COGWORKS_BENCH_CLAUDE_CMD="bash scripts/recursive-bench-claude.sh '{sources_path}' '{out_dir}'"
-export COGWORKS_BENCH_CODEX_CMD="bash scripts/recursive-bench-codex.sh '{sources_path}' '{out_dir}'"
+export COGWORKS_BENCH_CLAUDE_CMD="bash scripts/recursive-bench.sh claude '{sources_path}' '{out_dir}'"
+export COGWORKS_BENCH_CODEX_CMD="bash scripts/recursive-bench.sh codex '{sources_path}' '{out_dir}'"
 bash scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1
 ```
 
@@ -40,7 +40,7 @@ Decision-grade note:
 ```bash
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark scaffold --run-id 20260220-ab1
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark run --run-id 20260220-ab1 \
-  --command-template "claude::./scripts/run-claude-benchmark.sh '{sources_path}' '{out_dir}'" \
-  --command-template "codex::./scripts/run-codex-benchmark.sh '{sources_path}' '{out_dir}'"
+  --command-template "claude::./scripts/run-benchmark.sh claude '{sources_path}' '{out_dir}'" \
+  --command-template "codex::./scripts/run-benchmark.sh codex '{sources_path}' '{out_dir}'"
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark summarize --run-id 20260220-ab1
 ```
