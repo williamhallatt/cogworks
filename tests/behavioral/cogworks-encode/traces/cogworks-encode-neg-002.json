@@ -15,6 +15,6 @@
   "harness": "shared-harness",
   "model": "shared-model",
   "trace_source": "captured",
-  "captured_at": "2026-02-21T06:03:31Z",
-  "notes": "Captured and parity-checked across claude+codex pipelines"
+  "captured_at": "2026-02-26T12:34:30Z",
+  "notes": "Captured and parity-checked across claude+copilot pipelines"
 }

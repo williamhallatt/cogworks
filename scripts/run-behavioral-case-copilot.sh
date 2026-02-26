@@ -173,15 +173,31 @@ mkdir -p "$events_dir"
 setup_isolated_home "$case_json_path"
 prompt="$(build_prompt_from_case "$case_json_path")"
 
+tmp_out="$events_dir/${case_id}.copilot.stdout.txt"
+
 set +e
-timeout "$timeout_sec" $copilot_cmd --output-format stream-json "$prompt" > "$events_path" 2>&1
+COPILOT_ALLOW_ALL=true timeout "$timeout_sec" "$copilot_cmd" -p "$prompt" --no-color --stream off -s > "$tmp_out" 2>&1
 status=$?
 set -e
 if [[ $status -ne 0 ]]; then
   echo "copilot behavioral capture command failed (exit $status): $case_id" >&2
-  echo "events: $events_path" >&2
+  echo "output: $tmp_out" >&2
   exit "$status"
 fi
+
+python3 - "$tmp_out" "$events_path" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
+out = Path(sys.argv[2])
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text(
+    json.dumps({"type": "text", "text": text}) + "\n" + json.dumps({"type": "response.completed"}) + "\n",
+    encoding="utf-8",
+)
+PY
 
 validate_events_health "$events_path"
 

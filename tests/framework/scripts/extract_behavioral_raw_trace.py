@@ -125,6 +125,15 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
 
     skill_slug_lower = skill_slug.lower()
 
+    def _skill_call_targets_current(tool_input: Any) -> bool:
+        if not isinstance(tool_input, dict):
+            return False
+        value = tool_input.get("skill") or tool_input.get("name") or tool_input.get("slug")
+        if not isinstance(value, str) or not value.strip():
+            return False
+        normalized = value.strip().lower()
+        return normalized == skill_slug_lower or normalized.endswith("/" + skill_slug_lower)
+
     for event in events:
         event_type = str(event.get("type", "")).strip()
         payload = event.get("payload")
@@ -134,25 +143,25 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
         if event_type == "response_item" and isinstance(payload, dict):
             if payload_type == "function_call":
                 name = str(payload.get("name", "")).strip()
+                args = _parse_json_object(str(payload.get("arguments", ""))) or {}
                 if name:
                     normalized = _normalize_tool_name(name)
                     tools_used.append(normalized)
                     tool_events.append(normalized)
-                    if name.lower() == "skill":
+                    if name.lower() == "skill" and _skill_call_targets_current(args):
                         skill_tool_seen = True
-                args = _parse_json_object(str(payload.get("arguments", ""))) or {}
                 cmd = args.get("cmd")
                 if isinstance(cmd, str) and cmd.strip():
                     commands.append(cmd.strip())
             elif payload_type == "custom_tool_call":
                 name = str(payload.get("name", "")).strip()
+                tool_input = payload.get("input")
                 if name:
                     normalized = _normalize_tool_name(name)
                     tools_used.append(normalized)
                     tool_events.append(normalized)
-                    if name.lower() == "skill":
+                    if name.lower() == "skill" and _skill_call_targets_current(tool_input):
                         skill_tool_seen = True
-                tool_input = payload.get("input")
                 if name == "apply_patch" and isinstance(tool_input, str):
                     created, modified = _extract_paths_from_patch(tool_input)
                     files_created.extend(created)
@@ -200,13 +209,13 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
                 item_kind = str(item.get("type", "")).strip().lower()
                 if item_kind == "function_call":
                     name = str(item.get("name", "")).strip()
+                    args = _parse_json_object(str(item.get("arguments", ""))) or {}
                     if name:
                         normalized = _normalize_tool_name(name)
                         tools_used.append(normalized)
                         tool_events.append(normalized)
-                        if name.lower() == "skill":
+                        if name.lower() == "skill" and _skill_call_targets_current(args):
                             skill_tool_seen = True
-                    args = _parse_json_object(str(item.get("arguments", ""))) or {}
                     cmd = args.get("cmd") or args.get("command")
                     if isinstance(cmd, str) and cmd.strip():
                         commands.append(cmd.strip())
@@ -233,13 +242,13 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
             # Generic tool_use block support
             if str(item.get("type", "")).strip().lower() == "tool_use":
                 name = str(item.get("name", "")).strip()
+                tool_input = item.get("input", {})
                 if name:
                     normalized = _normalize_tool_name(name)
                     tools_used.append(normalized)
                     tool_events.append(normalized)
-                    if name.lower() == "skill":
+                    if name.lower() == "skill" and _skill_call_targets_current(tool_input):
                         skill_tool_seen = True
-                tool_input = item.get("input", {})
                 if isinstance(tool_input, dict):
                     command = tool_input.get("command") or tool_input.get("cmd")
                     if isinstance(command, str) and command.strip():
