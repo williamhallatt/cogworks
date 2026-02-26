@@ -93,7 +93,8 @@ For each pattern found:
 2. **When to use** - Context and triggers
 3. **How to apply** - Concrete steps
 4. **Why it works** - Underlying rationale
-5. **Cite sources** - Which source(s) recommend this?
+5. **Mechanism probe** — Ask explicitly: "What assumption does this pattern make that, if false, would make it wrong or inapplicable?" This surfaces structural rationale (mechanism-level) rather than benefit-level rationale. Record the answer as the primary content for the Boundary conditions field; an unanswered mechanism probe is a boundary conditions defect.
+6. **Cite sources** - Which source(s) recommend this?
 
 **Pattern template:**
 
@@ -228,6 +229,8 @@ Structure the synthesis logically:
 - Create connections between ideas
 - Attach rationale to every directive ("Do X because Y") — agents generalize from rationale to handle unstated edge cases, while bare directives are followed literally and brittly
 
+**Tacit knowledge accounting** — Before finalizing narrative, ask: "What aspects of this domain are likely to involve expert judgment that the sources don't capture?" For judgment-heavy domains, record 3-5 such aspects now for the Tacit Knowledge Boundary section. An absent Tacit Knowledge Boundary section in a judgment-heavy domain is a fidelity defect — consumers have no signal for where to verify rather than trust.
+
 **Deduplication principle:** Each section must contribute unique information. Before finalizing, verify that:
 
 - **Patterns** generalize beyond the domain (not restatements of Core Concepts as procedures)
@@ -333,7 +336,7 @@ Add these only when they provide unique information not already present:
 - Patterns
 - Practical Examples
 - Deep Dives
-- Tacit Knowledge Boundary (include when the domain relies heavily on expert judgment that documents cannot fully capture; briefly identify where synthesis has a ceiling so skill consumers know where to verify rather than trust)
+- Tacit Knowledge Boundary (include when the domain relies heavily on expert judgment that documents cannot fully capture, or when the domain contains judgment calls between similar-looking options, context-dependent weighting, or practitioner heuristics not explicit in sources. Produce 3-5 items in the format: "**[Domain/decision area]:** [what kind of judgment is required] — documents likely do not capture [what ceiling]. Verify by [how a consumer should calibrate]." Skip only for purely formal/definitional domains where every valid answer is explicitly enumerated.)
 
 ### Supporting-file rules
 
