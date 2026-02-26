@@ -1,4 +1,4 @@
-audited_through: 2026-02-25
+audited_through: 2026-02-26
 
 # Decision Log
 
@@ -83,3 +83,9 @@ human-readable history only.
 - Concrete capture command implementations for both pipelines provided; commands remain per-user env config, not in-repo defaults.
 - The framework contract and refresh runner existed but no canonical harness could emit raw JSON to `{raw_trace_path}` reliably across environments.
 - Each capture command template must support `{skill_slug}`, `{case_id}`, `{case_json_path}`, `{raw_trace_path}` placeholders.
+
+## [D-014] IBM-guided hardening for core cogworks skill prompts
+- **Date**: 2026-02-26 | **Source**: [2026-02-26-ibm-guided-hardening-cogworks-skills.md](archive/2026-02-26-ibm-guided-hardening-cogworks-skills.md) | **Status**: implemented
+- Added explicit untrusted-source security boundaries, staged handoff contracts, calibration mini-examples, and quantitative convergence thresholds to `skills/cogworks/SKILL.md`, `skills/cogworks-encode/SKILL.md`, and `skills/cogworks-learn/SKILL.md`.
+- The core pipeline prompts were strong on fidelity gates but under-specified on injection-safe ingestion semantics and measurable convergence criteria, creating avoidable drift/security risk in judgment-heavy flows.
+- New required artifacts now include trust/sanitization and stage validation reports (`{source_trust_report}`, `{sanitized_source_blocks}`, `{stage_validation_report}`), with blocking thresholds codified for mapping/citation/boundary coverage.

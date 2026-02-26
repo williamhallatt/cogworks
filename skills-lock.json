@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "ibm-prompt-guide": {
+      "source": "/home/williamh/code/cogworks/_generated-skills",
+      "sourceType": "local",
+      "computedHash": "ff34ab9458fdfe81429301693c8faa6b833a960b2254a76b7f6e356d0f8371c9"
+    }
+  }
+}
