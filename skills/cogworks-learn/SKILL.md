@@ -4,7 +4,7 @@ description: Use when creating or revising agent skills, including SKILL.md stru
 license: MIT
 metadata:
   author: cogworks
-  version: v3.2.2
+  version: v3.3.0
 ---
 
 # Skill Writer Expert
