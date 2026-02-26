@@ -4,7 +4,7 @@ description: Use when combining 2+ sources on a single topic to produce a unifie
 license: MIT
 metadata:
   author: cogworks
-  version: v3.2.2
+  version: v3.3.0
 ---
 
 # Topic Synthesis Expertise
