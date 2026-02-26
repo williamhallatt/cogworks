@@ -4,7 +4,7 @@ description: Expert knowledge on writing agent skills - SKILL.md files, frontmat
 license: MIT
 metadata:
   author: cogworks
-  version: v3.2.0
+  version: v3.2.1
 ---
 
 # Skill Writer Expert
