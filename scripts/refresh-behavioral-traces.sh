@@ -15,7 +15,7 @@ usage() {
 Usage: $0 [options]
 
 Options:
-  --skill <slug>         Skill slug to process (repeatable). Default: cogworks-learn + cogworks-encode
+  --skill <slug>         Skill slug to process (repeatable). Default: cogworks-learn + cogworks-encode + cogworks
   --tests-root <path>    Behavioral tests root (default: tests/behavioral)
   --raw-root <path>      Raw trace workspace (default: /tmp/cogworks-behavioral-raw)
   --mode <mode>          capture | validate | all (default: all)
@@ -23,6 +23,9 @@ Options:
 
 Required env for capture mode:
   COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD
+  COGWORKS_BEHAVIORAL_COPILOT_CAPTURE_CMD
+
+Optional env for Codex pipeline (adds a third capture leg when set):
   COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD
 
 Capture command placeholders:
@@ -66,7 +69,7 @@ if [[ "$MODE" != "capture" && "$MODE" != "validate" && "$MODE" != "all" ]]; then
 fi
 
 if [[ ${#SKILLS[@]} -eq 0 ]]; then
-  SKILLS=("cogworks-learn" "cogworks-encode")
+  SKILLS=("cogworks-learn" "cogworks-encode" "cogworks")
 fi
 
 if [[ "$MODE" == "capture" || "$MODE" == "all" ]]; then
@@ -74,8 +77,8 @@ if [[ "$MODE" == "capture" || "$MODE" == "all" ]]; then
     echo "Missing COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD for capture mode." >&2
     exit 2
   fi
-  if [[ -z "${COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD:-}" ]]; then
-    echo "Missing COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD for capture mode." >&2
+  if [[ -z "${COGWORKS_BEHAVIORAL_COPILOT_CAPTURE_CMD:-}" ]]; then
+    echo "Missing COGWORKS_BEHAVIORAL_COPILOT_CAPTURE_CMD for capture mode." >&2
     exit 2
   fi
 fi
@@ -164,14 +167,14 @@ if diffs == ["activated"] and category in {"implicit", "contextual"} and evidenc
             print("claude")
             raise SystemExit(0)
         if right_activated and not left_activated:
-            print("codex")
+            print("copilot")
             raise SystemExit(0)
     else:
         if not left_activated and right_activated:
             print("claude")
             raise SystemExit(0)
         if not right_activated and left_activated:
-            print("codex")
+            print("copilot")
             raise SystemExit(0)
 
 print(f"mismatch:{','.join(diffs)}", file=sys.stderr)
@@ -201,8 +204,10 @@ capture_skill_cases() {
     local case_json_path="$skill_raw_root/${case_id}.case.json"
     local raw_claude="$skill_raw_root/${case_id}.claude.raw.json"
     local raw_codex="$skill_raw_root/${case_id}.codex.raw.json"
+    local raw_copilot="$skill_raw_root/${case_id}.copilot.raw.json"
     local norm_claude="$skill_raw_root/${case_id}.claude.norm.json"
     local norm_codex="$skill_raw_root/${case_id}.codex.norm.json"
+    local norm_copilot="$skill_raw_root/${case_id}.copilot.norm.json"
     local final_trace="$traces_dir/${case_id}.json"
 
     printf '%s\n' "$case_json" > "$case_json_path"
@@ -211,9 +216,15 @@ capture_skill_cases() {
     run_capture_cmd "$COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD" \
       "$skill_slug" "$case_id" "$case_json_path" "$raw_claude"
 
-    echo "Capturing $skill_slug/$case_id (codex)..."
-    run_capture_cmd "$COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD" \
-      "$skill_slug" "$case_id" "$case_json_path" "$raw_codex"
+    echo "Capturing $skill_slug/$case_id (copilot)..."
+    run_capture_cmd "$COGWORKS_BEHAVIORAL_COPILOT_CAPTURE_CMD" \
+      "$skill_slug" "$case_id" "$case_json_path" "$raw_copilot"
+
+    if [[ -n "${COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD:-}" ]]; then
+      echo "Capturing $skill_slug/$case_id (codex)..."
+      run_capture_cmd "$COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD" \
+        "$skill_slug" "$case_id" "$case_json_path" "$raw_codex"
+    fi
 
     python3 "$NORMALIZER" \
       --pipeline claude \
@@ -227,29 +238,42 @@ capture_skill_cases() {
       --notes "Captured from claude pipeline"
 
     python3 "$NORMALIZER" \
-      --pipeline codex \
+      --pipeline copilot \
       --skill-slug "$skill_slug" \
       --case-id "$case_id" \
-      --raw-trace "$raw_codex" \
-      --out "$norm_codex" \
-      --harness "${COGWORKS_BEHAVIORAL_CODEX_HARNESS:-codex-cli}" \
-      --model "${COGWORKS_BEHAVIORAL_CODEX_MODEL:-gpt-5-codex}" \
+      --raw-trace "$raw_copilot" \
+      --out "$norm_copilot" \
+      --harness "${COGWORKS_BEHAVIORAL_COPILOT_HARNESS:-copilot-cli}" \
+      --model "${COGWORKS_BEHAVIORAL_COPILOT_MODEL:-gpt-5.3-codex}" \
       --trace-source captured \
-      --notes "Captured from codex pipeline"
+      --notes "Captured from copilot pipeline"
+
+    if [[ -n "${COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD:-}" ]]; then
+      python3 "$NORMALIZER" \
+        --pipeline codex \
+        --skill-slug "$skill_slug" \
+        --case-id "$case_id" \
+        --raw-trace "$raw_codex" \
+        --out "$norm_codex" \
+        --harness "${COGWORKS_BEHAVIORAL_CODEX_HARNESS:-codex-cli}" \
+        --model "${COGWORKS_BEHAVIORAL_CODEX_MODEL:-gpt-5-codex}" \
+        --trace-source captured \
+        --notes "Captured from codex pipeline"
+    fi
 
     local shared_source
-    if ! shared_source="$(compare_normalized_behavior "$case_json_path" "$norm_claude" "$norm_codex")"; then
+    if ! shared_source="$(compare_normalized_behavior "$case_json_path" "$norm_claude" "$norm_copilot")"; then
       echo "Behavior mismatch between pipelines for $skill_slug/$case_id." >&2
-      echo "Claude trace: $norm_claude" >&2
-      echo "Codex trace:  $norm_codex" >&2
+      echo "Claude trace:  $norm_claude" >&2
+      echo "Copilot trace: $norm_copilot" >&2
       echo "Resolve mismatch before writing shared trace." >&2
       return 1
     fi
 
     local shared_raw="$raw_claude"
-    if [[ "$shared_source" == "codex" ]]; then
-      shared_raw="$raw_codex"
-      echo "Using codex raw trace as shared baseline for $skill_slug/$case_id due to tolerated activation mismatch."
+    if [[ "$shared_source" == "copilot" ]]; then
+      shared_raw="$raw_copilot"
+      echo "Using copilot raw trace as shared baseline for $skill_slug/$case_id due to tolerated activation mismatch."
     fi
 
     python3 "$NORMALIZER" \
@@ -261,9 +285,22 @@ capture_skill_cases() {
       --harness "shared-harness" \
       --model "shared-model" \
       --trace-source captured \
-      --notes "Captured and parity-checked across claude+codex pipelines"
+      --notes "Captured and parity-checked across claude+copilot pipelines"
 
     echo "Wrote shared trace: $final_trace"
+
+    # Codex comparison is informational: warn on divergence, do not fail.
+    if [[ -n "${COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD:-}" ]]; then
+      local codex_shared_source
+      if ! codex_shared_source="$(compare_normalized_behavior "$case_json_path" "$final_trace" "$norm_codex" 2>&1)"; then
+        echo "Warning: codex behavior diverges from shared trace for $skill_slug/$case_id." >&2
+        echo "  Shared trace: $final_trace" >&2
+        echo "  Codex trace:  $norm_codex" >&2
+        echo "  Divergence detail: $codex_shared_source" >&2
+      else
+        echo "Codex parity confirmed for $skill_slug/$case_id."
+      fi
+    fi
   done < <(extract_case_lines "$cases_path")
 }
 
@@ -281,12 +318,22 @@ validate_strict() {
     --strict-provenance \
     "${skills_args[@]}"
 
-  echo "Running strict behavioral validation for Codex..."
+  local copilot_skills_root="$ROOT_DIR/.agents/skills"
+  echo "Running strict behavioral validation for Copilot..."
   python3 "$EVAL_CLI" behavioral run \
-    --skills-root "$ROOT_DIR/.agents/skills" \
+    --skills-root "$copilot_skills_root" \
     --tests-root "$TESTS_ROOT" \
     --strict-provenance \
     "${skills_args[@]}"
+
+  if [[ -n "${COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD:-}" ]]; then
+    echo "Running strict behavioral validation for Codex..."
+    python3 "$EVAL_CLI" behavioral run \
+      --skills-root "$ROOT_DIR/.agents/skills" \
+      --tests-root "$TESTS_ROOT" \
+      --strict-provenance \
+      "${skills_args[@]}"
+  fi
 }
 
 if [[ "$MODE" == "capture" || "$MODE" == "all" ]]; then

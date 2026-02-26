@@ -33,7 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Normalize behavioral trace output for cogworks-eval."
     )
-    parser.add_argument("--pipeline", required=True, choices=["claude", "codex", "shared"])
+    parser.add_argument("--pipeline", required=True, choices=["claude", "codex", "copilot", "shared"])
     parser.add_argument("--skill-slug", required=True)
     parser.add_argument("--case-id", required=True)
     parser.add_argument("--raw-trace", required=True, help="Input JSON trace payload")
