@@ -171,6 +171,13 @@ When sources conflict:
 **Synthesis:** {Balanced guidance - e.g., "Use A when X, use B when Y" or "This depends on Z"}
 ```
 
+**Before recording any conflict resolution, reason through:**
+1. "What assumption does Source N make that Source M does not share?"
+2. "If both assumptions are true, which domain condition activates each?"
+3. "Can I construct a conditional rule that honors both? If not, which source has stronger evidence and why?"
+
+Only after completing this sequence write the Synthesis field. A synthesis that does not reference at least one domain condition is incomplete.
+
 **Important:** ALWAYS flag conflicts. Never silently pick one source over another.
 
 ### Phase 7: Example Collection and Citation
