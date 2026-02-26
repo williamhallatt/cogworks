@@ -9,13 +9,15 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF' >&2
-Usage: scripts/capture-behavioral-trace.sh <claude|codex> <case-id> <skill-slug> <raw-trace.json> <out-trace.json>
+Usage: scripts/capture-behavioral-trace.sh <claude|codex|copilot> <case-id> <skill-slug> <raw-trace.json> <out-trace.json>
 
 Environment (pipeline-specific):
-  COGWORKS_BEHAVIORAL_CLAUDE_HARNESS  (default: claude-code)
-  COGWORKS_BEHAVIORAL_CLAUDE_MODEL    (default: claude-opus-4-6)
-  COGWORKS_BEHAVIORAL_CODEX_HARNESS   (default: codex-cli)
-  COGWORKS_BEHAVIORAL_CODEX_MODEL     (default: gpt-5-codex)
+  COGWORKS_BEHAVIORAL_CLAUDE_HARNESS    (default: claude-code)
+  COGWORKS_BEHAVIORAL_CLAUDE_MODEL      (default: claude-opus-4-6)
+  COGWORKS_BEHAVIORAL_CODEX_HARNESS     (default: codex-cli)
+  COGWORKS_BEHAVIORAL_CODEX_MODEL       (default: gpt-5.3-codex)
+  COGWORKS_BEHAVIORAL_COPILOT_HARNESS   (default: copilot-cli)
+  COGWORKS_BEHAVIORAL_COPILOT_MODEL     (default: gpt-5.3-codex)
 
 Sample data for testing this script:
   tests/test-data/behavioral-capture/case-sample.json
@@ -44,8 +46,11 @@ if [[ "$pipeline" == "claude" ]]; then
 elif [[ "$pipeline" == "codex" ]]; then
   harness="${COGWORKS_BEHAVIORAL_CODEX_HARNESS:-codex-cli}"
   model="${COGWORKS_BEHAVIORAL_CODEX_MODEL:-gpt-5-codex}"
+elif [[ "$pipeline" == "copilot" ]]; then
+  harness="${COGWORKS_BEHAVIORAL_COPILOT_HARNESS:-copilot-cli}"
+  model="${COGWORKS_BEHAVIORAL_COPILOT_MODEL:-gpt-5.3-codex}"
 else
-  echo "Pipeline must be 'claude' or 'codex', got: $pipeline" >&2
+  echo "Pipeline must be 'claude', 'codex', or 'copilot', got: $pipeline" >&2
   usage
   exit 2
 fi

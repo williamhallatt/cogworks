@@ -3,11 +3,12 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF' >&2
-Usage: scripts/behavioral-capture.sh <claude|codex> <skill_slug> <case_id> <case_json_path> <raw_trace_path>
+Usage: scripts/behavioral-capture.sh <claude|codex|copilot> <skill_slug> <case_id> <case_json_path> <raw_trace_path>
 
 Required environment (pipeline-specific):
-  COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD  (when pipeline=claude)
-  COGWORKS_BEHAVIORAL_CODEX_REAL_CMD   (when pipeline=codex)
+  COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD   (when pipeline=claude)
+  COGWORKS_BEHAVIORAL_CODEX_REAL_CMD    (when pipeline=codex)
+  COGWORKS_BEHAVIORAL_COPILOT_REAL_CMD  (when pipeline=copilot)
 
 Template placeholders supported in the env var:
   {skill_slug} {case_id} {case_json_path} {raw_trace_path}
@@ -74,8 +75,11 @@ if [[ "$pipeline" == "claude" ]]; then
 elif [[ "$pipeline" == "codex" ]]; then
   template="${COGWORKS_BEHAVIORAL_CODEX_REAL_CMD:-}"
   env_var="COGWORKS_BEHAVIORAL_CODEX_REAL_CMD"
+elif [[ "$pipeline" == "copilot" ]]; then
+  template="${COGWORKS_BEHAVIORAL_COPILOT_REAL_CMD:-}"
+  env_var="COGWORKS_BEHAVIORAL_COPILOT_REAL_CMD"
 else
-  echo "Pipeline must be 'claude' or 'codex', got: $pipeline" >&2
+  echo "Pipeline must be 'claude', 'codex', or 'copilot', got: $pipeline" >&2
   usage
   exit 2
 fi

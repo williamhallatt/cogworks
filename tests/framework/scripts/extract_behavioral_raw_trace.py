@@ -192,6 +192,39 @@ def extract_from_events(events: Iterable[Dict[str, Any]], skill_slug: str) -> Tu
                     if isinstance(text, str):
                         text_fragments.append(text)
 
+        # Copilot JSON stream format: response.output_item.* events with nested "item" payload.
+        # Also handles plain-text output written as a single-line JSON blob {"type":"text","text":"..."}.
+        if event_type in {"response.output_item.done", "response.output_item.added"}:
+            item = event.get("item")
+            if isinstance(item, dict):
+                item_kind = str(item.get("type", "")).strip().lower()
+                if item_kind == "function_call":
+                    name = str(item.get("name", "")).strip()
+                    if name:
+                        normalized = _normalize_tool_name(name)
+                        tools_used.append(normalized)
+                        tool_events.append(normalized)
+                        if name.lower() == "skill":
+                            skill_tool_seen = True
+                    args = _parse_json_object(str(item.get("arguments", ""))) or {}
+                    cmd = args.get("cmd") or args.get("command")
+                    if isinstance(cmd, str) and cmd.strip():
+                        commands.append(cmd.strip())
+                elif item_kind in {"message", "text"}:
+                    text = item.get("text") or (
+                        item.get("content", [{}])[0].get("text", "")
+                        if isinstance(item.get("content"), list) and item.get("content")
+                        else ""
+                    )
+                    if isinstance(text, str) and text:
+                        text_fragments.append(text)
+
+        # Copilot plain-text event: {"type":"text","text":"..."}
+        if event_type == "text":
+            text = event.get("text")
+            if isinstance(text, str) and text:
+                text_fragments.append(text)
+
         # Claude stream-json often emits explicit tool-use names in nested blocks.
         for item in _walk_json(event):
             if not isinstance(item, dict):
@@ -243,7 +276,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Extract behavioral raw trace contract from pipeline event JSONL."
     )
-    parser.add_argument("--pipeline", required=True, choices=["claude", "codex"])
+    parser.add_argument("--pipeline", required=True, choices=["claude", "codex", "copilot"])
     parser.add_argument("--skill-slug", required=True)
     parser.add_argument("--case-id", required=True)
     parser.add_argument("--case-json-path", required=True)

@@ -98,9 +98,9 @@ Runs the agent against each test case and normalizes the output into a behaviora
 
 ```bash
 export COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD="bash scripts/run-behavioral-case-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CODEX_REAL_CMD="bash scripts/run-behavioral-case-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_COPILOT_REAL_CMD="bash scripts/run-behavioral-case-copilot.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
 export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="bash scripts/behavioral-capture.sh claude '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture.sh codex '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_COPILOT_CAPTURE_CMD="bash scripts/behavioral-capture.sh copilot '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
 bash scripts/refresh-behavioral-traces.sh --mode all
 ```
 
@@ -115,6 +115,38 @@ Scope to one skill to reduce token burn:
 
 ```bash
 bash scripts/refresh-behavioral-traces.sh --mode all --skill cogworks-learn
+```
+
+`run-behavioral-case-copilot.sh` defaults to invoking `copilot --output-format stream-json`. Override with:
+
+```bash
+export COGWORKS_BEHAVIORAL_COPILOT_CMD="my-copilot-cli-binary"
+```
+
+Optional Copilot tuning:
+
+```bash
+export COGWORKS_BEHAVIORAL_COPILOT_TIMEOUT_SEC="900"
+export COGWORKS_BEHAVIORAL_COPILOT_HARNESS="copilot-cli"
+export COGWORKS_BEHAVIORAL_COPILOT_MODEL="gpt-5.3-codex"
+```
+
+If Copilot skills are installed under `.copilot/skills/`, strict validation runs against that root automatically.
+
+To normalize a Copilot raw trace without re-running:
+
+```bash
+bash scripts/capture-behavioral-trace.sh copilot <case-id> <skill-slug> <raw-trace.json> <out-trace.json>
+```
+
+#### Codex pipeline (optional third leg)
+
+Set `COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD` to add Codex as a third capture pipeline. When set, `refresh-behavioral-traces.sh` captures from Codex in parallel with Claude and Copilot, normalizes the trace, and compares it against the claude/copilot shared baseline. Divergence produces a warning but does not fail the run.
+
+```bash
+export COGWORKS_BEHAVIORAL_CODEX_REAL_CMD="bash scripts/run-behavioral-case-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture.sh codex '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
+bash scripts/refresh-behavioral-traces.sh --mode all
 ```
 
 To normalize a single existing raw trace without re-running the agent:

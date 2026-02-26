@@ -107,7 +107,7 @@ def _validate_trace_provenance(
         issues.append(f"pipeline mismatch (expected={expected_pipeline}, trace={pipeline})")
 
     if strict:
-        if pipeline and pipeline not in {"claude", "codex", "shared"}:
+        if pipeline and pipeline not in {"claude", "codex", "copilot", "shared"}:
             issues.append(f"invalid pipeline value: {pipeline}")
         if harness in placeholder_values:
             issues.append(f"placeholder harness not allowed in strict mode: {trace.get('harness')}")
