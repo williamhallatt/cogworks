@@ -1,6 +1,6 @@
 {
-  "skill_slug": "cogworks-learn",
-  "case_id": "cogworks-learn-exp-002",
+  "skill_slug": "cogworks",
+  "case_id": "cogworks-exp-002",
   "activated": true,
   "activation_source": "explicit_request_match",
   "tools_used": [],
@@ -15,6 +15,6 @@
   "harness": "shared-harness",
   "model": "shared-model",
   "trace_source": "captured",
-  "captured_at": "2026-02-26T12:46:51Z",
+  "captured_at": "2026-02-26T12:36:47Z",
   "notes": "Captured and parity-checked across claude+copilot pipelines"
 }

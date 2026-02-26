@@ -2,7 +2,7 @@
   "skill_slug": "cogworks-learn",
   "case_id": "cogworks-learn-imp-001",
   "activated": true,
-  "activation_source": "description_token_overlap",
+  "activation_source": "skill_tool",
   "tools_used": [],
   "tool_events": [],
   "commands": [],
@@ -15,6 +15,6 @@
   "harness": "shared-harness",
   "model": "shared-model",
   "trace_source": "captured",
-  "captured_at": "2026-02-21T06:53:27Z",
-  "notes": "Captured and parity-checked across claude+codex pipelines"
+  "captured_at": "2026-02-26T12:48:57Z",
+  "notes": "Captured and parity-checked across claude+copilot pipelines"
 }
