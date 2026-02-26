@@ -26,6 +26,8 @@ This skill relies on two supporting skills for methodology and quality:
 - **cogworks-encode** ([SKILL.md](../cogworks-encode/SKILL.md), [reference.md](../cogworks-encode/reference.md)) - Synthesis methodology: the 8-phase process for transforming multiple sources into coherent knowledge bases
 - **cogworks-learn** ([SKILL.md](../cogworks-learn/SKILL.md), [reference.md](../cogworks-learn/reference.md)) - Skill writing expertise: frontmatter configuration, progressive disclosure, quality gates, and best practices
 
+Apply the priority contract from cogworks-learn: fidelity > judgment density > drift resistance > context efficiency > composability.
+
 ## Dependency Check
 
 Before executing any workflow step, verify that both supporting skills are accessible:
@@ -112,6 +114,8 @@ If overwriting, detect version bump per cogworks-learn metadata rules.
 
 **Capture source provenance as `{source_manifest}`** — a list of objects recording each source's type (`url` or `file`), URI/path, and (for fetched-then-saved files) the original URI. This enables regeneration without manual source recall.
 
+**Extract the Critical Distinctions Registry (CDR)** following the Hard Gates protocol in cogworks-encode before the first compression pass.
+
 Synthesise all gathered source material into a unified knowledge base following the `cogworks-encode` synthesis process. Find non-obvious connections between sources, resolve contradictions with nuanced analysis, and extract decision-useful guidance.
 
 Apply the **Synthesis Output Contract**:
@@ -123,7 +127,7 @@ Apply the **Synthesis Output Contract**:
 **Quality guardrails for synthesis:**
 
 - Do not optimize for section counts; optimize for decision utility per token.
-- Run a compression pass before finalizing: remove duplication, collapse repetitive prose, keep one canonical location per fact.
+- Run a compression pass before finalizing: remove duplication, collapse repetitive prose, keep one canonical location per fact. **During compression, maintain a `Removed as non-critical` list.** Before concluding the compression pass, verify that no item in the Critical Distinctions Registry was removed. A removed registry item is a fidelity failure — restore it or escalate.
 - Supporting files (patterns.md, examples.md) are optional and should only be created when they add unique content not already present in reference.md.
 - If a supporting file would only reformat existing content, merge into reference.md instead.
 - Use source-scope labelling in reference.md:
@@ -144,6 +148,7 @@ For each of the 5-7 most important decisions the synthesis reveals:
 | **Options** | What are the plausible choices at this decision point? |
 | **Right call** | What does the synthesis say to do, and in what context? |
 | **Failure mode** | What goes wrong if you choose incorrectly? |
+| **Boundary / implied nuance** | What does this rule assume that, if false, would change the guidance? What would an experienced practitioner know that the source doesn't explicitly state? Where does this rule NOT apply? |
 
 The Decision Skeleton serves two purposes:
 1. It is the organizing backbone of the skill — Step 5 builds the skill around the Decision Skeleton, not around the synthesis structure
@@ -185,8 +190,9 @@ Apply cogworks-learn Generated Skill Profile for frontmatter format, metadata.js
 
 Use these structure requirements by default:
 
-- **SKILL.md** includes: Overview, When to Use This Skill, Quick Decision Cheatsheet, Supporting Docs, Invocation — *Quick Decision Cheatsheet entries come directly from the top Decision Skeleton items*
+- **SKILL.md** includes: Overview, When to Use This Skill, Quick Decision Cheatsheet, Supporting Docs, Invocation — *Quick Decision Cheatsheet entries come directly from the top Decision Skeleton items. Decompose each Decision Skeleton entry into its distinct judgment calls — a single Decision Rule may produce multiple cheatsheet rows. Prioritize rows that encode: (a) distinctions between similar-looking choices (e.g. 401 vs 403, 422 vs 400), (b) non-obvious defaults (e.g. POST → 201+Location, DELETE → 204), (c) conditional rules with clear when/not-when structure. The cheatsheet is a fast-path lookup for judgment calls most likely to be made incorrectly under a vague or edge-case prompt — not a one-row-per-DR summary.*
 - **reference.md** includes: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources — *Decision Rules entries map 1:1 from the Decision Skeleton*
+- **Anti-Patterns in reference.md**: for reference skills (continuously applied in agent context), render as a table rather than prose section headings: `| Anti-Pattern | Why Bad | Fix |` — more scannable in context, lower per-row token cost. Use prose headings only when the "why bad" explanation requires more than one sentence to be actionable.
 - **patterns.md/examples.md** (if created) begin with a source-pointer line mapping source IDs to `reference.md#sources`
 - Keep content concise and decision-first. Default total size target is <=2500 words unless source breadth requires more.
 
@@ -205,20 +211,20 @@ Apply integrated prompt-quality gates from `cogworks-learn` before writing compl
 
 Run automated validation on the generated skill:
 
-1. **Layer 1 - Deterministic checks**:
+1. **Synthesis deterministic checks (blocking)**:
    ```bash
-   bash tests/framework/graders/deterministic-checks.sh {skill_path} --json
+   bash {cogworks_encode_dir}/scripts/validate-synthesis.sh {skill_path}/reference.md
    ```
-   If critical failures: fix the issues, then re-run (max 1 retry).
+   If unavailable: run fallback checks (section presence, citations, fence balance, required headings) and report results before continuing.
 
-2. **Self-verification pass (required)**:
-   - cogworks-encode self-verification: fidelity, operational density, citations, structure (see cogworks-encode SKILL.md)
-   - cogworks-learn self-verification: section presence, frontmatter, content quality, metadata (see cogworks-learn SKILL.md)
-   - If cogworks-learn ships `scripts/validate-skill.sh`, run it as a deterministic check
-   - Fix any failures, then re-verify
+2. **Skill deterministic checks (blocking)**:
+   ```bash
+   bash {cogworks_learn_dir}/scripts/validate-skill.sh {skill_path}
+   ```
+   If critical failures: fix and re-run (max 1 retry). If script unavailable: treat as failed gate until fallback checks (frontmatter validity, required sections, metadata schema) are run and reported.
 
-3. **Generalization probe (recommended for judgment-heavy domains)**:
-   Generate 3-5 novel scenarios not explicitly covered in the source material — edge cases or combinations the sources didn't address directly. Apply the generated skill to each. If responses are brittle (example-recall rather than principled application of the Decision Skeleton), revise the relevant Decision Rules to express the underlying principle more clearly. Note: not required for reference or specification skills where the domain is fully explicit.
+3. **Generalization probe (blocking for judgment-heavy domains)**:
+   Generate 3-5 novel scenarios not explicitly covered in the source material — edge cases or combinations the sources didn't address directly. Apply the generated skill to each. If responses are brittle (example-recall rather than principled application of the Decision Skeleton), revise the relevant Decision Rules to express the underlying principle more clearly. Note: not required only for purely formal/definitional domains (config schemas, grammar specifications, format references) where every valid answer is explicitly enumerated. It IS required for any domain containing judgment-call distinctions between similar-looking options (e.g. HTTP status code selection, strategy choice, conditional rules) — even if structured as a reference skill. The presence of distinctions like 401 vs 403, 422 vs 400, or POST vs PUT means the probe is needed: these are exactly the failure modes it catches.
 
 ### 7. Confirm Success and Prompt Installation
 
@@ -227,6 +233,8 @@ Display:
 - Topic name and slug
 - **Skill files**: {skill_path}
 - Validation results: Layer 1 deterministic status and whether any auto-fixes were applied
+- Critical Distinctions Registry: all [N] items preserved in output
+- Pre-Review Coverage Gate: pass/fail with any intentionally omitted capabilities listed
 - metadata.json: regeneration manifest written
 
 Then prompt the user to install the generated skill to their agents. The installation is interactive (agent selection, symlink vs copy, global vs local) and must be run by the user in their terminal:
@@ -242,6 +250,8 @@ Where `{skill_path_parent}` is the staging directory (e.g. `_generated-skills` f
 Throughout the workflow, use these variables consistently:
 
 - `{skill_path}` - Full destination path for skill files (default: `_generated-skills/{slug}/`, overridable via explicit path in command)
+- `{cogworks_encode_dir}` - Absolute path to cogworks-encode skill directory (used for validation script routing)
+- `{cogworks_learn_dir}` - Absolute path to cogworks-learn skill directory (used for validation script routing)
 - `{slug}` - Skill name/identifier derived from topic name
 - `{topic_name}` - Human-readable topic name provided by user
 - `{snapshot_date}` - ISO 8601 date (YYYY-MM-DD) when sources were synthesized
@@ -271,6 +281,9 @@ The `{skill_path}` variable replaces all hardcoded `.claude/skills/{slug}/` refe
 1. `{skill_path}` directory created with skill files
 2. Skill files generated following cogworks-learn expertise
 3. Layer 1 deterministic checks pass (no critical failures)
-4. Prompt-quality rewrite pass completed after Layer 1 validation
-5. `metadata.json` written with valid schema, slug matching directory name, and non-empty sources
-6. User prompted with `npx skills add` command to install to their agents
+4. CDR traceability check passed: all Critical Distinctions Registry items mapped to Decision Rules or anti-patterns
+5. Pre-Review Coverage Gate passed: all named source capabilities represented or explicitly omitted with specific rationale
+6. Generalization probe passed or exemption stated with explicit rationale
+7. Prompt-quality rewrite pass completed after validation
+8. `metadata.json` written with valid schema, slug matching directory name, and non-empty sources
+9. User prompted with `npx skills add` command to install to their agents

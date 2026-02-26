@@ -77,6 +77,15 @@ For generated skills, all gates must pass:
 4. **Canonical placement** - each rule lives in one canonical location, with no cross-file restatement.
 5. **Token-dense quality** - preserve critical constraints while removing low-value verbosity.
 
+**Priority order (non-compensatory):**
+1. Fidelity to source material
+2. Density of judgment calls
+3. Drift resistance
+4. Context efficiency
+5. Composability
+
+A failure in Fidelity cannot be offset by strengths in lower-priority dimensions. The quality-guidance tiebreaker is fidelity, not actionability.
+
 After drafting, run an **instruction quality rewrite pass**:
 - tighten weak wording into concrete directives
 - remove duplicated doctrine
@@ -96,6 +105,8 @@ Before finalizing any skill:
 7. Is `description` under 1024 characters with no XML tags?
 8. Is each fact documented in one canonical file location (no restated duplication)?
 9. Did all integrated prompt quality gates pass after rewrite?
+10. **(L1)** Does the primary source spec prescribe a file structure (e.g., a "Supporting Content" or progressive disclosure section naming which files to produce)? If yes, generate those files regardless of the default optional/required split — source prescription takes precedence over default optional logic.
+11. **(L2)** If the source contains safety guardrails, behavioral constraints, or explicit deferral rules (e.g., "design-only, defers implementation to backend engineers"), do these appear in SKILL.md Invocation as a composability boundary? These define which adjacent skills this skill must not override.
 
 ## Self-Verification for Generated Skills (Required Before Completion)
 
@@ -104,7 +115,7 @@ After generating skill files, verify against this checklist:
 **Structure:**
 - SKILL.md contains: Overview, When to Use, Quick Decision Cheatsheet, Supporting Docs, Invocation
 - reference.md contains: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
-- patterns.md/examples.md present only when contributing unique content not in reference.md
+- patterns.md/examples.md present only when contributing unique content not in reference.md (but see L1 — if source prescribed these files, they are required regardless)
 
 **Frontmatter & metadata:**
 - `name`: lowercase + hyphens only, ≤ 64 chars, matches directory name
@@ -117,17 +128,27 @@ After generating skill files, verify against this checklist:
 - Decision Rules contain operational guidance ("when X, do Y"), not restated source summaries
 - No doctrinal duplication across files — each fact has one canonical home
 - Markdown fences balanced, YAML frontmatter parseable
+- Decision Skeleton completeness: each decision includes Trigger, Options, Right call, Failure mode, Boundary/implied nuance
+- Critical Distinctions from synthesis are all represented in Decision Rules or Anti-Patterns
+- Fidelity Trace Matrix has no unmapped source-critical items
 
 **Deterministic validation:**
 If available, run the portable validation script:
 ```bash
-bash scripts/validate-skill.sh {skill_path}
+bash {cogworks_learn_dir}/scripts/validate-skill.sh {skill_path}
 ```
+
+**Drift probe protocol (required for judgment-heavy domains):**
+- Required for any domain containing judgment-call distinctions between similar-looking options. Skip only for purely formal/definitional domains (config schemas, grammar specifications, format references) where every valid answer is explicitly enumerated.
+- Run at least 3 edge-case prompts that are not direct restatements of source examples
+- Mark pass/fail per prompt with rationale
+- Revise and re-test if output drifts into generic guidance or confident unsupported claims
 
 **Truthfulness baseline:**
 - Do not fabricate facts, sources, metrics, or standard details
 - State uncertainty explicitly
 - Keep within declared scope
+- If source ambiguity exists, outputs must preserve uncertainty rather than asserting unsupported certainty
 
 ## Generated Skill Profile (Default)
 
@@ -174,7 +195,8 @@ Each `sources` entry: `{ type: "url"|"file", uri: "...", original_uri?: "..." }`
 
 - **SKILL.md**: Overview, When to Use, Quick Decision Cheatsheet, Supporting Docs, Invocation
 - **reference.md**: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick Reference, Source Scope, Sources
-- **patterns.md/examples.md**: optional, only when uniquely valuable
+- **patterns.md/examples.md**: optional when uniquely valuable — **(L1)** exception: if the primary source spec prescribes these files in a "Supporting Content" or progressive disclosure section, generate them regardless. Source prescription takes precedence.
+- **Safety/composability boundary (L2):** If the source contains safety guardrails, behavioral constraints, or explicit deferral rules, extract them and place in the **Invocation** section of SKILL.md. They define which adjacent skills this skill must not override and are a composability requirement, not optional content.
 - **Source scope taxonomy**:
   - Primary platform (normative)
   - Supporting foundations (normative when applicable)

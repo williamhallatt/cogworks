@@ -303,6 +303,8 @@ Use these structures as starting points — adapt headings and depth to the topi
 **Instead:** {recommended alternative with rationale}
 ```
 
+> **Format note for reference skills:** When the skill will be continuously applied (reference skill, not task skill), prefer table format over prose headings: `| Anti-Pattern | Why Bad | Fix |` — more scannable in agent context, lower token cost. Use prose headings only when the "why bad" explanation requires more than one sentence to be actionable.
+
 **Quick Reference entry:**
 ```markdown
 | Situation | Action | Rationale |
