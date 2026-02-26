@@ -1,11 +1,5 @@
 audited_through: 2026-02-26
 
-## [D-015] Structural rationale probe and tacit knowledge accounting
-- **Date**: 2026-02-26 | **Source**: [2026-02-26-gap-analysis-structural-rationale-tacit-knowledge.md](archive/2026-02-26-gap-analysis-structural-rationale-tacit-knowledge.md) | **Status**: implemented
-- Added a Phase 4 mechanism probe step to `cogworks-encode/reference.md` and a Phase 8 tacit knowledge accounting directive; strengthened the Tacit Knowledge Boundary conditional section with explicit content requirements; added `{tacit_knowledge_boundary}` as a required stage artifact in `cogworks/SKILL.md`.
-- Synthesis phase was probing boundary conditions structurally (via the pattern template) but not explicitly directing the synthesizer to ask the mechanism question ("what assumption, if false, makes this wrong?"). No phase produced explicit epistemic accounting of tacit knowledge gaps, leaving skill consumers without calibration signals for where to verify rather than trust.
-- The mechanism probe is a named step, not optional: an unanswered probe is a boundary conditions defect. The Tacit Knowledge Boundary section is required (not optional) for judgment-heavy domains; absence is a fidelity defect.
-
 # Decision Log
 
 This file is the agent context surface for `_plans/`. Load this for settled decisions.

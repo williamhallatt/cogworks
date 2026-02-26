@@ -4,7 +4,7 @@ description: Use when creating or revising agent skills, including SKILL.md stru
 license: MIT
 metadata:
   author: cogworks
-  version: v3.3.0
+  version: v3.2.2
 ---
 
 # Skill Writer Expert
@@ -74,6 +74,18 @@ Patterns and examples in separate files (loaded on-demand):
 - [patterns.md](patterns.md) - reusable patterns and anti-patterns to avoid
 - [examples.md](examples.md) - practical examples with citations
 - [persuasion-principles.md](persuasion-principles.md) - Persuasion psychology for discipline-enforcing skills
+
+## Staged Generation Contract (Required)
+
+Generate or revise skills in explicit stages with mandatory artifacts:
+
+1. **Draft** -> `{draft_skill}` (initial structure + normative directives)
+2. **Rewrite** -> `{rewrite_diff}` (instruction clarity tightening + duplication removal)
+3. **Deterministic validation** -> `{deterministic_gate_report}` (frontmatter/structure/runtime contract checks)
+4. **Drift probe** -> `{drift_probe_report}` (edge-case prompts + pass/fail rationale)
+5. **Finalization** -> `{final_gate_report}` (all blocking gates and thresholds met)
+
+Do not finalize until every stage artifact exists and no blocking failures remain.
 
 ## Integrated Prompt Quality Gates (Required)
 
