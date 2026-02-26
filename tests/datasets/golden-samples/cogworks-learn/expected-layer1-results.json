@@ -1,19 +1,28 @@
 {
-  "critical_failures": [
-  ],
-  "warnings": [
-  ],
+  "critical_failures": [],
+  "warnings": [],
   "checks_passed": [
+    "Dependencies available",
     "SKILL.md exists",
     "Frontmatter is valid YAML",
     "Required frontmatter fields present",
-    "Line count within limit (75/500)",
-    "Citations present (3 found)",
+    "Line count within limit (100/500)",
+    "Citations present in supporting files (5 found)",
     "No forbidden patterns",
     "Supporting files follow 3+ entry rule",
     "Description has sufficient content",
+    "Description workflow leakage check complete",
     "No duplicate headers",
-    "Markdown syntax valid"
+    "Markdown syntax valid",
+    "No cross-file heading duplication",
+    "Frontmatter name format valid",
+    "Supporting files have substantive content",
+    "Citation format consistency (no file-path citations to validate)",
+    "Snapshot date present in both SKILL.md and reference.md",
+    "metadata.json valid",
+    "License/metadata fields check complete",
+    "SKILL.md recommended sections present",
+    "reference.md recommended sections present"
   ],
   "status": "pass"
 }
