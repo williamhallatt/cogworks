@@ -1,6 +1,6 @@
 # cogworks
 
-Encode knowledge from sources and automate creation of high-quality skills.
+Encode knowledge from diverse sources and automate creation of high-quality agent skills.
 
 ## Installation
 
@@ -40,6 +40,8 @@ Provide sources -> `cogworks` synthesises them via an 8-phase process -> outputs
 6. Conflict Detection
 7. Example Collection
 8. Narrative Construction
+
+For a full system deep dive, see [this](./docs/cogworks-system-deep-dive-2026-02-26.md)
 
 ## Using `cogworks`
 
