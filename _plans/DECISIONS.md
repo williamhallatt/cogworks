@@ -1,4 +1,4 @@
-audited_through: 2026-02-26
+audited_through: 2026-03-03
 
 # Decision Log
 
@@ -95,3 +95,21 @@ human-readable history only.
 - Added a Phase 4 mechanism probe step to `cogworks-encode/reference.md` and a Phase 8 tacit knowledge accounting directive; strengthened the Tacit Knowledge Boundary conditional section with explicit content requirements; added `{tacit_knowledge_boundary}` as a required stage artifact in `cogworks/SKILL.md`.
 - Synthesis phase was probing boundary conditions structurally (via the pattern template) but not explicitly directing the synthesizer to ask the mechanism question ("what assumption, if false, makes this wrong?"). No phase produced explicit epistemic accounting of tacit knowledge gaps, leaving skill consumers without calibration signals for where to verify rather than trust.
 - The mechanism probe is a named step, not optional: an unanswered probe is a boundary conditions defect. The Tacit Knowledge Boundary section is required (not optional) for judgment-heavy domains; absence is a fidelity defect.
+
+## [D-016] Comparator benchmark harness for generator-vs-cogworks evaluation
+- **Date**: 2026-03-03 | **Source**: [2026-03-03-comparator-benchmark-harness.md](archive/2026-03-03-comparator-benchmark-harness.md) | **Status**: implemented
+- Added comparator-aware benchmark scaffolding with a local comparator manifest (`benchmarks/comparison/datasets/pipeline-benchmark/comparators.local.json`), wrapper adapters (`run-generator-a.sh`, `run-generator-b.sh`, `run-comparator-benchmark.sh`), and a dedicated orchestrator (`test-generator-comparison.sh`) that runs arbitrary pipeline sets with shared model/budget fairness controls.
+- Previous benchmark entrypoints were claude-vs-codex specific and assumed comparators could already emit full metrics. External generators lacked a deterministic integration contract, preventing reproducible, decision-grade comparison runs.
+- Added normalization/derivation fallback for comparator telemetry to required `metrics.json` keys, budget-violation hardening, and `quality-first-ranking.md` report generation for per-task and aggregate quality ranking.
+
+## [D-017] Protocol-run benchmark for workflow-style comparator toolkits
+- **Date**: 2026-03-03 | **Source**: [2026-03-03-protocol-run-benchmark-replan.md](archive/2026-03-03-protocol-run-benchmark-replan.md) | **Status**: implemented
+- Added authoritative protocol-run benchmark flow for workflow-style generators via `benchmarks/comparison/scripts/run-protocol-benchmark.sh`, per-run protocol case execution (`benchmarks/comparison/scripts/run-protocol-case.sh`), generated-skill scoring (`benchmarks/comparison/scripts/score-generated-skill.py`), and pilot summarization (`benchmarks/comparison/scripts/summarize-protocol-benchmark.py`), with pilot manifest `benchmarks/comparison/datasets/pipeline-benchmark/protocol-pilot.json`.
+- Deep-dive showed comparator repositories (`generator-a` skill-creator, `generator-b` skill-factory) are process/workflow toolkits rather than one-shot source-to-skill CLIs with a shared metrics contract, making adapter-only CLI benchmarking non-decision-grade.
+- Protocol-run artifacts now include `generation-artifact.json`, `quality-eval.json`, and `pilot-summary.json`/`pilot-report.md`; documentation updated to mark protocol-run as authoritative comparator path.
+
+## [D-018] Isolated comparison benchmark workspace + hard task suite expansion
+- **Date**: 2026-03-03 | **Source**: [2026-03-03-comparison-benchmark-isolation-hard-suite.md](archive/2026-03-03-comparison-benchmark-isolation-hard-suite.md) | **Status**: implemented
+- Relocated comparison benchmarking assets to dedicated `benchmarks/comparison/` tree: datasets, results root defaults, protocol docs, comparator repositories, and benchmark runner scripts.
+- Updated all active integrations and defaults (`tests/framework/scripts/cogworks-eval.py`, recursive round orchestration, smoke tests, and benchmark command templates) to the new benchmark root; no compatibility shim paths retained.
+- Expanded dataset with six harder tasks (`pb-005` through `pb-010`) and added `protocol-hard-v2.json` for expanded protocol-run evaluation.
