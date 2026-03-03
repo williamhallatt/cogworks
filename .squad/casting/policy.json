@@ -1,0 +1,7 @@
+{
+  "version": "1.0",
+  "universe_allowlist": "all",
+  "max_agents_per_assignment": 12,
+  "allow_overflow": true,
+  "overflow_strategy": ["diegetic_expansion", "thematic_promotion", "structural_mirroring"]
+}
