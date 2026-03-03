@@ -150,8 +150,9 @@ Before finalizing any skill:
 7. Is `description` under 1024 characters with no XML tags?
 8. Is each fact documented in one canonical file location (no restated duplication)?
 9. Did all integrated prompt quality gates pass after rewrite?
-10. **(L1)** Does the primary source spec prescribe a file structure (e.g., a "Supporting Content" or progressive disclosure section naming which files to produce)? If yes, generate those files regardless of the default optional/required split — source prescription takes precedence over default optional logic.
-11. **(L2)** If the source contains safety guardrails, behavioral constraints, or explicit deferral rules (e.g., "design-only, defers implementation to backend engineers"), do these appear in SKILL.md Invocation as a composability boundary? These define which adjacent skills this skill must not override.
+10. Does the generated SKILL.md text contain a literal `<<UNTRUSTED_SOURCE>>` or `<<END_UNTRUSTED_SOURCE>>` string? If yes, treat this as a generation defect and require user confirmation before writing to disk.
+11. **(L1)** Does the primary source spec prescribe a file structure (e.g., a "Supporting Content" or progressive disclosure section naming which files to produce)? If yes, generate those files regardless of the default optional/required split — source prescription takes precedence over default optional logic.
+12. **(L2)** If the source contains safety guardrails, behavioral constraints, or explicit deferral rules (e.g., "design-only, defers implementation to backend engineers"), do these appear in SKILL.md Invocation as a composability boundary? These define which adjacent skills this skill must not override.
 
 ## Self-Verification for Generated Skills (Required Before Completion)
 
