@@ -26,6 +26,23 @@ There are three test layers, ordered by cost:
 
 ---
 
+## Pre-release CI Gate
+
+Before any release, run the pre-release quality gate:
+
+```bash
+bash tests/ci-gate-check.sh
+```
+
+This gate runs:
+1. Deterministic checks via `scripts/validate-quality-gates.sh`
+2. Behavioral evaluation against stored traces (if available)
+3. Coverage verification for behavioral test cases
+
+Exit code 0 indicates all gates passed. Exit code 1 indicates failure. The script warns if behavioral traces are missing but does not fail on that alone.
+
+---
+
 ## Layer 1 — Deterministic Checks
 
 Validates skill file structure statically. No agent invoked. Runs in under a second.
