@@ -402,8 +402,8 @@ def build_parser() -> argparse.ArgumentParser:
     pipeline_sub = pipeline.add_subparsers(dest="subcommand", required=True)
 
     pb_scaffold = pipeline_sub.add_parser("scaffold", help="Scaffold benchmark layout")
-    pb_scaffold.add_argument("--manifest", default="tests/datasets/pipeline-benchmark/manifest.jsonl")
-    pb_scaffold.add_argument("--results-root", default="tests/results/pipeline-benchmark")
+    pb_scaffold.add_argument("--manifest", default="benchmarks/comparison/datasets/pipeline-benchmark/manifest.jsonl")
+    pb_scaffold.add_argument("--results-root", default="benchmarks/comparison/results/pipeline-benchmark")
     pb_scaffold.add_argument("--run-id", required=True)
     pb_scaffold.add_argument("--repeats", type=int, default=1)
     pb_scaffold.add_argument("--variant", action="append", default=[])
@@ -412,8 +412,8 @@ def build_parser() -> argparse.ArgumentParser:
     pb_scaffold.set_defaults(func=pipeline_benchmark_scaffold)
 
     pb_run = pipeline_sub.add_parser("run", help="Run benchmark commands")
-    pb_run.add_argument("--manifest", default="tests/datasets/pipeline-benchmark/manifest.jsonl")
-    pb_run.add_argument("--results-root", default="tests/results/pipeline-benchmark")
+    pb_run.add_argument("--manifest", default="benchmarks/comparison/datasets/pipeline-benchmark/manifest.jsonl")
+    pb_run.add_argument("--results-root", default="benchmarks/comparison/results/pipeline-benchmark")
     pb_run.add_argument("--run-id", required=True)
     pb_run.add_argument("--repeats", type=int, default=1)
     pb_run.add_argument("--variant", action="append", default=[])
@@ -425,8 +425,8 @@ def build_parser() -> argparse.ArgumentParser:
     pb_run.set_defaults(func=pipeline_benchmark_run)
 
     pb_summary = pipeline_sub.add_parser("summarize", help="Summarize benchmark")
-    pb_summary.add_argument("--manifest", default="tests/datasets/pipeline-benchmark/manifest.jsonl")
-    pb_summary.add_argument("--results-root", default="tests/results/pipeline-benchmark")
+    pb_summary.add_argument("--manifest", default="benchmarks/comparison/datasets/pipeline-benchmark/manifest.jsonl")
+    pb_summary.add_argument("--results-root", default="benchmarks/comparison/results/pipeline-benchmark")
     pb_summary.add_argument("--run-id", required=True)
     pb_summary.add_argument("--pipeline", action="append", default=[])
     pb_summary.add_argument("--output-json", default=None)

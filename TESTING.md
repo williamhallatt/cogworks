@@ -184,13 +184,13 @@ Runs `cogworks encode` end-to-end against benchmark datasets and compares claude
 
 **Real mode** — runs actual encode pipelines; produces decision-grade results.
 
-### Options (`scripts/test-cogworks-pipeline.sh`)
+### Options (`benchmarks/comparison/scripts/test-cogworks-pipeline.sh`)
 
 | Flag | Default | Description |
 |---|---|---|
 | `--run-id <id>` | `ab-<timestamp>` | Run identifier |
-| `--manifest <path>` | `tests/datasets/pipeline-benchmark/manifest.jsonl` | Benchmark dataset manifest |
-| `--results-root <path>` | `tests/results/pipeline-benchmark` | Output root |
+| `--manifest <path>` | `benchmarks/comparison/datasets/pipeline-benchmark/manifest.jsonl` | Benchmark dataset manifest |
+| `--results-root <path>` | `benchmarks/comparison/results/pipeline-benchmark` | Output root |
 | `--repeats <n>` | `3` | Repeat count per task |
 | `--variant <label>` | `clean source-order-shuffled` | Variants to run (repeatable) |
 | `--mode <offline\|real>` | `offline` | `offline` = plumbing check; `real` = decision-grade |
@@ -200,7 +200,7 @@ Runs `cogworks encode` end-to-end against benchmark datasets and compares claude
 ### Offline (plumbing verification)
 
 ```bash
-bash scripts/test-cogworks-pipeline.sh --mode offline --run-id 20260220-ab1
+bash benchmarks/comparison/scripts/test-cogworks-pipeline.sh --mode offline --run-id 20260220-ab1
 ```
 
 ### Real mode (decision-grade)
@@ -210,7 +210,7 @@ Point the benchmark commands at your actual encode runners:
 ```bash
 export COGWORKS_BENCH_CLAUDE_CMD="your-claude-runner --sources '{sources_path}' --out '{out_dir}'"
 export COGWORKS_BENCH_CODEX_CMD="your-codex-runner --sources '{sources_path}' --out '{out_dir}'"
-bash scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1
+bash benchmarks/comparison/scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1
 ```
 
 Each command must write `<out_dir>/metrics.json` with at least:
@@ -219,12 +219,124 @@ Each command must write `<out_dir>/metrics.json` with at least:
 Re-running after a partial run:
 
 ```bash
-bash scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1 --force
+bash benchmarks/comparison/scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1 --force
 ```
 
 Outputs:
-- `tests/results/pipeline-benchmark/{run_id}/benchmark-summary.json`
-- `tests/results/pipeline-benchmark/{run_id}/benchmark-report.md`
+- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/benchmark-summary.json`
+- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/benchmark-report.md`
+
+### Comparator Benchmark (A/B/C)
+
+Compare cogworks against two external generators (`generator-a`, `generator-b`) with shared fairness controls (same model family + budget limits) from:
+
+- `benchmarks/comparison/datasets/pipeline-benchmark/comparators.local.json`
+
+Expected local comparator paths:
+
+- `benchmarks/comparison/comparators/generator-a/`
+- `benchmarks/comparison/comparators/generator-b/`
+
+Run plumbing check (offline):
+
+```bash
+bash benchmarks/comparison/scripts/test-generator-comparison.sh --mode offline --run-id comp-20260303-smoke1
+```
+
+Run decision-grade comparison (real mode):
+
+```bash
+bash benchmarks/comparison/scripts/test-generator-comparison.sh --mode real --run-id comp-20260303-real1
+```
+
+Override comparator commands when their local default scripts differ:
+
+```bash
+export COGWORKS_BENCH_GENERATOR_A_CMD="bash {comparator_dir}/scripts/benchmark.sh '{sources_path}' '{out_dir}'"
+export COGWORKS_BENCH_GENERATOR_B_CMD="bash {comparator_dir}/scripts/benchmark.sh '{sources_path}' '{out_dir}'"
+```
+
+Comparator adapters normalize outputs through:
+
+- `benchmarks/comparison/scripts/run-comparator-benchmark.sh`
+- `benchmarks/comparison/scripts/run-generator-a.sh`
+- `benchmarks/comparison/scripts/run-generator-b.sh`
+
+Additional output:
+
+- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/quality-first-ranking.md`
+
+### Protocol-Run Comparator Benchmark (Authoritative for Workflow Toolkits)
+
+Use this path when comparators are workflow/process repositories (not one-shot generators with a stable metrics contract).
+
+Canonical operational runbook:
+- `benchmarks/comparison/RUNBOOK.md`
+
+Protocol manifests:
+- `benchmarks/comparison/datasets/pipeline-benchmark/protocol-pilot.json` (fast pilot)
+- `benchmarks/comparison/datasets/pipeline-benchmark/protocol-hard-v2.json` (expanded hard suite)
+
+Runbooks:
+- `benchmarks/comparison/docs/protocols/cogworks.md`
+- `benchmarks/comparison/docs/protocols/generator-a.md`
+- `benchmarks/comparison/docs/protocols/generator-b.md`
+
+Pilot tasks (current default): `pb-001-api-auth`, `pb-002-k8s-troubleshoot`
+
+Offline protocol smoke run:
+
+```bash
+bash benchmarks/comparison/scripts/run-protocol-benchmark.sh \
+  --protocol benchmarks/comparison/datasets/pipeline-benchmark/protocol-pilot.json \
+  --mode offline \
+  --run-id protocol-20260303-smoke1 \
+  --force
+```
+
+Real protocol run:
+
+```bash
+bash benchmarks/comparison/scripts/run-protocol-benchmark.sh \
+  --protocol benchmarks/comparison/datasets/pipeline-benchmark/protocol-pilot.json \
+  --mode real \
+  --run-id protocol-20260303-real1 \
+  --force
+```
+
+Hard-suite real protocol run:
+
+```bash
+bash benchmarks/comparison/scripts/run-protocol-benchmark.sh \
+  --protocol benchmarks/comparison/datasets/pipeline-benchmark/protocol-hard-v2.json \
+  --mode real \
+  --run-id protocol-hard-v2-real1 \
+  --force
+```
+
+Optional legacy compatibility summary:
+
+```bash
+bash benchmarks/comparison/scripts/run-protocol-benchmark.sh \
+  --protocol benchmarks/comparison/datasets/pipeline-benchmark/protocol-pilot.json \
+  --mode real \
+  --run-id protocol-20260303-real1 \
+  --force \
+  --compat-summary
+```
+
+Artifacts:
+- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/pilot-summary.json` (protocol summary)
+- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/pilot-report.md`
+- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/quality-first-ranking.md`
+
+Optional compatibility artifact:
+- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/benchmark-summary.json` (legacy comparator summary; non-authoritative in protocol mode)
+
+Per-run artifacts:
+- `generation-artifact.json`
+- `quality-eval.json`
+- `metrics.json`
 
 ---
 
@@ -304,14 +416,14 @@ bash scripts/validate-recursive-docs.sh
 
 ## Advanced Manual CLI
 
-The `pipeline-benchmark` subcommand requires `scripts/` on PYTHONPATH. Prefer `scripts/test-cogworks-pipeline.sh` as the entry point. For direct CLI access:
+The `pipeline-benchmark` subcommand requires `benchmarks/comparison/scripts/` on `PYTHONPATH` (for `pipeline_benchmark.py`). Prefer `benchmarks/comparison/scripts/test-cogworks-pipeline.sh` as the entry point. For direct CLI access:
 
 ```bash
 export PYTHONPATH="$PWD/scripts:${PYTHONPATH:-}"
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark scaffold --run-id 20260220-ab1
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark run --run-id 20260220-ab1 \
-  --command-template "claude::./scripts/run-benchmark.sh claude '{sources_path}' '{out_dir}'" \
-  --command-template "codex::./scripts/run-benchmark.sh codex '{sources_path}' '{out_dir}'"
+  --command-template "claude::./benchmarks/comparison/scripts/run-benchmark.sh claude '{sources_path}' '{out_dir}'" \
+  --command-template "codex::./benchmarks/comparison/scripts/run-benchmark.sh codex '{sources_path}' '{out_dir}'"
 python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark summarize --run-id 20260220-ab1
 ```
 
@@ -320,7 +432,6 @@ python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark summarize --
 ## References
 
 - `tests/framework/README.md`
-- `tests/datasets/pipeline-benchmark/README.md`
+- `benchmarks/comparison/datasets/pipeline-benchmark/README.md`
 - `tests/datasets/recursive-round/README.md`
 - `tests/run-black-box-tests.sh`
-

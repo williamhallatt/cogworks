@@ -1,7 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC2034
 
-# Benchmark command contracts consumed by scripts/test-cogworks-pipeline.sh
+# Benchmark command contracts consumed by benchmarks/comparison/scripts/test-cogworks-pipeline.sh
 export COGWORKS_BENCH_CLAUDE_CMD="bash scripts/recursive-bench.sh claude '{sources_path}' '{out_dir}'"
 export COGWORKS_BENCH_CODEX_CMD="bash scripts/recursive-bench.sh codex '{sources_path}' '{out_dir}'"
 
