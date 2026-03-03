@@ -48,6 +48,13 @@
 - `_generated-skills/` is the neutral staging directory for skills produced by `cogworks encode`, installed to agents via `npx skills add`.
 - `_sources/` and `_plans/` are working materials and research artifacts.
 
+### ⚠️ Auto-Loading & Live-Edit Hazard
+- `.claude/skills/` contains symlinks to `skills/cogworks/SKILL.md`, `skills/cogworks-encode/SKILL.md`, and `skills/cogworks-learn/SKILL.md` — any agent that auto-loads these skills is running under live instructions from those files.
+- Editing a `skills/cogworks*/SKILL.md` file immediately changes the instructions for every session currently reading it via the symlink — there is no staging buffer.
+- An agent that is both operating under a skill's instructions and editing that skill's `SKILL.md` is in circular/inconsistent state.
+- **Convention:** when editing any `skills/cogworks*/SKILL.md`, note it at the top of your session and do not invoke the skill you are editing during that session.
+- **Convention:** if you accidentally invoke a skill while editing it, treat the session as potentially corrupted — restart, or carefully verify that the instructions in memory still match the file on disk.
+
 ## Build, Test, and Development Commands
 - `npx skills add williamhallatt/cogworks` installs skills to detected agents.
 - `npx skills add . -a claude-code -y` installs from local repo for development.
