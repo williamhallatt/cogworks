@@ -1,0 +1,19 @@
+{
+  "model_family": "gpt-5-codex",
+  "budget": {
+    "max_total_tokens": 12000,
+    "max_context_tokens": 5000,
+    "max_runtime_sec": 900
+  },
+  "pipelines": {
+    "cogworks": {
+      "command_template": "bash benchmarks/comparison/scripts/run-benchmark.sh codex '{sources_path}' '{out_dir}'"
+    },
+    "generator-a": {
+      "command_template": "bash benchmarks/comparison/scripts/run-comparator-benchmark.sh generator-a '{sources_path}' '{out_dir}'"
+    },
+    "generator-b": {
+      "command_template": "bash benchmarks/comparison/scripts/run-comparator-benchmark.sh generator-b '{sources_path}' '{out_dir}'"
+    }
+  }
+}

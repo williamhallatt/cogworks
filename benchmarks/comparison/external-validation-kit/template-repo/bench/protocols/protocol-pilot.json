@@ -1,0 +1,86 @@
+{
+  "name": "protocol-pilot-v1",
+  "source_manifest": "bench/datasets/pipeline-benchmark/manifest.jsonl",
+  "tasks": [
+    "pb-001-api-auth",
+    "pb-002-k8s-troubleshoot"
+  ],
+  "model_family": "gpt-5-codex",
+  "budget": {
+    "max_total_tokens": 12000,
+    "max_context_tokens": 5000,
+    "max_runtime_sec": 900
+  },
+  "pipelines": {
+    "cogworks": {
+      "generation_command_template": "bash bench/scripts/run-protocol-generator.sh cogworks '{task_id}' '{sources_path}' '{skill_out_dir}'",
+      "skill_path_template": "{out_dir}/generated-skill",
+      "execution_mode": "skill_installed",
+      "skill_install": {
+        "source": "vendors/cogworks",
+        "agent": "codex",
+        "expected_skills": [
+          "cogworks",
+          "cogworks-encode",
+          "cogworks-learn"
+        ],
+        "install_flags": [
+          "-a",
+          "codex",
+          "-y"
+        ]
+      },
+      "skill_invocation": {
+        "required_skill_slug": "cogworks",
+        "evidence_markers": [
+          "cogworks"
+        ]
+      },
+      "notes": "True installed-skill execution via npx skills add"
+    },
+    "generator-a": {
+      "generation_command_template": "bash bench/scripts/run-protocol-generator.sh generator-a '{task_id}' '{sources_path}' '{skill_out_dir}'",
+      "skill_path_template": "{out_dir}/generated-skill",
+      "execution_mode": "skill_installed",
+      "skill_install": {
+        "source": "vendors/generator-a/skill-creator",
+        "agent": "codex",
+        "expected_skills": [
+          "skill-creator"
+        ],
+        "install_flags": [
+          "-a",
+          "codex",
+          "-y"
+        ]
+      },
+      "skill_invocation": {
+        "required_skill_slug": "skill-creator",
+        "evidence_markers": [
+          "skill-creator"
+        ]
+      },
+      "notes": "Comparator in true installed-skill mode"
+    },
+    "generator-b": {
+      "generation_command_template": "bash bench/scripts/run-protocol-generator.sh generator-b '{task_id}' '{sources_path}' '{skill_out_dir}'",
+      "skill_path_template": "{out_dir}/generated-skill",
+      "execution_mode": "protocol_prompt",
+      "notes": "Fallback protocol-prompt mode until a single installable benchmark skill package is provided"
+    }
+  },
+  "execution": {
+    "isolation_mode": "ephemeral_container",
+    "allowed_mounts": [
+      "sandbox/input",
+      "sandbox/output"
+    ],
+    "forbidden_paths": [
+      "bench/results",
+      "../"
+    ]
+  },
+  "reproducibility": {
+    "repeats_min": 3
+  }
+}
