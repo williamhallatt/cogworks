@@ -3,12 +3,12 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EVAL_CLI="$ROOT_DIR/tests/framework/scripts/cogworks-eval.py"
-BENCH_SCRIPT="$ROOT_DIR/scripts/test-cogworks-pipeline.sh"
+BENCH_SCRIPT="$ROOT_DIR/benchmarks/comparison/scripts/test-cogworks-pipeline.sh"
 
 ROUND_MANIFEST=""
 RUN_ID="rr-$(date +%Y%m%d-%H%M%S)"
 MODE="fast"
-TASK_MANIFEST="$ROOT_DIR/tests/datasets/pipeline-benchmark/manifest.jsonl"
+TASK_MANIFEST="$ROOT_DIR/benchmarks/comparison/datasets/pipeline-benchmark/manifest.jsonl"
 SMOKE_ONLY=0
 SKIP_HOOKS=0
 
@@ -265,8 +265,8 @@ if [[ "$MODE" == "deep" ]]; then
     bash "$BENCH_SCRIPT" --mode real --run-id "$RUN_ID" --manifest "$TASK_MANIFEST" --force
   fi
 
-  BENCHMARK_SUMMARY="$ROOT_DIR/tests/results/pipeline-benchmark/$RUN_ID/benchmark-summary.json"
-  BENCHMARK_REPORT="$ROOT_DIR/tests/results/pipeline-benchmark/$RUN_ID/benchmark-report.md"
+  BENCHMARK_SUMMARY="$ROOT_DIR/benchmarks/comparison/results/pipeline-benchmark/$RUN_ID/benchmark-summary.json"
+  BENCHMARK_REPORT="$ROOT_DIR/benchmarks/comparison/results/pipeline-benchmark/$RUN_ID/benchmark-report.md"
 
   mapfile -t BENCH_STATE < <(python3 - "$MANIFEST_STATE" "$BENCHMARK_SUMMARY" <<'PY'
 import json

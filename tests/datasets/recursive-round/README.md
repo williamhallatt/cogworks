@@ -128,8 +128,8 @@ Per run outputs:
 
 Deep mode adds references to:
 
-- `tests/results/pipeline-benchmark/<run-id>/benchmark-summary.json`
-- `tests/results/pipeline-benchmark/<run-id>/benchmark-report.md`
+- `benchmarks/comparison/results/pipeline-benchmark/<run-id>/benchmark-summary.json`
+- `benchmarks/comparison/results/pipeline-benchmark/<run-id>/benchmark-report.md`
 
 ## Troubleshooting
 

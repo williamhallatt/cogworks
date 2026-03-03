@@ -2,15 +2,15 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RESULTS_ROOT="$ROOT_DIR/tests/results/pipeline-benchmark"
+RESULTS_ROOT="$ROOT_DIR/benchmarks/comparison/results/pipeline-benchmark"
 RUN_ID="smoke-$(date +%Y%m%d-%H%M%S)"
-RUNNER="$ROOT_DIR/scripts/test-cogworks-pipeline.sh"
+RUNNER="$ROOT_DIR/benchmarks/comparison/scripts/test-cogworks-pipeline.sh"
 SUMMARY_JSON="$RESULTS_ROOT/$RUN_ID/benchmark-summary.json"
 REPORT_MD="$RESULTS_ROOT/$RUN_ID/benchmark-report.md"
 
 for required_script in \
-  "$ROOT_DIR/scripts/test-cogworks-pipeline.sh" \
-  "$ROOT_DIR/scripts/run-benchmark.sh"; do
+  "$ROOT_DIR/benchmarks/comparison/scripts/test-cogworks-pipeline.sh" \
+  "$ROOT_DIR/benchmarks/comparison/scripts/run-benchmark.sh"; do
   if [[ ! -x "$required_script" ]]; then
     echo "Missing or non-executable benchmark script: $required_script" >&2
     exit 1
