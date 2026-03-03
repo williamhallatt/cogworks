@@ -1,6 +1,6 @@
 ---
-updated_at: 2026-03-03T11:10:00Z
-focus_area: Cogworks agent risk remediation (mitigations 1–12)
+updated_at: 2026-03-03T21:12:00Z
+focus_area: cogworks risk remediation — 12 issues live on board github.com/users/williamhallatt/projects/1
 active_issues:
   - M2 delimiter sanitisation (Ash)
   - M6 default-untrusted URLs (Ash)
