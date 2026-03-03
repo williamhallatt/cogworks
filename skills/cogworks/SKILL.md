@@ -148,6 +148,8 @@ If overwriting, detect version bump per cogworks-learn metadata rules.
 - `{decision_skeleton}` - ordered decision tree for downstream skill assembly
 - `{stage_validation_report}` - machine-readable pass/fail report for each stage and blocking gate
 
+**Context budget check (warn):** Count source files/URLs. If more than 3 sources are large (files > ~20 KB or URLs with > 500 lines of content), warn the user: "Context window pressure may affect synthesis quality with [N] large sources. Consider batching into sub-topics." The user may acknowledge and proceed — this is a warning, not a block.
+
 Synthesise all gathered source material into a unified knowledge base following the `cogworks-encode` synthesis process. Find non-obvious connections between sources, resolve contradictions with nuanced analysis, and extract decision-useful guidance.
 
 Apply the **Synthesis Output Contract**:
@@ -200,6 +202,8 @@ The Decision Skeleton serves two purposes:
 2. It maps directly to the output structure: Decision Skeleton entries → `Decision Rules` in reference.md; the highest-priority entries → `Quick Decision Cheatsheet` in SKILL.md
 
 **Why this step matters:** Synthesis is organized around knowledge structure (what is known about the domain). Skills must be organized around decision structure (what choices the consumer needs to make correctly). The Decision Skeleton is the transformation between these two forms.
+
+**Minimum skeleton gate (blocking):** If fewer than 5 entries are extracted, stop and ask the user to clarify scope before proceeding — do not advance to synthesis with a sparse skeleton.
 
 ### 4. User Review
 
