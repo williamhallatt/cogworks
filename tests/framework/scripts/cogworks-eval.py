@@ -3,7 +3,7 @@ import argparse
 import json
 import os
 import sys
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from behavioral_lib import load_json, load_jsonl, validate_case, compute_f1
@@ -123,6 +123,42 @@ def _validate_trace_provenance(
     return issues
 
 
+_WARN_DAYS = 90
+_BLOCK_DAYS = 180
+
+
+def check_trace_freshness(trace_path: str) -> bool:
+    """Check the modification age of a trace file.
+
+    Returns True (continue) if the trace is fresh or only warned.
+    Returns False (skip/fail) if the trace is older than BLOCK_DAYS.
+    """
+    try:
+        mtime = os.path.getmtime(trace_path)
+    except OSError:
+        return True  # File not found is handled separately; don't block here.
+
+    age_days = (datetime.now(timezone.utc).timestamp() - mtime) / 86400
+
+    if age_days > _BLOCK_DAYS:
+        print(
+            f"ERROR: trace is {int(age_days)} days old (>{_BLOCK_DAYS}d threshold) — "
+            f"refresh required: {trace_path}\n"
+            "  Run: bash scripts/refresh-behavioral-traces.sh",
+            file=sys.stderr,
+        )
+        return False
+
+    if age_days > _WARN_DAYS:
+        print(
+            f"WARNING: trace is {int(age_days)} days old (>{_WARN_DAYS}d threshold) — "
+            f"consider refreshing: {trace_path}",
+            file=sys.stderr,
+        )
+
+    return True
+
+
 def behavioral_run(args: argparse.Namespace) -> int:
     timestamp = args.timestamp or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     results_dir = os.path.join(args.results_root, timestamp)
@@ -206,6 +242,13 @@ def behavioral_run(args: argparse.Namespace) -> int:
             trace_path = os.path.join(traces_dir, f"{case_id}.json")
             if not os.path.exists(trace_path):
                 msg = f"missing trace: {trace_path}"
+                case_results.append({"case_id": case_id, "pass": False, "issues": [msg]})
+                skill_summary["status"] = "FAIL"
+                skill_summary["failures"].append(msg)
+                continue
+
+            if not check_trace_freshness(trace_path):
+                msg = f"trace too stale (>{_BLOCK_DAYS}d): {trace_path}"
                 case_results.append({"case_id": case_id, "pass": False, "issues": [msg]})
                 skill_summary["status"] = "FAIL"
                 skill_summary["failures"].append(msg)
