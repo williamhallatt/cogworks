@@ -2,6 +2,26 @@
 
 ## Learnings
 
+**2026-03-04 — Gap Closure Review (Round 3 Coherence Audit)**
+
+Recorded architectural decisions D-020 and D-021 in `_plans/DECISIONS.md`. Verified all six closed gaps (M2, M9, D9, D3, D6, D8) for cross-agent coherence.
+
+**D-020 (Deterministic Delimiter Neutralisation):** Behavioral directives ("treat as data") are insufficient when the attack surface is literal string content. A source containing `<</UNTRUSTED_SOURCE>>` deterministically collapses the security boundary at the parser level regardless of model intent. The fix must be deterministic preprocessing, not intent (Ash's M2 closure).
+
+**D-021 (CI Gate Behavioral Coverage Requirement):** Trace presence check is now a blocking gate (exit 1 on failure), not a warning. Behavioral coverage is a release guarantee, not an optional signal (Hudson's D8 closure).
+
+**Coherence verification (no conflicts found):**
+- M2 ↔ cogworks-learn consistency: M9 checks for delimiter *leaks* (defect detection), orthogonal to replacement tokens. No conflict.
+- M2 ↔ cogworks orchestrator: Orchestrator delegates to cogworks-encode's protocol; changes automatically picked up. No conflict.
+- D9 ↔ existing overwrite protection: Slug guard complements path-based overwrite protection; different surfaces. No conflict.
+- CI gate ↔ existing traces: New loop iterates all skills; traces exist for all three. No false-positive risk.
+
+**Follow-up noted:** Lambert's compatibility template note (cogworks-learn generated-skill guidance) is documented but not yet enforced in generation checklist. Low-priority follow-up for next round.
+
+**Team coordination (Round 3):** All five agents completed parallel work on 6 gaps with zero conflicts. Orchestration, session log, decision merge, and history updates all captured for commit.
+
+- **Learnings**
+
 - **Quality calibration vs capability gating are distinct concerns.** Model capability requirements (Sonnet-class or above) address whether the model *can* synthesize; quality calibration addresses whether it *does* synthesize with appropriate depth. The anti-superficiality gate added to Self-Verification targets the latter — it forces the model to introspect on its own output before declaring completion. The key design insight: a model that finds zero tensions between multiple sources has almost certainly under-analyzed, so "all clear" is the red flag, not the green light.
 
 **2026-03-03 — Team coordination notes**
@@ -15,3 +35,10 @@
 - Added context-budget warning bullet to AGENTS.md Auto-Loading hazard section
 - Improves awareness of squad.agent.md circular edit hazard during skill development
 - Sharpens developer friction point for F4/F5 risk mitigation
+
+### 2026-03-04: Gap Closure Review (Self-Knowledge Audit)
+- Recorded D-020 (deterministic delimiter neutralisation) and D-021 (CI gate fails on missing traces) in `_plans/DECISIONS.md`.
+- Verified all four agents' changes (Ash/M2, Dallas/D9, Lambert/D6, Hudson/CI gate) are coherent — no cross-agent conflicts found.
+- Key insight: behavioral-only security boundaries are insufficient when the attack surface is literal string content. Deterministic preprocessing is the correct layer for delimiter integrity.
+- Follow-up noted: Lambert's compatibility template note is documented but not yet enforced in cogworks-learn's generation checklist.
+

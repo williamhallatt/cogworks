@@ -2,6 +2,18 @@
 
 ## Learnings
 
+### 2026-03-04: Gap Closure Round 3: D9 Slug Collision + D3 Handoff Artifacts
+
+Closed two self-knowledge audit gaps:
+
+1. **D9 Slug collision guard extended** — `skills/cogworks/SKILL.md` Step 5 overwrite protection now additionally checks `.claude/skills/{slug}/`, `.agents/skills/{slug}/`, `.copilot/skills/{slug}/` for an existing skill with the same slug. Warns the user and requires confirmation if found. Missing agent directories are skipped gracefully. Previously the guard only protected `_generated-skills/`, leaving installed production skills silently replaceable.
+
+2. **D3 Handoff artifact presence check** — `skills/cogworks-encode/SKILL.md` Stage Contracts now includes an explicit "Artifact presence check (blocking)" note: if any required handoff artifact (`{cdr_registry}`, `{traceability_map}`, `{decision_skeleton}`, etc.) is absent or empty at the point it is consumed, the pipeline halts. Previously only content checks existed; a missing artifact would cause silent downstream failure.
+
+**Key learning:** A semantic completeness check (does the artifact's content satisfy quality gates?) is not the same as a presence check (does the artifact exist at all?). Both must be explicit. The presence check belongs at the consumption point, not at generation.
+
+**Team coordination (Round 3):** Ash closed M2/M9 (delimiter escape + injection scan), Lambert closed D6 (compatibility matrix), Hudson closed D8 (CI gate behavioral enforcement), Ripley recorded architectural decisions D-020 and D-021.
+
 ### 2026-03-03: Pipeline Guard Implementation Round 2
 
 Implemented four pipeline safety guards addressing issues #5, #11, #14, and #16:
@@ -27,3 +39,4 @@ All changes are surgical — single bullets or short notes at the relevant workf
 - Fixed .gitignore with deep patterns: `tests/results/**/` and `benchmarks/**/output_skills/`
 - Updated TESTING.md with pre-session cleanup guidance
 - Reduced context leak from test artifacts in repo scans
+
