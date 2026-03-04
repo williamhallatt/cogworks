@@ -14,7 +14,7 @@
 | 2 | **Prompt injection via untrusted sources** | Critical | Using | `<<UNTRUSTED_SOURCE>>` delimiter protocol relies on model compliance, not enforcement |
 | 3 | **Model capability degradation** | High | Using | Workhorse-tier models (Haiku, GPT-3.5) warned but not blocked; output appears complete but synthesis is shallow |
 | 4 | **Live skill edit during execution** | High | Working-on | Symlinks in `.claude/skills/` point to `skills/` — editing SKILL.md changes in-flight instructions |
-| 5 | **Behavioral trace staleness** | High | Working-on | Layer 2 tests validate against stored traces; model drift invalidates traces without detection |
+| 5 | **Behavioral evaluation circular** | High | **Resolved (D-022)** | Behavioral traces deleted — they were LLM-generated circular ground truth. Parker defining replacement. See `.squad/agents/parker/charter.md`. |
 
 ---
 
@@ -154,7 +154,7 @@
 
 **Risks:**
 
-- **Behavioral traces become stale** — Severity: High — Agents: All — Stored traces in `tests/behavioral/*/traces/` reflect model behavior at capture time. As models update, actual behavior diverges from stored traces. Tests pass against stale traces while real behavior has drifted. — *Mitigation:* Add trace freshness check: "Traces older than 90 days trigger warning. Traces older than 180 days trigger blocking refresh requirement."
+- **Behavioral evaluation was circular** — Severity: High — **Status: Resolved (D-022/D-023)** — Behavioral traces (`tests/behavioral/*/traces/`) were LLM-generated. The model generating skills also evaluated them — circular verification. `quality_score: null` on all core skill traces; `task_completed: false` in baseline runs. — *Resolution:* Traces deleted. Capture scripts deleted. CI gate blocks regeneration. Parker (Benchmark & Evaluation Engineer) is defining replacement quality ground truth from first principles. See `.squad/agents/parker/charter.md`.
 
 - **Layer 1 structural pass ≠ quality** — Severity: Medium — Agents: All — Deterministic checks validate structure (sections present, citations exist, fences balanced) but not semantic correctness. A skill with all sections present but wrong guidance passes Layer 1. — *Mitigation:* Acknowledged limitation. Layer 2 behavioral tests and the generalization probe partially address this.
 
@@ -287,7 +287,7 @@
 
 3. **Document auto-loading risks for contributors** — Add prominent warning to AGENTS.md and CLAUDE.md: "When editing cogworks-*/SKILL.md files, the skill you're editing is likely active. Disable auto-loading or start a fresh session first."
 
-4. **Add trace freshness checks to behavioral test runner** — Modify `cogworks-eval.py` to check trace modification timestamps. Traces >90 days old produce warnings; >180 days produce blocking failures requiring refresh.
+4. ~~**Add trace freshness checks to behavioral test runner**~~ — *Superseded by D-022/D-023: behavioral traces deleted, capture scripts removed. Parker defining replacement quality ground truth.*
 
 5. **Add `--no-overwrite` flag for autonomous mode** — Implement environment variable or flag that hard-blocks overwrites in `_generated-skills/`, preventing autonomous agents from silently replacing existing skills.
 
@@ -299,7 +299,7 @@
 
 9. **Scan generated skills for injection patterns** — Add post-generation check scanning for instruction-like patterns (`ignore prior`, imperative verbs targeting agent, tool call syntax). Flag matches for human review.
 
-10. **Enable Codex behavioral capture pipeline** — Uncomment `COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD` in `scripts/behavioral-env.example.sh` and ensure Codex traces are captured for cross-agent validation.
+10. ~~**Enable Codex behavioral capture pipeline**~~ — *Superseded by D-022/D-023: behavioral capture scripts deleted. Codex capture was part of circular ground truth problem.*
 
 11. **Add structural cross-source connection count** — In Phase 2, count explicit multi-source connections. If fewer than 2 connections reference multiple source IDs, flag as potential concatenation.
 

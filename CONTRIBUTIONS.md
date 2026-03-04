@@ -21,14 +21,13 @@ npx skills add ./skills
 # Framework meta-tests
 bash tests/run-black-box-tests.sh
 
-# Behavioral gates for repo skills
-python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-
-
 # Fast recursive improvement round
 bash scripts/run-recursive-round.sh \
   --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
   --mode fast
 ```
+
+> **Note:** Layer 2 behavioral evaluation (`cogworks-eval.py behavioral run`) is pending reconstruction (D-022/D-023). Layer 1 deterministic checks and recursive rounds are the current gates.
 
 See [TESTING.md](TESTING.md) for the full test runbook, including recursive improvement rounds and generated-skill testing.
 
@@ -43,7 +42,7 @@ See [TESTING.md](TESTING.md) for the full test runbook, including recursive impr
 
 PR checklist:
 
-- [ ] Changes to `skills/**` or `.claude/**` include updated or passing behavioral tests
+- [ ] Changes to `skills/**` or `.claude/**` pass Layer 1 deterministic checks (`bash scripts/validate-quality-gates.sh`)
 - [ ] Shell scripts pass shellcheck
 - [ ] README.md and INSTALL.md updated if user-facing behavior changed
 - [ ] Commit messages follow the `<type>/ <summary>` format

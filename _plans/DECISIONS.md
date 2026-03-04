@@ -15,6 +15,22 @@ see `_plans/archive/` for historical plans.
 - **Trade-off:** Neutralisation changes the appearance of source content (the literal strings are rewritten). This is a minor cosmetic issue weighed against deterministic security. The replacement tokens are visually distinct and unambiguous.
 - **Scope:** `skills/cogworks-encode/SKILL.md` (delimiter protocol), with downstream consistency in `skills/cogworks-learn/SKILL.md` (generation defect check).
 
+## [D-024] Documentation audit — stale behavioral refs removed (D-022/D-023 cleanup)
+
+- **Date:** 2026-03-04 | **By:** William (owner) / Scribe (mandate)
+- **Decision:** Full documentation audit following D-022/D-023. All remaining stale references to deleted behavioral traces, capture scripts, and `cogworks-eval.py behavioral run` updated across 7 live files.
+- **Files updated:**
+  - `.github/workflows/pre-release-validation.yml` — "Behavioral tests" step replaced with skip notice (was actively breaking CI)
+  - `AGENTS.md` — behavioral run command replaced with scaffold; testing guidelines updated
+  - `CONTRIBUTIONS.md` — quick-start command block updated; PR checklist item updated to Layer 1 checks
+  - `scripts/run-recursive-round.sh` — behavioral run calls replaced with skip guard
+  - `scripts/test-generated-skill.sh` — behavioral run call replaced with skip guard
+  - `docs/cogworks-agent-risk-analysis.md` — Risk #5 updated to "Resolved (D-022)"; mitigations #4 and #10 struck through
+- **Files deleted:**
+  - `docs/codex-behavioral-capture.md` — entire file described deleted Codex trace capture workflow
+- **Clean state:** No remaining live files reference deleted behavioral traces, capture scripts, or the now-meaningless `cogworks-eval.py behavioral run` command without a D-022/D-023 context note.
+- **Scope:** `.github/workflows/`, `AGENTS.md`, `CONTRIBUTIONS.md`, `scripts/` (2 files), `docs/` (1 updated, 1 deleted).
+
 ## [D-023] Orphaned capture scripts deleted — docs updated
 
 - **Date:** 2026-03-04 | **By:** William (owner), following D-022
