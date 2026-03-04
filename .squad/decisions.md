@@ -143,3 +143,11 @@
 - **Test Coverage:** Hudson added 7 new test cases covering `$ARGUMENTS` scoping, compatibility field usage, allowed-tools support, parallel tool use, subagent delegation, and persistent config guidance. All existing activation tests remain valid.
 - **CI Gate:** Correctly blocks on missing traces (per D-022); Parker responsible for ground truth definition.
 - **Status:** Approved by product review. Ready for commit.
+
+## TD-017 — Spec-align: remove wrong .copilot/skills path, label Claude Code scope guidance
+**Date:** 2025-07-27
+**Files:** skills/cogworks/SKILL.md, skills/cogworks-learn/reference.md
+**Changes:**
+- cogworks/SKILL.md: removed `.copilot/skills/{slug}/` from slug collision check (Copilot project path is `.agents/skills/`, already in the list)
+- cogworks-learn/reference.md: added `[Claude Code only]` to `disable-model-invocation` in Task Content definition (sole unlabeled occurrence)
+- cogworks-learn/reference.md: added cross-agent scope note after both Scope Path tables (Claude Code paths only; other agents use their own paths, handled by `npx skills add`)
