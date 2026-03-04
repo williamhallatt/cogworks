@@ -18,6 +18,14 @@
 | PRD intake, spec authoring | Kane | Product Manager |
 | Product coherence review on PRs | Kane | Product Manager |
 | "What should we build next?" / backlog grooming | Kane | Product Manager |
+| Skill quality definition, "what makes a good skill?" | Parker | First-principles eval |
+| Agent behavior delta measurement (with vs without skill) | Parker | Core quality signal |
+| Cross-model independent grading, LLM-as-judge protocol | Parker | Eval independence |
+| Golden reference set, human-graded skill evaluation | Parker | External ground truth |
+| Adversarial test case design, generator blind spot probes | Parker | Eval coverage |
+| Statistical validity of eval results, confidence intervals | Parker | Eval rigor |
+| "Is our testing trustworthy?" / circular testing concerns | Parker | Eval architecture |
+| Audit of current quality measurement (Layers 2/3) | Parker | Audit authority |
 | Agent skill UX feedback, invocation ergonomics | Kane | Product Manager |
 | Architecture decisions, code review, scope | Ripley | Lead |
 | Session logs, decision merges, cross-agent updates | Scribe | Always background |
