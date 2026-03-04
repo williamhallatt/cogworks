@@ -2,6 +2,11 @@
 
 ## Expected Test Outcomes
 
+# ⚠️ ASPIRATIONAL TARGETS — NOT MEASURED VALUES
+# These scores have never been produced by an actual evaluation run.
+# The deployment-skill generated artifact does not exist in this repo.
+# These are design targets for what a high-quality skill SHOULD achieve,
+# calibrated against the LLM-judge rubric. Do NOT use as regression baselines.
 expected_scores:
   overall_score: 0.87  # Tolerance: ±5%
   weighted_score: 4.35  # Out of 5.0
@@ -92,6 +97,8 @@ Use as reference for:
 - Training new skill authors
 - Regression testing framework changes
 
+# ⚠️ FABRICATED HISTORY — This table was hand-authored, not recorded from a real eval run.
+# Remove this row once an actual evaluation has been performed.
 ## Validation History
 
 | Date       | Framework Version | Score | Pass/Fail | Notes                  |
