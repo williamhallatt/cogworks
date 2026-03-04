@@ -6,7 +6,7 @@
       "tests/test-suite/mvp-test-cases.jsonl",
       "tests/behavioral"
     ],
-    "expected_sha256": "909ee9acf3768b27717b0e1c31eaa2a67c91548dda2a70b9b38eb34bdb2c49e2"
+    "expected_sha256": "d015856f36f57e1e38d1e0dca0692ad73cad81dbdb1f72e102af7f0e14bbdf5e"
   },
   "pipeline_paths": {
     "claude_skills_root": ".claude/skills",
