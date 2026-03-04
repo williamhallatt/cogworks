@@ -31,3 +31,8 @@
 - Ash implemented security guards (D2, D1, D1) addressing escalation boundaries, stale skill detection, and intent clarification.
 - Ripley implemented quality calibration gate (D4) in cogworks-encode Self-Verification to detect superficial synthesis.
 - Hudson added generalization probe and edge case tests (D8) plus pre-release CI gate to catch circular verification failures.
+
+### 2026-03-04: Context-Impact Remediation
+- Converted CLAUDE.md from symlink (mode 120000) to regular file (mode 100644)
+- Replaced content with 3-line pointer to AGENTS.md per expert subtraction principle
+- Eliminated F2/F3 context bloat from byte-for-byte duplication
