@@ -159,3 +159,16 @@
 - Frontmatter template: added `# compatibility: Requires Claude Code for [feature]` comment to show the field as conditional
 - L2 compatibility rule: expanded from `$ARGUMENTS` only to ALL CC-specific fields (`$ARGUMENTS`, `disable-model-invocation: true`, `user-invocable: false`, `context: fork`); now requires `compatibility:` frontmatter (not just body note) when any CC-specific field is present in a generated skill
 - Self-verification checklist: added gate — "If generated SKILL.md uses any CC-specific field or placeholder, is `compatibility:` present in frontmatter?"
+
+## [TD-019] Cross-Agent Path Fixes & CC-Only Labeling
+- **Date:** 2026-03-04 | **By:** Lambert (Compatibility Engineer)
+- **Commit:** ca8f5cb
+- **Work Items:**
+  1. **INSTALL.md cross-agent alignment:** Split manual install paths into Claude Code (`.claude/skills/`) and cross-agent (`.agents/skills/`); corrected Codex invocation syntax from `$` to natural language; enhanced verification commands.
+  2. **CONTRIBUTIONS.md cross-agent alignment:** Fixed dev install command to `npx skills add .`; added `.agents/**` to PR and release validation checklists; enhanced symlink verification for both `.claude/` and `.agents/` paths.
+  3. **examples.md labeling:** Added `[Claude Code only]` markers to 8 examples (2, 4, 5, 6, 7, 8, 10, 11) with heading notes and inline YAML comments.
+  4. **patterns.md labeling:** Labeled patterns 2, 4, 6, 7, 8, 10 and anti-patterns 3, 4, 7, 8 with CC-only markers for syntax and fields.
+- **Fields Labeled:** `context: fork`, `disable-model-invocation`, `argument-hint`, `$ARGUMENTS`, positional placeholders, `${CLAUDE_SESSION_ID}`, `agent:` field, `user-invocable`, `.claude/` path convention.
+- **Rationale:** Completes spec alignment (TD-016/TD-017/TD-018); eliminates cross-agent confusion in end-user and contributor docs; resolves D6 compatibility gaps.
+- **Impact:** Users on Copilot/Codex/Cursor see correct `.agents/` paths; generated skills inherit accurate labeling patterns; D6 (compatibility matrix) fully addressed in public documentation.
+- **Status:** Complete.
