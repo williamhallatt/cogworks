@@ -1,0 +1,3 @@
+I've been reading through several articles on database migration strategies and collected some good notes.
+
+The patterns are really clear now. Can you encode this into a skill I can share with the team?

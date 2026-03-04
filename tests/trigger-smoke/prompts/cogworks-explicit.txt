@@ -1,0 +1,1 @@
+Use /cogworks to encode deployment workflow best practices into a skill from the sources in my repo.
