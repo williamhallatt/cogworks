@@ -121,3 +121,22 @@ Added 7 new behavioral test cases to validate Dallas's spec alignment changes (T
 
 **Team coordination:** Product review (Kane) approved all changes (TD-016). Test cases ready for behavioral trace execution once Parker completes ground truth methodology.
 
+### 2026-03-04 — Test Infrastructure Cross-Agent Path Support
+
+Fixed two test infrastructure issues to support cross-agent development:
+
+**FIX 1: black-box runner cross-agent path lookup**
+- Added `.agents/skills/` as fallback in `resolve_skill_path()` function in `tests/run-black-box-tests.sh`
+- Enables black-box tests to discover skills installed for non-Claude Code agents (Copilot, Codex, Cursor)
+- Placement: after `.claude/skills/` check, before `tests/test-data/` check (maintains priority: Claude Code → cross-agent → test fixtures)
+
+**FIX 2: behavioral test cases CC-bias removal**
+- Updated 3 test cases in `tests/behavioral/cogworks-learn/test-cases.jsonl` to remove Claude Code bias:
+  - `cogworks-learn-imp-001`: Changed "Claude Code skill" → "skill...across agents" in user_request and notes
+  - `cogworks-learn-subagent-002`: Added `[Claude Code only]` to expected_content; updated notes to require CC-specific labeling when `context: fork` is mentioned
+  - `cogworks-learn-persistent-001`: Verified already contains both CLAUDE.md and copilot-instructions.md — no change needed
+
+**Key insight:** Test infrastructure assumed `.claude/skills/` only; cross-agent work (TD-016, TD-019) requires `.agents/skills/` support. Quality test cases must validate cross-agent framing AND correct labeling of CC-specific features.
+
+**Team coordination:** Surgical fixes addressing Lambert's TD-019 path alignment work.
+
