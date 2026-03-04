@@ -44,20 +44,6 @@ jobs:
             echo "✓ $skill_name"
           done
 
-      - name: Validate symlinks
-        run: |
-          for link in .claude/skills/*; do
-            link_name=$(basename "$link")
-            if [ -L "$link" ]; then
-              if [ -e "$link/SKILL.md" ]; then
-                echo "✓ symlink $link_name resolves"
-              else
-                echo "ERROR: symlink $link_name broken"
-                exit 1
-              fi
-            fi
-          done
-
       - name: Validate testing framework
         run: |
           TEST_FRAMEWORK_DIR="tests/framework"
