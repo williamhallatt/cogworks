@@ -28,21 +28,12 @@ There are three test layers, ordered by cost:
 - `python3`
 - `jq`
 - Python package `PyYAML`
-- For Layer 2 live capture and Layer 3 real mode: `claude` and `codex` CLIs installed and authenticated with network access
 
 ---
 
 ## Pre-release CI Gate
 
-Before any release, complete the pre-release checklist in order:
-
-**1. Capture fresh behavioral traces** (required — gate will fail without them):
-
-```bash
-python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-
-```
-
-**2. Run the pre-release quality gate:**
+Before any release, run the pre-release quality gate:
 
 ```bash
 bash tests/ci-gate-check.sh
@@ -50,8 +41,9 @@ bash tests/ci-gate-check.sh
 
 This gate runs:
 1. Deterministic checks via `scripts/validate-quality-gates.sh`
-2. Behavioral trace coverage verification — **exits non-zero if any skill has no traces**
-3. Behavioral evaluation against stored traces
+2. Behavioral trace coverage check — **exits non-zero (D-022/D-023 pending reconstruction)**
+
+> **Note:** The behavioral evaluation step is blocked pending Parker's quality ground truth definition (D-022). The CI gate will fail on behavioral coverage until replacement ground truth is in place. Layer 1 deterministic checks still pass independently.
 
 Exit code 0 indicates all gates passed. Exit code 1 indicates failure.
 
@@ -87,112 +79,26 @@ bash tests/framework/graders/deterministic-checks.sh path/to/skill --json   # ma
 
 ## Layer 2 — Behavioral Tests
 
-Evaluates whether skills activate on the right prompts and stay silent on negative controls, using stored traces.
+> **⚠️ Pending reconstruction (D-022/D-023).**
+> Behavioral traces were deleted — they were LLM-generated circular ground truth (`quality_score: null` on all core skill traces; `task_completed: false` in baseline runs). The capture scripts that generated them have also been removed.
+> The CI gate blocks regeneration. Parker (Benchmark & Evaluation Engineer) is defining replacement quality ground truth from first principles. See `.squad/agents/parker/charter.md`.
 
-**Pass criteria:**
+Evaluates whether skills activate on the right prompts and stay silent on negative controls.
+
+**Target pass criteria (to be re-established by Parker):**
 - `activation_f1 >= 0.85`
 - `false_positive_rate <= 0.05`
 - `negative_control_ratio >= 0.25`
-- Strict provenance mode additionally requires `activation_source=skill_tool` for all positive activation cases
 
-### Evaluate against stored traces (no agent invoked)
+Test cases (`tests/behavioral/*/test-cases.jsonl`) are valid and retained — they define activation intent, not ground truth. 31 cases across 3 skills.
 
-```bash
-python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-
-```
-
-With strict provenance (rejects placeholder or manually-authored traces):
+To scaffold test cases for a new skill:
 
 ```bash
-python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks- --strict-provenance
+python3 tests/framework/scripts/cogworks-eval.py behavioral scaffold --skill cogworks-newskill
 ```
 
-Results are written to `tests/results/behavioral/<timestamp>/`:
-- `<skill>-behavioral.json` — per-skill results
-- `summary.json` — overall pass/fail
-
-Run per skill to reduce scope:
-
-```bash
-python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill cogworks-learn
-```
-
-With behavioral gate added to Layer 1:
-
-```bash
-bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill --with-behavioral
-```
-
-### Live capture (invokes agent CLI — expensive)
-
-Runs the agent against each test case and normalizes the output into a behavioral trace. Required before the evaluate step can use fresh traces.
-
-```bash
-export COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD="bash scripts/run-behavioral-case-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_COPILOT_REAL_CMD="bash scripts/run-behavioral-case-copilot.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="bash scripts/behavioral-capture.sh claude '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_COPILOT_CAPTURE_CMD="bash scripts/behavioral-capture.sh copilot '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-bash scripts/refresh-behavioral-traces.sh --mode all
-```
-
-Or load defaults from the example env file:
-
-```bash
-source scripts/behavioral-env.example.sh
-bash scripts/refresh-behavioral-traces.sh --mode all
-```
-
-Scope to one skill to reduce token burn:
-
-```bash
-bash scripts/refresh-behavioral-traces.sh --mode all --skill cogworks-learn
-```
-
-`run-behavioral-case-copilot.sh` defaults to invoking `copilot --output-format stream-json`. Override with:
-
-```bash
-export COGWORKS_BEHAVIORAL_COPILOT_CMD="my-copilot-cli-binary"
-```
-
-Optional Copilot tuning:
-
-```bash
-export COGWORKS_BEHAVIORAL_COPILOT_TIMEOUT_SEC="900"
-export COGWORKS_BEHAVIORAL_COPILOT_HARNESS="copilot-cli"
-export COGWORKS_BEHAVIORAL_COPILOT_MODEL="gpt-5.3-codex"
-```
-
-If Copilot skills are installed under `.copilot/skills/`, strict validation runs against that root automatically.
-
-To normalize a Copilot raw trace without re-running:
-
-```bash
-bash scripts/capture-behavioral-trace.sh copilot <case-id> <skill-slug> <raw-trace.json> <out-trace.json>
-```
-
-#### Codex pipeline (optional third leg)
-
-Set `COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD` to add Codex as a third capture pipeline. When set, `refresh-behavioral-traces.sh` captures from Codex in parallel with Claude and Copilot, normalizes the trace, and compares it against the claude/copilot shared baseline. Divergence produces a warning but does not fail the run.
-
-```bash
-export COGWORKS_BEHAVIORAL_CODEX_REAL_CMD="bash scripts/run-behavioral-case-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture.sh codex '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-bash scripts/refresh-behavioral-traces.sh --mode all
-```
-
-To normalize a single existing raw trace without re-running the agent:
-
-```bash
-bash scripts/capture-behavioral-trace.sh <claude|codex> <case-id> <skill-slug> <raw-trace.json> <out-trace.json>
-```
-
-Sample data for manual testing: `tests/test-data/behavioral-capture/`
-
-If capture fails, inspect event logs under:
-- `/tmp/cogworks-behavioral-raw/<skill_slug>/<case_id>.claude.events.jsonl`
-- `/tmp/cogworks-behavioral-raw/<skill_slug>/<case_id>.codex.events.jsonl`
-
-Fast trigger smoke tests (checks skill invocation only, not full behavioral eval):
+Fast trigger smoke tests (checks skill invocation only — not full behavioral eval):
 
 ```bash
 bash scripts/run-trigger-smoke-tests.sh claude
