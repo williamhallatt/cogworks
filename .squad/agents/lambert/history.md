@@ -69,3 +69,25 @@ Completed full D6 risk mitigation. Created comprehensive compatibility matrix co
 - Replaced content with 3-line pointer to AGENTS.md per expert subtraction principle
 - Eliminated F2/F3 context bloat from byte-for-byte duplication
 
+
+### 2026-03-05: CC-Only Labeling — examples.md and patterns.md
+
+- Added `**[Claude Code only]**` notes to 8 examples in `examples.md` (Examples 2, 4, 5, 6, 7, 8, 10, 11) covering `context: fork`, `disable-model-invocation`, `argument-hint`, `$ARGUMENTS`, `${CLAUDE_SESSION_ID}`, `user-invocable: false`, and `~/.claude/skills/` paths.
+- Added inline `# [Claude Code only]` YAML comments and heading-level notes to 7 patterns/anti-patterns in `patterns.md` (Patterns 2, 4, 6, 7, 8, 10; Anti-Patterns 3, 4, 7, 8).
+- Consistent with `reference.md` labeling established in TD-017/TD-018.
+- Labels are additive only — no examples, logic, or structure was changed.
+- Pattern 10 received a prose note after the code block (not YAML) since the CC-only aspect is the directory path convention, not a frontmatter field.
+
+### 2026-03-12: Cross-Agent Path Fixes — INSTALL.md and CONTRIBUTIONS.md
+
+- Fixed INSTALL.md Manual Installation section (lines 38-50): Added `.agents/skills/` as primary cross-agent path alongside `.claude/skills/` (Claude Code only).
+- Fixed INSTALL.md Verify Installation section (lines 54-66): Added `.agents/skills/` verification commands alongside `.claude/skills/`.
+- Fixed INSTALL.md Invoking Skills table (line 75): Corrected Codex CLI invocation from incorrect `$` prefix to `varies | natural language or see Codex docs`.
+- Fixed CONTRIBUTIONS.md dev install command (line 15): Changed `npx skills add ./skills` → `npx skills add .` per AGENTS.md.
+- Fixed CONTRIBUTIONS.md PR checklist (lines 45, 49): Added `.agents/**` alongside `.claude/**` in Layer 1 checks and pre-release validation workflow path list.
+- Fixed CONTRIBUTIONS.md Step 1: Validate symlink check (lines 67-75): Added second loop for `.agents/skills/` verification alongside `.claude/skills/`.
+- Fixed CONTRIBUTIONS.md Release validation checklist (line 112): Added `.agents/skills/` symlinks alongside `.claude/skills/`.
+- Fixed CONTRIBUTIONS.md Broken symlinks section (lines 130-134): Added `ls -la .agents/skills/` command alongside `.claude/skills/`.
+- **Key learning:** Codex invocation prefix `$` was incorrect; Codex uses natural language (varies). `.agents/skills/` is the primary cross-agent path; `.claude/skills/` is Claude Code-specific.
+- **Decision captured:** TD-019 in team decisions.md (merged from inbox).
+- **Commit:** ca8f5cb
