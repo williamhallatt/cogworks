@@ -90,7 +90,7 @@ Evaluates whether skills activate on the right prompts and stay silent on negati
 - `false_positive_rate <= 0.05`
 - `negative_control_ratio >= 0.25`
 
-Test cases (`tests/behavioral/*/test-cases.jsonl`) are valid and retained — they define activation intent, not ground truth. 31 cases across 3 skills.
+Test cases (`tests/behavioral/*/test-cases.jsonl`) are valid and retained — they define activation intent, not ground truth. 39 cases across 3 skills.
 
 To scaffold test cases for a new skill:
 
