@@ -37,9 +37,7 @@ SKILL.md includes: "See [reference.md](reference.md) for complete details"
 ```yaml
 ---
 name: deploy
-disable-model-invocation: true
----
-Deploy to production:
+disable-model-invocation: true   # [Claude Code only]
 1. Run test suite - STOP if failures
 2. Build application
 3. Push to deployment target
@@ -68,8 +66,7 @@ Include: action verbs, trigger phrases, use cases
 ```yaml
 ---
 name: legacy-system-context
-user-invocable: false
----
+user-invocable: false   # [Claude Code only]
 ```
 
 ### 5. Safe Exploration Mode
@@ -87,6 +84,8 @@ allowed-tools: Read, Grep, Glob
 
 ### 6. Isolated Research Task
 
+**[Claude Code only]** — uses `context: fork`, `agent: Explore`, and `$ARGUMENTS` interpolation, which are Claude Code extensions.
+
 **When:** Self-contained analysis not needing conversation context
 **Why:** Clean execution without conversation history pollution
 **How:**
@@ -94,8 +93,8 @@ allowed-tools: Read, Grep, Glob
 ```yaml
 ---
 name: deep-research
-context: fork
-agent: Explore
+context: fork   # [Claude Code only]
+agent: Explore   # [Claude Code only]
 ---
 Research $ARGUMENTS thoroughly:
 1. Find relevant files
@@ -112,7 +111,7 @@ Research $ARGUMENTS thoroughly:
 ```yaml
 ---
 name: pr-summary
-context: fork
+context: fork   # [Claude Code only]
 ---
 ## Current PR
 - Diff: !`gh pr diff`
@@ -123,6 +122,8 @@ Summarize this pull request...
 
 ### 8. Multi-Argument Command
 
+**[Claude Code only]** — uses `argument-hint` and `$0`/`$1`/`$2` positional argument placeholders, which are Claude Code extensions.
+
 **When:** Skill needs multiple distinct inputs
 **Why:** Structured input more reliable than parsing free text
 **How:**
@@ -130,7 +131,7 @@ Summarize this pull request...
 ```yaml
 ---
 name: migrate-component
-argument-hint: [component] [from-framework] [to-framework]
+argument-hint: [component] [from-framework] [to-framework]   # [Claude Code only]
 ---
 Migrate the $0 component from $1 to $2.
 ```
@@ -156,6 +157,8 @@ packages/
 └── shared/.claude/skills/      # Shared utilities
 ```
 
+> **Note:** Paths shown use the `.claude/skills/` convention, which is Claude Code project scope. Other agents use `.agents/skills/` or their own discovery paths.
+
 ---
 
 ## Anti-Patterns
@@ -176,13 +179,13 @@ packages/
 
 **Problem:** Deploy skill without `disable-model-invocation`
 **Why it fails:** The agent might deploy because code "looks ready"
-**Alternative:** Always use `disable-model-invocation: true` for deployments, commits, external API calls
+**Alternative:** **[Claude Code only]** Always use `disable-model-invocation: true` for deployments, commits, external API calls
 
 ### 4. Guidelines in Forked Context
 
-**Problem:** `context: fork` with "use these API conventions" (no task)
+**Problem:** **[Claude Code only]** `context: fork` with "use these API conventions" (no task)
 **Why it fails:** Subagent receives guidelines but no actionable prompt, returns nothing
-**Alternative:** Only use `context: fork` for skills with explicit task instructions
+**Alternative:** **[Claude Code only]** Only use `context: fork` for skills with explicit task instructions
 
 ### 5. Over-Specific Steps for Low-Stakes Tasks
 
@@ -198,15 +201,15 @@ packages/
 
 ### 7. Hiding User-Actionable Commands
 
-**Problem:** `user-invocable: false` on a deploy skill
+**Problem:** **[Claude Code only]** `user-invocable: false` on a deploy skill
 **Why it fails:** Users can't invoke when they need to
-**Alternative:** Use `disable-model-invocation: true` instead to hide from the agent while keeping user access
+**Alternative:** **[Claude Code only]** Use `disable-model-invocation: true` instead to hide from the agent while keeping user access
 
 ### 8. Overly Broad Triggering
 
 **Problem:** Description matches too many user requests
 **Why it fails:** Skill activates when unwanted, pollutes responses
-**Alternative:** Narrow description, add `disable-model-invocation: true` if needed
+**Alternative:** Narrow description, add **[Claude Code only]** `disable-model-invocation: true` if needed
 
 ### 9. Reformatted Duplication Across Files
 

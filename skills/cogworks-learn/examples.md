@@ -36,6 +36,7 @@ When writing API endpoints:
 ```
 
 ## Example 2: Deploy (Task Skill with Side Effects)
+**[Claude Code only]** — uses `context: fork` and `disable-model-invocation: true`, which are Claude Code extensions.
 ```yaml
 ---
 name: deploy
@@ -65,6 +66,7 @@ When explaining code, always include:
 ```
 
 ## Example 4: Fix GitHub Issue
+**[Claude Code only]** — uses `disable-model-invocation: true`, `argument-hint`, and `$ARGUMENTS` interpolation, which are Claude Code extensions.
 ```yaml
 ---
 name: fix-issue
@@ -83,6 +85,7 @@ Fix GitHub issue $ARGUMENTS following our coding standards.
 ```
 
 ## Example 5: PR Summary with Live Data
+**[Claude Code only]** — uses `context: fork` and `agent: Explore`, which are Claude Code extensions.
 ```yaml
 ---
 name: pr-summary
@@ -102,6 +105,7 @@ Summarize this pull request...
 ```
 
 ## Example 6: Deep Research (Forked Subagent)
+**[Claude Code only]** — uses `context: fork`, `agent: Explore`, and `$ARGUMENTS` interpolation, which are Claude Code extensions.
 ```yaml
 ---
 name: deep-research
@@ -118,6 +122,7 @@ Research $ARGUMENTS thoroughly:
 ```
 
 ## Example 7: Component Migration (Multi-Argument)
+**[Claude Code only]** — uses `argument-hint` and `$0`/`$1`/`$2` positional argument placeholders, which are Claude Code extensions.
 ```yaml
 ---
 name: migrate-component
@@ -130,6 +135,7 @@ Preserve all existing behavior and tests.
 ```
 
 ## Example 8: Session Logger
+**[Claude Code only]** — uses `$ARGUMENTS` and `${CLAUDE_SESSION_ID}`, which are Claude Code extensions.
 ```yaml
 ---
 name: session-logger
@@ -153,6 +159,7 @@ Explore the codebase in read-only mode.
 ```
 
 ## Example 10: Legacy System Context (Background Knowledge)
+**[Claude Code only]** — uses `user-invocable: false`, which is a Claude Code extension.
 ```yaml
 ---
 name: legacy-system-context
@@ -165,6 +172,7 @@ The legacy billing system uses...
 ```
 
 ## Example 11: Codebase Visualizer (Visual Output)
+**[Claude Code only]** — uses the `~/.claude/skills/` path convention, which is Claude Code project scope.
 ```yaml
 ---
 name: codebase-visualizer
