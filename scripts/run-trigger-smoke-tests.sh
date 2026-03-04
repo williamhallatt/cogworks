@@ -36,6 +36,8 @@ cases=(
   "cogworks-learn|$PROMPTS_DIR/cogworks-learn-mid-conversation.txt"
   "cogworks-encode|$PROMPTS_DIR/cogworks-encode-explicit.txt"
   "cogworks-encode|$PROMPTS_DIR/cogworks-encode-mid-conversation.txt"
+  "cogworks|$PROMPTS_DIR/cogworks-explicit.txt"
+  "cogworks|$PROMPTS_DIR/cogworks-mid-conversation.txt"
 )
 
 run_case() {
