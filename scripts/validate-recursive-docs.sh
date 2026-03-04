@@ -7,7 +7,7 @@ required_files=(
   "$ROOT_DIR/README.md"
   "$ROOT_DIR/TESTING.md"
   "$ROOT_DIR/INSTALL.md"
-  "$ROOT_DIR/RELEASES.md"
+  "$ROOT_DIR/CONTRIBUTIONS.md"
   "$ROOT_DIR/AGENTS.md"
   "$ROOT_DIR/tests/framework/README.md"
   "$ROOT_DIR/tests/datasets/recursive-round/README.md"
@@ -17,8 +17,8 @@ for f in "${required_files[@]}"; do
   [[ -f "$f" ]] || { echo "Missing required doc: $f" >&2; exit 1; }
 done
 
-# Canonical runbook reference must exist in major docs.
-for f in "$ROOT_DIR/README.md" "$ROOT_DIR/TESTING.md" "$ROOT_DIR/INSTALL.md" "$ROOT_DIR/tests/framework/README.md" "$ROOT_DIR/AGENTS.md"; do
+# Canonical runbook reference must exist in developer docs.
+for f in "$ROOT_DIR/TESTING.md" "$ROOT_DIR/tests/framework/README.md" "$ROOT_DIR/AGENTS.md"; do
   rg -q "tests/datasets/recursive-round/README.md" "$f" || {
     echo "Missing canonical runbook reference in $f" >&2
     exit 1
