@@ -233,22 +233,11 @@ for slug in "${SKILL_SLUGS[@]}"; do
   BEHAVIORAL_ARGS+=(--skill "$slug")
 done
 
-python3 "$EVAL_CLI" behavioral run \
-  --skills-root "$ROOT_DIR/$CLAUDE_ROOT" \
-  --tests-root "$ROOT_DIR/tests/behavioral" \
-  --results-root "$RESULTS_DIR/behavioral-claude" \
-  --strict-provenance \
-  "${BEHAVIORAL_ARGS[@]}"
 
-python3 "$EVAL_CLI" behavioral run \
-  --skills-root "$ROOT_DIR/$CODEX_ROOT" \
-  --tests-root "$ROOT_DIR/tests/behavioral" \
-  --results-root "$RESULTS_DIR/behavioral-codex" \
-  --strict-provenance \
-  "${BEHAVIORAL_ARGS[@]}"
-
-BENCHMARK_SUMMARY=""
-BENCHMARK_REPORT=""
+# Behavioral evaluation pending reconstruction (D-022/D-023).
+# Behavioral traces deleted — circular LLM ground truth. Capture scripts removed.
+# Parker is defining replacement quality ground truth. Skipping behavioral eval.
+# See .squad/agents/parker/charter.md
 SIGNAL_MODE="not-run"
 RANKING_ELIGIBLE="false"
 SELECTED_WINNER="none"

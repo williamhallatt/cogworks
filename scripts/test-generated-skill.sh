@@ -80,8 +80,9 @@ SKILL_SLUG="$(basename "$SKILL_PATH")"
 SKILLS_ROOT="$(dirname "$SKILL_PATH")"
 
 echo "Running behavioral checks for $SKILL_SLUG..."
-python3 "$EVAL_CLI" behavioral run \
-  --skills-root "$SKILLS_ROOT" \
-  --tests-root "$TESTS_ROOT" \
-  --results-root "$RESULTS_ROOT" \
-  --skill "$SKILL_SLUG"
+# Behavioral evaluation pending reconstruction (D-022/D-023).
+# Behavioral traces deleted — circular LLM ground truth. Capture scripts removed.
+# Parker is defining replacement quality ground truth.
+# See .squad/agents/parker/charter.md
+echo "  ⚠️  Behavioral evaluation pending reconstruction (D-022/D-023) — skipping."
+echo "  Parker is defining replacement quality ground truth."
