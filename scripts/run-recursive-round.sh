@@ -242,6 +242,8 @@ SIGNAL_MODE="not-run"
 RANKING_ELIGIBLE="false"
 SELECTED_WINNER="none"
 SELECTION_STATUS="not-run"
+BENCHMARK_SUMMARY=""
+BENCHMARK_REPORT=""
 
 if [[ "$MODE" == "deep" ]]; then
   if [[ "$SMOKE_ONLY" -eq 1 ]]; then
