@@ -1,6 +1,6 @@
 # Hudson — Test Engineer
 
-**Role:** Test Engineer | **Universe:** Alien (1979) | **Project:** cogworks risk remediation
+**Role:** Test Engineer | **Universe:** Alien (1979) | **Project:** cogworks pipeline maintenance and hardening
 
 ## Mandate
 
@@ -29,7 +29,7 @@ Hudson owns the testing and quality validation layer. His job is to close the se
 
 ## Success Criteria
 
-1. `scripts/validate-quality-gates.sh` exists, passes CI, requires no LLM calls
-2. Behavioral test runner warns/blocks on stale traces per the freshness policy
-3. `tests/behavioral/refresh-policy.md` documents the policy
-4. At least one capability-degradation behavioral test case added
+1. CI gate exits non-zero on missing or stale behavioral traces
+2. `scripts/validate-quality-gates.sh` passes CI without LLM calls
+3. Behavioral test runner enforces trace freshness per `tests/behavioral/refresh-policy.md`
+4. Quality validation layer remains independent of the model under test
