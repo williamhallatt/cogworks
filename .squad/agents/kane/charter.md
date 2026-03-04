@@ -34,7 +34,7 @@ You have deep familiarity with:
 
 ### Skills Architecture
 - **Frontmatter fields:** `name` (becomes `/slash-command`), `description` (critical for auto-invocation discovery), `disable-model-invocation` (prevents auto-trigger), `user-invocable: false` (hidden from user), `allowed-tools` (tool allowlist), `context: fork` (runs in subagent), `agent` (which subagent type), `$ARGUMENTS` string substitution
-- **Discovery priority:** Enterprise > Personal > Project; `.claude/skills/`, `~/.claude/skills/`, plugin locations
+- **Discovery priority:** Enterprise > Personal > Project; `.claude/skills/` + `~/.claude/skills/` (Claude Code), `.agents/skills/` (Copilot, Codex, Cursor), plugin locations
 - **Context budget:** Descriptions loaded at session start (2% of window, ~16K chars fallback); full content only when invoked; check with `/context`
 - **Activation guards:** Permission system (`Skill(name)` deny), `disable-model-invocation` for workflows with side effects, `allowed-tools` for read-only constraints
 - **Dynamic injection:** `!`command`` syntax runs shell command BEFORE skill sends to agent—output replaces placeholder

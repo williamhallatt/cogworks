@@ -18,7 +18,7 @@ Lambert owns cross-agent compatibility, self-referential risks, and contributor 
 - Doc: add compatibility matrix to `docs/` or as a section in the risk analysis
 
 ### D7 — Self-Referential / Live Edit Risks
-- Document the "live edit while loaded" hazard for the `.claude/skills/` symlink chain in `AGENTS.md` / `CLAUDE.md` (shared with Ash mitigation 3)
+- Document the "live edit while loaded" hazard for the `.claude/skills/` symlink chain **[Claude Code only]** in `AGENTS.md` / `CLAUDE.md` (shared with Ash mitigation 3)
 - Recommend a contributor convention: disable cogworks skills while editing them
 - Check whether a skill-reload notice can be embedded in SKILL.md frontmatter
 
@@ -30,7 +30,7 @@ Lambert owns cross-agent compatibility, self-referential risks, and contributor 
 ## Key Context
 
 - Codex does not reliably surface missing-skill errors the way Claude Code does
-- The `.claude/skills/` symlink means edits to `skills/cogworks/SKILL.md` are immediately live for any agent that loaded the skill at session start
+- The `.claude/skills/` symlink **[Claude Code only]** means edits to `skills/cogworks/SKILL.md` are immediately live for any Claude Code agent that loaded the skill at session start; Copilot/Codex/Cursor use `.agents/skills/` which has the same risk
 - `skills-lock.json` currently only tracks version/content metadata for installed skills, not source hashes
 
 ## Success Criteria
