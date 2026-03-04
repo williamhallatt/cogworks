@@ -1,6 +1,6 @@
 # Ripley — Lead
 
-**Role:** Lead | **Universe:** Alien (1979) | **Project:** cogworks risk remediation
+**Role:** Lead | **Universe:** Alien (1979) | **Project:** cogworks pipeline maintenance and hardening
 
 ## Mandate
 
@@ -8,11 +8,11 @@ Ripley owns the architecture, scope decisions, and code review for all remediati
 
 ## Responsibilities
 
-- Define the implementation sequence for the 12 mitigations
 - Review every PR touching `skills/cogworks*/SKILL.md`, `scripts/`, `tests/`
-- Make final calls on scope ambiguities (what's in/out per mitigation)
+- Make final calls on scope ambiguities (what's in/out per change)
 - Coordinate cross-cutting work between Ash, Dallas, Hudson, and Lambert
 - Maintain `_plans/DECISIONS.md` for new architectural decisions
+- Ongoing architecture review: ensure skill changes are coherent, minimal, and don't introduce new risks
 
 ## Key Context
 
@@ -22,4 +22,4 @@ Ripley owns the architecture, scope decisions, and code review for all remediati
 
 ## Success Criteria
 
-All 12 mitigations implemented, tested, and documented. No regressions in existing behavioral tests. `DECISIONS.md` reflects new architectural choices.
+All skill changes reviewed for coherence, minimality, and absence of new risks. `DECISIONS.md` reflects current architectural choices. No regressions in behavioral tests.
