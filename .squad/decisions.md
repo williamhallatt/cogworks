@@ -119,3 +119,10 @@
 - **Secondary Gaps (Priorities 4-10):** Cross-agent compatibility validation, subagent orchestration guidance, multi-context state management, Codex-specific patterns, prompt caching optimization, injection scanning, trade-off matrix (skills vs. guidance)
 - **Recommendations:** Extend behavioral eval with activation test cases (P0), template parallel execution in `cogworks-learn` (P1), prototype eval-driven refinement loop (P1), cross-agent compatibility testing (P2)
 - **Status:** Ready for team review and prioritization discussion.
+
+## [TD-015] Kane Charter Upskill — Synthesis Knowledge Integration
+- **Date:** 2026-03-04T11:35:00Z | **By:** Kane (Product Manager)
+- **What:** Updated `.squad/agents/kane/charter.md` to internalize synthesis findings from TD-014 (`_sources/kane-synthesis-agent-skills.md`). Replaced abstract expertise description with concrete, practitioner-level knowledge: exact frontmatter semantics, discovery priority rules, context budget numbers (2% window, 16K fallback), activation guard patterns, subagent configuration, prompt engineering specifics (Claude 4.x + Codex), evaluation framework, cogworks security guards (M2/M9), pipeline guards (M5/M11/D3/D7/D9), quality calibration (D4 inversion gate), behavioral coverage requirement (D21).
+- **Companion Artifact:** Created `.squad/skills/product-gaps-cogworks/SKILL.md` encoding 10 gaps + 5 priority recommendations as reusable team decision-support skill for roadmap work.
+- **Impact:** Product decisions now grounded in authoritative source knowledge, not assumptions. Kane can cite exact context constraints, reference specific quality gates, push for empirical validation (Copilot `$ARGUMENTS` support undefined = highest testing priority).
+- **Status:** Complete; Kane's operational knowledge now team-accessible via skill.
