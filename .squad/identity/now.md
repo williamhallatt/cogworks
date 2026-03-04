@@ -1,7 +1,8 @@
 ---
-updated_at: 2026-03-03T21:12:00Z
-focus_area: cogworks risk remediation — 12 issues live on board github.com/users/williamhallatt/projects/1
+updated_at: 2026-03-04T09:13:35Z
+focus_area: cogworks risk remediation — define skill quality from first principles; team now includes Parker (Benchmark & Evaluation Engineer)
 active_issues:
+  - Skill quality benchmarking scoping (Parker)
   - M2 delimiter sanitisation (Ash)
   - M6 default-untrusted URLs (Ash)
   - M1 external quality validation script (Hudson)
