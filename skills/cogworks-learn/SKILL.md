@@ -222,6 +222,7 @@ After generating skill files, verify against this checklist:
 - Runtime contract violations = 0 (no tool/schema examples that conflict with target runtime)
 - Canonical placement violations = 0 (no doctrinal restatement across files)
 - Markdown fences balanced, YAML frontmatter parseable
+- **(L2)** If generated SKILL.md uses any CC-specific field or placeholder (`$ARGUMENTS`, `disable-model-invocation`, `user-invocable`, `context: fork`), is `compatibility:` present in frontmatter?
 - Decision Skeleton completeness: each decision includes Trigger, Options, Right call, Failure mode, Boundary/implied nuance (including what failure the rule prevents)
 - Critical Distinctions from synthesis are all represented in Decision Rules or Anti-Patterns
 - Fidelity Trace Matrix has no unmapped source-critical items
@@ -260,6 +261,7 @@ license: {license}
 metadata:
   author: {author}
   version: '{version}'
+# compatibility: Requires Claude Code for [feature]  # Add when using any CC-specific field
 ---
 ```
 
@@ -294,7 +296,7 @@ Each `sources` entry: `{ type: "url"|"file", uri: "...", original_uri?: "..." }`
 - **reference.md (conditional — judgment-heavy domains)**: Tacit Knowledge Boundary — a short section listing 3-5 aspects of the domain where expert judgment is not fully captured in the source material. Template: "The following aspects of this domain likely involve tacit expert judgment not fully captured in sources: [list each item with one sentence on why it's tacit and what a consumer should verify independently]." Include when `{tacit_knowledge_boundary}` contains entries; omit for purely formal/definitional domains.
 - **patterns.md/examples.md**: optional when uniquely valuable — **(L1)** exception: if the primary source spec prescribes these files in a "Supporting Content" or progressive disclosure section, generate them regardless. Source prescription takes precedence.
 - **Safety/composability boundary (L2):** If the source contains safety guardrails, behavioral constraints, or explicit deferral rules, extract them and place in the **Invocation** section of SKILL.md. They define which adjacent skills this skill must not override and are a composability requirement, not optional content.
-- **Compatibility (L2):** If the generated skill uses `$ARGUMENTS`, `$ARGUMENTS[N]`, or `$N` placeholders (Claude Code extensions — not in agentskills.io spec), add a one-sentence note to SKILL.md **Compatibility** section: "Argument interpolation is a Claude Code extension. On other agents (Copilot, Codex, Cursor, etc.), skills receive arguments via natural language — no token substitution needed or expected." Include this section in the generated SKILL.md file structure (between Invocation and Supporting Docs).
+- **Compatibility (L2):** If the generated skill uses any Claude Code-specific field or placeholder — `$ARGUMENTS`, `$ARGUMENTS[N]`, `$N`, `disable-model-invocation: true`, `user-invocable: false`, or `context: fork` (none are in the agentskills.io spec) — two things are required: (1) add `compatibility: Requires Claude Code for [feature]` to the SKILL.md **frontmatter**; (2) add a one-sentence note to the SKILL.md **Compatibility** body section naming the CC-specific feature and stating it is unavailable on other agents. Include the Compatibility section in the generated SKILL.md file structure (between Invocation and Supporting Docs).
 - **Source scope taxonomy**:
   - Primary platform (normative)
   - Supporting foundations (normative when applicable)
