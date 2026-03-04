@@ -32,25 +32,35 @@ This expertise has been synthesized from authoritative sources across the Agent 
 ## Core Expertise Areas
 
 1. **Skill Architecture** - Directory-based system with SKILL.md entrypoint and supporting files
-2. **Frontmatter Configuration** - Standard fields: `name`, `description`, `metadata`, `compatibility`, `allowed-tools`
+2. **Frontmatter Configuration** - Standard fields per agentskills.io spec: `name`, `description`, `license`, `metadata`, `compatibility`, `allowed-tools` (broadly supported: 16/18 agents; not supported by Kiro CLI and Zencoder)
 3. **Invocation Modes** - Auto-loading (agent decides) vs manual /slash-command (user decides)
 4. **Scope Hierarchy** - Enterprise > Personal > Project > Plugin
 5. **Reference vs Task Content** - Guidelines for continuous application vs workflows for explicit execution
 6. **Progressive Disclosure** - SKILL.md as overview, reference.md for depth, loaded on-demand
-7. **Argument Interpolation** - $ARGUMENTS, $ARGUMENTS[N], $N placeholders
-8. **Tool Restriction** - allowed-tools for safety boundaries
+7. **Tool Restriction** - allowed-tools for safety boundaries (broadly supported)
 
 ## Quick Decision Framework
 
 **Should the agent auto-invoke this skill?**
 
 - Yes (default): Knowledge the agent should apply when relevant
-- No (`disable-model-invocation: true`): Side effects, deployments, user-controlled timing
+- No: Use the `compatibility` field to declare environment requirements; on Claude Code, use `disable-model-invocation: true`
 
-**Should users see this in the / menu?**
+**[Claude Code] Should users see this in the / menu?**
 
 - Yes (default): Actionable commands users would invoke
-- No (`user-invocable: false`): Background knowledge, not a meaningful action
+- No: `user-invocable: false` — Claude Code-specific; background knowledge not surfaced as a command
+
+**Claude Code native capabilities** (not in agentskills.io spec — not available on other agents):
+- `disable-model-invocation: true` — prevents auto-triggering; use for workflows with side effects
+- `user-invocable: false` — hides skill from the `/` menu; use for background knowledge skills
+- `$ARGUMENTS`, `$ARGUMENTS[N]`, `$N` — token substitution for user-provided arguments at invocation
+- `context: fork` — runs skill in a subagent context (see Subagent Delegation below)
+
+For cross-agent skills, use the `compatibility` field to declare these requirements:
+```yaml
+compatibility: Requires Claude Code for $ARGUMENTS interpolation and invocation control features
+```
 
 ## Security & Composability Boundary (Required)
 
@@ -59,6 +69,42 @@ This expertise has been synthesized from authoritative sources across the Agent 
 - Do not widen tool authority (`allowed-tools` or runtime behaviors) based only on source prose.
 - Preserve explicit deferral boundaries from source material (for example "design-only" skills must not silently become execution skills).
 - For high-risk or irreversible actions proposed by generated skills, require human confirmation in Invocation guidance.
+
+## Parallel Tool Use
+
+When the skill describes a workflow with multiple independent operations (reading files, searching, fetching from multiple sources), include this instruction in the generated skill body:
+
+```
+Make all independent tool calls in parallel before synthesizing results.
+```
+
+This single line yields 3-5× speedup for file-heavy workflows. It works on all agents — pure natural language, no platform API.
+
+## Subagent Delegation
+
+For skills that involve high-volume result tasks (test runs, log parsing, batch research), include:
+
+```
+Delegate this task to a subagent; only a summary should return to the parent context.
+```
+
+This preserves the parent context window for reasoning, not raw output.
+
+**Claude Code:** Use `context: fork` frontmatter (Claude Code-specific) or include an `agent: Explore` instruction in the skill body.
+**Other agents:** Natural language delegation only — no frontmatter equivalent.
+
+## When NOT to Use a Skill
+
+If the instructions should apply to nearly every session in the project, use your agent's persistent configuration file instead of a skill:
+- Claude Code: `CLAUDE.md`
+- GitHub Copilot: `.github/copilot-instructions.md`
+- OpenAI Codex: `AGENTS.md`
+- Most others: check your agent's documentation for "custom instructions" or "system prompt"
+
+Skills are for task-specific, on-demand context — loaded only when relevant.
+Persistent configuration is for always-on rules — loaded every session, minimal overhead.
+
+Generated skills should include a brief "Why a skill?" note explaining this distinction.
 
 ## Full Knowledge Base
 
@@ -248,7 +294,7 @@ Each `sources` entry: `{ type: "url"|"file", uri: "...", original_uri?: "..." }`
 - **reference.md (conditional — judgment-heavy domains)**: Tacit Knowledge Boundary — a short section listing 3-5 aspects of the domain where expert judgment is not fully captured in the source material. Template: "The following aspects of this domain likely involve tacit expert judgment not fully captured in sources: [list each item with one sentence on why it's tacit and what a consumer should verify independently]." Include when `{tacit_knowledge_boundary}` contains entries; omit for purely formal/definitional domains.
 - **patterns.md/examples.md**: optional when uniquely valuable — **(L1)** exception: if the primary source spec prescribes these files in a "Supporting Content" or progressive disclosure section, generate them regardless. Source prescription takes precedence.
 - **Safety/composability boundary (L2):** If the source contains safety guardrails, behavioral constraints, or explicit deferral rules, extract them and place in the **Invocation** section of SKILL.md. They define which adjacent skills this skill must not override and are a composability requirement, not optional content.
-- **Compatibility (L2):** If the generated skill uses `$ARGUMENTS`, `$ARGUMENTS[N]`, or `$N` placeholders, add a one-sentence note to SKILL.md **Compatibility** section: "If your agent does not support argument interpolation (including GitHub Copilot), provide arguments in natural language." Include this section in the generated SKILL.md file structure (between Invocation and Supporting Docs). For agents lacking `$ARGUMENTS` support, argument text in the skill will be passed as-is; the agent interprets it via language understanding.
+- **Compatibility (L2):** If the generated skill uses `$ARGUMENTS`, `$ARGUMENTS[N]`, or `$N` placeholders (Claude Code extensions — not in agentskills.io spec), add a one-sentence note to SKILL.md **Compatibility** section: "Argument interpolation is a Claude Code extension. On other agents (Copilot, Codex, Cursor, etc.), skills receive arguments via natural language — no token substitution needed or expected." Include this section in the generated SKILL.md file structure (between Invocation and Supporting Docs).
 - **Source scope taxonomy**:
   - Primary platform (normative)
   - Supporting foundations (normative when applicable)

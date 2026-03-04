@@ -126,3 +126,20 @@
 - **Companion Artifact:** Created `.squad/skills/product-gaps-cogworks/SKILL.md` encoding 10 gaps + 5 priority recommendations as reusable team decision-support skill for roadmap work.
 - **Impact:** Product decisions now grounded in authoritative source knowledge, not assumptions. Kane can cite exact context constraints, reference specific quality gates, push for empirical validation (Copilot `$ARGUMENTS` support undefined = highest testing priority).
 - **Status:** Complete; Kane's operational knowledge now team-accessible via skill.
+
+## [TD-016] Spec-Align cogworks-learn: Scope Claude Code Extensions, Add Gap 3/4/10 Guidance
+- **Date:** 2026-03-04T12:12:29Z | **By:** Dallas (Pipeline Engineer)
+- **Issues Addressed:** TD-014 Gaps 3, 4, 10 (product synthesis)
+- **Core Problem:** cogworks-learn presented Claude Code-specific features as universal standard features, causing incorrect guidance for Copilot, Codex, Cursor, and other agents.
+- **Evidence:** agentskills.io specification defines exactly 6 frontmatter fields; vercel-labs/skills compatibility matrix shows `allowed-tools` supported by 16/18 agents; `$ARGUMENTS`, `disable-model-invocation`, `user-invocable` are NOT in the spec — Claude Code extensions only.
+- **Changes Implemented:**
+  1. **Correctly scoped Claude Code extensions:** `disable-model-invocation`, `user-invocable`, `$ARGUMENTS` grouped under "Claude Code native capabilities" in `skills/cogworks-learn/SKILL.md` and `reference.md`. Removed incorrect implication that these are universal. For cross-agent skills, guidance recommends using `compatibility` field (the spec-defined mechanism).
+  2. **Reframed `allowed-tools` as broadly supported:** Updated to "16/18 agents" with vercel-labs/skills as primary reference. Documented as broadly supported (Claude Code, Copilot, Codex, Cursor, +12 others) with only Kiro CLI and Zencoder unsupported.
+  3. **Added Gap 3 (Parallel Tool Use):** "Make all independent tool calls in parallel" instruction for file-heavy workflows (3-5× speedup). Works on all agents via natural language.
+  4. **Added Gap 4 (Subagent Delegation):** For high-volume result tasks, delegate to subagent with `context: fork` for Claude Code or natural language delegation for others.
+  5. **Added Gap 10 (When NOT to use skills):** Rules for every session belong in persistent config (CLAUDE.md, copilot-instructions.md, AGENTS.md), not skills.
+- **Files Updated:** `skills/cogworks-learn/SKILL.md`, `skills/cogworks-learn/reference.md`, `docs/cross-agent-compatibility.md`.
+- **Product Review:** Kane approved (Haiku) with notes: (1) frame Claude Code-specific features as "powerful native capabilities"; (2) verify 16/18 claim before publishing.
+- **Test Coverage:** Hudson added 7 new test cases covering `$ARGUMENTS` scoping, compatibility field usage, allowed-tools support, parallel tool use, subagent delegation, and persistent config guidance. All existing activation tests remain valid.
+- **CI Gate:** Correctly blocks on missing traces (per D-022); Parker responsible for ground truth definition.
+- **Status:** Approved by product review. Ready for commit.
