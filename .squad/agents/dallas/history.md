@@ -2,6 +2,20 @@
 
 ## Learnings
 
+### 2026-03-04: Kane's Product Gap Synthesis: Pipeline Implications
+
+Kane completed systematic source audit identifying three critical product gaps. Two have direct pipeline implications:
+
+1. **Parallel tool use guidance (P1):** Generated skills should template parallel execution patterns. Dallas's pipeline (cogworks-learn) should encode guidance: "When you intend to call multiple tools with no dependencies, make all independent tool calls in parallel." Applies to any skill reading multiple files, running searches, or performing batch operations. This is skill generation template guidance (cogworks-learn), not orchestration-level.
+
+2. **Cross-source synthesis validation (M11):** Kane's synthesis validates grounding across sources (TD-014 will note this). Dallas's existing M11 guard (claims merging N sources must be grounded in 2+ sources) is correctly positioned. Kane's audit confirms the pattern across Claude, Codex, and IBM sources independently.
+
+3. **Eval-driven iteration (P1):** One-shot generation produces brittle skills. Prototype loop: behavioral test → analyze failures → revise skill → re-test. Does not require new pipeline orchestration phases; cogworks already calls cogworks-encode → cogworks-learn. But cogworks-learn (the revision skill) would benefit from pre-filled "failure mode" context in subsequent iterations.
+
+**No conflicts:** M11 cross-source guard remains correctly positioned. Parallel tool guidance is skill template content (cogworks-learn responsibility). Eval loop requires no pipeline changes.
+
+**Team coordination:** Kane's findings inform product roadmap; no impacts on Dallas's existing M5/M11/D3/D7 closures.
+
 ### 2026-03-04: Gap Closure Round 3: D9 Slug Collision + D3 Handoff Artifacts
 
 Closed two self-knowledge audit gaps:
