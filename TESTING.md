@@ -34,7 +34,15 @@ There are three test layers, ordered by cost:
 
 ## Pre-release CI Gate
 
-Before any release, run the pre-release quality gate:
+Before any release, complete the pre-release checklist in order:
+
+**1. Capture fresh behavioral traces** (required — gate will fail without them):
+
+```bash
+python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-
+```
+
+**2. Run the pre-release quality gate:**
 
 ```bash
 bash tests/ci-gate-check.sh
@@ -42,10 +50,10 @@ bash tests/ci-gate-check.sh
 
 This gate runs:
 1. Deterministic checks via `scripts/validate-quality-gates.sh`
-2. Behavioral evaluation against stored traces (if available)
-3. Coverage verification for behavioral test cases
+2. Behavioral trace coverage verification — **exits non-zero if any skill has no traces**
+3. Behavioral evaluation against stored traces
 
-Exit code 0 indicates all gates passed. Exit code 1 indicates failure. The script warns if behavioral traces are missing but does not fail on that alone.
+Exit code 0 indicates all gates passed. Exit code 1 indicates failure.
 
 ---
 

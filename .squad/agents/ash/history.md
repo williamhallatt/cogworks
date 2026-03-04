@@ -2,6 +2,18 @@
 
 ## Learnings
 
+**2026-03-04 — Gap Closure Round 3: M2 & M9 Completion**
+
+Closed two critical security gaps from self-knowledge audit:
+
+1. **M2 — Deterministic Delimiter Escape** — Behavioral directive ("treat as data") is insufficient when the attack surface is literal string content. A source containing `<</UNTRUSTED_SOURCE>>` deterministically collapses the security boundary at the parser level regardless of model intent. Replaced with explicit preprocessing: `<<UNTRUSTED_SOURCE>>` → `[UNTRUSTED_SOURCE_TAG]`, `<</UNTRUSTED_SOURCE>>` / `<<END_UNTRUSTED_SOURCE>>` → `[/UNTRUSTED_SOURCE_TAG]` before wrapping. Architectural decision: **D-020** (deterministic preprocessing required; behavioral intent insufficient).
+
+2. **M9 — Extended Post-Generation Injection Scan** — Prior check only flagged delimiter leakage. Extended `cogworks-learn/SKILL.md` item 10 to also detect: prompt-override phrases ("ignore prior", "ignore previous"), standalone agent imperative directives ("you must", "you should always", "always do", "never do"), tool call syntax not belonging to skill delimiters. All checks case-insensitive pattern matches; user confirmation required before write if triggered.
+
+**Team coordination (Round 3):** Dallas closed D9/D3 (slug collision guard + handoff artifacts), Lambert closed D6 (compatibility matrix), Hudson closed D8 (CI gate behavioral enforcement), Ripley recorded architectural decisions D-020 and D-021.
+
+## Learnings
+
 **2026-03-03 — Security guards round 2 (Issues #13, #18, #22)**
 
 Implemented three security boundaries in cogworks orchestrator:
