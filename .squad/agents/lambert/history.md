@@ -2,6 +2,38 @@
 
 ## Learnings
 
+### 2026-03-04: Round 3 Completion — D6 Cross-Agent Compatibility Closure
+
+Completed full D6 risk mitigation. Created comprehensive compatibility matrix covering invocation syntax, `$ARGUMENTS` interpolation, and `allowed-tools` enforcement across Claude Code, GitHub Copilot, Codex/GPT-5, and generic MCP agents.
+
+**Deliverables:**
+1. **docs/cross-agent-compatibility.md** (~360 lines, 7 sections): Overview, invocation syntax matrix, `$ARGUMENTS` analysis, `allowed-tools` matrix, known gaps with testing roadmap, user guidance, skill author recommendations. Honest labeling (✅ Confirmed | 🟡 Partial | ❓ Untested | ❌ Known broken).
+2. **cogworks-learn/SKILL.md Compatibility (L2):** Generated-skill template guidance. When skills use `$ARGUMENTS`, authors must add Compatibility section to SKILL.md with fallback note for non-interpolating agents.
+3. **User-facing guidance:** "Compatibility Note for Generated Skills" explains portability, limitations, testing approach.
+
+**Key findings:**
+- cogworks, cogworks-encode, cogworks-learn do NOT use `$ARGUMENTS` internally; documentation is for skill authors.
+- Copilot `$ARGUMENTS` support marked ❓ (undefined per risk analysis); highest-priority live testing candidate.
+- Copilot `allowed-tools` enforcement also undefined; documented impact and author recommendations.
+- 5 gaps identified with effort estimates for post-Round-3 testing (Copilot `$ARGUMENTS`, Copilot `allowed-tools`, MCP integration, Cursor auto-load, argument fallback).
+
+**Risk remapping:** D6 partially closed (documentation complete; live testing roadmap documented for future rounds).
+
+**Team coordination (Round 3):** Ash closed M2/M9 (security), Dallas closed D9/D3 (pipeline), Hudson closed D8 (CI gate), Ripley recorded architectural decisions D-020 and D-021.
+
+### Round 3: Cross-Agent Compatibility Audit (2026-03-11)
+
+**D6 Risk Closure (Cross-Agent Compatibility)**
+- Created `docs/cross-agent-compatibility.md` with 7 sections: Overview, Invocation Syntax by Agent (5 agents + MCP), $ARGUMENTS Interpolation (per-skill + agent matrix), allowed-tools Compatibility, Known Gaps (5 untested items with effort estimates), user-facing Compatibility Note, and skill-author recommendations.
+- **Key findings:**
+  - cogworks, cogworks-encode, cogworks-learn do NOT use `$ARGUMENTS` internally; documentation is for skill authors writing generated skills
+  - Copilot `$ARGUMENTS` support marked ❓ (undefined per risk analysis); flagged as highest-priority unknown
+  - Copilot `allowed-tools` enforcement also undefined; documented impact and recommendation for authors
+- **Generated-skill template update:** Added Compatibility (L2) guidance to cogworks-learn/SKILL.md instructing authors to include Compatibility section in generated SKILL.md when skills use `$ARGUMENTS`, with fallback guidance for non-interpolating agents
+- **User guidance:** "Compatibility Note for Generated Skills" section explains portability, limitations, and testing approach for multi-agent skill deployment
+- **Honest unknowns:** Copilot support marked as undefined (not guessed); 5 gaps identified with testing roadmap
+- **Risk remapping:** D6 partially closed (documentation complete, live testing remains); Copilot testing prioritized post-Round-3
+
 ### Round 2: Compatibility Documentation & Schema (2026-03-10)
 
 **Core Skills Hash Tracking (Issue #12)**
@@ -36,3 +68,4 @@
 - Converted CLAUDE.md from symlink (mode 120000) to regular file (mode 100644)
 - Replaced content with 3-line pointer to AGENTS.md per expert subtraction principle
 - Eliminated F2/F3 context bloat from byte-for-byte duplication
+

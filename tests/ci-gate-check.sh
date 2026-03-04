@@ -23,20 +23,34 @@ else
 fi
 echo ""
 
-# Step 2: Check for behavioral traces
+# Step 2: Check for behavioral traces per skill
 echo "Step 2/3: Checking for behavioral test coverage..."
-TRACE_COUNT=$(find tests/behavioral/cogworks-encode/traces -name "*.json" 2>/dev/null | wc -l || echo "0")
-if [ "$TRACE_COUNT" -gt 0 ]; then
-    echo "✓ Found $TRACE_COUNT behavioral trace(s)"
+MISSING_TRACES_SKILLS=()
+TOTAL_TRACE_COUNT=0
+
+for skill_dir in tests/behavioral/*/; do
+    skill_name=$(basename "$skill_dir")
+    count=$(find "${skill_dir}traces" -name "*.json" 2>/dev/null | wc -l || echo "0")
+    TOTAL_TRACE_COUNT=$((TOTAL_TRACE_COUNT + count))
+    if [ "$count" -eq 0 ]; then
+        MISSING_TRACES_SKILLS+=("$skill_name")
+    fi
+done
+
+if [ ${#MISSING_TRACES_SKILLS[@]} -gt 0 ]; then
+    echo "✗ No behavioral traces found for skill(s): ${MISSING_TRACES_SKILLS[*]}"
+    echo "  Behavioral traces must be captured before release."
+    echo "  Run: python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-"
+    echo "  (See TESTING.md → Layer 2 — Behavioral Tests → Live capture for full instructions)"
+    EXIT_CODE=1
 else
-    echo "⚠ Warning: No behavioral traces found in tests/behavioral/cogworks-encode/"
-    echo "  Run behavioral trace capture before release for full validation"
+    echo "✓ Found $TOTAL_TRACE_COUNT behavioral trace(s) across all skills"
 fi
 echo ""
 
-# Step 3: Run behavioral evaluation if traces exist
+# Step 3: Run behavioral evaluation if all skills have traces
 echo "Step 3/3: Running behavioral evaluation..."
-if [ "$TRACE_COUNT" -gt 0 ]; then
+if [ ${#MISSING_TRACES_SKILLS[@]} -eq 0 ]; then
     if python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-; then
         echo "✓ Behavioral evaluation passed"
     else
@@ -44,7 +58,7 @@ if [ "$TRACE_COUNT" -gt 0 ]; then
         EXIT_CODE=1
     fi
 else
-    echo "⊘ Skipping behavioral eval (no traces available)"
+    echo "⊘ Skipping behavioral eval (traces missing — see Step 2 error above)"
 fi
 echo ""
 

@@ -58,3 +58,46 @@
 - **Rationale:** Placed in Self-Verification (not new phase) because calibration is quality dimension of existing verification. Written as authoritative instruction (not checklist) to match skill voice. Key pattern exploits fact that genuine multi-source synthesis almost always surfaces tension.
 - **Scope:** `skills/cogworks-encode/SKILL.md` only.
 - **Status:** Ready for review and commit.
+
+## [TD-008] Security Injection Scan Completion (Round 3 Gap Closure)
+- **Date:** 2026-03-04 | **By:** Ash (Security Engineer)
+- **Issues Addressed:** M2 (delimiter escape), M9 (post-generation injection scan)
+- **M2 — Deterministic Delimiter Escape:** Replaced behavioral directive with explicit deterministic preprocessing. Literal closing delimiter forms (`<</UNTRUSTED_SOURCE>>`, `<<END_UNTRUSTED_SOURCE>>`) are now replaced with `[UNTRUSTED_SOURCE_TAG]` / `[/UNTRUSTED_SOURCE_TAG]` before wrapping in untrusted block. Architectural decision: **D-020** (deterministic escape required; behavioral intent insufficient).
+- **M9 — Post-Generation Injection Scan:** Extended `cogworks-learn/SKILL.md` checklist item 10 to scan for four additional pattern categories: (1) prompt-override phrases ("ignore prior", "ignore previous"), (2) standalone imperative directives ("you must", "always do"), (3) tool call syntax not belonging to skill delimiters, (4) delimiter leakage. All checks case-insensitive pattern matches. User confirmation required before writing if any pattern found.
+- **Scope:** `skills/cogworks-encode/SKILL.md` (delimiter protocol), `skills/cogworks-learn/SKILL.md` (injection checklist).
+- **Status:** Completed, merged to orchestration log.
+
+## [TD-009] Pipeline Overwrite Protection Extended (Round 3 Gap Closure)
+- **Date:** 2026-03-04 | **By:** Dallas (Pipeline Engineer)
+- **Issues Addressed:** D9 (slug collision against installed agent directories), D3 (handoff artifact presence check)
+- **D9 — Slug Collision Guard Extended:** Overwrite protection in `skills/cogworks/SKILL.md` Step 5 now checks for slug collisions in installed agent directories (`.claude/skills/`, `.agents/skills/`, `.copilot/skills/`) in addition to `_generated-skills/` staging directory. Missing directories gracefully skipped — no error if agent directory does not exist.
+- **D3 — Handoff Artifact Presence Check:** Added explicit artifact presence check to `skills/cogworks-encode/SKILL.md` Stage Contracts section. Pipeline halts with blocking error if any required handoff artifact (`{cdr_registry}`, `{traceability_map}`, `{decision_skeleton}`, etc.) is absent or empty at consumption point. Placed at consumption boundary.
+- **Scope:** `skills/cogworks/SKILL.md` (Step 5), `skills/cogworks-encode/SKILL.md` (Stage Contracts).
+- **Status:** Completed, merged to orchestration log.
+
+## [TD-010] Cross-Agent Compatibility Documentation (Round 3 Gap Closure)
+- **Date:** 2026-03-04 | **By:** Lambert (Compatibility Engineer)
+- **Issue Addressed:** D6 (cross-agent compatibility matrix and generated-skill guidance)
+- **Deliverable 1 — Compatibility Matrix:** New `docs/cross-agent-compatibility.md` (~360 lines, 7 sections). Covers invocation syntax (/, $, natural language), `$ARGUMENTS` interpolation, `allowed-tools` enforcement across Claude Code, GitHub Copilot, Codex/GPT-5, and MCP agents. Honest labeling of unknowns: ✅ Confirmed, 🟡 Partial, ❓ Untested, ❌ Known broken. Flags Copilot `$ARGUMENTS` support as undefined and documents as highest priority for live testing.
+- **Deliverable 2 — Generated-Skill Template:** Added Compatibility (L2) guidance to `skills/cogworks-learn/SKILL.md`. Instructs generated skill authors to include a Compatibility section in SKILL.md, with fallback note for agents lacking `$ARGUMENTS` support.
+- **User-Facing Guidance:** "Compatibility Note for Generated Skills" section provides 1-paragraph explanation for skill users on non-Claude Code agents.
+- **Outstanding Work:** 5 identified gaps (Copilot `$ARGUMENTS`, Copilot `allowed-tools`, MCP integration, Cursor auto-load, argument fallback behavior) documented with effort estimates for post-Round-3 testing.
+- **Scope:** `docs/cross-agent-compatibility.md` (new), `skills/cogworks-learn/SKILL.md` (template guidance).
+- **Status:** Completed, merged to orchestration log.
+
+## [TD-011] CI Gate Behavioral Coverage Enforcement (Round 3 Gap Closure)
+- **Date:** 2026-03-04 | **By:** Hudson (Test Engineer)
+- **Issue Addressed:** D8 (CI gate now blocks on missing behavioral traces)
+- **Change:** Updated `tests/ci-gate-check.sh` to fail (exit non-zero) when behavioral traces are missing for any skill. Previous behavior: warning only, allowed releases with zero behavioral evaluation. New behavior: iterates all skill directories (`cogworks`, `cogworks-encode`, `cogworks-learn`), counts trace files per skill, exits 1 with actionable error if any skill has zero traces.
+- **Remediation Command:** Gate output includes exact command to fix: `python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-`.
+- **Documentation:** Updated `TESTING.md` Pre-release CI Gate section with trace requirement.
+- **Architectural Decision:** **D-021** (behavioral coverage is release guarantee, not optional signal; trace presence check is blocking gate).
+- **Scope:** `tests/ci-gate-check.sh`, `TESTING.md`.
+- **Status:** Completed, merged to orchestration log.
+
+## [TD-012] Architectural Decision Recording (Round 3 Gap Closure)
+- **Date:** 2026-03-04 | **By:** Ripley (Lead Architect)
+- **Decisions Recorded:** D-020 (M2 deterministic delimiter escape), D-021 (CI gate behavioral coverage requirement).
+- **Coherence Review:** All agent closures (M2, M9, D9, D3, D6, D8) verified for conflicts. No conflicts found. M2 ↔ cogworks-learn consistency verified; D9 ↔ existing overwrite protection verified; CI gate ↔ existing traces verified.
+- **Scope:** `_plans/DECISIONS.md`.
+- **Status:** Completed, merged to orchestration log.
