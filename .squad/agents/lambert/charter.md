@@ -12,6 +12,8 @@ Lambert owns cross-agent compatibility, self-referential risks, and contributor 
 - Audit invocation syntax coverage: `/` prefix (Claude Code), `$` prefix or equivalent (Codex), Copilot command surface
 - Validate `$ARGUMENTS` / `$N` interpolation behaviour across agents — document gaps
 - Check `allowed-tools` semantics — ensure no silent tool restriction failures
+- Validate that generated skills using any Claude Code-specific field include `compatibility:` in frontmatter (TD-018 gate)
+  - CC-specific fields requiring `compatibility:` gate: `$ARGUMENTS` / `$N`, `disable-model-invocation: true`, `user-invocable: false`, `context: fork`
 - File: `skills/cogworks/SKILL.md`, `skills/cogworks-encode/SKILL.md`, `skills/cogworks-learn/SKILL.md`
 - Doc: add compatibility matrix to `docs/` or as a section in the risk analysis
 
