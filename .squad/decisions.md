@@ -151,3 +151,11 @@
 - cogworks/SKILL.md: removed `.copilot/skills/{slug}/` from slug collision check (Copilot project path is `.agents/skills/`, already in the list)
 - cogworks-learn/reference.md: added `[Claude Code only]` to `disable-model-invocation` in Task Content definition (sole unlabeled occurrence)
 - cogworks-learn/reference.md: added cross-agent scope note after both Scope Path tables (Claude Code paths only; other agents use their own paths, handled by `npx skills add`)
+
+## TD-018 — Spec-compliant generation: require compatibility: frontmatter for CC-specific fields
+**Date:** 2026-03-04
+**Files:** skills/cogworks-learn/SKILL.md
+**Changes:**
+- Frontmatter template: added `# compatibility: Requires Claude Code for [feature]` comment to show the field as conditional
+- L2 compatibility rule: expanded from `$ARGUMENTS` only to ALL CC-specific fields (`$ARGUMENTS`, `disable-model-invocation: true`, `user-invocable: false`, `context: fork`); now requires `compatibility:` frontmatter (not just body note) when any CC-specific field is present in a generated skill
+- Self-verification checklist: added gate — "If generated SKILL.md uses any CC-specific field or placeholder, is `compatibility:` present in frontmatter?"
