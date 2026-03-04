@@ -101,3 +101,9 @@
 - **Coherence Review:** All agent closures (M2, M9, D9, D3, D6, D8) verified for conflicts. No conflicts found. M2 ↔ cogworks-learn consistency verified; D9 ↔ existing overwrite protection verified; CI gate ↔ existing traces verified.
 - **Scope:** `_plans/DECISIONS.md`.
 - **Status:** Completed, merged to orchestration log.
+
+## [TD-013] User Directive: Windows/Cross-Platform Out of Scope
+- **Date:** 2026-03-04T08:57:57Z | **By:** William Hallatt (via Copilot)
+- **What:** Windows and cross-platform support are explicitly out of scope. Do not spend engineering effort on Windows compatibility, PowerShell, or WSL testing.
+- **Why:** User request — captured for team memory
+- **Context:** Established during Parker (Benchmark & Evaluation Engineer) onboarding.
