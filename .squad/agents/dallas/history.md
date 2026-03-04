@@ -22,3 +22,8 @@ All changes are surgical — single bullets or short notes at the relevant workf
 - Ripley implemented quality calibration gate (D4) in cogworks-encode Self-Verification to detect superficial synthesis.
 - Hudson added generalization probe and edge case tests (D8) plus pre-release CI gate to catch circular verification failures.
 - Lambert documented Codex behavioral capture and skills-lock schema; recommended AGENTS/CLAUDE dedup approach.
+
+### 2026-03-04: Context-Impact Remediation
+- Fixed .gitignore with deep patterns: `tests/results/**/` and `benchmarks/**/output_skills/`
+- Updated TESTING.md with pre-session cleanup guidance
+- Reduced context leak from test artifacts in repo scans

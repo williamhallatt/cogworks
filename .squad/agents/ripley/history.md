@@ -10,3 +10,8 @@
 - Ash implemented security guards (D2, D1, D1) addressing escalation boundaries, stale skill detection, and intent clarification.
 - Hudson added generalization probe and edge case tests (D8) plus pre-release CI gate to catch circular verification failures.
 - Lambert documented Codex behavioral capture and skills-lock schema; recommended AGENTS/CLAUDE dedup approach.
+
+### 2026-03-04: Context-Impact Remediation
+- Added context-budget warning bullet to AGENTS.md Auto-Loading hazard section
+- Improves awareness of squad.agent.md circular edit hazard during skill development
+- Sharpens developer friction point for F4/F5 risk mitigation
