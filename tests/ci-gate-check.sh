@@ -39,9 +39,16 @@ done
 
 if [ ${#MISSING_TRACES_SKILLS[@]} -gt 0 ]; then
     echo "✗ No behavioral traces found for skill(s): ${MISSING_TRACES_SKILLS[*]}"
-    echo "  Behavioral traces must be captured before release."
-    echo "  Run: python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-"
-    echo "  (See TESTING.md → Layer 2 — Behavioral Tests → Live capture for full instructions)"
+    echo ""
+    echo "  Behavioral traces were intentionally removed (D-022)."
+    echo "  The prior traces were LLM-generated circular ground truth:"
+    echo "    - quality_score: null on all core skill traces"
+    echo "    - task_completed: false in baseline runs"
+    echo "  These records validated consistency, not correctness."
+    echo ""
+    echo "  DO NOT regenerate traces with cogworks-eval.py — that recreates the same circular problem."
+    echo "  Parker is responsible for defining quality ground truth as first-principles replacement."
+    echo "  See .squad/agents/parker/charter.md and _plans/DECISIONS.md [D-022]."
     EXIT_CODE=1
 else
     echo "✓ Found $TOTAL_TRACE_COUNT behavioral trace(s) across all skills"
