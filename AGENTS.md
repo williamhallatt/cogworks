@@ -54,6 +54,7 @@
 - An agent that is both operating under a skill's instructions and editing that skill's `SKILL.md` is in circular/inconsistent state.
 - **Convention:** when editing any `skills/cogworks*/SKILL.md`, note it at the top of your session and do not invoke the skill you are editing during that session.
 - **Convention:** if you accidentally invoke a skill while editing it, treat the session as potentially corrupted — restart, or carefully verify that the instructions in memory still match the file on disk.
+- **`.github/agents/squad.agent.md` is auto-loaded by GitHub Copilot** — this file is 1,000+ lines and will consume a significant portion of your context window on every Copilot session. For non-Squad work, run `/clear` after session start or use a scoped workspace that excludes `.github/agents/`.
 
 ## Build, Test, and Development Commands
 - `npx skills add williamhallatt/cogworks` installs skills to detected agents.
