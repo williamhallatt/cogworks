@@ -39,7 +39,7 @@
 
 ## Project Structure & Module Organization
 - `skills/` at repo root contains all skills — the canonical source discovered by `npx skills add`.
-- `.claude/skills/` contains symlinks to `skills/` for local Claude Code development.
+- `.claude/skills/` and `.agents/skills/` contains symlinks to `skills/` for local Claude Code development.
 - `tests/` contains validation assets:
   - `tests/run-black-box-tests.sh` for framework meta-tests.
   - `tests/framework/` for shared deterministic + behavioral + benchmark tooling.
@@ -49,7 +49,7 @@
 - `_sources/` and `_plans/` are working materials and research artifacts.
 
 ### ⚠️ Auto-Loading & Live-Edit Hazard
-- `.claude/skills/` contains symlinks to `skills/cogworks/SKILL.md`, `skills/cogworks-encode/SKILL.md`, and `skills/cogworks-learn/SKILL.md` — any agent that auto-loads these skills is running under live instructions from those files.
+- `.claude/skills/` and `.agents/skills/` contains symlinks to `skills/cogworks/SKILL.md`, `skills/cogworks-encode/SKILL.md`, and `skills/cogworks-learn/SKILL.md` — any agent that auto-loads these skills is running under live instructions from those files.
 - Editing a `skills/cogworks*/SKILL.md` file immediately changes the instructions for every session currently reading it via the symlink — there is no staging buffer.
 - An agent that is both operating under a skill's instructions and editing that skill's `SKILL.md` is in circular/inconsistent state.
 - **Convention:** when editing any `skills/cogworks*/SKILL.md`, note it at the top of your session and do not invoke the skill you are editing during that session.
