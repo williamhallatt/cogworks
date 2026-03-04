@@ -2,6 +2,32 @@
 
 ## Learnings
 
+### 2026-03-04 — Spec Alignment Test Cases (Dallas Changes Verification)
+
+Verified Dallas's cogworks-learn changes and added 7 new test cases covering Gaps 3, 4, 10 and spec alignment (Claude Code-specific features).
+
+**Test execution findings:**
+- No behavioral traces exist for cogworks-learn (or any skill) — intentionally removed per D-022 (circular LLM ground truth)
+- Existing 8 activation test cases remain valid — Dallas's guidance changes don't affect activation patterns
+- CI gate correctly fails on missing traces, with actionable error referencing Parker's charter
+
+**New test cases added (7):**
+1. **Parallel tool use (Gap 3):** Skills with multiple independent operations should include "Make all independent tool calls in parallel"
+2. **Subagent delegation (Gap 4):** High-volume result tasks should include delegation guidance
+3. **Subagent delegation - Claude Code:** Claude Code targets should mention `context: fork` frontmatter
+4. **When NOT to use skills (Gap 10):** Always-on rules should recommend persistent config (CLAUDE.md, copilot-instructions.md), not skills
+5. **$ARGUMENTS scoping:** $ARGUMENTS should be labeled "Claude Code extension" / "not in agentskills.io spec", not "universal"
+6. **Compatibility field:** Skills using Claude Code-specific features should include `compatibility:` field in frontmatter
+7. **allowed-tools scoping:** allowed-tools should be described as "broadly supported (16/18 agents)", not "experimental"
+
+**Key insight:** Activation tests (do skills trigger?) and quality tests (does guidance match spec?) are orthogonal. Existing cogworks-learn tests were activation-only, so Dallas's spec alignment changes required new quality test cases, not updates to existing ones.
+
+**Minor bug found:** CI gate line 34 arithmetic evaluation syntax error when traces directory doesn't exist (non-blocking — gate still fails correctly with proper error message).
+
+**Written decision:** `.squad/decisions/inbox/hudson-spec-alignment-tests.md`
+
+**Team coordination:** Parker owns ground truth replacement for circular LLM traces; Hudson owns test case coverage for spec alignment.
+
 ### 2026-03-04 — Kane's Product Gap Synthesis: Impact on Testing Strategy
 
 Kane's analysis identifies **activation testing** as the highest-priority gap (P0). Current behavioral eval validates output quality but not whether skills trigger on relevant prompts. This directly impacts Hudson's testing roadmap:
@@ -74,4 +100,24 @@ Key insight: The D8 risk (generator evaluating its own output) requires test cas
 - Ash implemented security guards (D2, D1, D1) addressing escalation boundaries, stale skill detection, and intent clarification.
 - Ripley implemented quality calibration gate (D4) in cogworks-encode Self-Verification to detect superficial synthesis.
 - Lambert documented Codex behavioral capture and skills-lock schema; recommended AGENTS/CLAUDE dedup approach.
+
+
+### 2026-03-04 — Spec-Align Test Cases Finalized (Dallas Review Complete)
+
+Added 7 new behavioral test cases to validate Dallas's spec alignment changes (TD-016).
+
+**Test case summary:**
+1. cogworks-learn-parallel-001 (Gap 3): Parallel tool use instruction
+2. cogworks-learn-subagent-001 (Gap 4): Subagent delegation guidance
+3. cogworks-learn-subagent-002 (Gap 4 - CC only): `context: fork` frontmatter
+4. cogworks-learn-persistent-001 (Gap 10): Persistent config recommendation
+5. cogworks-learn-arguments-001: $ARGUMENTS scoping (Claude Code-specific)
+6. cogworks-learn-compatibility-001: Compatibility field usage
+7. cogworks-learn-allowed-tools-001: "16/18 agents" support framing
+
+**Key insight:** Activation tests (invocation triggers) and quality tests (guidance accuracy) are orthogonal. Existing 8 cogworks-learn activation tests remain valid; new 7 test cases target quality validation of spec alignment.
+
+**CI gate:** Correctly blocks on missing traces (per D-022); awaiting Parker's ground truth definition.
+
+**Team coordination:** Product review (Kane) approved all changes (TD-016). Test cases ready for behavioral trace execution once Parker completes ground truth methodology.
 

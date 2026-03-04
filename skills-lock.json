@@ -5,6 +5,11 @@
       "source": "/home/williamh/code/cogworks/_generated-skills",
       "sourceType": "local",
       "computedHash": "ff34ab9458fdfe81429301693c8faa6b833a960b2254a76b7f6e356d0f8371c9"
+    },
+    "tdd": {
+      "source": "/home/williamh/code/cogworks/_generated-skills",
+      "sourceType": "local",
+      "computedHash": "068412296cfe5068aa30c2884354e6e77bd4d35cabcf0f6f478ea0587dfb3e8a"
     }
   }
 }

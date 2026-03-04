@@ -54,3 +54,59 @@ All changes are surgical — single bullets or short notes at the relevant workf
 - Updated TESTING.md with pre-session cleanup guidance
 - Reduced context leak from test artifacts in repo scans
 
+
+### 2026-03-11: Spec-Alignment Pass: Claude Code Extensions + Gaps 3/4/10
+
+Completed spec-alignment pass on cogworks-learn addressing incorrect presentation of Claude Code-specific features as universal standards.
+
+**Problem:** cogworks-learn presented `disable-model-invocation`, `user-invocable`, and `$ARGUMENTS` as standard Agent Skills features. They are Claude Code extensions — not in agentskills.io spec, not in vercel-labs/skills compatibility matrix. Any user generating a skill for Copilot, Codex, Cursor, etc. got wrong guidance.
+
+**Evidence sources:**
+1. agentskills.io/specification — defines exactly 6 frontmatter fields; none of the three are listed
+2. vercel-labs/skills compatibility matrix (18 agents) — `allowed-tools` shows Yes for 16/18; `$ARGUMENTS` not listed at all; `disable-model-invocation` and `user-invocable` not listed
+
+**Changes:**
+
+1. **Scoped Claude Code extensions** — Added "Claude Code native capabilities" section to SKILL.md grouping the three fields with framing as powerful features, not demotions. Quick Decision Framework now explicitly scopes them. For cross-agent skills, recommend using `compatibility` field (the spec-defined mechanism).
+
+2. **Reframed `allowed-tools`** — Updated to "broadly supported (16/18 agents per vercel-labs/skills matrix)." Only Kiro CLI and Zencoder don't support it. Copilot confirmed as Yes.
+
+3. **Added Gaps 3, 4, 10** — New sections in SKILL.md:
+   - **Gap 3 (Parallel Tool Use):** Single-line instruction for generated skills: "Make all independent tool calls in parallel." Works on all agents, pure natural language.
+   - **Gap 4 (Subagent Delegation):** For high-volume tasks, delegate to subagent. Claude Code: `context: fork` frontmatter. Other agents: natural language only.
+   - **Gap 10 (When NOT to Use a Skill):** Use persistent config files (CLAUDE.md, .github/copilot-instructions.md, AGENTS.md) for always-on rules, not skills.
+
+4. **Fixed compatibility guidance** — Line ~251 in SKILL.md: changed from "If your agent does not support argument interpolation (including GitHub Copilot)" to "Argument interpolation is a Claude Code extension. On other agents (Copilot, Codex, Cursor, etc.), skills receive arguments via natural language — no token substitution needed or expected."
+
+5. **Updated cross-agent-compatibility.md** — Linked vercel-labs/skills as primary reference. Updated `allowed-tools` status from ❓ to ✅ Confirmed. Removed Copilot `allowed-tools` gap. Cleaned up risk language.
+
+**Key learning:** Spec vs. implementation are different surfaces. Always verify against agentskills.io spec and vercel-labs/skills compatibility matrix before claiming universal support. Natural language is the cross-agent fallback — no token substitution needed or expected on most agents.
+
+**Files changed:**
+- `skills/cogworks-learn/SKILL.md` (targeted edits: Core Expertise Areas, Quick Decision Framework, new sections for Gaps 3/4/10, Compatibility L2 guidance)
+- `skills/cogworks-learn/reference.md` (scoping labels: "[Claude Code only]" added to invocation modes, `$ARGUMENTS` section, quick reference tables)
+- `docs/cross-agent-compatibility.md` (vercel-labs reference, `allowed-tools` status update, risk language cleanup)
+
+No structure changes. Surgical edits only.
+
+### 2026-03-04: Spec-Align cogworks-learn: Scope Claude Code Extensions, Add Gap 3/4/10
+
+Completed spec alignment pass addressing TD-014 product gaps (Gaps 3, 4, 10) and agentskills.io specification compliance.
+
+**Changes implemented:**
+1. **Scoped Claude Code extensions** (`disable-model-invocation`, `user-invocable`, `$ARGUMENTS`) under "Claude Code native capabilities" section. Removed misleading universal framing. For cross-agent skills, guidance recommends `compatibility` field (spec-defined mechanism).
+
+2. **Reframed `allowed-tools`** as broadly supported (16/18 agents per vercel-labs/skills compatibility matrix). Documented support: Claude Code, Copilot, Codex, Cursor, +12 others. Only Kiro CLI and Zencoder unsupported.
+
+3. **Added Gap 3 guidance:** "Make all independent tool calls in parallel" for file-heavy operations (3-5× speedup).
+
+4. **Added Gap 4 guidance:** Subagent delegation for high-volume result tasks. Include `context: fork` for Claude Code; natural language delegation for others.
+
+5. **Added Gap 10 guidance:** When-NOT-to-use-skills — always-on rules belong in persistent config (CLAUDE.md, copilot-instructions.md, AGENTS.md), not skills.
+
+**Files updated:** `skills/cogworks-learn/SKILL.md`, `skills/cogworks-learn/reference.md`, `docs/cross-agent-compatibility.md`.
+
+**Product review:** Kane approved (TD-016) with two notes: (1) frame Claude Code-specific as "powerful native capabilities"; (2) verify 16/18 claim.
+
+**Team coordination:** Hudson added 7 new test cases; no conflicts with existing M5/M11/D3/D7 pipeline closures. Test coverage ready for Parker's ground truth definition (D-022).
+
