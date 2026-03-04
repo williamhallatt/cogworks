@@ -14,6 +14,11 @@
 | Cross-agent compatibility, invocation syntax, argument interpolation | Lambert | D6 in risk analysis |
 | Self-referential/circular risks, symlink safety, live-edit warnings | Lambert | D7 in risk analysis |
 | Contributor guard rails, AGENTS.md, skills-lock hashing | Lambert | D10 in risk analysis |
+| Roadmap questions, feature prioritization | Kane | Product Manager |
+| PRD intake, spec authoring | Kane | Product Manager |
+| Product coherence review on PRs | Kane | Product Manager |
+| "What should we build next?" / backlog grooming | Kane | Product Manager |
+| Agent skill UX feedback, invocation ergonomics | Kane | Product Manager |
 | Architecture decisions, code review, scope | Ripley | Lead |
 | Session logs, decision merges, cross-agent updates | Scribe | Always background |
 | Work queue monitoring, issue triage | Ralph | Always monitoring |

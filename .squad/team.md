@@ -17,6 +17,7 @@
 | Dallas | Pipeline Engineer | Pipeline workflow, handoff artifacts, file system guards | 🔧 |
 | Hudson | Test Engineer | Behavioral traces, CI gates, quality validation | 🧪 |
 | Lambert | Compatibility Engineer | Cross-agent compatibility, contributor safety, self-ref risks | 🌐 |
+| Kane | Product Manager | Roadmap, PRD authoring, backlog, AI skills UX | 📦 |
 | Scribe | Session Logger | Memory, decisions, orchestration logs | 📋 |
 | Ralph | Work Monitor | — | 🔄 Monitor |
 
