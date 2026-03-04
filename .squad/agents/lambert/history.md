@@ -91,3 +91,17 @@ Completed full D6 risk mitigation. Created comprehensive compatibility matrix co
 - **Key learning:** Codex invocation prefix `$` was incorrect; Codex uses natural language (varies). `.agents/skills/` is the primary cross-agent path; `.claude/skills/` is Claude Code-specific.
 - **Decision captured:** TD-019 in team decisions.md (merged from inbox).
 - **Commit:** ca8f5cb
+
+### 2026-03-12: Cross-Agent Path Fixes — Testing Docs and Fixture Sync
+
+Fixed three compatibility gaps:
+
+1. **TESTING.md case count (line 93):** Updated from "31 cases" to "39 cases" (cogworks=8, cogworks-encode=15, cogworks-learn=16). Verified cross-agent path examples already present in Layer 1.
+2. **cogworks-eval.py default paths (lines 419, 439):** Changed `--skills-root` default from `.claude/skills` to `.agents/skills` for both `run` and `scaffold` subcommands. Aligns CLI defaults with cross-agent convention.
+3. **snapshot-cogworks-learn fixture identity:** Synced description field from Claude Code-specific "Expert knowledge on writing Claude Code skills..." to cross-agent "Use when creating or revising agent skills..." per current live `skills/cogworks-learn/SKILL.md`. Updated body line 13 from "writing Claude Code skills" to "writing agent skills". Preserved `snapshot_date`, `license`, `metadata` fields unchanged.
+
+**Key learning:** Test fixtures can drift from live skills when skills evolve identity/scope. Cross-agent path defaults should match primary convention (`.agents/skills/` = cross-agent, `.claude/skills/` = Claude Code-specific).
+
+**Scope:** Surgical changes only—did not touch other defaults, logic, or unrelated fixture fields.
+
+**Commit:** [pending]
