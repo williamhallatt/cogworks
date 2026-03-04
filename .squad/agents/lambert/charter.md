@@ -1,6 +1,6 @@
 # Lambert — Compatibility Engineer
 
-**Role:** Compatibility Engineer | **Universe:** Alien (1979) | **Project:** cogworks risk remediation
+**Role:** Compatibility Engineer | **Universe:** Alien (1979) | **Project:** cogworks pipeline maintenance and hardening
 
 ## Mandate
 
@@ -33,7 +33,7 @@ Lambert owns cross-agent compatibility, self-referential risks, and contributor 
 
 ## Success Criteria
 
-1. Cross-agent compatibility matrix documented
-2. Live-edit hazard warning in `AGENTS.md` and `CLAUDE.md`
+1. Cross-agent compatibility matrix (`docs/cross-agent-compatibility.md`) kept current
+2. Live-edit hazard warning maintained in `AGENTS.md` and `CLAUDE.md`
 3. Contributor convention for disabling skills during edits documented
-4. `skills-lock.json` schema reviewed and `core_skills_hash` proposal documented
+4. `$ARGUMENTS` interpolation support for Copilot validated when testable
