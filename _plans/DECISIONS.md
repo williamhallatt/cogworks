@@ -7,7 +7,15 @@ audited_through: 2026-03-04
 Settled decisions for the cogworks project. Agents load this file for context;
 see `_plans/archive/` for historical plans.
 
-## [D-020] Deterministic delimiter neutralisation for source ingestion
+## [D-025] Scribe mandate expanded — repo documentation ownership
+
+- **Date:** 2026-03-04 | **By:** William (owner), Scribe (mandate)
+- **Decision:** Scribe's charter expanded from `.squad/` memory + `_plans/DECISIONS.md` to include all repo-facing documentation. She owns README.md, INSTALL.md, AGENTS.md, CONTRIBUTIONS.md, TESTING.md, CLAUDE.md, `docs/` (full ownership except `cogworks-system-deep-dive-*.md` which she flags but Ash authors), and `tests/framework/README.md`.
+- **Rationale:** D-022 → D-024 each left stale references in live files that required a separate manual audit pass. No one owned repo docs between decisions — the gap was structural, not a one-time miss. Formalising Scribe's ownership and a post-decision audit protocol closes the gap.
+- **Post-decision audit protocol:** After every D-NNN commit, Scribe searches all owned files for references to changed/deleted artifacts, fixes stale refs in the same or immediate follow-on commit, and records the audit result (clean / N files updated) in the D-NNN entry here. A decision is not closed until the audit result is recorded.
+- **Scope:** `.squad/agents/scribe/charter.md` — `## Repository Documentation` section added with canonical doc map and audit protocol.
+
+
 
 - **Date:** 2026-03-04 | **By:** Ripley (Lead), implementing Ash's M2 remediation
 - **Decision:** Source content is pre-processed to replace literal `<<UNTRUSTED_SOURCE>>` and `<<END_UNTRUSTED_SOURCE>>` strings with `[UNTRUSTED_SOURCE_TAG]` / `[/UNTRUSTED_SOURCE_TAG]` before wrapping in delimiter markers. This makes the delimiter boundary deterministic rather than behavioral-only.
