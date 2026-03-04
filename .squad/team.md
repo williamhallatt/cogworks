@@ -18,6 +18,7 @@
 | Hudson | Test Engineer | Behavioral traces, CI gates, quality validation | 🧪 |
 | Lambert | Compatibility Engineer | Cross-agent compatibility, contributor safety, self-ref risks | 🌐 |
 | Kane | Product Manager | Roadmap, PRD authoring, backlog, AI skills UX | 📦 |
+| Parker | Benchmark & Evaluation Engineer | Skill quality definition, cross-model eval, external validation | 📐 |
 | Scribe | Session Logger | Memory, decisions, orchestration logs | 📋 |
 | Ralph | Work Monitor | — | 🔄 Monitor |
 

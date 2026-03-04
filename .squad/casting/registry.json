@@ -63,6 +63,14 @@
       "created_at": "2026-03-04T08:12:33Z",
       "legacy_named": false,
       "status": "active"
+    },
+    {
+      "persistent_name": "Parker",
+      "role": "Benchmark & Evaluation Engineer",
+      "universe": "Alien (1979)",
+      "created_at": "2026-03-04T09:01:59Z",
+      "legacy_named": false,
+      "status": "active"
     }
   ]
 }
