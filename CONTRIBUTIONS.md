@@ -12,7 +12,7 @@ Requires Node.js 18+. Uses [`npx skills`](https://github.com/vercel-labs/skills)
 To install your local copy for development (run from root):
 
 ```bash
-npx skills add ./skills
+npx skills add .
 ```
 
 ## Running tests
@@ -42,11 +42,11 @@ See [TESTING.md](TESTING.md) for the full test runbook, including recursive impr
 
 PR checklist:
 
-- [ ] Changes to `skills/**` or `.claude/**` pass Layer 1 deterministic checks (`bash scripts/validate-quality-gates.sh`)
+- [ ] Changes to `skills/**`, `.claude/**`, or `.agents/**` pass Layer 1 deterministic checks (`bash scripts/validate-quality-gates.sh`)
 - [ ] Shell scripts pass shellcheck
 - [ ] README.md and INSTALL.md updated if user-facing behavior changed
 - [ ] Commit messages follow the `<type>/ <summary>` format
-- [ ] PRs touching `skills/**`, `.claude/**`, `README.md`, `INSTALL.md`, or `LICENSE` pass `.github/workflows/pre-release-validation.yml`
+- [ ] PRs touching `skills/**`, `.claude/**`, `.agents/**`, `README.md`, `INSTALL.md`, or `LICENSE` pass `.github/workflows/pre-release-validation.yml`
 
 ## Releasing
 
@@ -64,8 +64,13 @@ for skill in skills/*/; do
   [ ! -f "$skill/SKILL.md" ] && echo "Missing: $skill/SKILL.md"
 done
 
-# Verify symlinks resolve
+# Verify symlinks resolve for Claude Code
 for link in .claude/skills/*; do
+  [ -L "$link" ] && [ ! -e "$link/SKILL.md" ] && echo "Broken: $link"
+done
+
+# Verify symlinks resolve for other agents
+for link in .agents/skills/*; do
   [ -L "$link" ] && [ ! -e "$link/SKILL.md" ] && echo "Broken: $link"
 done
 
@@ -104,7 +109,7 @@ skills/
 
 - [ ] All commits pushed to `main`
 - [ ] All `skills/*/SKILL.md` files exist with valid frontmatter
-- [ ] `.claude/skills/` symlinks resolve
+- [ ] `.claude/skills/` and `.agents/skills/` symlinks resolve
 - [ ] Tests pass: `bash tests/run-black-box-tests.sh`
 - [ ] README.md and INSTALL.md are up to date
 
@@ -122,10 +127,11 @@ done
 
 **Broken symlinks**
 
-Symlinks in `.claude/skills/` must point to `../../skills/<name>`. Verify:
+Symlinks in `.claude/skills/` and `.agents/skills/` must point to `../../skills/<name>`. Verify:
 
 ```bash
 ls -la .claude/skills/
+ls -la .agents/skills/
 ```
 
 ### Generating release notes locally
