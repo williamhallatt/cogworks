@@ -144,7 +144,9 @@ def check_trace_freshness(trace_path: str) -> bool:
         print(
             f"ERROR: trace is {int(age_days)} days old (>{_BLOCK_DAYS}d threshold) — "
             f"refresh required: {trace_path}\n"
-            "  Run: bash scripts/refresh-behavioral-traces.sh",
+            "  NOTE: Behavioral trace capture scripts were removed (D-022/D-023).\n"
+            "  DO NOT regenerate LLM-captured traces — they are circular ground truth.\n"
+            "  See .squad/agents/parker/charter.md for replacement quality measurement mandate.",
             file=sys.stderr,
         )
         return False
