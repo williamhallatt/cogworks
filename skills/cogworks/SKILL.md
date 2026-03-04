@@ -245,7 +245,7 @@ Ask user to approve before creating skill files. If they decline, stop execution
 
 **Overwrite protection (guard):** If `{skill_path}` already exists and contains a SKILL.md file, pause and confirm with the user before proceeding. Never silently overwrite an existing skill.
 
-Also check for slug collision in installed agent directories: `.claude/skills/{slug}/`, `.agents/skills/{slug}/`, `.copilot/skills/{slug}/`. For each directory that exists, if a `{slug}` subdirectory is found, warn the user that an installed skill with the same name will be affected and require confirmation before continuing. Skip any agent directory that does not exist.
+Also check for slug collision in installed agent directories: `.claude/skills/{slug}/`, `.agents/skills/{slug}/`. For each directory that exists, if a `{slug}` subdirectory is found, warn the user that an installed skill with the same name will be affected and require confirmation before continuing. Skip any agent directory that does not exist.
 
 Generate skill files in `{skill_path}` from the synthesis output. Create SKILL.md with frontmatter and overview, reference.md as canonical guidance, and supporting files (patterns.md, examples.md) only when they contain substantive unique content. Pass:
 
