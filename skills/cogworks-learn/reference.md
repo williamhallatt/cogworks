@@ -141,12 +141,14 @@ Anti-patterns:
 | Project | `.claude/skills/<name>/SKILL.md` | This project only |
 | Plugin | `<plugin>/skills/<name>/SKILL.md` | Where plugin enabled |
 
+_Paths above are Claude Code-specific. Other agents use their own scope paths (e.g., `.agents/skills/` at project scope). Use `npx skills add` to install to all detected agents._
+
 ### 5. Reference vs Task Content
 **Definition:** Two fundamental content types that determine how skills are used.
 
 **Reference Content:** Knowledge the agent applies to current work. Conventions, patterns, style guides, domain knowledge. Runs inline with conversation context.
 
-**Task Content:** Step-by-step workflows for specific actions. Often invoked manually. May use `disable-model-invocation: true` to prevent auto-triggering.
+**Task Content:** Step-by-step workflows for specific actions. Often invoked manually. May use `disable-model-invocation: true` **[Claude Code only]** to prevent auto-triggering.
 
 ### 6. Progressive Disclosure
 **Definition:** Keep SKILL.md focused and concise (prefer 150-350 words) with detailed reference material in supporting files. The agent loads additional files on-demand when needed.
@@ -334,12 +336,14 @@ metadata:                     # Custom key-value pairs
 | `$ARGUMENTS[N]` | Nth argument (0-indexed) |
 | `$N` | Shorthand for $ARGUMENTS[N] |
 
-### Scope Paths
+### Scope Paths (Claude Code)
 | Scope | Path |
 |-------|------|
 | Personal | `~/.claude/skills/<name>/SKILL.md` |
 | Project | `.claude/skills/<name>/SKILL.md` |
 | Plugin | `<plugin>/skills/<name>/SKILL.md` |
+
+_Other agents use their own paths. Use `npx skills add` to install to all detected agents._
 
 ### Invocation Control
 | Goal | Frontmatter |
