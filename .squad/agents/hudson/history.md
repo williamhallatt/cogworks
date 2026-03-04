@@ -2,6 +2,22 @@
 
 ## Learnings
 
+### 2026-03-04 — Round 3 Issues Closure: Test Infrastructure Fixes
+
+Fixed three critical test infrastructure issues (#30, #33, #35) as final Ralph-coordinated remediation:
+
+1. **Template check label mismatch (#30):** Changed `has_user_invocable_field` → `has_name_field` in `tests/framework/templates/test-case-template.jsonl`. Removes false implication that Claude Code `user-invocable` extension is universal requirement.
+
+2. **llm_judge aspirational annotation (#33):** Added `"note": "aspirational — no runner implemented yet"` to 8 template cases and 5 golden sample cases. Makes explicit that these are design placeholders with no cogworks-eval.py execution path.
+
+3. **Cogworks orchestrator smoke prompts (#35):** Created explicit and mid-conversation trigger prompts for cogworks orchestrator; added to smoke test suite. Closes coverage gap: existing smoke tests validated cogworks-learn and cogworks-encode but not full orchestration entry point.
+
+**Decisions captured:** D-023 (check names must match semantics), D-024 (aspirational cases require annotation), D-025 (smoke coverage required for all cogworks-* skills).
+
+**Key insight:** Template mislabeling was introduced when Claude Code extensions were generalized to agentskills.io spec. Aspirational annotation prevents future implementers from assuming llm_judge runner exists. Smoke test coverage gap meant orchestrator activation could regress undetected.
+
+**Commits:** Merged to main via Ralph coordination.
+
 ### 2026-03-04 — Spec Alignment Test Cases (Dallas Changes Verification)
 
 Verified Dallas's cogworks-learn changes and added 7 new test cases covering Gaps 3, 4, 10 and spec alignment (Claude Code-specific features).
@@ -139,4 +155,28 @@ Fixed two test infrastructure issues to support cross-agent development:
 **Key insight:** Test infrastructure assumed `.claude/skills/` only; cross-agent work (TD-016, TD-019) requires `.agents/skills/` support. Quality test cases must validate cross-agent framing AND correct labeling of CC-specific features.
 
 **Team coordination:** Surgical fixes addressing Lambert's TD-019 path alignment work.
+
+### 2026-03-04 — Test Template and Smoke Test Coverage Fixes
+
+Fixed three test infrastructure issues (GitHub #30, #33, #35):
+
+**FIX 1: Template check label mismatch (#30)**
+- Line 8 of `tests/framework/templates/test-case-template.jsonl` had mislabeled check
+- Changed `has_user_invocable_field` → `has_name_field` (description already correct)
+- Removes implication that Claude Code `user-invocable` extension is universal requirement
+
+**FIX 2: llm_judge aspirational annotation (#33)**
+- Added `"note": "aspirational — no runner implemented yet"` to all llm_judge category cases
+- Applied to both `test-case-template.jsonl` (8 cases: fidelity-001 through fidelity-004, quality-001 through quality-004) and `deployment-skill/test-cases.jsonl` (5 cases: deploy-fidelity-001/002, deploy-quality-001/002/003)
+- Makes explicit that these cases are design placeholders — no execution path exists in cogworks-eval.py
+
+**FIX 3: cogworks orchestrator smoke prompts (#35)**
+- Created `tests/trigger-smoke/prompts/cogworks-explicit.txt` (explicit `/cogworks` invocation)
+- Created `tests/trigger-smoke/prompts/cogworks-mid-conversation.txt` (implicit mid-conversation request)
+- Added both to `scripts/run-trigger-smoke-tests.sh` cases array
+- Closes coverage gap: existing prompts covered cogworks-learn and cogworks-encode but not orchestrator
+
+**Key insight:** Test template mislabeling was introduced when Claude Code extensions were generalized to agentskills.io spec — old check name (`user-invocable`) was CC-specific, description was universal. The llm_judge note makes explicit the current eval limitation (activation-based only) so future implementers understand design intent vs. missing runner.
+
+**Team coordination:** Ralph requested these fixes as pre-merge cleanup for cogworks stabilization.
 

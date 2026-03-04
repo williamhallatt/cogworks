@@ -172,3 +172,18 @@
 - **Rationale:** Completes spec alignment (TD-016/TD-017/TD-018); eliminates cross-agent confusion in end-user and contributor docs; resolves D6 compatibility gaps.
 - **Impact:** Users on Copilot/Codex/Cursor see correct `.agents/` paths; generated skills inherit accurate labeling patterns; D6 (compatibility matrix) fully addressed in public documentation.
 - **Status:** Complete.
+
+## [TD-020] Test Template Consistency and Smoke Test Coverage (Round 3 Issue Remediation)
+- **Date:** 2026-03-04 | **By:** Hudson (Test Engineer)
+- **Issues Addressed:** #30, #33, #35
+- **Work Items:**
+  1. **Template check label fix (#30):** Changed mislabeled check `has_user_invocable_field` → `has_name_field` in `tests/framework/templates/test-case-template.jsonl` (line 8). Original mislabel implied Claude Code `user-invocable` extension is universal requirement; correction aligns check name with universal semantics when template generalizes to agentskills.io spec.
+  2. **llm_judge aspirational annotation (#33):** Added `"note": "aspirational — no runner implemented yet"` to all llm_judge category cases in both `tests/framework/templates/test-case-template.jsonl` (8 cases: fidelity-001-004, quality-001-004) and `tests/datasets/golden-samples/deployment-skill/test-cases.jsonl` (5 cases: deploy-fidelity-001/002, deploy-quality-001/002/003). Makes explicit that these are design placeholders with no execution path in cogworks-eval.py.
+  3. **Cogworks orchestrator smoke prompts (#35):** Created `tests/trigger-smoke/prompts/cogworks-explicit.txt` (explicit `/cogworks` invocation) and `tests/trigger-smoke/prompts/cogworks-mid-conversation.txt` (implicit mid-conversation request). Added both to `scripts/run-trigger-smoke-tests.sh` cases array. Closes coverage gap: existing smoke tests validated cogworks-learn and cogworks-encode but not orchestrator.
+- **Architectural Decisions:**
+  - **D-023: Test template check names must match their validation logic** — Check field should describe what is validated, not what was historically copied. When Claude Code extensions generalize to agentskills.io spec, check names must update to reflect universal semantics.
+  - **D-024: Aspirational test cases must be explicitly labeled** — Test cases with no runner implementation must include `"note": "aspirational — no runner implemented yet"`. Makes design intent clear: these define future capability, not current enforcement.
+  - **D-025: Trigger smoke tests must cover all repo skills** — Each cogworks-* skill requires explicit and mid-conversation prompts. Gaps in smoke coverage mean activation regression can go undetected.
+- **Impact:** Template consumers won't inherit mislabeled checks; llm_judge cases won't be mistaken for implemented gates; smoke tests now validate all three cogworks orchestration entry points.
+- **Scope:** `tests/framework/templates/test-case-template.jsonl`, `tests/datasets/golden-samples/deployment-skill/test-cases.jsonl`, `tests/trigger-smoke/prompts/`, `scripts/run-trigger-smoke-tests.sh`.
+- **Status:** Complete.
