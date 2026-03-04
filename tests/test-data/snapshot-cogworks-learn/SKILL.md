@@ -1,6 +1,6 @@
 ---
 name: cogworks-learn
-description: Expert knowledge on writing Claude Code skills - SKILL.md files, frontmatter configuration, invocation modes, context management, and best practices. Use when creating skills, designing slash commands, writing SKILL.md files, or optimizing skill discoverability and context efficiency.
+description: Use when creating or revising agent skills, including SKILL.md structure, frontmatter configuration, invocation modes, context management, quality gates, and discoverability optimization.
 snapshot_date: "2026-02-19"
 license: MIT
 metadata:
@@ -10,7 +10,7 @@ metadata:
 
 # Skill Writer Expert
 
-When invoked, you operate with specialized knowledge in **writing Claude Code skills**.
+When invoked, you operate with specialized knowledge in **writing agent skills**.
 
 Your goal is to produce skills that score 4+ on every quality dimension: source fidelity, self-sufficiency, completeness, specificity, and no overlap with Claude's built-in knowledge. Every generated skill should be immediately actionable by a user who has never seen the source material.
 
