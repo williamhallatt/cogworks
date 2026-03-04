@@ -126,7 +126,7 @@ If you prefer a more controlled setup or need enterprise providers:
 
 In an issue comment:
 
-```
+```text  theme={null}
 @claude implement this feature based on the issue description
 ```
 
@@ -136,7 +136,7 @@ Claude analyzes the issue and codebase, writes changes in a branch, and opens an
 
 In an MR discussion:
 
-```
+```text  theme={null}
 @claude suggest a concrete approach to cache the results of this API call
 ```
 
@@ -146,7 +146,7 @@ Claude proposes changes, adds code with appropriate caching, and updates the MR.
 
 In an issue or MR comment:
 
-```
+```text  theme={null}
 @claude fix the TypeError in the user dashboard component
 ```
 
@@ -319,7 +319,7 @@ claude-bedrock:
 ```
 
 <Note>
-  Model IDs for Bedrock include region-specific prefixes and version suffixes (for example, `us.anthropic.claude-sonnet-4-5-20250929-v1:0`). Pass the desired model via your job configuration or prompt if your workflow supports it.
+  Model IDs for Bedrock include region-specific prefixes (for example, `us.anthropic.claude-sonnet-4-6`). Pass the desired model via your job configuration or prompt if your workflow supports it.
 </Note>
 
 ### Google Vertex AI job example (Workload Identity Federation)

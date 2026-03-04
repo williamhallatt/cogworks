@@ -240,7 +240,7 @@ Plan Mode instructs Claude to create a plan by analyzing the codebase with read-
 
 You can switch into Plan Mode during a session using **Shift+Tab** to cycle through permission modes.
 
-If you are in Normal Mode, **Shift+Tab** first switches into Auto-Accept Mode, indicated by `⏵⏵ accept edits on` at the bottom of the terminal. A subsequent **Shift+Tab** will switch into Plan Mode, indicated by `⏸ plan mode on`. When an [agent team](/en/agent-teams) is active, the cycle also includes Delegate Mode.
+If you are in Normal Mode, **Shift+Tab** first switches into Auto-Accept Mode, indicated by `⏵⏵ accept edits on` at the bottom of the terminal. A subsequent **Shift+Tab** will switch into Plan Mode, indicated by `⏸ plan mode on`.
 
 **Start a new session in Plan Mode**
 
@@ -525,7 +525,7 @@ Thinking is enabled by default, but you can adjust or disable it.
 
 | Scope                  | How to configure                                                                           | Details                                                                                                                                               |
 | ---------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Effort level**       | Adjust in `/model` or set [`CLAUDE_CODE_EFFORT_LEVEL`](/en/settings#environment-variables) | Control thinking depth for Opus 4.6: low, medium, high (default). See [Adjust effort level](/en/model-config#adjust-effort-level)                     |
+| **Effort level**       | Adjust in `/model` or set [`CLAUDE_CODE_EFFORT_LEVEL`](/en/settings#environment-variables) | Control thinking depth for Opus 4.6 and Sonnet 4.6: low, medium, high. See [Adjust effort level](/en/model-config#adjust-effort-level)                |
 | **Toggle shortcut**    | Press `Option+T` (macOS) or `Alt+T` (Windows/Linux)                                        | Toggle thinking on/off for the current session (all models). May require [terminal configuration](/en/terminal-config) to enable Option key shortcuts |
 | **Global default**     | Use `/config` to toggle thinking mode                                                      | Sets your default across all projects (all models).<br />Saved as `alwaysThinkingEnabled` in `~/.claude/settings.json`                                |
 | **Limit token budget** | Set [`MAX_THINKING_TOKENS`](/en/settings#environment-variables) environment variable       | Limit the thinking budget to a specific number of tokens (ignored on Opus 4.6 unless set to 0). Example: `export MAX_THINKING_TOKENS=10000`           |
@@ -540,7 +540,7 @@ Extended thinking controls how much internal reasoning Claude performs before re
 
 **With other models**, thinking uses a fixed budget of up to 31,999 tokens from your output budget. You can limit this with the [`MAX_THINKING_TOKENS`](/en/settings#environment-variables) environment variable, or disable thinking entirely via `/config` or the `Option+T`/`Alt+T` toggle.
 
-`MAX_THINKING_TOKENS` is ignored when using Opus 4.6, since adaptive reasoning controls thinking depth instead. The one exception: setting `MAX_THINKING_TOKENS=0` still disables thinking entirely on any model.
+`MAX_THINKING_TOKENS` is ignored on Opus 4.6 and Sonnet 4.6, since adaptive reasoning controls thinking depth instead. The one exception: setting `MAX_THINKING_TOKENS=0` still disables thinking entirely on any model. To disable adaptive thinking and revert to the fixed thinking budget, set `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1`. See [environment variables](/en/settings#environment-variables).
 
 <Warning>
   You're charged for all thinking tokens used, even though Claude 4 models show summarized thinking
@@ -642,72 +642,136 @@ Forked sessions (created with `/rewind` or `--fork-session`) are grouped togethe
 
 ## Run parallel Claude Code sessions with Git worktrees
 
-Suppose you need to work on multiple tasks simultaneously with complete code isolation between Claude Code instances.
+When working on multiple tasks at once, you need each Claude session to have its own copy of the codebase so changes don't collide. Git worktrees solve this by creating separate working directories that each have their own files and branch, while sharing the same repository history and remote connections. This means you can have Claude working on a feature in one worktree while fixing a bug in another, without either session interfering with the other.
+
+Use the `--worktree` (`-w`) flag to create an isolated worktree and start Claude in it. The value you pass becomes the worktree directory name and branch name:
+
+```bash  theme={null}
+# Start Claude in a worktree named "feature-auth"
+# Creates .claude/worktrees/feature-auth/ with a new branch
+claude --worktree feature-auth
+
+# Start another session in a separate worktree
+claude --worktree bugfix-123
+```
+
+If you omit the name, Claude generates a random one automatically:
+
+```bash  theme={null}
+# Auto-generates a name like "bright-running-fox"
+claude --worktree
+```
+
+Worktrees are created at `<repo>/.claude/worktrees/<name>` and branch from the default remote branch. The worktree branch is named `worktree-<name>`.
+
+You can also ask Claude to "work in a worktree" or "start a worktree" during a session, and it will create one automatically.
+
+### Subagent worktrees
+
+Subagents can also use worktree isolation to work in parallel without conflicts. Ask Claude to "use worktrees for your agents" or configure it in a [custom subagent](/en/sub-agents#supported-frontmatter-fields) by adding `isolation: worktree` to the agent's frontmatter. Each subagent gets its own worktree that is automatically cleaned up when the subagent finishes without changes.
+
+### Worktree cleanup
+
+When you exit a worktree session, Claude handles cleanup based on whether you made changes:
+
+* **No changes**: the worktree and its branch are removed automatically
+* **Changes or commits exist**: Claude prompts you to keep or remove the worktree. Keeping preserves the directory and branch so you can return later. Removing deletes the worktree directory and its branch, discarding all uncommitted changes and commits
+
+To clean up worktrees outside of a Claude session, use [manual worktree management](#manage-worktrees-manually).
+
+<Tip>
+  Add `.claude/worktrees/` to your `.gitignore` to prevent worktree contents from appearing as untracked files in your main repository.
+</Tip>
+
+### Manage worktrees manually
+
+For more control over worktree location and branch configuration, create worktrees with Git directly. This is useful when you need to check out a specific existing branch or place the worktree outside the repository.
+
+```bash  theme={null}
+# Create a worktree with a new branch
+git worktree add ../project-feature-a -b feature-a
+
+# Create a worktree with an existing branch
+git worktree add ../project-bugfix bugfix-123
+
+# Start Claude in the worktree
+cd ../project-feature-a && claude
+
+# Clean up when done
+git worktree list
+git worktree remove ../project-feature-a
+```
+
+Learn more in the [official Git worktree documentation](https://git-scm.com/docs/git-worktree).
+
+<Tip>
+  Remember to initialize your development environment in each new worktree according to your project's setup. Depending on your stack, this might include running dependency installation (`npm install`, `yarn`), setting up virtual environments, or following your project's standard setup process.
+</Tip>
+
+### Non-git version control
+
+Worktree isolation works with git by default. For other version control systems like SVN, Perforce, or Mercurial, configure [WorktreeCreate and WorktreeRemove hooks](/en/hooks#worktreecreate) to provide custom worktree creation and cleanup logic. When configured, these hooks replace the default git behavior when you use `--worktree`.
+
+For automated coordination of parallel sessions with shared tasks and messaging, see [agent teams](/en/agent-teams).
+
+***
+
+## Get notified when Claude needs your attention
+
+When you kick off a long-running task and switch to another window, you can set up desktop notifications so you know when Claude finishes or needs your input. This uses the `Notification` [hook event](/en/hooks-guide#get-notified-when-claude-needs-input), which fires whenever Claude is waiting for permission, idle and ready for a new prompt, or completing authentication.
 
 <Steps>
-  <Step title="Understand Git worktrees">
-    Git worktrees allow you to check out multiple branches from the same
-    repository into separate directories. Each worktree has its own working
-    directory with isolated files, while sharing the same Git history. Learn
-    more in the [official Git worktree
-    documentation](https://git-scm.com/docs/git-worktree).
+  <Step title="Open the hooks menu">
+    Type `/hooks` and select `Notification` from the list of events.
   </Step>
 
-  <Step title="Create a new worktree">
-    ```bash  theme={null}
-    # Create a new worktree with a new branch 
-    git worktree add ../project-feature-a -b feature-a
+  <Step title="Configure the matcher">
+    Select `+ Match all (no filter)` to fire on all notification types. To notify only for specific events, select `+ Add new matcher…` and enter one of these values:
 
-    # Or create a worktree with an existing branch
-    git worktree add ../project-bugfix bugfix-123
-    ```
-
-    This creates a new directory with a separate working copy of your repository.
+    | Matcher              | Fires when                                      |
+    | :------------------- | :---------------------------------------------- |
+    | `permission_prompt`  | Claude needs you to approve a tool use          |
+    | `idle_prompt`        | Claude is done and waiting for your next prompt |
+    | `auth_success`       | Authentication completes                        |
+    | `elicitation_dialog` | Claude is asking you a question                 |
   </Step>
 
-  <Step title="Run Claude Code in each worktree">
-    ```bash  theme={null}
-    # Navigate to your worktree 
-    cd ../project-feature-a
+  <Step title="Add your notification command">
+    Select `+ Add new hook…` and enter the command for your OS:
 
-    # Run Claude Code in this isolated environment
-    claude
-    ```
+    <Tabs>
+      <Tab title="macOS">
+        Uses [`osascript`](https://ss64.com/mac/osascript.html) to trigger a native macOS notification through AppleScript:
+
+        ```
+        osascript -e 'display notification "Claude Code needs your attention" with title "Claude Code"'
+        ```
+      </Tab>
+
+      <Tab title="Linux">
+        Uses `notify-send`, which is pre-installed on most Linux desktops with a notification daemon:
+
+        ```
+        notify-send 'Claude Code' 'Claude Code needs your attention'
+        ```
+      </Tab>
+
+      <Tab title="Windows (PowerShell)">
+        Uses PowerShell to show a native message box through .NET's Windows Forms:
+
+        ```
+        powershell.exe -Command "[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('Claude Code needs your attention', 'Claude Code')"
+        ```
+      </Tab>
+    </Tabs>
   </Step>
 
-  <Step title="Run Claude in another worktree">
-    ```bash  theme={null}
-    cd ../project-bugfix
-    claude
-    ```
-  </Step>
-
-  <Step title="Manage your worktrees">
-    ```bash  theme={null}
-    # List all worktrees
-    git worktree list
-
-    # Remove a worktree when done
-    git worktree remove ../project-feature-a
-    ```
+  <Step title="Save to user settings">
+    Select `User settings` to apply the notification across all your projects.
   </Step>
 </Steps>
 
-<Tip>
-  Tips:
-
-  * Each worktree has its own independent file state, making it perfect for parallel Claude Code sessions
-  * Changes made in one worktree won't affect others, preventing Claude instances from interfering with each other
-  * All worktrees share the same Git history and remote connections
-  * For long-running tasks, you can have Claude working in one worktree while you continue development in another
-  * Use descriptive directory names to easily identify which task each worktree is for
-  * Remember to initialize your development environment in each new worktree according to your project's setup. Depending on your stack, this might include:
-    * JavaScript projects: Running dependency installation (`npm install`, `yarn`)
-    * Python projects: Setting up virtual environments or installing with package managers
-    * Other languages: Following your project's standard setup process
-</Tip>
-
-For automated coordination of parallel sessions with shared tasks and messaging, see [agent teams](/en/agent-teams).
+For the full walkthrough with JSON configuration examples, see [Automate workflows with hooks](/en/hooks-guide#get-notified-when-claude-needs-input). For the complete event schema and notification types, see the [Notification reference](/en/hooks#notification).
 
 ***
 

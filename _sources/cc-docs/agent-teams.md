@@ -36,6 +36,12 @@ Agent teams add coordination overhead and use significantly more tokens than a s
 
 Both agent teams and [subagents](/en/sub-agents) let you parallelize work, but they operate differently. Choose based on whether your workers need to communicate with each other:
 
+<Frame caption="Subagents only report results back to the main agent and never talk to each other. In agent teams, teammates share a task list, claim work, and communicate directly with each other.">
+  <img src="https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-light.png?fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=2f8db9b4f3705dd3ab931fbe2d96e42a" className="dark:hidden" alt="Diagram comparing subagent and agent team architectures. Subagents are spawned by the main agent, do work, and report results back. Agent teams coordinate through a shared task list, with teammates communicating directly with each other." data-og-width="4245" width="4245" data-og-height="1615" height="1615" data-path="images/subagents-vs-agent-teams-light.png" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-light.png?w=280&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=a2cfe413c2084b477be40ac8723d9d40 280w, https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-light.png?w=560&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=c642c09a4c211b10b35eee7d7d0d149f 560w, https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-light.png?w=840&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=40d286f77c8a4075346b4fcaa2b36248 840w, https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-light.png?w=1100&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=923986caa23c0ef2c27d7e45f4dce6d1 1100w, https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-light.png?w=1650&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=17a730a070db6d71d029a98b074c68e8 1650w, https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-light.png?w=2500&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=e402533fc9e8b5e8d26a835cc4aa1742 2500w" />
+
+  <img src="https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-dark.png?fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=d573a037540f2ada6a9ae7d8285b46fd" className="hidden dark:block" alt="Diagram comparing subagent and agent team architectures. Subagents are spawned by the main agent, do work, and report results back. Agent teams coordinate through a shared task list, with teammates communicating directly with each other." data-og-width="4245" width="4245" data-og-height="1615" height="1615" data-path="images/subagents-vs-agent-teams-dark.png" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-dark.png?w=280&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=06ca5b18b232855acc488357d8d01fa7 280w, https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-dark.png?w=560&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=3d34daee83994781eb74b74d1ed511c4 560w, https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-dark.png?w=840&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=82ea35ac837de7d674002de69689b9cf 840w, https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-dark.png?w=1100&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=3653085214a9fc65d1f589044894a296 1100w, https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-dark.png?w=1650&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=8e74b42694e428570e876d34f29e6ad6 1650w, https://mintcdn.com/claude-code/nsvRFSDNfpSU5nT7/images/subagents-vs-agent-teams-dark.png?w=2500&fit=max&auto=format&n=nsvRFSDNfpSU5nT7&q=85&s=3be00c56c6a0dcccbe15640020be0128 2500w" />
+</Frame>
+
 |                   | Subagents                                        | Agent teams                                         |
 | :---------------- | :----------------------------------------------- | :-------------------------------------------------- |
 | **Context**       | Own context window; results return to the caller | Own context window; fully independent               |
@@ -64,7 +70,7 @@ After enabling agent teams, tell Claude to create an agent team and describe the
 
 This example works well because the three roles are independent and can explore the problem without waiting on each other:
 
-```
+```text  theme={null}
 I'm designing a CLI tool that helps developers track TODO comments across
 their codebase. Create an agent team to explore this from different angles: one
 teammate on UX, one on technical architecture, one playing devil's advocate.
@@ -72,7 +78,7 @@ teammate on UX, one on technical architecture, one playing devil's advocate.
 
 From there, Claude creates a team with a [shared task list](/en/interactive-mode#task-list), spawns teammates for each perspective, has them explore the problem, synthesizes findings, and attempts to [clean up the team](#clean-up-the-team) when finished.
 
-The lead's terminal lists all teammates and what they're working on. Use Shift+Up/Down to select a teammate and message them directly.
+The lead's terminal lists all teammates and what they're working on. Use Shift+Down to cycle through teammates and message them directly. After the last teammate, Shift+Down wraps back to the lead.
 
 If you want each teammate in its own split pane, see [Choose a display mode](#choose-a-display-mode).
 
@@ -84,7 +90,7 @@ Tell the lead what you want in natural language. It handles team coordination, t
 
 Agent teams support two display modes:
 
-* **In-process**: all teammates run inside your main terminal. Use Shift+Up/Down to select a teammate and type to message them directly. Works in any terminal, no extra setup required.
+* **In-process**: all teammates run inside your main terminal. Use Shift+Down to cycle through teammates and type to message them directly. Works in any terminal, no extra setup required.
 * **Split panes**: each teammate gets its own pane. You can see everyone's output at once and click into a pane to interact directly. Requires tmux, or iTerm2.
 
 <Note>
@@ -114,7 +120,7 @@ Split-pane mode requires either [tmux](https://github.com/tmux/tmux/wiki) or iTe
 
 Claude decides the number of teammates to spawn based on your task, or you can specify exactly what you want:
 
-```
+```text  theme={null}
 Create a team with 4 teammates to refactor these modules in parallel.
 Use Sonnet for each teammate.
 ```
@@ -123,7 +129,7 @@ Use Sonnet for each teammate.
 
 For complex or risky tasks, you can require teammates to plan before implementing. The teammate works in read-only plan mode until the lead approves their approach:
 
-```
+```text  theme={null}
 Spawn an architect teammate to refactor the authentication module.
 Require plan approval before they make any changes.
 ```
@@ -132,19 +138,11 @@ When a teammate finishes planning, it sends a plan approval request to the lead.
 
 The lead makes approval decisions autonomously. To influence the lead's judgment, give it criteria in your prompt, such as "only approve plans that include test coverage" or "reject plans that modify the database schema."
 
-### Use delegate mode
-
-Without delegate mode, the lead sometimes starts implementing tasks itself instead of waiting for teammates. Delegate mode prevents this by restricting the lead to coordination-only tools: spawning, messaging, shutting down teammates, and managing tasks.
-
-This is useful when you want the lead to focus entirely on orchestration, such as breaking down work, assigning tasks, and synthesizing results, without touching code directly.
-
-To enable it, start a team first, then press Shift+Tab to cycle into delegate mode.
-
 ### Talk to teammates directly
 
 Each teammate is a full, independent Claude Code session. You can message any teammate directly to give additional instructions, ask follow-up questions, or redirect their approach.
 
-* **In-process mode**: use Shift+Up/Down to select a teammate, then type to send them a message. Press Enter to view a teammate's session, then Escape to interrupt their current turn. Press Ctrl+T to toggle the task list.
+* **In-process mode**: use Shift+Down to cycle through teammates, then type to send them a message. Press Enter to view a teammate's session, then Escape to interrupt their current turn. Press Ctrl+T to toggle the task list.
 * **Split-pane mode**: click into a teammate's pane to interact with their session directly. Each teammate has a full view of their own terminal.
 
 ### Assign and claim tasks
@@ -162,7 +160,7 @@ Task claiming uses file locking to prevent race conditions when multiple teammat
 
 To gracefully end a teammate's session:
 
-```
+```text  theme={null}
 Ask the researcher teammate to shut down
 ```
 
@@ -172,7 +170,7 @@ The lead sends a shutdown request. The teammate can approve, exiting gracefully,
 
 When you're done, ask the lead to clean up:
 
-```
+```text  theme={null}
 Clean up the team
 ```
 
@@ -255,7 +253,7 @@ These examples show how agent teams handle tasks where parallel exploration adds
 
 A single reviewer tends to gravitate toward one type of issue at a time. Splitting review criteria into independent domains means security, performance, and test coverage all get thorough attention simultaneously. The prompt assigns each teammate a distinct lens so they don't overlap:
 
-```
+```text  theme={null}
 Create an agent team to review PR #142. Spawn three reviewers:
 - One focused on security implications
 - One checking performance impact
@@ -269,7 +267,7 @@ Each reviewer works from the same PR but applies a different filter. The lead sy
 
 When the root cause is unclear, a single agent tends to find one plausible explanation and stop looking. The prompt fights this by making teammates explicitly adversarial: each one's job is not only to investigate its own theory but to challenge the others'.
 
-```
+```text  theme={null}
 Users report the app exits after one message instead of staying connected.
 Spawn 5 agent teammates to investigate different hypotheses. Have them talk to
 each other to try to disprove each other's theories, like a scientific
@@ -286,12 +284,26 @@ With multiple independent investigators actively trying to disprove each other, 
 
 Teammates load project context automatically, including CLAUDE.md, MCP servers, and skills, but they don't inherit the lead's conversation history. See [Context and communication](#context-and-communication) for details. Include task-specific details in the spawn prompt:
 
-```
+```text  theme={null}
 Spawn a security reviewer teammate with the prompt: "Review the authentication module
 at src/auth/ for security vulnerabilities. Focus on token handling, session
 management, and input validation. The app uses JWT tokens stored in
 httpOnly cookies. Report any issues with severity ratings."
 ```
+
+### Choose an appropriate team size
+
+There's no hard limit on the number of teammates, but practical constraints apply:
+
+* **Token costs scale linearly**: each teammate has its own context window and consumes tokens independently. See [agent team token costs](/en/costs#agent-team-token-costs) for details.
+* **Coordination overhead increases**: more teammates means more communication, task coordination, and potential for conflicts
+* **Diminishing returns**: beyond a certain point, additional teammates don't speed up work proportionally
+
+Start with 3-5 teammates for most workflows. This balances parallel work with manageable coordination. The examples in this guide use 3-5 teammates because that range works well across different task types.
+
+Having 5-6 [tasks](/en/agent-teams#architecture) per teammate keeps everyone productive without excessive context switching. If you have 15 independent tasks, 3 teammates is a good starting point.
+
+Scale up only when the work genuinely benefits from having teammates work simultaneously. Three focused teammates often outperform five scattered ones.
 
 ### Size tasks appropriately
 
@@ -307,7 +319,7 @@ httpOnly cookies. Report any issues with severity ratings."
 
 Sometimes the lead starts implementing tasks itself instead of waiting for teammates. If you notice this:
 
-```
+```text  theme={null}
 Wait for your teammates to complete their tasks before proceeding
 ```
 
@@ -343,7 +355,7 @@ Teammate permission requests bubble up to the lead, which can create friction. P
 
 ### Teammates stopping on errors
 
-Teammates may stop after encountering errors instead of recovering. Check their output using Shift+Up/Down in in-process mode or by clicking the pane in split mode, then either:
+Teammates may stop after encountering errors instead of recovering. Check their output using Shift+Down in in-process mode or by clicking the pane in split mode, then either:
 
 * Give them additional instructions directly
 * Spawn a replacement teammate to continue the work

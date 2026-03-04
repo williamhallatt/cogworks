@@ -37,7 +37,12 @@ To install a plugin from the official marketplace:
 ```
 
 <Note>
-  The official marketplace is maintained by Anthropic. To distribute your own plugins, [create your own marketplace](/en/plugin-marketplaces) and share it with users.
+  The official marketplace is maintained by Anthropic. To submit a plugin to the official marketplace, use one of the in-app submission forms:
+
+  * **Claude.ai**: [claude.ai/settings/plugins/submit](https://claude.ai/settings/plugins/submit)
+  * **Console**: [platform.claude.com/plugins/submit](https://platform.claude.com/plugins/submit)
+
+  To distribute plugins independently, [create your own marketplace](/en/plugin-marketplaces) and share it with users.
 </Note>
 
 The official marketplace includes several categories of plugins:
@@ -355,6 +360,21 @@ This is useful when you want to manage Claude Code updates manually but still re
 ## Configure team marketplaces
 
 Team admins can set up automatic marketplace installation for projects by adding marketplace configuration to `.claude/settings.json`. When team members trust the repository folder, Claude Code prompts them to install these marketplaces and plugins.
+
+Add `extraKnownMarketplaces` to your project's `.claude/settings.json`:
+
+```json  theme={null}
+{
+  "extraKnownMarketplaces": {
+    "my-team-tools": {
+      "source": {
+        "source": "github",
+        "repo": "your-org/claude-plugins"
+      }
+    }
+  }
+}
+```
 
 For full configuration options including `extraKnownMarketplaces` and `enabledPlugins`, see [Plugin settings](/en/settings#plugin-settings).
 
