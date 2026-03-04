@@ -30,7 +30,7 @@ TOTAL_TRACE_COUNT=0
 
 for skill_dir in tests/behavioral/*/; do
     skill_name=$(basename "$skill_dir")
-    count=$(find "${skill_dir}traces" -name "*.json" 2>/dev/null | wc -l || echo "0")
+    count=$({ find "${skill_dir}traces" -name "*.json" 2>/dev/null || true; } | wc -l)
     TOTAL_TRACE_COUNT=$((TOTAL_TRACE_COUNT + count))
     if [ "$count" -eq 0 ]; then
         MISSING_TRACES_SKILLS+=("$skill_name")
