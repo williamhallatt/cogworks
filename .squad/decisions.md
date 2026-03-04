@@ -107,3 +107,15 @@
 - **What:** Windows and cross-platform support are explicitly out of scope. Do not spend engineering effort on Windows compatibility, PowerShell, or WSL testing.
 - **Why:** User request — captured for team memory
 - **Context:** Established during Parker (Benchmark & Evaluation Engineer) onboarding.
+
+## [TD-014] Product Gap Analysis: Agent Skills, Sub-Agents & Prompt Engineering
+- **Date:** 2026-03-04T11:22:28Z | **By:** Kane (Product Manager)
+- **Artifact:** `_sources/kane-synthesis-agent-skills.md` (20K+ words, 10 sections)
+- **Methodology:** Systematic audit of 13 Tier 1 + 7 Tier 2 sources covering Claude Code, Anthropic, OpenAI/Codex, and IBM prompt engineering guidance
+- **Top 3 Critical Gaps (Priority Order):**
+  1. **No activation testing** — behavioral eval validates output quality but not skill invocation precision; skills with perfect content but poor `description` fields may never be discovered
+  2. **No parallel tool use guidance** — generated skills lack templates for parallel tool execution; 3-5x performance left on table for file-heavy operations
+  3. **No evaluation flywheel** — generated skills deployed immediately without iterative refinement; no mechanism to run behavioral tests, analyze failures, surgically revise, and re-test
+- **Secondary Gaps (Priorities 4-10):** Cross-agent compatibility validation, subagent orchestration guidance, multi-context state management, Codex-specific patterns, prompt caching optimization, injection scanning, trade-off matrix (skills vs. guidance)
+- **Recommendations:** Extend behavioral eval with activation test cases (P0), template parallel execution in `cogworks-learn` (P1), prototype eval-driven refinement loop (P1), cross-agent compatibility testing (P2)
+- **Status:** Ready for team review and prioritization discussion.

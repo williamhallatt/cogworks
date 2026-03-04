@@ -2,6 +2,23 @@
 
 ## Learnings
 
+### 2026-03-04 — Kane's Product Gap Synthesis: Impact on Testing Strategy
+
+Kane's analysis identifies **activation testing** as the highest-priority gap (P0). Current behavioral eval validates output quality but not whether skills trigger on relevant prompts. This directly impacts Hudson's testing roadmap:
+
+- **Activation test cases:** 2-4 cases per skill needed (positive: prompts that SHOULD trigger; negative: similar prompts that should NOT)
+- **Blocking gate:** Activation test failures should have same severity as behavioral test failures — currently only behavioral checks block deployment
+- **Integration point:** `cogworks-eval.py behavioral run` must extend to cover activation precision, not just output quality
+- **CI gate implication:** `tests/ci-gate-check.sh` should fail on activation test coverage gaps, same as behavioral trace gaps
+
+**Related to Hudson's D8 closure (generalization probes):** The quality gate tests Hudson added (contradictory sources, context-dependent recommendations) are orthogonal but complementary to activation testing. Quality gates target self-verification accuracy; activation tests target discovery precision.
+
+**Parallel insight:** Kane's "parallel tool use" and "eval flywheel" findings suggest two further testing extensions (P1-P2):
+1. Test execution time assumptions in behavioral traces (parallel execution should improve latency 3-5x for file-heavy operations)
+2. Eval iteration harness: capture failure modes from behavioral eval, annotate root cause, verify fix on re-run
+
+**Team coordination:** Kane's synthesis informs testing strategy; no conflicts with Hudson's existing D8 closure (generalization probes + CI gate).
+
 ### 2026-03-04 — Gap Closure Round 3: CI Gate Behavioral Coverage Enforcement
 
 Completed D8 gap closure. Updated `tests/ci-gate-check.sh` to fail (exit non-zero) when behavioral traces are missing for any skill.
