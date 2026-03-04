@@ -9,7 +9,7 @@ Canonical recursive round runbook: `tests/datasets/recursive-round/README.md`
 This framework supports two test tracks:
 
 - Layer 1 deterministic checks for generated skills
-- Behavioral activation tests
+- Behavioral activation tests (pending reconstruction — see D-022/D-023)
 
 ## Primary Commands
 
@@ -17,7 +17,6 @@ Generated skill tests:
 
 ```bash
 bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
-bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill --with-behavioral
 ```
 
 Recursive TDD round:
@@ -33,11 +32,12 @@ bash scripts/run-recursive-round.sh \
 ## Advanced CLI
 
 ```bash
-python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-
-python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks- --strict-provenance
+python3 tests/framework/scripts/cogworks-eval.py behavioral scaffold --skill cogworks-newskill
 bash scripts/run-trigger-smoke-tests.sh claude
 bash scripts/run-trigger-smoke-tests.sh codex
 ```
+
+> **Note:** `cogworks-eval.py behavioral run` is blocked — traces were deleted (D-022). Capture scripts have been removed (D-023). See Parker's mandate: `.squad/agents/parker/charter.md`.
 
 ## Framework Layout
 
@@ -47,47 +47,9 @@ tests/framework/
 │   └── deterministic-checks.sh
 ├── scripts/
 │   ├── behavioral_lib.py
-│   ├── capture_behavioral_trace.py
 │   └── cogworks-eval.py
 └── templates/
     ├── behavioral-test-case-template.jsonl
     └── behavioral-trace-template.json
 ```
 
-## Trace Capture
-
-Normalize a single raw trace file into the behavioral trace contract (when you already have a raw trace):
-
-```bash
-bash scripts/capture-behavioral-trace.sh <claude|codex> <case-id> <skill-slug> <raw-trace.json> <out-trace.json>
-```
-
-Key strict-mode fields:
-- `activation_source` (`skill_tool` required for positive cases in strict provenance mode)
-- `tool_events` (ordered tool timeline for `order_assertions`)
-
-Sample data: `tests/test-data/behavioral-capture/`
-
-Refresh + strict-validate all behavioral traces:
-
-```bash
-export COGWORKS_BEHAVIORAL_CLAUDE_REAL_CMD="bash scripts/run-behavioral-case-claude.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CODEX_REAL_CMD="bash scripts/run-behavioral-case-codex.sh '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CLAUDE_CAPTURE_CMD="bash scripts/behavioral-capture.sh claude '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-export COGWORKS_BEHAVIORAL_CODEX_CAPTURE_CMD="bash scripts/behavioral-capture.sh codex '{skill_slug}' '{case_id}' '{case_json_path}' '{raw_trace_path}'"
-bash scripts/refresh-behavioral-traces.sh --mode all
-```
-
-Or load defaults:
-
-```bash
-source scripts/behavioral-env.example.sh
-```
-
-Prerequisites:
-- authenticated `claude` and `codex` CLIs
-- backend network connectivity during capture
-
-Troubleshooting:
-- check raw event streams in `/tmp/cogworks-behavioral-raw/<skill_slug>/`
-- if either pipeline exits non-zero, refresh stops before trace normalization
