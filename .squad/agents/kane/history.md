@@ -66,3 +66,23 @@ Lambert (Compatibility), Scribe, Ralph
 1. **Activation testing** — without it, we're shipping skills that may never trigger correctly
 2. **Parallel tool use** — 3-5x performance improvement for free; appears in both Claude and Codex best practices
 3. **Evaluation flywheel integration** — one-shot generation produces brittle skills; eval-driven refinement creates resilient ones
+
+### 2026-03-05: Charter Upskill from Synthesis Findings
+
+**Task:** Internalized agent skills synthesis findings into Kane's charter and encoded 10 gaps + 5 priority recommendations as reusable skill.
+
+**What changed:**
+- **Charter update:** Expanded `## AI & Agent Expertise` section with specific, actionable knowledge from synthesis — replaced vague bullet points with concrete patterns (activation guards, subagent configuration, tool contracts, context budget numbers, parallel execution rules, quality gates)
+- **Skill creation:** `.squad/skills/product-gaps-cogworks/SKILL.md` created to encode product gaps as decision-support for roadmap work — includes what's missing, why it matters, what done looks like, priority recommendations, and roadmap considerations
+
+**Key additions to charter:**
+- Skills Architecture: frontmatter fields, discovery priority, context budget (2% window/16K fallback), activation guards, dynamic injection syntax
+- Sub-Agent Patterns: built-in types (Explore/Plan/General-purpose), context isolation contracts, foreground vs background modes, memory scope paths, preloaded skills behavior
+- Context Management: CLAUDE.md vs Auto Memory (full file vs first 200 lines), multi-context workflows (JSON/text/git/init.sh), when to `/clear`
+- Prompt Engineering (Claude): explicit > implicit, examples taken literally in 4.x, extended thinking (adaptive), parallel tool execution (3-5x speedup), reversibility guardrails
+- Prompt Engineering (Codex): autonomy principle, reasoning effort calibration, tool contracts (`apply_patch`, `update_plan`), output compactness rules
+- Cross-Agent Compatibility: invocation syntax, `$ARGUMENTS` interpolation status (Claude ✅, Copilot 🟡 undefined, others ❓), compatibility labeling system
+- Evaluation: activation testing criteria, ground truth metrics, behavioral eval for non-determinism, evaluation flywheel pattern, cogworks quality gates (M11/D3/D4/D8/D21)
+- cogworks Pipeline: security guards (M2/M9), pipeline guards (M5/M11/D3/D7/D9), quality calibration (D4 inversion gate)
+
+**Product knowledge now operationalized:** Kane can reference specific context budget numbers, exact tool contracts, concrete activation guard patterns, priority-ranked gaps with effort estimates—senior practitioner working knowledge, not job description abstractions.
