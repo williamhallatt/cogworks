@@ -54,4 +54,22 @@ The deeper problem: **skill quality was never defined.** `quality_score` exists 
 
 ## Learnings
 
-_(append here after each session)_
+### 2026-03-04: Round 3 Issues Closure — Fabricated Scores Disclaimer
+
+Issue #32: golden sample metadata.yaml (deployment-skill) contained hand-authored scores and validation history with no actual evaluation run. Added two YAML comment disclaimer blocks to unmistakably flag fabricated provenance to any contributor reviewing the file:
+- Top disclaimer above `expected_scores:` notes aspirational targets never measured
+- Bottom disclaimer above `## Validation History` notes table was hand-authored and should be removed once real evaluation occurs
+
+**Principle:** Evaluation integrity requires honest labeling of provenance. Undisclosed fabrication undermines contributor confidence in benchmark baselines and corrupts regression signals.
+
+**Commit:** Merged to main via Ralph coordination (98d4056).
+
+### Session 2026-03-04: Golden Sample Sync
+
+Golden sample regression testing requires baseline updates when live skill files change. The deterministic-checks.sh harness is evolving—the Layer 1 checker now executes 17 checks instead of the documented 10, driven by the addition of [Claude Code only] field validation and reference materialization checks.
+
+**Why this matters:** Stale golden samples report false regression failures. A regression test that compares current output against outdated baselines becomes a noise generator, degrading signal. Every checkpoint that changes the skill structure (like the checkpoint 009 [Claude Code only] labeling work) requires golden sample re-baseline.
+
+**Outcome:** Golden sample updated with post-spec-alignment examples.md and patterns.md. metadata.yaml checks_passed count rebaselined from 10 to 17. Usage notes path updated to canonical .agents/skills convention.
+
+**Commit:** Merged to main via Ralph coordination (2a76e10).

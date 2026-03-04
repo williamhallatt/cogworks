@@ -2,6 +2,18 @@
 
 ## Learnings
 
+### 2026-03-04: Round 3 Issues Closure — Cross-Agent Path Sync & Defaults Update
+
+Completed final Ralph-coordinated remediation for cross-agent compatibility defaults:
+
+1. **TESTING.md case count:** Updated from 31 to 39 cases (cogworks=8, cogworks-encode=15, cogworks-learn=16).
+2. **cogworks-eval.py defaults:** Changed `--skills-root` default from `.claude/skills` → `.agents/skills` on lines 419, 439 (both `run` and `scaffold` subcommands). Aligns CLI defaults with primary cross-agent convention.
+3. **snapshot-cogworks-learn fixture:** Synced description from "writing Claude Code skills..." → "writing agent skills..." per live `skills/cogworks-learn/SKILL.md`. Preserved snapshot_date, license, and metadata unchanged.
+
+**Key decision:** Primary cross-agent convention is `.agents/skills/` (universal); `.claude/skills/` is Claude Code-specific. CLI defaults must reflect this ordering.
+
+**Commit:** Merged to main via Ralph coordination (34d0d08).
+
 ### 2026-03-04: Round 3 Completion — D6 Cross-Agent Compatibility Closure
 
 Completed full D6 risk mitigation. Created comprehensive compatibility matrix covering invocation syntax, `$ARGUMENTS` interpolation, and `allowed-tools` enforcement across Claude Code, GitHub Copilot, Codex/GPT-5, and generic MCP agents.
