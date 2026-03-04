@@ -6,7 +6,7 @@ Synthesized from the Agent Skills specification, Anthropic skill authoring best 
 
 ## TL;DR
 
-Agent skills are SKILL.md files that extend agent capabilities through YAML frontmatter (configuration) and markdown content (instructions). Skills live in directory structures at various scopes (Enterprise > Personal > Project > Plugin) and can be invoked automatically by the agent when relevant or manually via `/slash-commands`. Effective skills are concise (context window is a public good), use progressive disclosure (SKILL.md as overview pointing to reference files loaded on-demand), and match specificity to task fragility. The description field is critical for discovery - agents use it to decide when to load the skill from potentially 100+ available options. Advanced features include argument interpolation (`$ARGUMENTS`, `$N`) and tool restrictions (`allowed-tools`).
+Agent skills are SKILL.md files that extend agent capabilities through YAML frontmatter (configuration) and markdown content (instructions). Skills live in directory structures at various scopes (Enterprise > Personal > Project > Plugin) and can be invoked automatically by the agent when relevant or manually via `/slash-commands`. Effective skills are concise (context window is a public good), use progressive disclosure (SKILL.md as overview pointing to reference files loaded on-demand), and match specificity to task fragility. The description field is critical for discovery - agents use it to decide when to load the skill from potentially 100+ available options. Advanced features include tool restrictions (`allowed-tools`, broadly supported across agents) and — on Claude Code specifically — argument interpolation (`$ARGUMENTS`, `$N`) and invocation control flags.
 
 ---
 
@@ -94,9 +94,9 @@ my-skill/
 | `name` | Display name, becomes /slash-command. Defaults to directory name. The prefix is agent-specific (e.g. `/` in Claude Code, `$` in Codex CLI). |
 | `description` | What skill does and when to use it. Agent uses for auto-loading decisions. |
 | `license` | License identifier (e.g., MIT, Apache-2.0). |
-| `compatibility` | List of compatible agent targets. |
+| `compatibility` | List of compatible agent targets. The spec-defined mechanism for declaring cross-agent requirements. |
 | `metadata` | Key-value map for custom metadata. |
-| `allowed-tools` | Tools the agent can use without permission when skill active. |
+| `allowed-tools` | Tools the agent can use without permission when skill active. Broadly supported (16/18 agents per vercel-labs/skills compatibility matrix; not supported by Kiro CLI and Zencoder). |
 
 **Validation Rules:**
 | Field | Constraint |
@@ -126,8 +126,8 @@ Anti-patterns:
 | Frontmatter | User can invoke | Agent can invoke | When loaded |
 |-------------|-----------------|------------------|-------------|
 | (default) | Yes | Yes | Description always in context, full skill on invocation |
-| `disable-model-invocation: true` | Yes | No | Description not in context, full skill when user invokes |
-| `user-invocable: false` | No | Yes | Description always in context, full skill on invocation |
+| `disable-model-invocation: true` **[Claude Code only]** | Yes | No | Description not in context, full skill when user invokes |
+| `user-invocable: false` **[Claude Code only]** | No | Yes | Description always in context, full skill on invocation |
 
 ### 4. Scope Hierarchy
 **Definition:** Skills exist at multiple levels with higher-priority scopes overriding lower ones when names conflict.
@@ -202,7 +202,9 @@ For generated skills, default to a compact decision-first contract unless source
 - Cross-platform contrast (non-normative)
 
 ### 7. Argument Interpolation
-**Definition:** Placeholder system for passing data into skills at invocation time.
+**Definition:** **Claude Code extension** — not in agentskills.io spec. Not available on Copilot, Cursor, Codex, or other agents.
+
+Placeholder system for passing data into skills at invocation time (Claude Code only):
 
 | Variable | Description |
 |----------|-------------|
@@ -325,7 +327,7 @@ metadata:                     # Custom key-value pairs
 ---
 ```
 
-### String Substitutions
+### String Substitutions (Claude Code extension)
 | Variable | Value |
 |----------|-------|
 | `$ARGUMENTS` | All arguments |
@@ -342,8 +344,8 @@ metadata:                     # Custom key-value pairs
 ### Invocation Control
 | Goal | Frontmatter |
 |------|-------------|
-| User-only (hide from agent) | `disable-model-invocation: true` |
-| Agent-only (hide from menu) | `user-invocable: false` |
+| User-only (hide from agent) | **[Claude Code only]** `disable-model-invocation: true` |
+| Agent-only (hide from menu) | **[Claude Code only]** `user-invocable: false` |
 | Both (default) | (no fields needed) |
 
 ---

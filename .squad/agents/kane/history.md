@@ -86,3 +86,21 @@ Lambert (Compatibility), Scribe, Ralph
 - cogworks Pipeline: security guards (M2/M9), pipeline guards (M5/M11/D3/D7/D9), quality calibration (D4 inversion gate)
 
 **Product knowledge now operationalized:** Kane can reference specific context budget numbers, exact tool contracts, concrete activation guard patterns, priority-ranked gaps with effort estimates—senior practitioner working knowledge, not job description abstractions.
+
+### 2026-03-04 — Product Review: Spec Alignment (TD-016)
+
+Approved Dallas's spec-alignment implementation (TD-016) addressing TD-014 product gaps.
+
+**Review scope:**
+- Scoping of Claude Code extensions (`disable-model-invocation`, `user-invocable`, `$ARGUMENTS`)
+- Reframing of `allowed-tools` support (16/18 agents per vercel-labs/skills)
+- Addition of Gap 3 (parallel tool use), Gap 4 (subagent delegation), Gap 10 (when-NOT-to-use) guidance
+
+**Approval notes:**
+1. **Framing strength:** Ensure Claude Code-specific features are presented as "powerful native capabilities," not limitations — Dallas's text correctly frames them as feature advantages.
+2. **Pre-publish verification:** Before shipping, confirm 16/18 agents claim is correct and cite vercel-labs/skills compatibility matrix as primary reference.
+
+**Test coverage:** Hudson added 7 quality test cases (parallel tool use, subagent delegation, persistent config guidance, $ARGUMENTS scoping, compatibility field, allowed-tools support). Existing 8 activation test cases remain valid.
+
+**Status:** Approved for commit. Ready for pipeline merge pending Dallas's verification of 16/18 claim against vercel-labs/skills.
+

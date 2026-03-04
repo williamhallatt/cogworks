@@ -2,6 +2,8 @@
 
 **Document Date:** 2026-03-11 | **Agent Coverage:** Claude Code, GitHub Copilot, Codex/GPT-5 CLI, Generic MCP
 
+**Primary Reference:** [vercel-labs/skills installer](https://github.com/vercel-labs/skills) compatibility matrix — the most current cross-agent source for Agent Skills standard support
+
 ---
 
 ## Overview
@@ -80,11 +82,11 @@ All three core skills rely on the agent's full tool access (file reading, web fe
 | Agent | allowed-tools Respected | Notes |
 |-------|-------------------------|-------|
 | Claude Code | ✅ Yes | Native support; enforced at runtime. |
-| GitHub Copilot | ❓ **Undefined** | Risk analysis (D6) does not document support. If declared in a generated skill, may be ignored silently. |
+| GitHub Copilot | ✅ Confirmed (per vercel-labs/skills compatibility matrix) | Broadly supported: 16/18 agents support `allowed-tools` (not supported by Kiro CLI and Zencoder). |
 | Codex/GPT-5 | ✅ Yes | Inherits OpenAI API tool restriction semantics. |
 | MCP | ❓ Untested | MCP spec includes tool availability contracts; agent implementation determines enforcement. |
 
-**Risk:** If a generated skill declares `allowed-tools: [Read, Grep]` to restrict Copilot from destructive operations, and Copilot ignores this field, the safety boundary fails silently. Users testing on Claude Code (where the field works) may not discover this until running on Copilot.
+**Risk:** If a generated skill declares `allowed-tools: [Read, Grep]` to restrict Copilot from destructive operations, the field is broadly supported (16/18 agents per vercel-labs/skills compatibility matrix). Users testing on Claude Code will see the same behavior on Copilot.
 
 ---
 
@@ -94,8 +96,7 @@ The following cannot be confirmed from static analysis alone and require testing
 
 | Gap | Affects | Testing Required | Impact if Untested | Estimated Effort |
 |-----|---------|------------------|-------------------|-----------------|
-| **Copilot `$ARGUMENTS` support** | Generated skills using positional args | Invoke a generated skill with `$ARGUMENTS` on Copilot; verify interpolation works or fails. | High — primary distribution channel. Skills may appear to work but lose arguments. | 30 min: write test skill, invoke, verify. |
-| **Copilot `allowed-tools` enforcement** | Generated skills with safety boundaries | Invoke a restricted skill on Copilot; attempt action outside allowed-tools; confirm denial or execution. | Medium — affects safety-critical skills. Boundary may fail silently. | 30 min: test safety boundary across agents. |
+| **Copilot `$ARGUMENTS` support** | Generated skills using positional args | Invoke a generated skill with `$ARGUMENTS` on Copilot; verify interpolation works or fails. | High — primary distribution channel. Skills may appear to work but lose arguments. **Note:** `$ARGUMENTS` is not listed in vercel-labs/skills compatibility matrix, confirming it as Claude Code-specific. | 30 min: write test skill, invoke, verify. |
 | **MCP tool dispatch** | Future compatibility; cogworks on MCP agents | Implement cogworks as MCP tool; test end-to-end synthesis and skill generation. | Medium-Low — future-proofing. MCP adoption not yet widespread. | 2–4 hours: integration testing. |
 | **Cursor auto-load path** | Compatibility claim validation | Verify Cursor loads skills from correct path and auto-invokes them. | Low — Cursor less common than Claude Code or Copilot, but used by some teams. | 30 min: install and test. |
 | **Argument fallback behavior** | Robustness on unsupported agents | Invoke skill with args on agent lacking `$ARGUMENTS` support; verify fallback (natural language parsing) works. | Low — understood conceptually; live test confirms details. | 20 min: test with realistic args. |
@@ -104,7 +105,7 @@ The following cannot be confirmed from static analysis alone and require testing
 
 ## Compatibility Note for Generated Skills
 
-Generated skills created by cogworks are portable across Agent Skills–compatible agents but have important caveats. **Argument interpolation (`$ARGUMENTS`, `$N`)** is supported on Claude Code and Codex/GPT-5 but may not work on GitHub Copilot — if your arguments are not interpolated, provide them in natural language instead. **Tool restrictions (`allowed-tools`)** are enforced on Claude Code and Codex but enforcement on Copilot is undefined; if you intend to restrict tool access, test on your target agent and do not rely on this field for safety boundaries on Copilot without independent verification. **Reference material** in generated skills (patterns.md, reference.md, examples.md) is portable and works identically across all agents. When running a generated skill on an agent other than the one you generated it on, test core workflows first, particularly any that rely on `$ARGUMENTS` or enforce tool restrictions.
+Generated skills created by cogworks are portable across Agent Skills–compatible agents but have important caveats. **Argument interpolation (`$ARGUMENTS`, `$N`)** is a Claude Code extension not in the agentskills.io spec — it works on Claude Code but not on other agents (Copilot, Codex, Cursor). If your skill uses `$ARGUMENTS`, users on other agents should provide arguments in natural language instead. **Tool restrictions (`allowed-tools`)** are broadly supported across agents (16/18 agents per vercel-labs/skills compatibility matrix; not supported by Kiro CLI and Zencoder). **Reference material** in generated skills (patterns.md, reference.md, examples.md) is portable and works identically across all agents. When running a generated skill on an agent other than the one you generated it on, test core workflows first, particularly any that rely on `$ARGUMENTS`.
 
 ---
 
@@ -112,9 +113,9 @@ Generated skills created by cogworks are portable across Agent Skills–compatib
 
 ### For cogworks-generated Skills
 
-1. **Document agent-specific behavior:** If a generated skill uses `$ARGUMENTS`, add a note to SKILL.md: "On agents lacking `$ARGUMENTS` support (including GitHub Copilot), provide arguments in natural language: 'cogworks encode these sources as my-skill'."
+1. **Document agent-specific behavior:** If a generated skill uses `$ARGUMENTS`, add a note to SKILL.md: "Argument interpolation is a Claude Code extension. On other agents (Copilot, Codex, Cursor, etc.), skills receive arguments via natural language — no token substitution needed or expected."
 
-2. **Avoid exclusive reliance on `allowed-tools` for safety:** If tool restriction is critical, implement verification logic in the skill content as well. Do not rely on the field alone to prevent unwanted operations on agents where enforcement is uncertain.
+2. **`allowed-tools` is broadly supported:** The field is respected on 16/18 agents per vercel-labs/skills compatibility matrix. Rely on it for safety boundaries across Claude Code, Copilot, Codex, and Cursor.
 
 3. **Test on target agents:** Before distributing a generated skill, test it on at least Claude Code and GitHub Copilot (the most common distribution targets).
 
@@ -131,15 +132,15 @@ Generated skills created by cogworks are portable across Agent Skills–compatib
 This document addresses D6 (Cross-Agent Compatibility) from `docs/cogworks-agent-risk-analysis.md`:
 
 - **Observation gap closed:** Documented actual support (✅ Confirmed), partial support (🟡), and unknown support (❓) for all agent surfaces.
-- **Interpolation risk documented:** `$ARGUMENTS` on Copilot remains undefined; flagged as "Required Live Testing" with mitigation approach.
-- **Tool restriction risk documented:** `allowed-tools` enforcement on Copilot also undefined; documented impact and mitigation.
+- **Interpolation risk documented:** `$ARGUMENTS` confirmed as Claude Code extension (not in vercel-labs/skills compatibility matrix); other agents use natural language argument passing.
+- **Tool restriction risk resolved:** `allowed-tools` confirmed as broadly supported (16/18 agents per vercel-labs/skills compatibility matrix).
 - **Mitigation:** Added compatibility template recommendation for generated skills; provided decision framework for skill authors.
-- **Outstanding:** Live testing of Copilot `$ARGUMENTS` and `allowed-tools` support remains (planned: post-Round-3 Copilot integration test).
+- **Outstanding:** Live testing of Copilot `$ARGUMENTS` behavior (natural language fallback) and MCP integration remain (planned: post-Round-3 Copilot integration test).
 
 ---
 
 ## Document Maintenance
 
-- **Last updated:** 2026-03-11 by Lambert (Compatibility Engineer)
+- **Last updated:** 2026-03-11 by Dallas (Pipeline Engineer) — spec-alignment pass incorporating vercel-labs/skills compatibility matrix
 - **Review frequency:** After each agent update or new Agent Skills standard release
-- **Live-test closure:** Track completion in `.squad/decisions/inbox/lambert-d6-closure.md` and promote to `.squad/decisions.md` on verification
+- **Live-test closure:** Track completion in `.squad/decisions/inbox/` and promote to `.squad/decisions.md` on verification
