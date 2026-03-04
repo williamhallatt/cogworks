@@ -48,6 +48,12 @@ resolve_skill_path() {
         return 0
     fi
 
+    # Check if it's in .agents/skills/ (cross-agent production skills)
+    if [[ -d "$PROJECT_ROOT/.agents/skills/$skill_name" ]]; then
+        echo "$PROJECT_ROOT/.agents/skills/$skill_name"
+        return 0
+    fi
+
     # Check if it's in tests/test-data/ (test fixtures)
     if [[ -d "$SCRIPT_DIR/test-data/$skill_name" ]]; then
         echo "$SCRIPT_DIR/test-data/$skill_name"
