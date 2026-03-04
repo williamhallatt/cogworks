@@ -55,6 +55,14 @@
       "created_at": "2026-03-03T11:10:00Z",
       "legacy_named": false,
       "status": "active"
+    },
+    {
+      "persistent_name": "Kane",
+      "role": "Product Manager",
+      "universe": "Alien (1979)",
+      "created_at": "2026-03-04T08:12:33Z",
+      "legacy_named": false,
+      "status": "active"
     }
   ]
 }
