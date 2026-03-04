@@ -17,6 +17,12 @@ There are three test layers, ordered by cost:
 
 ---
 
+## Before you start
+
+> **Before opening an AI coding session:** run `git clean -fdx tests/results/` to remove cached test outputs. These are gitignored but on-disk files will be surfaced in agent context.
+
+---
+
 ## Prerequisites
 
 - `python3`
