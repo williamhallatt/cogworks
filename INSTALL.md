@@ -37,9 +37,16 @@ Clone the repository and copy skills directly:
 
 ```bash
 git clone https://github.com/williamhallatt/cogworks.git
+
+# For Claude Code
 cp -r cogworks/skills/cogworks your-project/.claude/skills/
 cp -r cogworks/skills/cogworks-encode your-project/.claude/skills/
 cp -r cogworks/skills/cogworks-learn your-project/.claude/skills/
+
+# For Copilot, Codex, Cursor, and other agents
+cp -r cogworks/skills/cogworks your-project/.agents/skills/
+cp -r cogworks/skills/cogworks-encode your-project/.agents/skills/
+cp -r cogworks/skills/cogworks-learn your-project/.agents/skills/
 ```
 
 The three skills above are the minimum required set.
@@ -47,9 +54,15 @@ The three skills above are the minimum required set.
 ## Verify Installation
 
 ```bash
+# For Claude Code
 ls your-project/.claude/skills/cogworks/SKILL.md
 ls your-project/.claude/skills/cogworks-encode/SKILL.md
 ls your-project/.claude/skills/cogworks-learn/SKILL.md
+
+# For Copilot, Codex, Cursor, and other agents
+ls your-project/.agents/skills/cogworks/SKILL.md
+ls your-project/.agents/skills/cogworks-encode/SKILL.md
+ls your-project/.agents/skills/cogworks-learn/SKILL.md
 ```
 
 ## Invoking Skills
@@ -59,7 +72,7 @@ After installation, invoke skills using your agent's command prefix:
 | Agent | Prefix | Example |
 |-------|--------|---------|
 | Claude Code | `/` | `/cogworks encode ...` |
-| Codex CLI | `$` | `$cogworks encode ...` |
+| Codex CLI | varies | natural language or see Codex docs |
 | Other agents | varies | consult agent documentation |
 
 ## Available Skills
