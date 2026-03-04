@@ -13,7 +13,7 @@ layer1_expected:
   status: pass
   critical_failures: 0
   warnings: 0
-  checks_passed: 10
+  checks_passed: 17
   line_count: 75
   citation_count: 3
 
@@ -85,7 +85,7 @@ regression_detection:
 sources:
   primary: "cogworks-learn skill SKILL.md"
   provenance: "Generated via cogworks-learn from skill authoring documentation"
-  last_updated: "2026-02-14"
+  last_updated: "2026-03-04"
 
 # Usage Notes
 usage_notes: |
@@ -99,4 +99,4 @@ usage_notes: |
   - Maintains minimal but sufficient citations (3 ±1)
 
   Regression testing:
-  bash scripts/test-generated-skill.sh --skill-path .claude/skills/cogworks-learn
+  bash scripts/test-generated-skill.sh --skill-path .agents/skills/cogworks-learn
