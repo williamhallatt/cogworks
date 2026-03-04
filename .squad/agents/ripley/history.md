@@ -2,6 +2,20 @@
 
 ## Learnings
 
+**2026-03-04 — Product Gap Analysis: Agent Skills & Prompt Engineering (Kane Synthesis)**
+
+Kane completed systematic audit of 13 Tier 1 + 7 Tier 2 sources on agent skills, sub-agents, and prompt engineering. Identified three critical gaps directly impacting generated skill quality:
+
+1. **Activation testing missing** — behavioral eval validates *output* quality but not *invocation* precision. Skills with perfect content but poor `description` fields may never be discovered by agents. Blocks deployability without additional engineering.
+
+2. **No parallel tool use guidance** — generated skills don't template parallel execution guidance. 3-5x performance improvement left on table for file-heavy operations; appears in both Claude Opus 4.6 and Codex best practices independently.
+
+3. **Evaluation flywheel missing** — one-shot generation produces brittle skills. No mechanism to run behavioral tests, analyze failures, surgically revise, and re-test. Eval-driven iteration (draft → eval → analyze → revise → re-eval) is the difference between first-draft and resilient artifacts.
+
+**Architectural implications:** These gaps directly inform how generated skills should be templated and tested. Activation testing should block deployability (same severity as behavioral failures). Parallel tool guidance should be standard template content. Eval flywheel would require orchestration changes but not architectural ones.
+
+**Recommendations:** P0 = extend behavioral eval with activation cases; P1 = template parallel execution in cogworks-learn + prototype eval iteration; P2 = cross-agent compatibility testing.
+
 **2026-03-04 — Gap Closure Review (Round 3 Coherence Audit)**
 
 Recorded architectural decisions D-020 and D-021 in `_plans/DECISIONS.md`. Verified all six closed gaps (M2, M9, D9, D3, D6, D8) for cross-agent coherence.
