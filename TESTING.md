@@ -79,9 +79,13 @@ bash tests/framework/graders/deterministic-checks.sh path/to/skill --json   # ma
 
 ## Layer 2 — Behavioral Tests
 
-> **⚠️ Pending reconstruction (D-022/D-023).**
-> Behavioral traces were deleted — they were LLM-generated circular ground truth (`quality_score: null` on all core skill traces; `task_completed: false` in baseline runs). The capture scripts that generated them have also been removed.
-> The CI gate blocks regeneration. Parker (Benchmark & Evaluation Engineer) is defining replacement quality ground truth from first principles. See `.squad/agents/parker/charter.md`.
+Behavioral evaluation now uses LLM-as-judge with external rubrics, designed by Parker to replace the circular ground truth traces that were deleted in D-022. Judge models are decoupled from the generating model (non-negotiable). Three judge prompts define quality criteria:
+
+- `tests/behavioral/cogworks/judge-prompt.md`
+- `tests/behavioral/cogworks-encode/judge-prompt.md`
+- `tests/behavioral/cogworks-learn/judge-prompt.md`
+
+The quality schema is defined in `tests/framework/QUALITY-SCHEMA.md`. The evaluation harness specification (for Hudson to implement) is at `tests/framework/HARNESS-SPEC.md`. The CI gate remains blocked on behavioral coverage until the harness is fully implemented per spec.
 
 Evaluates whether skills activate on the right prompts and stay silent on negative controls.
 

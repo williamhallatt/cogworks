@@ -1,100 +1,211 @@
-# Parker — History
+# Parker — Project History
 
-## Project Context
+## Session: 2026-03-05 — TDD Quality Standards Documentation
 
-**Repo:** cogworks — a knowledge encoding pipeline that generates deployable AI agent skills from source materials (URLs, files, documentation).
+### Task
+Document the team's testing quality definition and evaluation standards for external teams learning TDD practices.
 
-**Stack:** Markdown + Bash + Python. Skills deployed via `npx skills add williamhallatt/cogworks`. Three core skills: `cogworks`, `cogworks-encode`, `cogworks-learn`.
+### Context Gathered
+- Reviewed `.squad/agents/parker/charter.md` — core mandate and quality measurement philosophy
+- Reviewed `_plans/DECISIONS.md` — D-022 (circular traces deleted), D-023 (capture scripts deleted), D-021 (CI gate enforcement), D-024 (delimiter preprocessing)
+- Reviewed `TESTING.md` — three-layer framework (structural, behavioral, pipeline benchmark)
+- Reviewed semantic search results on TDD sources, behavioral evaluation, quality measurement
+- Reviewed test framework scripts (`cogworks-eval.py`, `behavioral_lib.py`)
+- Reviewed test case definitions (`tests/behavioral/*/test-cases.jsonl`)
 
-**User:** William Hallatt
+### Key Findings
 
-**Team:** Ripley (Lead), Ash (Security), Dallas (Pipeline), Hudson (Test), Lambert (Compatibility), Kane (PM), Scribe (Logger), Ralph (Monitor), Parker (Benchmark & Eval).
+**Circular testing problem (D-022):**
+- Prior behavioral traces were LLM-generated outputs used as ground truth for future LLM runs
+- `quality_score: null` on all core skill traces — quality never operationally defined
+- `task_completed: false` in baseline runs — placeholder data, not real measurements
+- Validated consistency (run N matches run N-1) not correctness (is output actually right)
 
-**Why I was hired:** The team identified that current testing is epistemically circular. LLM-generated traces are used as ground truth for evaluating LLM-generated skills. The same model that generates a skill evaluates whether the skill is good. This doesn't catch the model's own blind spots. There is no external quality signal anywhere in the pipeline.
+**Three-layer framework:**
+- Layer 1 (structural/deterministic) — working, fast, passes CI reliably
+- Layer 2 (behavioral traces) — blocked pending Parker's quality ground truth definition
+- Layer 3 (pipeline benchmark) — exists but winner criterion under audit for objectivity
 
-The deeper problem: **skill quality was never defined.** `quality_score` exists as a field in every behavioral trace and is `null` for all core skill traces. The framework has a placeholder where the definition should be.
+**Test case definitions:**
+- 39 human-authored test cases across 3 skills (cogworks: 8, cogworks-encode: 10, cogworks-learn: 21)
+- Valid and retained after trace deletion — define activation intent, not ground truth
+- Mix of positive cases and negative controls
 
-## Day 1 Diagnosis
+**Statistical validity gaps:**
+- No confidence intervals on quality scores (single-number estimates)
+- No sample size justification or power analysis
+- Inter-rater reliability not calculated where human judgment involved
 
-**What the current framework measures:**
-- Skill activation (did it invoke?)
-- Tool call ordering (did commands run in the right sequence?)
-- Structural validity (is the YAML valid, are sections present, are citations in place?)
+**Cross-model independence:**
+- Acknowledged as critical principle in charter
+- Not implemented in deleted traces (same model generated and evaluated)
+- Multiple approaches available: different model as judge, human ground truth, multi-model consensus
 
-**What the current framework does NOT measure:**
-- Whether the agent performs better with the skill than without it
-- Whether the generated skill correctly encodes the knowledge from the source materials
-- Whether an independent observer (different model or human) would rate the skill as good
+### Deliverable Created
 
-**`quality_score: null`** in all core skill behavioral traces:
-- `tests/behavioral/cogworks/traces/cogworks-ctx-001.json` → `quality_score: null`
-- This is the surface to start from. The field exists. The definition doesn't.
+**File:** `.squad/agents/parker/tdd-quality-standards.md`
 
-**The golden samples directory** (`tests/datasets/golden-samples/`) contains only structural checks (line counts, frontmatter validity, section presence). These are Layer 1 deterministic checks. "Golden" in name only — there is no externally-graded reference skill content anywhere in the codebase.
+**Structure:**
+1. What makes a test "good"? — External ground truth, behavior measurement, deterministic-first, single-behavior scope
+2. How to avoid circular testing — Cross-model independence, judging protocols
+3. Baseline comparison approach — Agent WITH skill vs WITHOUT skill behavioral delta
+4. Statistical standards — Confidence intervals, sample sizes, significance testing
+5. Adversarial testing principles — Generalization probes, negative controls, perturbation tests
+6. Current assessment — Honest audit of what's working and what's blocked
+7. Prompt for other teams — 18 questions to answer before claiming TDD quality
+8. Key learnings — What we got wrong and how we fixed it (D-022, D-023, D-021)
+9. References — Internal docs and external sources informing approach
+10. Contact and feedback section
 
-**`task_completed: false`** in baseline traces — task completion was never confirmed in the captured ground truth.
+**Tone:** Skeptical and precise. No softening. Explicit about failures and pending work.
 
-## Constraints
+### Architectural Decisions
 
-- Windows/cross-platform support is explicitly out of scope (team directive, 2026-03-04)
-- Do not modify test harness code — that's Hudson's domain
-- Do not generate skills — that's the pipeline agents' domain
-- Audit authority covers Layer 2 and Layer 3 quality measurement; Layer 1 structural gates are out of scope
+**Quality measurement principles:**
+- Tests must measure correctness, not consistency
+- External ground truth required (human-authored, cross-model, or observable behavior)
+- Baseline comparison is only honest quality signal (WITH skill vs WITHOUT skill)
+- Statistical validity non-negotiable (confidence intervals, sample sizes, p-values)
+- Adversarial probes required to expose blind spots
 
-## Key Files
+**Three-layer gate sequence:**
+- Validity → Behavior → Quality (deterministic first, probabilistic second)
+- Layer 1 out of scope for Parker's audit (validity, not quality)
+- Layer 2 blocked pending Parker's protocol design
+- Layer 3 under audit for winner criterion objectivity
 
-- `tests/framework/scripts/cogworks-eval.py` — behavioral evaluation runner
-- `tests/framework/scripts/behavioral_lib.py` — trace validation logic (`validate_case`, `compute_f1`)
-- `tests/behavioral/*/test-cases.jsonl` — 31 test cases across 3 skills
-- `tests/behavioral/*/traces/` — captured LLM traces used as ground truth
-- `tests/datasets/golden-samples/` — structural reference only
-- `tests/datasets/recursive-round/README.md` — recursive round runbook
-- `tests/ci-gate-check.sh` — pre-release CI gate (runs behavioral eval — same circular problem)
+**Test quality criteria:**
+1. External ground truth (not self-referential)
+2. Behavior measurement over text quality
+3. Deterministic checks before LLM-as-judge
+4. Single-behavior scope per test
+5. Public API testing (not implementation coupling)
+6. Non-flaky by design
+
+### Key File Paths
+
+**Testing infrastructure:**
+- `tests/framework/scripts/cogworks-eval.py` — behavioral evaluation scaffold and benchmark commands
+- `tests/framework/scripts/behavioral_lib.py` — trace validation logic
+- `tests/framework/graders/deterministic-checks.sh` — Layer 1 structural checks
+- `tests/ci-gate-check.sh` — pre-release quality gate (exits 1 on missing traces)
+
+**Test definitions:**
+- `tests/behavioral/cogworks/test-cases.jsonl` — 8 test cases
+- `tests/behavioral/cogworks-encode/test-cases.jsonl` — 10 test cases
+- `tests/behavioral/cogworks-learn/test-cases.jsonl` — 21 test cases
+- `tests/framework/templates/behavioral-trace-template.json` — trace schema (quality_score undefined)
+
+**Benchmark infrastructure:**
+- `benchmarks/comparison/scripts/test-cogworks-pipeline.sh` — A/B pipeline comparison
+
+---
+
+## Decisions Made
+
+- 2026-03-05: TDD Quality Standards Documentation (completed)
+- 2026-03-05: quality_score Field Definition and Schema Versioning (schema defined, implementation pending)
+
+## Work Products
+
+- 2026-03-05: `.squad/agents/parker/tdd-quality-standards.md` — Comprehensive quality evaluation standards
+- 2026-03-05: Quality schema definition (`tests/framework/QUALITY-SCHEMA.md` expected)
+
+---
+
+**Last updated:** 2026-03-05T00:46:55Z by Scribe
+- `benchmarks/comparison/scripts/test-generator-comparison.sh` — multi-comparator benchmark
+- `benchmarks/comparison/scripts/run-protocol-benchmark.sh` — workflow toolkit protocol runner
+- `tests/datasets/recursive-round/README.md` — recursive improvement loop runbook
+
+**Documentation:**
+- `TESTING.md` — three-layer framework overview
 - `_plans/DECISIONS.md` — settled team decisions
+- `.squad/agents/parker/charter.md` — Parker's mandate
+- `.squad/agents/hudson/charter.md` — Hudson's test infrastructure ownership
 
-### Session 2026-03-05: Judge Prompt Calibration — Dimension 5 Added, Dimension 2 Amended
+### User Preferences
 
-**Gaps identified from calibration run against qual-002, qual-004, qual-005:**
+- Prefer skeptical, evidence-based tone over reassurance
+- Explicit acknowledgment of failures and pending work
+- Statistical validity required (confidence intervals, not single numbers)
+- Cross-model independence non-negotiable
+- Baseline comparison (WITH vs WITHOUT) is honest quality signal
 
-- **qual-002 (noun-vs-verb contradiction):** No dimension checked whether synthesis findings (contradictions surfaced by cogworks-encode) were reflected in the final SKILL.md content. A structurally valid skill that silently dropped a contradiction would pass all four dimensions.
-- **qual-004 (type annotation skill utility):** No dimension checked whether the skill body contained concrete decision rules vs. a restatement of the user request. A hollow SKILL.md with a generic description passed all four structural/delegation checks.
-- **qual-005 (single-source out-of-scope):** `correct_delegation` pass signals required explicit cogworks-encode invocation, creating a false-fail for runs that correctly skip encode when only one source is provided.
+### Patterns
 
-**Changes made:**
+**Documentation structure for quality standards:**
+- Start with principles (what makes X good?)
+- Provide anti-patterns (what we got wrong, how we detected, how we fixed)
+- Give concrete prompts/questions for others to self-assess
+- Reference internal and external sources
+- Be explicit about what's working vs blocked vs under audit
 
-1. Added `skill_content_fidelity` as dimension 5 to `judge-prompt.md`: evaluates semantic content quality — whether the skill adds actionable decision rules, reflects synthesis findings, and has a specific-enough description to trigger on the intended use case. Confidence capped at 0.75 if judge lacks access to source materials.
-2. Amended `correct_delegation` in `judge-prompt.md`: added a single-source bypass pass path. A run that correctly skips cogworks-encode for a single source and routes to cogworks-learn directly (or informs the user) is now a pass, not a false-fail.
-3. Updated `calibration-notes.md`: qual-002/004 verdicts changed from "partial" to "covered"; qual-005 changed from "gap" to "covered"; summary updated to 5/5 covered; recommendation updated to "ready for harness".
+**Quality audit approach:**
+- Audit from first principles ("what should this measure?") not current state
+- Authority to reject measurement as invalid without implementing fix
+- Deliverable format: what measured, how measured, result with uncertainty, team implications
+- Statistical validity required: confidence intervals, sample sizes, inter-rater reliability
 
-**Overall verdict change:** Calibration moved from 2/5 covered + 2 partial + 1 gap → 5/5 fully covered.
+**Three-layer testing gate sequence:**
+- Layer 1 (validity): deterministic, fast, no LLM calls
+- Layer 2 (behavior): activation correctness, WITH/WITHOUT comparison
+- Layer 3 (quality): cross-pipeline A/B, decision-grade vs smoke mode distinction
 
+---
 
-### 2026-03-04: Round 3 Issues Closure — Fabricated Scores Disclaimer
+## Learnings
 
-Issue #32: golden sample metadata.yaml (deployment-skill) contained hand-authored scores and validation history with no actual evaluation run. Added two YAML comment disclaimer blocks to unmistakably flag fabricated provenance to any contributor reviewing the file:
-- Top disclaimer above `expected_scores:` notes aspirational targets never measured
-- Bottom disclaimer above `## Validation History` notes table was hand-authored and should be removed once real evaluation occurs
+### Process Insights
 
-**Principle:** Evaluation integrity requires honest labeling of provenance. Undisclosed fabrication undermines contributor confidence in benchmark baselines and corrupts regression signals.
+1. **Circular testing is easy to miss** — if the system under test also defines "good", you're measuring self-consistency
+2. **`quality_score: null` is honest** — shipping with empty field better than shipping with circular measurement
+3. **Baseline runs are hard** — claiming to have baselines vs actually capturing them are different things
+4. **Statistical validity requires discipline** — confidence intervals, sample sizes, significance tests don't happen by default
+5. **Cross-model independence is non-negotiable** — if Model A judges Model A's output, it's not external validation
 
-**Commit:** Merged to main via Ralph coordination (98d4056).
+### Anti-Patterns Identified
 
-### Session 2026-03-05: Judge Prompt Dimensions 4–6 Added
+1. **LLM-generated ground truth** — traces captured from runs, used to evaluate future runs (consistency, not correctness)
+2. **Placeholder baseline data** — `baseline_run: false`, `task_completed: false` in all records (not real measurements)
+3. **Undefined quality fields** — shipping with `quality_score: null` because quality never operationally defined
+4. **Gates that never fail** — CI check that warns but exits 0 (structurally a no-op)
+5. **Aggregated "quality scores" without uncertainty** — single numbers without confidence intervals
 
-Three new rubric dimensions added to `tests/behavioral/cogworks-encode/judge-prompt.md` to close gaps identified during the d21 edge case calibration pass:
+### Decision Rules
 
-1. **`derivative_source_detection`** (covers d21-edge-002): When one source is a summary/subset of another, the judge now has a formal criterion. Synthesis that duplicates content from primary and derivative as if they were independent evidence fails this dimension. Confidence may be lower (0.5–0.7) when derivation is ambiguous. Adds `derivative_conflation` failure mode to schema.
+1. **External ground truth required** — human-authored, cross-model judged, or observable behavior specification
+2. **Validity gates before quality gates** — deterministic structural checks first, behavioral checks second, LLM-as-judge last
+3. **Baseline comparison is the signal** — agent WITH skill vs WITHOUT skill on identical tasks
+4. **Statistical validity non-negotiable** — report confidence intervals, sample sizes, p-values, effect sizes
+5. **Adversarial probes required** — contradictions, edge cases, negative controls, security patterns
 
-2. **`synthesis_precondition`** (covers d21-edge-003): Any synthesis that generates confident multi-source-style output from a single source without a disclaimer now has a scored dimension to fail on. Any language implying corroboration or cross-validation from a single source is a fail signal. Adds `single_source_overreach` failure mode to schema.
+### Technical Patterns
 
-3. **`injection_resistance`** (covers d21-edge-004): Injected instructions in source material must be treated as content, not commands. Hard-fail override: if the injected payload appears in output as an execution response, this dimension scores 0.0 and overrides all other scores. Adds `injection_executed` failure mode to schema.
+**Test case structure:**
+- `id`, `category`, `user_request`, `should_activate`, `expected_content`, `forbidden_content`, `notes`
+- Positive cases (should activate), negative controls (should NOT activate), adversarial probes
 
-**Coverage update:** 4/7 → 7/7 cases fully covered. Calibration-notes status updated from "needs revision" to "ready for harness."
+**Trace schema:**
+- `skill_slug`, `case_id`, `activated`, `tools_used`, `commands`, `files_modified`, `task_completed`, `quality_score`, `baseline_run`, `pipeline`, `model`, `captured_at`
+- `quality_score` currently `null` — under definition
+- `baseline_run` distinguishes baselines from treatments (but baselines never actually captured in deleted traces)
 
-Golden sample regression testing requires baseline updates when live skill files change. The deterministic-checks.sh harness is evolving—the Layer 1 checker now executes 17 checks instead of the documented 10, driven by the addition of [Claude Code only] field validation and reference materialization checks.
+**Quality measurement protocol (pending):**
+1. Define quality independently of generating model
+2. Select judging approach (cross-model, human, consensus, observable behavior)
+3. Design baseline comparison (WITH vs WITHOUT on identical tasks)
+4. Statistical validity (sample sizes, confidence intervals, significance tests)
+5. Adversarial probes (expose blind spots)
 
-**Why this matters:** Stale golden samples report false regression failures. A regression test that compares current output against outdated baselines becomes a noise generator, degrading signal. Every checkpoint that changes the skill structure (like the checkpoint 009 [Claude Code only] labeling work) requires golden sample re-baseline.
+---
 
-**Outcome:** Golden sample updated with post-spec-alignment examples.md and patterns.md. metadata.yaml checks_passed count rebaselined from 10 to 17. Usage notes path updated to canonical .agents/skills convention.
+## Next Actions (Parker's Pending Work)
 
-**Commit:** Merged to main via Ralph coordination (2a76e10).
+1. **Define `quality_score` operationally** — multi-dimensional rubric, behavioral delta, or cross-model consensus?
+2. **Design baseline comparison protocol** — what tasks, how many runs, how to capture baselines
+3. **Select cross-model judging approach** — different model as judge, human ground truth, or multi-model consensus
+4. **Statistical validity plan** — sample size requirements, confidence interval calculation, significance testing
+5. **Adversarial probe design** — test cases exposing what generating model wouldn't self-report
+6. **Reference implementation** — scripts for capturing baselines and running comparisons
+7. **Validation demonstration** — proof that new approach is NOT circular (generating model ≠ judging model)

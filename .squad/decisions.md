@@ -1,189 +1,211 @@
-# Team Decisions
+# Cogworks Squad Decisions
 
-<!-- Append-only. Scribe merges inbox entries here. -->
+Consolidated decision record for cross-agent coordination and architectural choices.
 
-## [TD-001] Team formed to address cogworks risk analysis findings
-- **Date:** 2026-03-03 | **By:** William Hallatt
-- Specialist team created to implement the 12 prioritised mitigations from `docs/cogworks-agent-risk-analysis.md`.
-- Work streams: security (Ash), pipeline (Dallas), testing (Hudson), compatibility/contributor safety (Lambert), with Ripley as lead reviewer.
+**Last audited:** 2026-03-05T00:46:55Z
+**Audited by:** Scribe
 
-## [TD-002] Security Guards Implementation (Round 2)
-- **Date:** 2026-03-03 | **By:** Ash (Security Engineer)
-- **Issues Addressed:** #13 (D2), #18 (D1), #22 (D1)
-- **Core Principle:** Autonomous systems must fail safely. Stop and ask rather than infer critical decisions.
-- **Stale Skill Guard:** Detects edits to cogworks skill files mid-session; warns of in-memory state inconsistency before invoking edited skills.
-- **Intent Clarification Gate:** Confirms explicit skill generation intent before proceeding with file side effects. Prevents unintended directory/file creation.
-- **Escalation Boundary (Autonomous Mode):** When autonomous mode hits unresolvable decision (conflicting sources, ambiguous scope, missing input), stops and surfaces question rather than silent best-guess.
-- **Implementation:** Three surgical edits to `skills/cogworks/SKILL.md`; no other changes.
-- **Status:** Ready for review and commit.
+---
 
-## [TD-003] Pipeline Guards Implementation (Round 2)
-- **Date:** 2026-03-03 | **By:** Dallas (Pipeline Engineer)
-- **Issues Addressed:** #5 (M5), #11 (M11), #14 (D3), #16 (D7)
-- **M5 Overwrite Protection:** User confirmation required before overwriting existing skill path with SKILL.md present. Prevents silent data loss.
-- **M11 Cross-Source Count:** Verification that synthesised claims merging N sources are grounded in at least 2 of those N sources. Detects false synthesis.
-- **D3 CDR Completeness:** Every CDR registry entry must trace to at least one Decision Skeleton entry. Prevents CDR bloat; ensures traceability function.
-- **D7 Convergence Guard:** Detects "Synthesis Metadata" or cogworks-generated sources in input; warns of non-convergence risk; requires explicit confirmation.
-- **Implementation:** Four surgical edits to `skills/cogworks/SKILL.md` and `skills/cogworks-encode/SKILL.md`; guards placed at earliest detection points.
-- **Status:** Ready for review and commit.
+## Decision: TDD Philosophy Synthesis for Cross-Squad Knowledge Transfer
 
-## [TD-004] No GitHub Project Board
-- **Date:** 2026-03-03 | **By:** William Hallatt (via Copilot)
-- **Decision:** Do not use GitHub Projects board. Issues + `squad:{member}` labels sufficient for 22 work items.
-- **Rationale:** Work tracking is lightweight; Ralph and agent routing work directly off issue labels; no stakeholder kanban view needed at this scale; Project board adds sync overhead and requires elevated token scopes.
-- **Action:** Run `gh auth refresh -s read:project,read:org,read:discussion` then `gh project delete 1 --owner @me` to remove existing board.
+**Date:** 2026-03-05
+**Author:** Ripley (Lead)
+**Status:** Informational — knowledge synthesis
 
-## [TD-005] Documentation & Schema Creation (Round 2)
-- **Date:** 2026-03-03 | **By:** Lambert (Compatibility Engineer)
-- **Issues Addressed:** #10 (M10), #12 (M12), #19 (D10)
-- **M10 Codex Behavioral Capture:** New `docs/codex-behavioral-capture.md` (~200 lines). Practical guide to manually capturing behavioral traces from Codex (no auto-loading). Addresses non-determinism via BLEU/ROUGE and manual grading.
-- **M12 Skills-Lock Schema:** New `docs/skills-lock-schema.md` (~100 lines). Adds `core_skills_hash` (SHA-256) field to detect unintentional cogworks core skill drift. Schema includes computation example and migration walkthrough with `jq`.
-- **D10 AGENTS/CLAUDE Dedup:** Analysis complete: files are byte-for-byte identical. Recommended action (Option A — minimal pointer): CLAUDE.md becomes pointer to AGENTS.md with optional preamble. Aligns with expert subtraction principle. No Claude-specific guidance segregated.
-- **Status:** Documentation created; dedup recommendation ready for William's decision.
+### Context
 
-## [TD-006] Test Coverage & CI Gate Implementation (Round 2)
-- **Date:** 2026-03-03 | **By:** Hudson (Test Engineer)
-- **Issues Addressed:** #17 (D8), #21 (D8), #20 (D10)
-- **D8 Generalization Probes:** 3 new test cases targeting circular verification failures: contradictory sources, context-dependent recommendations, distinct API endpoints. Each includes ground truth and evaluator notes.
-- **D8 Edge Cases:** 4 new test cases: direct contradiction, derivative/summary source, single-source synthesis (should warn), source with embedded instructions (injection resistance).
-- **D10 Pre-release CI Gate:** New `tests/ci-gate-check.sh` script runs quality gates, verifies behavioral trace coverage, executes behavioral eval. Returns exit 0 on pass, exit 1 on fail. Updated `TESTING.md` with Pre-release CI Gate section.
-- **Rationale:** D8 risk (generator evaluates own output) creates circular checks where same model rationalizes its synthesis. New tests force independent evaluation and surface issues self-evaluation misses.
-- **Status:** 7 test cases written to test-cases.jsonl (15 total); pre-release gate script created; ready for behavioral trace capture.
+William requested review of team's TDD testing approach from architectural perspective, synthesized into prompt for cross-squad knowledge transfer.
 
-## [TD-007] Quality Calibration Gate Implementation (Round 2)
-- **Date:** 2026-03-03 | **By:** Ripley (Lead Architect)
-- **Issue Addressed:** #15 (D4)
-- **Decision:** Added Quality calibration (anti-superficiality gate) subsection to Self-Verification in `skills/cogworks-encode/SKILL.md`.
-- **Implementation:** Four self-check questions target false consensus, unjustified authority assignment, untraceable claims, absent subtraction decisions. Calibration gate inversion: "all clear" resolution treated as superficiality signal → triggers re-examination.
-- **Rationale:** Placed in Self-Verification (not new phase) because calibration is quality dimension of existing verification. Written as authoritative instruction (not checklist) to match skill voice. Key pattern exploits fact that genuine multi-source synthesis almost always surfaces tension.
-- **Scope:** `skills/cogworks-encode/SKILL.md` only.
-- **Status:** Ready for review and commit.
+### Synthesis Delivered
 
-## [TD-008] Security Injection Scan Completion (Round 3 Gap Closure)
-- **Date:** 2026-03-04 | **By:** Ash (Security Engineer)
-- **Issues Addressed:** M2 (delimiter escape), M9 (post-generation injection scan)
-- **M2 — Deterministic Delimiter Escape:** Replaced behavioral directive with explicit deterministic preprocessing. Literal closing delimiter forms (`<</UNTRUSTED_SOURCE>>`, `<<END_UNTRUSTED_SOURCE>>`) are now replaced with `[UNTRUSTED_SOURCE_TAG]` / `[/UNTRUSTED_SOURCE_TAG]` before wrapping in untrusted block. Architectural decision: **D-020** (deterministic escape required; behavioral intent insufficient).
-- **M9 — Post-Generation Injection Scan:** Extended `cogworks-learn/SKILL.md` checklist item 10 to scan for four additional pattern categories: (1) prompt-override phrases ("ignore prior", "ignore previous"), (2) standalone imperative directives ("you must", "always do"), (3) tool call syntax not belonging to skill delimiters, (4) delimiter leakage. All checks case-insensitive pattern matches. User confirmation required before writing if any pattern found.
-- **Scope:** `skills/cogworks-encode/SKILL.md` (delimiter protocol), `skills/cogworks-learn/SKILL.md` (injection checklist).
-- **Status:** Completed, merged to orchestration log.
+5-section architectural overview covering:
 
-## [TD-009] Pipeline Overwrite Protection Extended (Round 3 Gap Closure)
-- **Date:** 2026-03-04 | **By:** Dallas (Pipeline Engineer)
-- **Issues Addressed:** D9 (slug collision against installed agent directories), D3 (handoff artifact presence check)
-- **D9 — Slug Collision Guard Extended:** Overwrite protection in `skills/cogworks/SKILL.md` Step 5 now checks for slug collisions in installed agent directories (`.claude/skills/`, `.agents/skills/`, `.copilot/skills/`) in addition to `_generated-skills/` staging directory. Missing directories gracefully skipped — no error if agent directory does not exist.
-- **D3 — Handoff Artifact Presence Check:** Added explicit artifact presence check to `skills/cogworks-encode/SKILL.md` Stage Contracts section. Pipeline halts with blocking error if any required handoff artifact (`{cdr_registry}`, `{traceability_map}`, `{decision_skeleton}`, etc.) is absent or empty at consumption point. Placed at consumption boundary.
-- **Scope:** `skills/cogworks/SKILL.md` (Step 5), `skills/cogworks-encode/SKILL.md` (Stage Contracts).
-- **Status:** Completed, merged to orchestration log.
+1. **Core Philosophy** — Breaking circular ground truth problem (LLM-generated traces validating LLM outputs = consistency check, not correctness)
+2. **Three-Layer Architecture** — Deterministic (Layer 1), Behavioral (Layer 2), Pipeline (Layer 3) with clear cost/benefit trade-offs
+3. **Key Architectural Decisions** — D-022 (traces deleted), D-023 (capture scripts removed), D-025 (doc ownership), D-026 (delimiter injection hardening)
+4. **Coordination Patterns** — Test-first with Layer 1, offline defaults, framework meta-tests, post-decision doc audits
+5. **Transfer Prompt** — Distilled 200-word summary capturing principles and discipline
 
-## [TD-010] Cross-Agent Compatibility Documentation (Round 3 Gap Closure)
-- **Date:** 2026-03-04 | **By:** Lambert (Compatibility Engineer)
-- **Issue Addressed:** D6 (cross-agent compatibility matrix and generated-skill guidance)
-- **Deliverable 1 — Compatibility Matrix:** New `docs/cross-agent-compatibility.md` (~360 lines, 7 sections). Covers invocation syntax (/, $, natural language), `$ARGUMENTS` interpolation, `allowed-tools` enforcement across Claude Code, GitHub Copilot, Codex/GPT-5, and MCP agents. Honest labeling of unknowns: ✅ Confirmed, 🟡 Partial, ❓ Untested, ❌ Known broken. Flags Copilot `$ARGUMENTS` support as undefined and documents as highest priority for live testing.
-- **Deliverable 2 — Generated-Skill Template:** Added Compatibility (L2) guidance to `skills/cogworks-learn/SKILL.md`. Instructs generated skill authors to include a Compatibility section in SKILL.md, with fallback note for agents lacking `$ARGUMENTS` support.
-- **User-Facing Guidance:** "Compatibility Note for Generated Skills" section provides 1-paragraph explanation for skill users on non-Claude Code agents.
-- **Outstanding Work:** 5 identified gaps (Copilot `$ARGUMENTS`, Copilot `allowed-tools`, MCP integration, Cursor auto-load, argument fallback behavior) documented with effort estimates for post-Round-3 testing.
-- **Scope:** `docs/cross-agent-compatibility.md` (new), `skills/cogworks-learn/SKILL.md` (template guidance).
-- **Status:** Completed, merged to orchestration log.
+### Key Architectural Insights
 
-## [TD-011] CI Gate Behavioral Coverage Enforcement (Round 3 Gap Closure)
-- **Date:** 2026-03-04 | **By:** Hudson (Test Engineer)
-- **Issue Addressed:** D8 (CI gate now blocks on missing behavioral traces)
-- **Change:** Updated `tests/ci-gate-check.sh` to fail (exit non-zero) when behavioral traces are missing for any skill. Previous behavior: warning only, allowed releases with zero behavioral evaluation. New behavior: iterates all skill directories (`cogworks`, `cogworks-encode`, `cogworks-learn`), counts trace files per skill, exits 1 with actionable error if any skill has zero traces.
-- **Remediation Command:** Gate output includes exact command to fix: `python3 tests/framework/scripts/cogworks-eval.py behavioral run --skill-prefix cogworks-`.
-- **Documentation:** Updated `TESTING.md` Pre-release CI Gate section with trace requirement.
-- **Architectural Decision:** **D-021** (behavioral coverage is release guarantee, not optional signal; trace presence check is blocking gate).
-- **Scope:** `tests/ci-gate-check.sh`, `TESTING.md`.
-- **Status:** Completed, merged to orchestration log.
+- **Circular ground truth is epistemological failure, not just technical shortcut** — Team chose correctness over convenience by deleting "working" tests that validated wrong thing
+- **Layer 1 deterministic checks are incorruptible** — Mechanical validation can't be gamed by prompt engineering, breaks self-verification circularity
+- **Behavioral testing is valuable only with non-circular ground truth** — Team blocked Layer 2 evaluation rather than perpetuate meaningless validation
+- **Documentation ownership prevents architectural drift** — No decision closes until stale references cleaned (D-025 protocol)
 
-## [TD-012] Architectural Decision Recording (Round 3 Gap Closure)
-- **Date:** 2026-03-04 | **By:** Ripley (Lead Architect)
-- **Decisions Recorded:** D-020 (M2 deterministic delimiter escape), D-021 (CI gate behavioral coverage requirement).
-- **Coherence Review:** All agent closures (M2, M9, D9, D3, D6, D8) verified for conflicts. No conflicts found. M2 ↔ cogworks-learn consistency verified; D9 ↔ existing overwrite protection verified; CI gate ↔ existing traces verified.
-- **Scope:** `_plans/DECISIONS.md`.
-- **Status:** Completed, merged to orchestration log.
+### Recommendation
 
-## [TD-013] User Directive: Windows/Cross-Platform Out of Scope
-- **Date:** 2026-03-04T08:57:57Z | **By:** William Hallatt (via Copilot)
-- **What:** Windows and cross-platform support are explicitly out of scope. Do not spend engineering effort on Windows compatibility, PowerShell, or WSL testing.
-- **Why:** User request — captured for team memory
-- **Context:** Established during Parker (Benchmark & Evaluation Engineer) onboarding.
+This synthesis should be considered canonical description of cogworks testing philosophy for external knowledge transfer. If TESTING.md or AGENTS.md ever diverge from these principles, documentation is stale.
 
-## [TD-014] Product Gap Analysis: Agent Skills, Sub-Agents & Prompt Engineering
-- **Date:** 2026-03-04T11:22:28Z | **By:** Kane (Product Manager)
-- **Artifact:** `_sources/kane-synthesis-agent-skills.md` (20K+ words, 10 sections)
-- **Methodology:** Systematic audit of 13 Tier 1 + 7 Tier 2 sources covering Claude Code, Anthropic, OpenAI/Codex, and IBM prompt engineering guidance
-- **Top 3 Critical Gaps (Priority Order):**
-  1. **No activation testing** — behavioral eval validates output quality but not skill invocation precision; skills with perfect content but poor `description` fields may never be discovered
-  2. **No parallel tool use guidance** — generated skills lack templates for parallel tool execution; 3-5x performance left on table for file-heavy operations
-  3. **No evaluation flywheel** — generated skills deployed immediately without iterative refinement; no mechanism to run behavioral tests, analyze failures, surgically revise, and re-test
-- **Secondary Gaps (Priorities 4-10):** Cross-agent compatibility validation, subagent orchestration guidance, multi-context state management, Codex-specific patterns, prompt caching optimization, injection scanning, trade-off matrix (skills vs. guidance)
-- **Recommendations:** Extend behavioral eval with activation test cases (P0), template parallel execution in `cogworks-learn` (P1), prototype eval-driven refinement loop (P1), cross-agent compatibility testing (P2)
-- **Status:** Ready for team review and prioritization discussion.
+### Scope
 
-## [TD-015] Kane Charter Upskill — Synthesis Knowledge Integration
-- **Date:** 2026-03-04T11:35:00Z | **By:** Kane (Product Manager)
-- **What:** Updated `.squad/agents/kane/charter.md` to internalize synthesis findings from TD-014 (`_sources/kane-synthesis-agent-skills.md`). Replaced abstract expertise description with concrete, practitioner-level knowledge: exact frontmatter semantics, discovery priority rules, context budget numbers (2% window, 16K fallback), activation guard patterns, subagent configuration, prompt engineering specifics (Claude 4.x + Codex), evaluation framework, cogworks security guards (M2/M9), pipeline guards (M5/M11/D3/D7/D9), quality calibration (D4 inversion gate), behavioral coverage requirement (D21).
-- **Companion Artifact:** Created `.squad/skills/product-gaps-cogworks/SKILL.md` encoding 10 gaps + 5 priority recommendations as reusable team decision-support skill for roadmap work.
-- **Impact:** Product decisions now grounded in authoritative source knowledge, not assumptions. Kane can cite exact context constraints, reference specific quality gates, push for empirical validation (Copilot `$ARGUMENTS` support undefined = highest testing priority).
-- **Status:** Complete; Kane's operational knowledge now team-accessible via skill.
+- Knowledge synthesis only — no code or doc changes proposed
+- Input artifacts: TESTING.md, AGENTS.md, _plans/DECISIONS.md, tests/framework/, scripts/validate-quality-gates.sh, scripts/test-generated-skill.sh
+- Output: Architectural overview + 200-word transfer prompt
 
-## [TD-016] Spec-Align cogworks-learn: Scope Claude Code Extensions, Add Gap 3/4/10 Guidance
-- **Date:** 2026-03-04T12:12:29Z | **By:** Dallas (Pipeline Engineer)
-- **Issues Addressed:** TD-014 Gaps 3, 4, 10 (product synthesis)
-- **Core Problem:** cogworks-learn presented Claude Code-specific features as universal standard features, causing incorrect guidance for Copilot, Codex, Cursor, and other agents.
-- **Evidence:** agentskills.io specification defines exactly 6 frontmatter fields; vercel-labs/skills compatibility matrix shows `allowed-tools` supported by 16/18 agents; `$ARGUMENTS`, `disable-model-invocation`, `user-invocable` are NOT in the spec — Claude Code extensions only.
-- **Changes Implemented:**
-  1. **Correctly scoped Claude Code extensions:** `disable-model-invocation`, `user-invocable`, `$ARGUMENTS` grouped under "Claude Code native capabilities" in `skills/cogworks-learn/SKILL.md` and `reference.md`. Removed incorrect implication that these are universal. For cross-agent skills, guidance recommends using `compatibility` field (the spec-defined mechanism).
-  2. **Reframed `allowed-tools` as broadly supported:** Updated to "16/18 agents" with vercel-labs/skills as primary reference. Documented as broadly supported (Claude Code, Copilot, Codex, Cursor, +12 others) with only Kiro CLI and Zencoder unsupported.
-  3. **Added Gap 3 (Parallel Tool Use):** "Make all independent tool calls in parallel" instruction for file-heavy workflows (3-5× speedup). Works on all agents via natural language.
-  4. **Added Gap 4 (Subagent Delegation):** For high-volume result tasks, delegate to subagent with `context: fork` for Claude Code or natural language delegation for others.
-  5. **Added Gap 10 (When NOT to use skills):** Rules for every session belong in persistent config (CLAUDE.md, copilot-instructions.md, AGENTS.md), not skills.
-- **Files Updated:** `skills/cogworks-learn/SKILL.md`, `skills/cogworks-learn/reference.md`, `docs/cross-agent-compatibility.md`.
-- **Product Review:** Kane approved (Haiku) with notes: (1) frame Claude Code-specific features as "powerful native capabilities"; (2) verify 16/18 claim before publishing.
-- **Test Coverage:** Hudson added 7 new test cases covering `$ARGUMENTS` scoping, compatibility field usage, allowed-tools support, parallel tool use, subagent delegation, and persistent config guidance. All existing activation tests remain valid.
-- **CI Gate:** Correctly blocks on missing traces (per D-022); Parker responsible for ground truth definition.
-- **Status:** Approved by product review. Ready for commit.
+---
 
-## TD-017 — Spec-align: remove wrong .copilot/skills path, label Claude Code scope guidance
-**Date:** 2025-07-27
-**Files:** skills/cogworks/SKILL.md, skills/cogworks-learn/reference.md
-**Changes:**
-- cogworks/SKILL.md: removed `.copilot/skills/{slug}/` from slug collision check (Copilot project path is `.agents/skills/`, already in the list)
-- cogworks-learn/reference.md: added `[Claude Code only]` to `disable-model-invocation` in Task Content definition (sole unlabeled occurrence)
-- cogworks-learn/reference.md: added cross-agent scope note after both Scope Path tables (Claude Code paths only; other agents use their own paths, handled by `npx skills add`)
+## Decision: TDD Quality Standards Documentation
 
-## TD-018 — Spec-compliant generation: require compatibility: frontmatter for CC-specific fields
-**Date:** 2026-03-04
-**Files:** skills/cogworks-learn/SKILL.md
-**Changes:**
-- Frontmatter template: added `# compatibility: Requires Claude Code for [feature]` comment to show the field as conditional
-- L2 compatibility rule: expanded from `$ARGUMENTS` only to ALL CC-specific fields (`$ARGUMENTS`, `disable-model-invocation: true`, `user-invocable: false`, `context: fork`); now requires `compatibility:` frontmatter (not just body note) when any CC-specific field is present in a generated skill
-- Self-verification checklist: added gate — "If generated SKILL.md uses any CC-specific field or placeholder, is `compatibility:` present in frontmatter?"
+**Date:** 2026-03-05
+**Author:** Parker (Benchmark & Evaluation Engineer)
+**Status:** Completed — documentation delivered
 
-## [TD-019] Cross-Agent Path Fixes & CC-Only Labeling
-- **Date:** 2026-03-04 | **By:** Lambert (Compatibility Engineer)
-- **Commit:** ca8f5cb
-- **Work Items:**
-  1. **INSTALL.md cross-agent alignment:** Split manual install paths into Claude Code (`.claude/skills/`) and cross-agent (`.agents/skills/`); corrected Codex invocation syntax from `$` to natural language; enhanced verification commands.
-  2. **CONTRIBUTIONS.md cross-agent alignment:** Fixed dev install command to `npx skills add .`; added `.agents/**` to PR and release validation checklists; enhanced symlink verification for both `.claude/` and `.agents/` paths.
-  3. **examples.md labeling:** Added `[Claude Code only]` markers to 8 examples (2, 4, 5, 6, 7, 8, 10, 11) with heading notes and inline YAML comments.
-  4. **patterns.md labeling:** Labeled patterns 2, 4, 6, 7, 8, 10 and anti-patterns 3, 4, 7, 8 with CC-only markers for syntax and fields.
-- **Fields Labeled:** `context: fork`, `disable-model-invocation`, `argument-hint`, `$ARGUMENTS`, positional placeholders, `${CLAUDE_SESSION_ID}`, `agent:` field, `user-invocable`, `.claude/` path convention.
-- **Rationale:** Completes spec alignment (TD-016/TD-017/TD-018); eliminates cross-agent confusion in end-user and contributor docs; resolves D6 compatibility gaps.
-- **Impact:** Users on Copilot/Codex/Cursor see correct `.agents/` paths; generated skills inherit accurate labeling patterns; D6 (compatibility matrix) fully addressed in public documentation.
-- **Status:** Complete.
+### Context
 
-## [TD-020] Test Template Consistency and Smoke Test Coverage (Round 3 Issue Remediation)
-- **Date:** 2026-03-04 | **By:** Hudson (Test Engineer)
-- **Issues Addressed:** #30, #33, #35
-- **Work Items:**
-  1. **Template check label fix (#30):** Changed mislabeled check `has_user_invocable_field` → `has_name_field` in `tests/framework/templates/test-case-template.jsonl` (line 8). Original mislabel implied Claude Code `user-invocable` extension is universal requirement; correction aligns check name with universal semantics when template generalizes to agentskills.io spec.
-  2. **llm_judge aspirational annotation (#33):** Added `"note": "aspirational — no runner implemented yet"` to all llm_judge category cases in both `tests/framework/templates/test-case-template.jsonl` (8 cases: fidelity-001-004, quality-001-004) and `tests/datasets/golden-samples/deployment-skill/test-cases.jsonl` (5 cases: deploy-fidelity-001/002, deploy-quality-001/002/003). Makes explicit that these are design placeholders with no execution path in cogworks-eval.py.
-  3. **Cogworks orchestrator smoke prompts (#35):** Created `tests/trigger-smoke/prompts/cogworks-explicit.txt` (explicit `/cogworks` invocation) and `tests/trigger-smoke/prompts/cogworks-mid-conversation.txt` (implicit mid-conversation request). Added both to `scripts/run-trigger-smoke-tests.sh` cases array. Closes coverage gap: existing smoke tests validated cogworks-learn and cogworks-encode but not orchestrator.
-- **Architectural Decisions:**
-  - **D-023: Test template check names must match their validation logic** — Check field should describe what is validated, not what was historically copied. When Claude Code extensions generalize to agentskills.io spec, check names must update to reflect universal semantics.
-  - **D-024: Aspirational test cases must be explicitly labeled** — Test cases with no runner implementation must include `"note": "aspirational — no runner implemented yet"`. Makes design intent clear: these define future capability, not current enforcement.
-  - **D-025: Trigger smoke tests must cover all repo skills** — Each cogworks-* skill requires explicit and mid-conversation prompts. Gaps in smoke coverage mean activation regression can go undetected.
-- **Impact:** Template consumers won't inherit mislabeled checks; llm_judge cases won't be mistaken for implemented gates; smoke tests now validate all three cogworks orchestration entry points.
-- **Scope:** `tests/framework/templates/test-case-template.jsonl`, `tests/datasets/golden-samples/deployment-skill/test-cases.jsonl`, `tests/trigger-smoke/prompts/`, `scripts/run-trigger-smoke-tests.sh`.
-- **Status:** Complete.
+William requested: "Team, I want to teach another squad how you approach TDD testing. Please review your process carefully and tell me the exact prompt I need to provide the other team to get them up to your standard."
+
+Required synthesizing team's quality measurement philosophy, lessons learned from D-022/D-023 (circular ground truth deletion), and statistical validity standards into clear, actionable document for external teams.
+
+### Decision
+
+Created `.squad/agents/parker/tdd-quality-standards.md` — comprehensive TDD quality evaluation standards document covering:
+
+1. Quality criteria for tests (external ground truth, behavior measurement, non-circular)
+2. Cross-model independence protocols (avoiding circular validation)
+3. Baseline comparison approach (agent WITH skill vs WITHOUT skill)
+4. Statistical validity standards (confidence intervals, sample sizes, significance testing)
+5. Adversarial testing principles (generalization probes, negative controls)
+6. Honest audit of current state (what's working, what's blocked)
+7. 18 self-assessment questions for other teams
+8. Key learnings from failures (D-022, D-023, D-021) and fixes
+
+### Rationale
+
+**Why this structure:**
+- Start with principles (what makes test "good"?) not mechanics
+- Provide anti-patterns (what we got wrong, how we detected, how we fixed)
+- Give concrete prompts for self-assessment (18 questions)
+- Be explicit about what's blocked/under audit (no false confidence)
+
+**Why skeptical tone:**
+- Parker's mandate: "It looks right" is not evidence
+- Quality measurement requires external validation, not self-approval
+- Other teams need to understand failure modes, not just success patterns
+
+**Why statistical validity emphasis:**
+- Results without uncertainty quantification are not results
+- Confidence intervals, sample sizes, significance tests are non-negotiable
+- Single-number "quality scores" are insufficient
+
+**Why baseline comparison focus:**
+- Agent WITH skill vs WITHOUT skill is only honest quality signal
+- Prior traces had `baseline_run: false` — baselines never actually captured
+- Replacement protocol must include real baseline measurements
+
+### Key Principles Documented
+
+#### 1. Quality Definition (Non-Circular)
+
+**The trap:** Tests measuring consistency (run N matches run N-1) not correctness (is output right?)
+
+**The fix:** External ground truth required:
+- Human-authored expectations
+- Cross-model judging (different model or multi-model consensus)
+- Observable behavior specifications from domain experts
+- Known-correct reference implementations
+
+#### 2. Cross-Model Independence
+
+**Hard rule:** If Model A generated artifact, Model A cannot be sole judge.
+
+**Approaches:**
+- Different model as judge (Claude generates, GPT evaluates)
+- Human ground truth (3+ examples per category, 2+ raters, inter-rater reliability ≥ 0.70)
+- Multi-model consensus (3+ independent models, different families)
+- Observable behavior grounding (deterministic trace checks, no LLM judgment)
+
+#### 3. Baseline Comparison Protocol
+
+**Structure:**
+1. Identical task set (same prompts, sources, expected outcomes)
+2. Baseline run (agent WITHOUT skill) — capture activation, task completion, quality
+3. Treatment run (agent WITH skill) — capture same metrics
+4. Statistical comparison (p-value, effect size, confidence intervals)
+
+**Pass criteria:**
+- Treatment outperforms baseline on task completion
+- No increase in false positive rate
+- Statistical significance (p < 0.05, appropriate sample size)
+
+#### 4. Statistical Validity Requirements
+
+**Confidence intervals:** Report uncertainty bounds, not just point estimates
+- Example: "Quality score: 0.87 ± 0.04 (95% CI, n=15)"
+
+**Sample sizes:** Justify with power analysis
+- Behavioral evaluation: ≥15 activation cases, ≥5 negative controls per skill
+- Baseline comparison: ≥10 identical tasks per condition
+- Human ground truth: ≥3 reference skills per category, ≥2 raters each
+
+**Significance testing:** Report p-values, effect sizes, multiple comparison corrections
+
+### Scope
+
+- Documentation deliverable only — no code changes
+- Input artifacts: charter.md, DECISIONS.md (D-022, D-023, D-021, D-024), TESTING.md, test framework scripts, test case definitions
+- Output: `.squad/agents/parker/tdd-quality-standards.md` (comprehensive standards document)
+
+### Status
+
+✅ **Completed** — Quality standards documented for external team handoff
+
+---
+
+## Decision: quality_score Field Definition and Schema Versioning
+
+**Date:** 2026-03-05
+**Author:** Parker (Benchmark & Evaluation Engineer)
+**Status:** Schema defined — implementation pending
+
+### Context
+
+D-022 deleted all behavioral traces due to circular ground truth problem. The `quality_score` field was never operationally defined — traces had `quality_score: null` throughout. This decision closes that gap with statistically valid, non-circular definition.
+
+### Decision
+
+The `quality_score` field in behavioral traces is formally defined. The top-level field is deprecated (remains null). A new `quality` object replaces it with:
+
+- **behavioral_delta** (primary signal) — Agent WITH skill vs WITHOUT skill performance improvement
+- **judge_model** — Model or process used for evaluation (must differ from generator)
+- **judge_confidence** — Confidence score from judge (0.0 to 1.0)
+- **dimension_scores** — Breakdown by evaluation dimension (correctness, completeness, etc.)
+- **sample_size** — Number of test cases evaluated
+- **confidence_interval_95** — Statistical uncertainty bounds
+- **verdict** — Human-readable quality assessment
+
+**Schema documentation:** `tests/framework/QUALITY-SCHEMA.md`
+
+### Pass Thresholds
+
+- `behavioral_delta` ≥ 0.20
+- `judge_confidence` ≥ 0.70
+- `sample_size` ≥ 5
+- Confidence interval lower bound > 0
+
+### Cross-Model Independence
+
+**Hard rule:** Generator and judge must be different model families (Claude ≠ GPT ≠ Gemini)
+
+This prevents circular validation where same model judges its own outputs.
+
+### Next Steps
+
+Hudson implements evaluation harness per `HARNESS-SPEC.md` (Parker's next deliverable after schema definition).
+
+### Scope
+
+- Schema definition only — no harness implementation yet
+- Output: `tests/framework/QUALITY-SCHEMA.md` (expected)
+- Blocks: Layer 2 behavioral evaluation unblocked once harness implemented
+
+---
+
+### Hudson Action Item: HARNESS-SPEC.md Ready for Implementation
+
+**Date:** 2026-03-05 | **By:** Parker (via Scribe)
+**What:** Parker's behavioral delta harness specification (`tests/framework/HARNESS-SPEC.md`) is complete and ready for Hudson to implement. All quality gates this spec depends on are now in place: three judge prompts (one per skill), QUALITY-SCHEMA.md, and calibration notes showing all 3 skills at "ready for harness" status.
+**Why:** Hudson owns harness implementation; Parker owns spec and methodology. This entry signals handoff.
+**Action required (Hudson):** Read `tests/framework/HARNESS-SPEC.md` and implement the behavioral delta runner. Implement cross-model independence check at startup (generator model ≠ judge model). Do not store run outputs as future ground truth.
+**Blocked until:** Hudson implements the harness — CI behavioral coverage gate remains failing.
