@@ -1,11 +1,25 @@
 ---
-audited_through: 2026-03-04
+audited_through: 2026-03-05
 ---
 
 # Architectural Decisions
 
 Settled decisions for the cogworks project. Agents load this file for context;
 see `_plans/archive/` for historical plans.
+
+## [D-026] `quality_score` schema defined — behavioral delta replaces null field
+
+- **Date:** 2026-03-05 | **By:** Parker (mandate), William (owner)
+- **Status:** Accepted
+- **Decision:** The deprecated top-level `quality_score: null` field is superseded by a canonical `quality` object (schema version `1.0`). Quality is defined as **behavioral delta** — the mean score difference between with-skill and without-skill agent runs, graded by a cross-model judge. This closes the gap left by D-022 (circular traces deleted, no non-circular measurement existed).
+- **Cross-model independence rule (non-negotiable):** The judge model must be from a different model family than the generating model. Same-family grading reintroduces the circularity that D-022 removed. The harness must enforce this constraint at runtime and refuse to record a `quality` object that violates it.
+- **Pass thresholds (all four must hold for `verdict = "pass"`):**
+  - `behavioral_delta` ≥ 0.20
+  - `judge_confidence` ≥ 0.70
+  - `sample_size` ≥ 5 (fewer than 5 → `verdict = "insufficient_data"`)
+  - `confidence_interval_95` lower bound > 0 (CI must not straddle zero)
+- **Rationale:** A quality signal that is not independent of the generator is not a signal. D-022 deleted circular traces; this decision defines the replacement measurement from first principles. The CI lower-bound requirement encodes a minimum burden of proof: a positive point estimate over a small sample is not evidence.
+- **Scope:** `tests/framework/QUALITY-SCHEMA.md` (schema and thresholds), `tests/framework/HARNESS-SPEC.md` (harness enforcement spec). The `quality_score` field remains `null` in all existing traces until regenerated; tooling must read `quality.behavioral_delta` / `quality.verdict` going forward.
 
 ## [D-025] Scribe mandate expanded — repo documentation ownership
 
