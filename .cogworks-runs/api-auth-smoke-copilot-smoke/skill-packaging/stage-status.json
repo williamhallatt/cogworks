@@ -1,0 +1,15 @@
+{
+  "stage": "skill-packaging",
+  "status": "pass",
+  "artifacts": [
+    "/home/will/code/cogworks/.cogworks-runs/api-auth-smoke-copilot-smoke/skill-packaging/decision-skeleton.json",
+    "/home/will/code/cogworks/.cogworks-runs/api-auth-smoke-copilot-smoke/skill-packaging/composition-notes.md",
+    "/home/will/code/cogworks/.cogworks-runs/api-auth-smoke-copilot-smoke/skill-packaging/stage-status.json",
+    "/home/will/code/cogworks/tmp-agentic-output/api-auth-smoke/SKILL.md",
+    "/home/will/code/cogworks/tmp-agentic-output/api-auth-smoke/reference.md",
+    "/home/will/code/cogworks/tmp-agentic-output/api-auth-smoke/metadata.json"
+  ],
+  "blocking_failures": [],
+  "warnings": [],
+  "recommended_next_action": "proceed to deterministic-validation stage"
+}

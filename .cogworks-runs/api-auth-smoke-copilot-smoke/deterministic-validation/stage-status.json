@@ -1,0 +1,13 @@
+{
+  "stage": "deterministic-validation",
+  "status": "pass",
+  "artifacts": [
+    "/home/will/code/cogworks/.cogworks-runs/api-auth-smoke-copilot-smoke/deterministic-validation/validation-report.md",
+    "/home/will/code/cogworks/.cogworks-runs/api-auth-smoke-copilot-smoke/deterministic-validation/stage-status.json"
+  ],
+  "blocking_failures": [],
+  "warnings": [
+    "Coverage gap (advisory, carried from prior stages): no source guidance on refresh tokens, token revocation, multi-factor auth, or 429 interaction with auth retries"
+  ],
+  "recommended_next_action": "proceed to final-review stage"
+}

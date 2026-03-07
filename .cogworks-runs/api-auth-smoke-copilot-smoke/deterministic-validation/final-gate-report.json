@@ -1,0 +1,9 @@
+{
+  "stage": "deterministic-validation",
+  "skill_name": "api-auth-smoke",
+  "gate_result": "pass",
+  "deterministic_gate": "pass",
+  "skill_validation": "pass",
+  "blocking_failures": [],
+  "recommendation": "proceed to final-review"
+}

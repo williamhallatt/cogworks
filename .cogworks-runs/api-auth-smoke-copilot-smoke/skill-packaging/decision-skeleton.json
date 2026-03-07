@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "stage": "skill-packaging",
+  "skill_name": "api-auth-smoke",
+  "decisions": [
+    {
+      "id": "dec-01",
+      "title": "401 is the required response for all authentication failures",
+      "normative_weight": "required",
+      "entity_refs": ["ent-http-401", "ent-authn-failure"],
+      "sources": ["src-01", "src-02"],
+      "rule": "Return HTTP 401 when: token is missing, token is invalid, token is expired, or token is malformed. No exceptions.",
+      "packaging_note": "Must appear as a normative rule block in SKILL.md, not advisory prose."
+    },
+    {
+      "id": "dec-02",
+      "title": "403 is strictly scoped to post-authentication permission failures",
+      "normative_weight": "required",
+      "entity_refs": ["ent-http-403", "ent-authz-failure"],
+      "sources": ["src-01", "src-02"],
+      "rule": "Return HTTP 403 only when the caller is successfully authenticated but lacks permission for the requested resource. Never return 403 for token problems.",
+      "packaging_note": "Must explicitly prohibit 403 for expired/malformed tokens — this is a common implementation error and must be called out."
+    },
+    {
+      "id": "dec-03",
+      "title": "WWW-Authenticate header is conditionally required with 401",
+      "normative_weight": "conditional-required",
+      "entity_refs": ["ent-www-authenticate", "ent-http-401"],
+      "sources": ["src-01"],
+      "rule": "Include a WWW-Authenticate header in 401 responses when the authentication scheme permits or requires credential retry.",
+      "packaging_note": "Must be framed as a conditional norm (when-then), not an absolute requirement."
+    },
+    {
+      "id": "dec-04",
+      "title": "Short-lived access tokens are recommended",
+      "normative_weight": "recommended",
+      "entity_refs": ["ent-token-lifecycle"],
+      "sources": ["src-02"],
+      "rule": "Prefer short-lived access tokens to reduce the exposure window for expired-token authentication failures.",
+      "packaging_note": "Advisory weight only. Must not be presented with the same normative force as dec-01 or dec-02."
+    },
+    {
+      "id": "dec-05",
+      "title": "Operator-facing documentation must distinguish authentication from authorization",
+      "normative_weight": "required",
+      "entity_refs": ["ent-authn-failure", "ent-authz-failure"],
+      "sources": ["src-02"],
+      "rule": "Any operator-facing guidance (including this skill) must clearly distinguish authentication failure (401) from authorization failure (403) in its explanatory text.",
+      "packaging_note": "This is a meta-obligation: it governs the skill content itself."
+    }
+  ],
+  "out_of_scope": [
+    "Refresh token flows and 401 signalling when a refresh path is available",
+    "Token revocation and blacklisting response semantics",
+    "Multi-factor / step-up authentication challenge semantics",
+    "Rate-limiting (429) interaction with authentication retry loops"
+  ],
+  "contradiction_summary": "No contradictions in source set. One near-miss tension (expired/malformed 401 vs 403) fully resolved by src-02 explicit language.",
+  "packaging_readiness": "ready"
+}
