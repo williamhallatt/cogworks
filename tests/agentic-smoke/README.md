@@ -12,6 +12,8 @@ This is a **live smoke test**, not a benchmark. It answers:
 
 It does **not** prove the agentic engine is better than legacy.
 
+> Context hygiene: prefer a disposable output root outside the repository, for example `/tmp/cogworks-agentic-smoke/`. Repo-local `.cogworks-runs/` and `tmp-agentic-output/` are non-canonical artifact surfaces and should not be your default scratch locations.
+
 ## Fixture Sources
 
 Use the tiny source set under:
@@ -39,19 +41,19 @@ npx skills add . -a claude-code -y
 ## Live Smoke Procedure
 
 1. Choose one of these working styles:
-   - start the tested agent surface from the cogworks repo root and use the repo-relative fixture path shown below
-   - use a disposable working directory outside the repo, but replace the source argument with the absolute path to `tests/agentic-smoke/fixtures/api-auth-smoke/`
+   - preferred: use a disposable working directory outside the repo and replace the source argument with the absolute path to `tests/agentic-smoke/fixtures/api-auth-smoke/`
+   - allowed but less clean: start the tested agent surface from the cogworks repo root and use the repo-relative fixture path shown below
 2. Start the target agent surface in that directory.
 3. Run the equivalent cogworks command for that surface:
 
 ```text
-/cogworks encode --engine agentic api-auth-smoke from tests/agentic-smoke/fixtures/api-auth-smoke/ to ./tmp-agentic-output/
+/cogworks encode --engine agentic api-auth-smoke from tests/agentic-smoke/fixtures/api-auth-smoke/ to /tmp/cogworks-agentic-smoke/skills/
 ```
 
 If you are outside the repo root, use an absolute path instead:
 
 ```text
-/cogworks encode --engine agentic api-auth-smoke from /absolute/path/to/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/ to ./tmp-agentic-output/
+/cogworks encode --engine agentic api-auth-smoke from /absolute/path/to/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/ to /tmp/cogworks-agentic-smoke/skills/
 ```
 
 4. Approve the run when cogworks asks to proceed with file creation.
@@ -69,8 +71,8 @@ Do not classify the run as stalled just because `deterministic-validation/` or
 The live run should:
 - explicitly acknowledge `agentic` mode
 - preserve generated skills as the primary output
-- write the skill to `./tmp-agentic-output/`
-- create a run root under `./.cogworks-runs/` or `./tmp-agentic-output/../.cogworks-runs/` depending on how the agent resolves `{skill_path_parent}`
+- write the skill to the requested disposable output path
+- create a run root alongside that output path, typically under `/tmp/cogworks-agentic-smoke/.cogworks-runs/`
 - mention or record `execution_surface`
 - mention or record `execution_adapter`
 - mention or record `execution_mode`
@@ -92,7 +94,7 @@ Then run:
 ```bash
 bash scripts/validate-agentic-run.sh \
   --run-root <resolved-run-root> \
-  --skill-path ./tmp-agentic-output/
+  --skill-path /tmp/cogworks-agentic-smoke/skills/
 ```
 
 If you know the surface and adapter that should have been used, add:

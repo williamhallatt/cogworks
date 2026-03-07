@@ -1,5 +1,7 @@
 # Cogworks Testing Workflow Guide
 
+> Historical note: this document is no longer the canonical testing runbook. Load `TESTING.md`, `tests/framework/README.md`, and `evals/skill-benchmark/runbook.md` first. Some paths in this file describe superseded or deleted benchmark surfaces.
+
 **Version:** 1.0
 **Last Updated:** March 5, 2026
 **Audience:** Engineering teams implementing TDD + multi-layer validation for AI skill generation pipelines

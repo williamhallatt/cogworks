@@ -7,6 +7,25 @@ audited_through: 2026-03-07
 Settled decisions for the cogworks project. Agents load this file for context;
 see `_plans/archive/` for historical plans.
 
+## [D-033] Default agent retrieval is restricted to canonical instruction surfaces; research, history, and generated artifacts are non-default
+
+- **Date:** 2026-03-07 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** Agents working in this repository must treat only the following as default retrieval surfaces unless the task explicitly calls for deeper context: `AGENTS.md`, top-level product docs (`README.md`, `TESTING.md`, `CONTRIBUTIONS.md`, `INSTALL.md`), `_plans/DECISIONS.md`, active `_plans/*.md`, and directly relevant canonical files under `skills/**`, `.claude/agents/**`, and `evals/**`. The following are non-default and must not be loaded opportunistically: `.github/agents/**`, `.squad/**`, `_plans/archive/**`, `_sources/**`, `.cogworks-runs/**`, `tmp-agentic-output/**`, `tests/results/**`, `tests/test-data/**`, and `tests/datasets/golden-samples/**`.
+- **Rationale:** The 2026-03-07 repository-wide context audit found that the repo has multiple high-authority but non-canonical surfaces: a large Copilot auto-loaded Squad instruction file, duplicate decision ledgers, tracked generated run artifacts, production-shaped generated skills outside `skills/`, and a mixed-authority research corpus under `_sources/`. Without a hard default retrieval boundary, agents can waste context budget or act on the wrong source of truth.
+- **Operational implication:** Default retrieval now follows an allowlist model. Research corpora, Squad memory, archived plans, run artifacts, and realistic fixtures remain valid repository assets, but only when a task explicitly requires them. When these surfaces are consulted, agents must treat them as scoped reference material rather than repo-wide policy.
+- **Audit artifact:** `docs/ai-context-retrieval-risk-audit-2026-03-07.md`
+- **Scope:** `AGENTS.md`, `_plans/DECISIONS.md`, `docs/ai-context-retrieval-risk-audit-2026-03-07.md`, `_plans/archive/2026-03-07-ai-context-retrieval-risk-audit.md`
+
+## [D-034] Context-hygiene cleanup marks non-canonical surfaces and defaults live smoke output to disposable paths
+
+- **Date:** 2026-03-07 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** The repository now enforces the default retrieval policy in live docs, not just in the decision record. `AGENTS.md` now carries the canonical allowlist for default loading. `TESTING.md` now recognizes the current skill-benchmark pilot harness under `evals/` and distinguishes it from the still-reconstructing broader behavioral harness. Live smoke docs now prefer disposable output roots outside the repository. High-risk non-canonical surfaces (`.github/agents/`, `.squad/`, `_sources/`, `.cogworks-runs/`, `tmp-agentic-output/`, `tests/test-data/`, and `tests/datasets/golden-samples/`) now contain explicit warning markers or READMEs that tell humans and agents not to treat them as default instruction sources.
+- **Rationale:** Policy that exists only in a decision file still leaves first-touch retrieval vulnerable. The audit showed that the repo's highest-risk surfaces were dangerous precisely because they looked canonical when opened directly. Marking those surfaces in place reduces wrong-authority retrieval without deleting useful historical evidence or test fixtures.
+- **Operational implication:** Future smoke runs and benchmark runs should default to disposable output roots, and any preserved in-repo artifacts should be treated as deliberate examples, not ambient scratch state. Historical handoff material no longer belongs in active `_plans/`.
+- **Scope:** `.gitignore`, `AGENTS.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `.github/agents/squad.agent.md`, `.squad/decisions.md`, `.squad/identity/now.md`, `.squad/README.md`, `_sources/README.md`, `.cogworks-runs/README.md`, `tmp-agentic-output/README.md`, `tests/test-data/README.md`, `tests/datasets/golden-samples/README.md`, `docs/testing-workflow-guide.md`, `docs/cogworks-agent-risk-analysis.md`, `_plans/archive/2026-03-06-agentic-v2-next-session.md`, `_plans/archive/2026-03-07-context-hygiene-cleanup.md`
+
 ## [D-029] Agentic runtime generalized to canonical role specs with Claude and Copilot CLI adapters
 
 - **Date:** 2026-03-07 | **By:** William (owner)
