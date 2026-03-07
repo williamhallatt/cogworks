@@ -1,0 +1,38 @@
+{
+  "skill_name": "api-auth-smoke",
+  "version": "1.0.0",
+  "engine_mode": "agentic",
+  "execution_surface": "copilot-cli",
+  "execution_adapter": "native-subagents",
+  "generated_at": "2026-03-07T09:47:28Z",
+  "run_root": ".cogworks-runs/api-auth-smoke-copilot-smoke",
+  "skill_path": "tmp-agentic-output/api-auth-smoke",
+  "stage_completed": "skill-packaging",
+  "sources": [
+    {
+      "id": "src-01",
+      "file": "01-status-codes.md",
+      "trust": "internal/trusted"
+    },
+    {
+      "id": "src-02",
+      "file": "02-token-handling.md",
+      "trust": "internal/trusted"
+    }
+  ],
+  "decision_count": 5,
+  "contradiction_count": 0,
+  "coverage_gaps": [
+    "Refresh token flows",
+    "Token revocation / blacklisting",
+    "Step-up / multi-factor authentication",
+    "Rate-limiting interaction with auth retry loops"
+  ],
+  "synthesis_status": "pass",
+  "packaging_status": "pass",
+  "artifacts": [
+    "SKILL.md",
+    "reference.md",
+    "metadata.json"
+  ]
+}

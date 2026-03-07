@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "stage": "source-intake",
+  "skill_name": "api-auth-smoke",
+  "source_path": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/",
+  "files": [
+    {
+      "id": "src-01",
+      "path": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/01-status-codes.md",
+      "filename": "01-status-codes.md",
+      "size_bytes": 341,
+      "mtime_unix": 1772761217,
+      "content_type": "text/markdown",
+      "trust_class": "internal/trusted",
+      "topic_summary": "HTTP status code guidance for API auth: 401 vs 403 semantics, WWW-Authenticate header usage"
+    },
+    {
+      "id": "src-02",
+      "path": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/02-token-handling.md",
+      "filename": "02-token-handling.md",
+      "size_bytes": 314,
+      "mtime_unix": 1772761217,
+      "content_type": "text/markdown",
+      "trust_class": "internal/trusted",
+      "topic_summary": "Token lifecycle guidance: short-lived tokens, rejection of expired/malformed tokens with 401, auth vs authz failure distinction"
+    }
+  ],
+  "total_files": 2,
+  "total_bytes": 655
+}
