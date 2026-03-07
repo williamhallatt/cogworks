@@ -102,5 +102,5 @@ Approved Dallas's spec-alignment implementation (TD-016) addressing TD-014 produ
 
 **Test coverage:** Hudson added 7 quality test cases (parallel tool use, subagent delegation, persistent config guidance, $ARGUMENTS scoping, compatibility field, allowed-tools support). Existing 8 activation test cases remain valid.
 
-**Status:** Approved for commit. Ready for pipeline merge pending Dallas's verification of 16/18 claim against vercel-labs/skills.
+**Status:** Done — Dallas's 2026-03-11 spec-alignment pass confirmed 16/18 claim via vercel-labs/skills matrix. Committed.
 
