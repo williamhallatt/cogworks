@@ -1,25 +1,25 @@
 # Cogworks Testing Guide
 
-## Test Layers
+## Current Testing Surface
 
-There are three test layers, ordered by cost:
+The benchmark implementation has been removed. The active testing strategy for cogworks is now:
 
-| Layer | What it tests | Invokes agent CLI? | Cost |
+| Layer | What it tests | Invokes live agent? | Cost |
 |---|---|---|---|
 | **1 — Deterministic** | Skill file structure, YAML, citations, sections, metadata | No | Free / instant |
-| **2 — Behavioral** | Skill activation, tool use, negative controls (against stored traces) | No (evaluation only) | Low |
-| **2 — Behavioral (live capture)** | Same, but runs agent to generate fresh traces first | Yes | High — burns real tokens |
-| **3 — Pipeline benchmark** | Full `cogworks encode` end-to-end, both pipelines, A/B comparison | Yes (real mode only) | Very high |
+| **2 — Trigger smoke** | Whether the right skill activates on representative prompts | Yes | Low |
+| **3 — Agentic contract smoke** | Whether the new `--engine agentic` flow writes the required runtime artifacts and still produces a generated skill | Optional live run | Low to medium |
+| **4 — Behavioral evaluation** | Quality/activation judged against external rubrics | Pending harness completion | High |
 
-**Offline/smoke mode** (Layer 3 default) uses hardcoded deterministic metrics to verify the benchmark plumbing works. Results in offline mode are not decision-grade — no real encoding runs and the winner is meaningless.
-
-**Decision-grade** results require real backends for both Layer 2 live capture and Layer 3 real mode.
+Use these layers in order. Do not make quality or performance claims from Layer 1 or Layer 3 alone.
 
 ---
 
-## Before you start
+## Before You Start
 
-> **Before opening an AI coding session:** run `git clean -fdx tests/results/` to remove cached test outputs. These are gitignored but on-disk files will be surfaced in agent context.
+> Before opening an AI coding session: `git clean -fdx tests/results/`
+
+These cached outputs are gitignored, but on-disk files can still leak into agent context.
 
 ---
 
@@ -28,32 +28,15 @@ There are three test layers, ordered by cost:
 - `python3`
 - `jq`
 - Python package `PyYAML`
-
----
-
-## Pre-release CI Gate
-
-Before any release, run the pre-release quality gate:
-
-```bash
-bash tests/ci-gate-check.sh
-```
-
-This gate runs:
-1. Deterministic checks via `scripts/validate-quality-gates.sh`
-2. Behavioral trace coverage check — **exits non-zero (D-022/D-023 pending reconstruction)**
-
-> **Note:** The behavioral evaluation step is blocked pending Parker's quality ground truth definition (D-022). The CI gate will fail on behavioral coverage until replacement ground truth is in place. Layer 1 deterministic checks still pass independently.
-
-Exit code 0 indicates all gates passed. Exit code 1 indicates failure.
+- Optional for live tests: the target agent surface CLI (for example `claude`, Copilot CLI, or another compatible surface)
 
 ---
 
 ## Layer 1 — Deterministic Checks
 
-Validates skill file structure statically. No agent invoked. Runs in under a second.
+Validates skill file structure statically. No agent is invoked.
 
-**Pass criteria:** exit code 0, zero critical failures. Warnings produce exit code 2 (not a hard failure for CI, but indicate drift from best practices).
+**Pass criteria:** exit code `0`, zero critical failures. Exit code `2` means warnings only.
 
 Run against a generated skill:
 
@@ -62,317 +45,218 @@ bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
 bash scripts/test-generated-skill.sh --skill-path .agents/skills/my-skill
 ```
 
-Run the framework meta-tests (validates the test harness itself):
+Run directly against any skill directory:
+
+```bash
+bash tests/framework/graders/deterministic-checks.sh path/to/skill
+bash tests/framework/graders/deterministic-checks.sh path/to/skill --json
+```
+
+Framework self-checks:
 
 ```bash
 bash tests/run-black-box-tests.sh
 ```
 
-Run directly against any skill directory:
-
-```bash
-bash tests/framework/graders/deterministic-checks.sh path/to/skill
-bash tests/framework/graders/deterministic-checks.sh path/to/skill --json   # machine-readable output
-```
-
 ---
 
-## Layer 2 — Behavioral Tests
+## Layer 2 — Trigger Smoke
 
-Behavioral evaluation now uses LLM-as-judge with external rubrics, designed by Parker to replace the circular ground truth traces that were deleted in D-022. Judge models are decoupled from the generating model (non-negotiable). Three judge prompts define quality criteria:
+Checks that the expected skill activates on representative prompts.
 
-- `tests/behavioral/cogworks/judge-prompt.md`
-- `tests/behavioral/cogworks-encode/judge-prompt.md`
-- `tests/behavioral/cogworks-learn/judge-prompt.md`
-
-The quality schema is defined in `tests/framework/QUALITY-SCHEMA.md`. The evaluation harness specification (for Hudson to implement) is at `tests/framework/HARNESS-SPEC.md`. The CI gate remains blocked on behavioral coverage until the harness is fully implemented per spec.
-
-Evaluates whether skills activate on the right prompts and stay silent on negative controls.
-
-**Target pass criteria (to be re-established by Parker):**
-- `activation_f1 >= 0.85`
-- `false_positive_rate <= 0.05`
-- `negative_control_ratio >= 0.25`
-
-Test cases (`tests/behavioral/*/test-cases.jsonl`) are valid and retained — they define activation intent, not ground truth. 39 cases across 3 skills.
-
-To scaffold test cases for a new skill:
-
-```bash
-python3 tests/framework/scripts/cogworks-eval.py behavioral scaffold --skill cogworks-newskill
-```
-
-Fast trigger smoke tests (checks skill invocation only — not full behavioral eval):
+Run:
 
 ```bash
 bash scripts/run-trigger-smoke-tests.sh claude
 bash scripts/run-trigger-smoke-tests.sh codex
 ```
 
----
-
-## Layer 3 — Pipeline Benchmark (A/B)
-
-Runs `cogworks encode` end-to-end against benchmark datasets and compares claude vs codex pipelines.
-
-**Guardrails** (both pipelines must pass to be eligible for winner selection):
-- `structural_pass_rate >= 0.95`
-- `activation_f1 >= 0.85`
-- `false_positive_rate <= 0.05`
-- `negative_control_ratio >= 0.25`
-
-**Offline mode** (default) — verifies benchmark plumbing only. Uses hardcoded deterministic metrics; no real encoding runs; winner is not meaningful.
-
-**Real mode** — runs actual encode pipelines; produces decision-grade results.
-
-### Options (`benchmarks/comparison/scripts/test-cogworks-pipeline.sh`)
-
-| Flag | Default | Description |
-|---|---|---|
-| `--run-id <id>` | `ab-<timestamp>` | Run identifier |
-| `--manifest <path>` | `benchmarks/comparison/datasets/pipeline-benchmark/manifest.jsonl` | Benchmark dataset manifest |
-| `--results-root <path>` | `benchmarks/comparison/results/pipeline-benchmark` | Output root |
-| `--repeats <n>` | `3` | Repeat count per task |
-| `--variant <label>` | `clean source-order-shuffled` | Variants to run (repeatable) |
-| `--mode <offline\|real>` | `offline` | `offline` = plumbing check; `real` = decision-grade |
-| `--force` | off | Overwrite existing run output (required to re-run after a partial run) |
-| `--dry-run` | off | Write placeholder metadata only; skip summarize |
-
-### Offline (plumbing verification)
-
-```bash
-bash benchmarks/comparison/scripts/test-cogworks-pipeline.sh --mode offline --run-id 20260220-ab1
-```
-
-### Real mode (decision-grade)
-
-Point the benchmark commands at your actual encode runners:
-
-```bash
-export COGWORKS_BENCH_CLAUDE_CMD="your-claude-runner --sources '{sources_path}' --out '{out_dir}'"
-export COGWORKS_BENCH_CODEX_CMD="your-codex-runner --sources '{sources_path}' --out '{out_dir}'"
-bash benchmarks/comparison/scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1
-```
-
-Each command must write `<out_dir>/metrics.json` with at least:
-`layer1_pass`, `quality_score`, `activation_f1`, `false_positive_rate`, `negative_control_ratio`, `perturbation_success`, `runtime_sec`, `usage.total_tokens`, `usage.context_tokens`, `failed`.
-
-Re-running after a partial run:
-
-```bash
-bash benchmarks/comparison/scripts/test-cogworks-pipeline.sh --mode real --run-id 20260220-ab1 --force
-```
-
-Outputs:
-- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/benchmark-summary.json`
-- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/benchmark-report.md`
-
-### Comparator Benchmark (A/B/C)
-
-Compare cogworks against two external generators (`generator-a`, `generator-b`) with shared fairness controls (same model family + budget limits) from:
-
-- `benchmarks/comparison/datasets/pipeline-benchmark/comparators.local.json`
-
-Expected local comparator paths:
-
-- `benchmarks/comparison/comparators/generator-a/`
-- `benchmarks/comparison/comparators/generator-b/`
-
-Run plumbing check (offline):
-
-```bash
-bash benchmarks/comparison/scripts/test-generator-comparison.sh --mode offline --run-id comp-20260303-smoke1
-```
-
-Run decision-grade comparison (real mode):
-
-```bash
-bash benchmarks/comparison/scripts/test-generator-comparison.sh --mode real --run-id comp-20260303-real1
-```
-
-Override comparator commands when their local default scripts differ:
-
-```bash
-export COGWORKS_BENCH_GENERATOR_A_CMD="bash {comparator_dir}/scripts/benchmark.sh '{sources_path}' '{out_dir}'"
-export COGWORKS_BENCH_GENERATOR_B_CMD="bash {comparator_dir}/scripts/benchmark.sh '{sources_path}' '{out_dir}'"
-```
-
-Comparator adapters normalize outputs through:
-
-- `benchmarks/comparison/scripts/run-comparator-benchmark.sh`
-- `benchmarks/comparison/scripts/run-generator-a.sh`
-- `benchmarks/comparison/scripts/run-generator-b.sh`
-
-Additional output:
-
-- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/quality-first-ranking.md`
-
-### Protocol-Run Comparator Benchmark (Authoritative for Workflow Toolkits)
-
-Use this path when comparators are workflow/process repositories (not one-shot generators with a stable metrics contract).
-
-Canonical operational runbook:
-- `benchmarks/comparison/RUNBOOK.md`
-
-Protocol manifests:
-- `benchmarks/comparison/datasets/pipeline-benchmark/protocol-pilot.json` (fast pilot)
-- `benchmarks/comparison/datasets/pipeline-benchmark/protocol-hard-v2.json` (expanded hard suite)
-
-Runbooks:
-- `benchmarks/comparison/docs/protocols/cogworks.md`
-- `benchmarks/comparison/docs/protocols/generator-a.md`
-- `benchmarks/comparison/docs/protocols/generator-b.md`
-
-Pilot tasks (current default): `pb-001-api-auth`, `pb-002-k8s-troubleshoot`
-
-Offline protocol smoke run:
-
-```bash
-bash benchmarks/comparison/scripts/run-protocol-benchmark.sh \
-  --protocol benchmarks/comparison/datasets/pipeline-benchmark/protocol-pilot.json \
-  --mode offline \
-  --run-id protocol-20260303-smoke1 \
-  --force
-```
-
-Real protocol run:
-
-```bash
-bash benchmarks/comparison/scripts/run-protocol-benchmark.sh \
-  --protocol benchmarks/comparison/datasets/pipeline-benchmark/protocol-pilot.json \
-  --mode real \
-  --run-id protocol-20260303-real1 \
-  --force
-```
-
-Hard-suite real protocol run:
-
-```bash
-bash benchmarks/comparison/scripts/run-protocol-benchmark.sh \
-  --protocol benchmarks/comparison/datasets/pipeline-benchmark/protocol-hard-v2.json \
-  --mode real \
-  --run-id protocol-hard-v2-real1 \
-  --force
-```
-
-Optional legacy compatibility summary:
-
-```bash
-bash benchmarks/comparison/scripts/run-protocol-benchmark.sh \
-  --protocol benchmarks/comparison/datasets/pipeline-benchmark/protocol-pilot.json \
-  --mode real \
-  --run-id protocol-20260303-real1 \
-  --force \
-  --compat-summary
-```
-
-Artifacts:
-- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/pilot-summary.json` (protocol summary)
-- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/pilot-report.md`
-- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/quality-first-ranking.md`
-
-Optional compatibility artifact:
-- `benchmarks/comparison/results/pipeline-benchmark/{run_id}/benchmark-summary.json` (legacy comparator summary; non-authoritative in protocol mode)
-
-Per-run artifacts:
-- `generation-artifact.json`
-- `quality-eval.json`
-- `metrics.json`
+These tests validate invocation behavior only. They do not validate output quality.
 
 ---
 
-## Recursive Improvement Round (TDD-First)
+## Layer 3 — Agentic Contract Smoke
 
-Canonical runbook: `tests/datasets/recursive-round/README.md`
+This is the current way to test the new opt-in agentic flow.
 
-1. Start from the example manifest:
+### 3.1 Static contract smoke
 
-```bash
-cp tests/datasets/recursive-round/round-manifest.example.json \
-  tests/datasets/recursive-round/round-manifest.local.json
-```
-
-2. Freeze tests by writing `expected_sha256`:
+Run:
 
 ```bash
-bash scripts/pin-test-bundle-hash.sh \
-  tests/datasets/recursive-round/round-manifest.local.json
+bash scripts/test-agentic-contract.sh
 ```
 
-3. Load concrete defaults for hook + benchmark commands:
+This verifies that the repo contains the required agentic contract surface:
+- `--engine agentic` documented in the right places
+- stage graph defined
+- canonical role specs defined
+- Claude and Copilot CLI adapters defined
+- deterministic validation still passes for `skills/cogworks`
+- testing docs point to the current smoke tooling
+
+### 3.2 Live agentic smoke
+
+Run a real agentic encode using the fixture sources in:
+
+```text
+tests/agentic-smoke/fixtures/api-auth-smoke/
+```
+
+Run from the repo root if you want to use that repo-relative path directly. If you use a disposable workspace outside the repo, replace it with the fixture directory's absolute path.
+
+The canonical manual runbook is:
+
+- `tests/agentic-smoke/README.md`
+
+After the live run completes, validate artifacts with:
 
 ```bash
-source scripts/recursive-env.example.sh
+bash scripts/validate-agentic-run.sh \
+  --run-root <resolved-run-root> \
+  --skill-path <generated-skill-path>
 ```
 
-4. Fast round (Layer 1 only, no benchmark):
+Optional stricter validation when you know the adapter used:
 
 ```bash
-bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
-  --mode fast \
-  --run-id rr-20260220-fast1
+bash scripts/validate-agentic-run.sh \
+  --run-root <resolved-run-root> \
+  --skill-path <generated-skill-path> \
+  --expect-surface claude-cli \
+  --expect-adapter native-subagents
 ```
 
-5. Deep smoke round (full pipeline, offline metrics — plumbing check):
+Copilot CLI examples:
 
 ```bash
-bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
-  --mode deep \
-  --smoke-only \
-  --run-id rr-20260220-deep-smoke1
+bash scripts/validate-agentic-run.sh \
+  --run-root <resolved-run-root> \
+  --skill-path <generated-skill-path> \
+  --expect-surface copilot-cli \
+  --expect-adapter native-subagents
+
+bash scripts/validate-agentic-run.sh \
+  --run-root <resolved-run-root> \
+  --skill-path <generated-skill-path> \
+  --expect-surface copilot-cli \
+  --expect-adapter single-agent-fallback
 ```
 
-6. Decision-grade deep round (set real backends first):
+### Pass criteria
 
-```bash
-export COGWORKS_RECURSIVE_BENCH_CLAUDE_REAL_CMD="<real claude benchmark command with {sources_path} and {out_dir}>"
-export COGWORKS_RECURSIVE_BENCH_CODEX_REAL_CMD="<real codex benchmark command with {sources_path} and {out_dir}>"
-bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
-  --mode deep \
-  --run-id rr-20260220-deep-real1
-```
+A passing live agentic smoke run must prove all of the following:
+- generated skill output still exists and is the primary artifact
+- generated `reference.md` passes `validate-synthesis.sh` without critical failures
+- generated skill directory passes `validate-skill.sh` without critical failures
+- `run-manifest.json` exists
+- `dispatch-manifest.json` exists for `native-subagents` runs
+- `stage-index.json` exists, whether emitted at the run root or under `final-review/`
+- `final-summary.md` exists, whether emitted at the run root or under `final-review/`
+- all five stage directories exist
+- each stage directory contains `stage-status.json`
+- `run-manifest.json` records `engine_mode`, `execution_surface`, `execution_adapter`, `execution_mode`, `specialist_profile_source`, and `agentic_path`
+- `dispatch-manifest.json` records the canonical role profiles, surface bindings, model policy, and actual dispatch modes for each specialist stage when `execution_adapter = native-subagents`
+- degraded execution is reported honestly when subagents are unavailable
 
-Hook execution is driven by `tests/datasets/recursive-round/round-manifest.local.json` via:
+Do not treat a run as stalled only because `deterministic-validation/` or
+`final-review/` appears later than earlier stage outputs.
 
-```bash
-bash scripts/run-recursive-hook.sh pre_round|generate|improve|regenerate|post_round
-```
-
-Round outputs:
-- `tests/results/meta-loop/{run_id}/round-summary.json`
-- `tests/results/meta-loop/{run_id}/round-report.md`
-
-Signal policy: deep mode with `signal_mode=real` and `ranking_eligible=true` is decision-grade. `--smoke-only` and `--mode fast` are plumbing verification only.
-
-Validate docs consistency:
-
-```bash
-bash scripts/validate-recursive-docs.sh
-```
+Layer 3 proves that the flow works. It does **not** prove it is better than legacy.
 
 ---
 
-## Advanced Manual CLI
+## Engine Comparison
 
-The `pipeline-benchmark` subcommand requires `benchmarks/comparison/scripts/` on `PYTHONPATH` (for `pipeline_benchmark.py`). Prefer `benchmarks/comparison/scripts/test-cogworks-pipeline.sh` as the entry point. For direct CLI access:
+Once you have one completed legacy run and one completed agentic run for the
+same fixture, generate saved comparison artifacts with:
 
 ```bash
-export PYTHONPATH="$PWD/scripts:${PYTHONPATH:-}"
-python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark scaffold --run-id 20260220-ab1
-python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark run --run-id 20260220-ab1 \
-  --command-template "claude::./benchmarks/comparison/scripts/run-benchmark.sh claude '{sources_path}' '{out_dir}'" \
-  --command-template "codex::./benchmarks/comparison/scripts/run-benchmark.sh codex '{sources_path}' '{out_dir}'"
-python3 tests/framework/scripts/cogworks-eval.py pipeline-benchmark summarize --run-id 20260220-ab1
+python3 scripts/compare-engine-performance.py \
+  --legacy-skill-path <legacy-skill-path> \
+  --legacy-log <legacy-claude-jsonl-log> \
+  --agentic-skill-path <agentic-skill-path> \
+  --agentic-log <agentic-claude-jsonl-log> \
+  --agentic-run-root <agentic-run-root> \
+  --out-dir tests/results/engine-comparison/<run-id>
 ```
+
+This emits:
+- `benchmark-summary.json`
+- `benchmark-report.md`
+
+Use the same fixture and destination style for both runs. Do not compare runs
+from different source sets or prompt surfaces.
+
+The comparison report is suitable for:
+- total duration
+- API duration
+- billed token counts aggregated from Claude `modelUsage`
+- cost
+- agentic stage timing approximations
+
+It is **not** sufficient on its own to claim quality superiority.
 
 ---
 
-## References
+## Layer 4 — Behavioral Evaluation
 
-- `tests/framework/README.md`
-- `benchmarks/comparison/datasets/pipeline-benchmark/README.md`
-- `tests/datasets/recursive-round/README.md`
-- `tests/run-black-box-tests.sh`
+Behavioral evaluation remains under reconstruction after D-022/D-026. Current authoritative references:
+
+- `tests/framework/QUALITY-SCHEMA.md`
+- `tests/framework/HARNESS-SPEC.md`
+- `tests/behavioral/cogworks/judge-prompt.md`
+- `tests/behavioral/cogworks-encode/judge-prompt.md`
+- `tests/behavioral/cogworks-learn/judge-prompt.md`
+
+Current status:
+- test cases are retained
+- judge prompts are retained
+- the replacement harness is not fully implemented yet
+
+### Targeted quality comparison
+
+For the current decision point, use the lightweight cross-model comparison:
+
+```bash
+python3 scripts/run-agentic-quality-compare.py \
+  --claude-workdir <workspace-with-cogworks-installed>
+```
+
+Defaults:
+- runs a fixed three-case synthesis set
+- uses Claude as generator and Codex as judge
+- emits `benchmark-summary.json` and `benchmark-report.md`
+- recommends only `continue` or `simplify`
+
+This is a focused decision tool, not a general replacement for the full behavioral harness.
+
+Do not treat behavioral quality as established until the harness exists and emits saved artifacts.
+
+---
+
+## Pre-release Minimum
+
+Before shipping changes to the cogworks orchestrator or agentic runtime, run at least:
+
+```bash
+bash tests/framework/graders/deterministic-checks.sh skills/cogworks
+bash tests/run-black-box-tests.sh
+bash scripts/test-agentic-contract.sh
+```
+
+For any claim that the live agentic flow works in Claude Code, also run one manual live smoke from `tests/agentic-smoke/README.md` and validate the result with `scripts/validate-agentic-run.sh`.
+
+---
+
+## What We Cannot Claim Yet
+
+Without a restored comparison harness, you cannot honestly claim:
+- agentic is faster
+- agentic is more robust
+- agentic is higher quality than legacy
+
+Current smoke coverage supports only:
+- the contract exists
+- the docs are aligned
+- the live flow can be exercised and validated for artifact completeness
