@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogworks.dev/evals/skill-benchmark/benchmark-summary.schema.json",
+  "title": "Skill Benchmark Summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "benchmark_id",
+    "skills_compared",
+    "model",
+    "agent_surface",
+    "trial_count",
+    "case_count",
+    "mean_delta",
+    "win_rate",
+    "candidate_a_win_rate",
+    "candidate_b_win_rate",
+    "tie_rate",
+    "confidence_interval_95",
+    "activation_metrics",
+    "safety_metrics",
+    "cost_metrics",
+    "verdict",
+    "ranking_eligible"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "benchmark_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "skills_compared": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_a",
+        "candidate_b"
+      ],
+      "properties": {
+        "candidate_a": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_b": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_surface": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trial_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "case_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "mean_delta": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1
+    },
+    "win_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "candidate_a_win_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "candidate_b_win_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "tie_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "confidence_interval_95": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number",
+        "minimum": -1,
+        "maximum": 1
+      }
+    },
+    "efficacy_breakdown": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": -1,
+        "maximum": 1
+      },
+      "default": {}
+    },
+    "activation_metrics": {
+      "$ref": "#/$defs/comparisonActivationMetrics"
+    },
+    "safety_metrics": {
+      "$ref": "#/$defs/safetyMetrics"
+    },
+    "cost_metrics": {
+      "$ref": "#/$defs/costMetrics"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "candidate_a",
+        "candidate_b",
+        "no_clear_winner",
+        "insufficient_evidence"
+      ]
+    },
+    "ranking_eligible": {
+      "type": "boolean"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  },
+  "$defs": {
+    "activationMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "precision",
+        "recall",
+        "false_positive_rate",
+        "false_negative_rate",
+        "ambiguous_trigger_rate"
+      ],
+      "properties": {
+        "precision": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "recall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "false_positive_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "false_negative_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "ambiguous_trigger_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "comparisonActivationMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_a",
+        "candidate_b"
+      ],
+      "properties": {
+        "candidate_a": {
+          "$ref": "#/$defs/activationMetrics"
+        },
+        "candidate_b": {
+          "$ref": "#/$defs/activationMetrics"
+        }
+      }
+    },
+    "safetyMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_a_violation_rate",
+        "candidate_b_violation_rate",
+        "regression"
+      ],
+      "properties": {
+        "candidate_a_violation_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "candidate_b_violation_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "regression": {
+          "type": "boolean"
+        }
+      }
+    },
+    "costMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_a_mean_runtime_ms",
+        "candidate_b_mean_runtime_ms",
+        "candidate_a_mean_estimated_usd",
+        "candidate_b_mean_estimated_usd"
+      ],
+      "properties": {
+        "candidate_a_mean_runtime_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "candidate_b_mean_runtime_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "candidate_a_mean_estimated_usd": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "candidate_b_mean_estimated_usd": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

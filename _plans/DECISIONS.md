@@ -16,6 +16,34 @@ see `_plans/archive/` for historical plans.
 - **Surface policy:** Claude Code may pin cheaper or deeper specialist models through generated agent files when native subagents are available. Copilot CLI must not claim per-role model pinning unless the surface proves it; its default native binding policy is `inherit-session-model`, and it must honestly fall back to `single-agent-fallback` when no real spawn primitive exists.
 - **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/agentic-runtime.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/copilot-adapter.md`, `skills/cogworks/role-profiles.json`, `.claude/agents/cogworks-*.md`, `scripts/render-agentic-role-bindings.py`, `scripts/validate-agentic-run.sh`, `scripts/run-agentic-quality-compare.py`, `scripts/compare-engine-performance.py`, `scripts/test-agentic-contract.sh`, `README.md`, `skills/cogworks/README.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `_plans/archive/2026-03-07-copilot-cli-agentic-adapter.md`.
 
+## [D-030] Skill evaluation benchmark isolated to skill-vs-skill efficacy with separate activation diagnostics
+
+- **Date:** 2026-03-07 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** Objective comparison of agent skills is now defined as a paired benchmark where the model, agent surface, tools, sandbox, task cases, and graders are held constant and only the skill differs. The primary score is task efficacy after invocation; activation quality is measured separately as its own scorecard. The benchmark must prefer deterministic trace/state checks, use cross-model judges only for residual qualitative criteria, and report repeated-trial uncertainty rather than single-run point estimates.
+- **Rationale:** Previous repo guidance correctly rejected circular self-grading, but it still left open a key attribution problem: if model, runtime, and skill all move at once, the result is not a skill benchmark. A clean intervention framing removes that ambiguity. Separating activation from efficacy also prevents two distinct failure modes from being flattened into one opaque score.
+- **Default benchmark policy:** Fixed model, fixed agent, fixed environment, repeated paired trials, hard-negative and boundary cases included, confidence intervals required, and no same-family generator/judge pairing for rubric-based grading.
+- **Artifacts:** The canonical specification now lives under `evals/`, with a research memo, benchmark doctrine, runbook, schemas, and examples. These artifacts are specification-grade; a harness and benchmark datasets remain future implementation work.
+- **Scope:** `evals/README.md`, `evals/research/2026-03-07-objective-skill-evaluation-research.md`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `evals/skill-benchmark/*.schema.json`, `evals/skill-benchmark/examples/*`, `_plans/archive/2026-03-07-objective-skill-benchmark-framework.md`.
+
+## [D-031] Pilot skill benchmark harness uses normalized observation artifacts and an env-var runner contract
+
+- **Date:** 2026-03-07 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** The first runnable skill benchmark harness is `scripts/run-skill-benchmark.py`. It does not embed agent-specific invocation logic. Instead, it executes two caller-supplied candidate commands and passes benchmark context through environment variables (`COGWORKS_BENCHMARK_*`). Each candidate command must write a normalized observation JSON to the supplied observation path and may write a judge JSON to the supplied judge path when a case uses `judge_only` checks.
+- **Rationale:** The benchmark needs to run now, but agent surfaces do not share a uniform execution API. An env-var contract keeps the harness reusable while separating benchmark policy from surface-specific runner adapters. Normalized observation artifacts also preserve the repo's anti-circular stance: deterministic checks run on explicit evidence, and judge output is optional and scoped only to residual criteria.
+- **Artifacts:** The harness emits `benchmark-summary.json`, `benchmark-report.md`, and `benchmark-results.json`. The summary remains the machine-readable ranking surface; results capture per-trial evidence for debugging and audit. A synthetic smoke fixture under `tests/test-data/skill-benchmark-pilot/` proves the contract end to end.
+- **Scope:** `scripts/run-skill-benchmark.py`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `evals/skill-benchmark/observation.schema.json`, `evals/skill-benchmark/benchmark-summary.schema.json`, `evals/skill-benchmark/examples/benchmark-summary.example.json`, `tests/test-data/skill-benchmark-pilot/*`, `tests/framework/README.md`.
+
+## [D-032] Codex benchmark integration goes through a replayable adapter, not a Codex-specific harness fork
+
+- **Date:** 2026-03-07 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** Codex integration for the skill benchmark is provided by `scripts/skill-benchmark-codex-adapter.py`, which translates `codex exec --json` event streams into the normalized benchmark observation schema. The adapter also supports replaying saved JSONL traces so the benchmark contract can be tested offline in sandboxed or network-restricted environments.
+- **Rationale:** The generic benchmark harness should remain surface-neutral. A dedicated adapter preserves that separation while still making Codex a first-class runnable target. Replay mode is required because live Codex runs may be blocked by sandboxed websocket/network restrictions, and the benchmark contract still needs deterministic smoke coverage in CI-like environments.
+- **Artifacts:** The adapter writes benchmark observations and optionally judge output, preserves the raw Codex JSONL event stream under the trial work directory, and is covered by a replay fixture under `tests/test-data/skill-benchmark-codex-adapter/`.
+- **Scope:** `scripts/skill-benchmark-codex-adapter.py`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `tests/framework/README.md`, `tests/test-data/skill-benchmark-codex-adapter/*`.
+
 ## [D-028] Agentic runtime simplified to a selective 5-stage v2; quality reruns constrained to 3 cases
 
 - **Date:** 2026-03-06 | **By:** William (owner)
