@@ -4,7 +4,7 @@ description: Use when creating or revising agent skills, including SKILL.md stru
 license: MIT
 metadata:
   author: cogworks
-  version: v3.2.2
+  version: v3.3.1
 ---
 
 # Skill Writer Expert
@@ -28,6 +28,17 @@ This expertise has been synthesized from authoritative sources across the Agent 
 - **Match specificity to task fragility**: High-stakes workflows need explicit steps, verification gates, and rationalization resistance; low-stakes guidelines can be principles-based
 - **Generated-skill default**: Optimize for decision utility per token, not section count
 - **Integrated prompt-quality enforcement**: Apply mandatory prompt quality gates and a rewrite pass before finalizing generated skills
+
+## Fast Path For Cogworks
+
+When this skill is used by `cogworks`, default to this `SKILL.md` as the working contract.
+
+Load [reference.md](reference.md) only if one of these is true:
+- deterministic validation fails and you need a specific remediation rule
+- the source explicitly prescribes a file structure or compatibility detail not covered here
+- the target agent/runtime contract is unclear from this file alone
+
+Do not load `patterns.md`, `examples.md`, or `persuasion-principles.md` unless blocked on a concrete issue they uniquely answer.
 
 ## Core Expertise Areas
 
@@ -106,30 +117,27 @@ Persistent configuration is for always-on rules — loaded every session, minima
 
 Generated skills should include a brief "Why a skill?" note explaining this distinction.
 
-## Full Knowledge Base
+## Reference Escalation
 
-Core knowledge in [reference.md](reference.md):
+Escalate to [reference.md](reference.md) only when the current task needs deeper detail on:
+- frontmatter or compatibility edge cases
+- canonical placement conflicts
+- prompt-quality remediation after validation
 
-- **Core Concepts** - Detailed definitions with source citations
-- **Concept Map** - Explicit relationships between concepts
-- **Deep Dives** - Context budget economy, description as discovery interface, specificity calibration
-- **Quick Reference** - Frontmatter fields, string substitutions, scope locations
-
-Patterns and examples in separate files (loaded on-demand):
-
+Escalate to supporting files only when they uniquely unblock the current task:
 - [patterns.md](patterns.md) - reusable patterns and anti-patterns to avoid
 - [examples.md](examples.md) - practical examples with citations
-- [persuasion-principles.md](persuasion-principles.md) - Persuasion psychology for discipline-enforcing skills
+- [persuasion-principles.md](persuasion-principles.md) - persuasion psychology for discipline-enforcing skills
 
 ## Staged Generation Contract (Required)
 
 Generate or revise skills in explicit stages with mandatory artifacts:
 
 1. **Draft** -> `{draft_skill}` (initial structure + normative directives)
-2. **Rewrite** -> `{rewrite_diff}` (instruction clarity tightening + duplication removal)
-3. **Deterministic validation** -> `{deterministic_gate_report}` (frontmatter/structure/runtime contract checks)
-4. **Drift probe** -> `{drift_probe_report}` (edge-case prompts + pass/fail rationale)
-5. **Finalization** -> `{final_gate_report}` (all blocking gates and thresholds met)
+2. **Deterministic validation** -> `{deterministic_gate_report}` (frontmatter/structure/runtime contract checks)
+3. **Targeted rewrite** -> `{rewrite_diff}` only when validation, fidelity, or duplication issues require it
+4. **Targeted drift probe** -> `{drift_probe_report}` only for judgment-heavy domains or when validation exposes a brittle rule
+5. **Finalization** -> `{final_gate_report}` (all blocking gates met)
 
 Do not finalize until every stage artifact exists and no blocking failures remain.
 
@@ -152,7 +160,7 @@ For generated skills, all gates must pass:
 
 A failure in Fidelity cannot be offset by strengths in lower-priority dimensions. The quality-guidance tiebreaker is fidelity, not actionability.
 
-After drafting, run an **instruction quality rewrite pass**:
+After drafting, run an **instruction quality rewrite pass** only when the draft fails a gate or contains avoidable doctrine duplication:
 - tighten weak wording into concrete directives
 - remove duplicated doctrine
 - compress filler without dropping hard requirements
