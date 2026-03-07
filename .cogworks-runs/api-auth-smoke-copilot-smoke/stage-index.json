@@ -1,0 +1,11 @@
+{
+  "run_id": "api-auth-smoke-copilot-smoke-20260307",
+  "stages": [
+    {"stage": "source-intake", "status": "pass", "dir": "source-intake"},
+    {"stage": "synthesis", "status": "pass", "dir": "synthesis"},
+    {"stage": "skill-packaging", "status": "pass", "dir": "skill-packaging"},
+    {"stage": "deterministic-validation", "status": "pass", "dir": "deterministic-validation"},
+    {"stage": "final-review", "status": "pass", "dir": "final-review"}
+  ],
+  "overall_status": "pass"
+}

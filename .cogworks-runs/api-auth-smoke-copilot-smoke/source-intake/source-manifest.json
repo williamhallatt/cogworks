@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "stage": "source-intake",
+  "skill_name": "api-auth-smoke",
+  "execution_surface": "copilot-cli",
+  "engine_mode": "agentic",
+  "sources": [
+    {
+      "id": "src-01",
+      "filename": "01-status-codes.md",
+      "role": "primary",
+      "claims": [
+        "Use 401 Unauthorized when token is missing or invalid",
+        "Use 403 Forbidden when caller is authenticated but lacks permission",
+        "Return WWW-Authenticate headers with 401 responses when auth scheme requires credential retry"
+      ],
+      "entity_boundaries": ["HTTP 401", "HTTP 403", "WWW-Authenticate header"],
+      "derivative_risk": "none",
+      "contradiction_signals": "none"
+    },
+    {
+      "id": "src-02",
+      "filename": "02-token-handling.md",
+      "role": "primary",
+      "claims": [
+        "Prefer short-lived access tokens",
+        "Reject expired tokens with 401, not 403",
+        "Reject malformed tokens with 401, not 403",
+        "Document authentication failure vs authorization failure in operator-facing guidance"
+      ],
+      "entity_boundaries": ["token lifecycle", "authentication failure", "authorization failure"],
+      "derivative_risk": "none",
+      "contradiction_signals": "none"
+    }
+  ],
+  "cross_source_notes": {
+    "consistency": "Both sources are consistent: src-02 reinforces the 401-for-token-failure rule established in src-01.",
+    "coverage_gaps": "No guidance on refresh tokens, token revocation, or multi-factor auth flows.",
+    "contradictions": "none"
+  }
+}
