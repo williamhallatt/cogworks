@@ -20,6 +20,13 @@ Ash owns the security boundary of cogworks. His job is to harden the prompt inje
 - Review description field keyword precision in all three cogworks SKILL.md files
 - Identify any missing `disable-model-invocation` patterns
 
+### D2 Extension — Agentic Dispatch Surface
+The agentic pivot (D-027/D-028) opened a new attack surface not covered by the cogworks-encode and cogworks-learn mitigations above. The `source-intake` stage dispatches raw source content to the `cogworks-intake-analyst` specialist agent without an explicit untrusted-data classification gate. The Copilot fallback dispatch path (see `skills/cogworks/copilot-adapter.md`) inherits this gap — source provenance labels exist in `dispatch-manifest.json` but are not enforced as a hard gate before content reaches the specialist.
+
+- Audit `skills/cogworks/copilot-adapter.md` and `.claude/agents/cogworks-intake-analyst.md` for delimiter bypass exposure in the dispatch flow
+- Propose an explicit untrusted-data classification gate at the source-intake stage boundary
+- This security checkpoint is a pre-condition for shipping the agentic engine to any new platform surface beyond Copilot CLI and Claude Code
+
 ## Key Context
 
 - Delimiter bypass risk: source containing literal `<</UNTRUSTED_SOURCE>>` collapses the sandboxed block
