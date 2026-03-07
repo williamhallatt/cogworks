@@ -35,6 +35,7 @@ see `_plans/archive/` for historical plans.
 - **Surface policy:** Claude Code may pin cheaper or deeper specialist models through generated agent files when native subagents are available. Copilot CLI must not claim per-role model pinning unless the surface proves it; its default native binding policy is `inherit-session-model`, and it must honestly fall back to `single-agent-fallback` when no real spawn primitive exists.
 - **Live proof (Copilot CLI):** Squad validated a Copilot CLI agentic smoke run on 2026-03-07 — run root `.cogworks-runs/api-auth-smoke-copilot-smoke/`, 50/50 validator checks passed, `execution_adapter = native-subagents`, `model_policy = inherit-session-model`. `.claude/agents/` confirmed as shared agent registration source for both surfaces.
 - **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/agentic-runtime.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/copilot-adapter.md`, `skills/cogworks/role-profiles.json`, `.claude/agents/cogworks-*.md`, `scripts/render-agentic-role-bindings.py`, `scripts/validate-agentic-run.sh`, `scripts/run-agentic-quality-compare.py`, `scripts/compare-engine-performance.py`, `scripts/test-agentic-contract.sh`, `README.md`, `skills/cogworks/README.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `_plans/archive/2026-03-07-copilot-cli-agentic-adapter.md`.
+- **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
 
 ## [D-030] Skill evaluation benchmark isolated to skill-vs-skill efficacy with separate activation diagnostics
 
@@ -45,6 +46,7 @@ see `_plans/archive/` for historical plans.
 - **Default benchmark policy:** Fixed model, fixed agent, fixed environment, repeated paired trials, hard-negative and boundary cases included, confidence intervals required, and no same-family generator/judge pairing for rubric-based grading.
 - **Artifacts:** The canonical specification now lives under `evals/`, with a research memo, benchmark doctrine, runbook, schemas, and examples. These artifacts are specification-grade; a harness and benchmark datasets remain future implementation work.
 - **Scope:** `evals/README.md`, `evals/research/2026-03-07-objective-skill-evaluation-research.md`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `evals/skill-benchmark/*.schema.json`, `evals/skill-benchmark/examples/*`, `_plans/archive/2026-03-07-objective-skill-benchmark-framework.md`.
+- **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
 
 ## [D-031] Pilot skill benchmark harness uses normalized observation artifacts and an env-var runner contract
 
@@ -54,6 +56,7 @@ see `_plans/archive/` for historical plans.
 - **Rationale:** The benchmark needs to run now, but agent surfaces do not share a uniform execution API. An env-var contract keeps the harness reusable while separating benchmark policy from surface-specific runner adapters. Normalized observation artifacts also preserve the repo's anti-circular stance: deterministic checks run on explicit evidence, and judge output is optional and scoped only to residual criteria.
 - **Artifacts:** The harness emits `benchmark-summary.json`, `benchmark-report.md`, and `benchmark-results.json`. The summary remains the machine-readable ranking surface; results capture per-trial evidence for debugging and audit. A synthetic smoke fixture under `tests/test-data/skill-benchmark-pilot/` proves the contract end to end.
 - **Scope:** `scripts/run-skill-benchmark.py`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `evals/skill-benchmark/observation.schema.json`, `evals/skill-benchmark/benchmark-summary.schema.json`, `evals/skill-benchmark/examples/benchmark-summary.example.json`, `tests/test-data/skill-benchmark-pilot/*`, `tests/framework/README.md`.
+- **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
 
 ## [D-032] Codex benchmark integration goes through a replayable adapter, not a Codex-specific harness fork
 
@@ -63,6 +66,7 @@ see `_plans/archive/` for historical plans.
 - **Rationale:** The generic benchmark harness should remain surface-neutral. A dedicated adapter preserves that separation while still making Codex a first-class runnable target. Replay mode is required because live Codex runs may be blocked by sandboxed websocket/network restrictions, and the benchmark contract still needs deterministic smoke coverage in CI-like environments.
 - **Artifacts:** The adapter writes benchmark observations and optionally judge output, preserves the raw Codex JSONL event stream under the trial work directory, and is covered by a replay fixture under `tests/test-data/skill-benchmark-codex-adapter/`.
 - **Scope:** `scripts/skill-benchmark-codex-adapter.py`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `tests/framework/README.md`, `tests/test-data/skill-benchmark-codex-adapter/*`.
+- **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
 
 ## [D-028] Agentic runtime simplified to a selective 5-stage v2; quality reruns constrained to 3 cases
 
@@ -71,6 +75,7 @@ see `_plans/archive/` for historical plans.
 - **Decision:** The agentic runtime is simplified from the original 9-stage architecture to a selective 5-stage v2: `source-intake`, `synthesis`, `skill-packaging`, `deterministic-validation`, and `final-review`. Agentic runs must now record `agentic_path` as either `agentic-short-path` or `agentic-full-path`. The quality comparison surface is also narrowed from a default 5-case set to a targeted 3-case synthesis set, and the decision tool may recommend only `continue` or `simplify` unless the user explicitly authorizes a kill decision.
 - **Rationale:** The original agentic architecture worked, but its operational cost was too high relative to the decision needed. Performance evidence already showed a substantial latency/cost penalty, and live comparative evaluation itself began to exhibit the same pathology: too much orchestration for too little signal. Simplifying the runtime before broadening the benchmark surface keeps the pivot alive while forcing it to earn its complexity.
 - **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/agentic-runtime.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/README.md`, `skills/cogworks/metadata.json`, `README.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `scripts/test-agentic-contract.sh`, `scripts/validate-agentic-run.sh`, `scripts/run-agentic-quality-compare.py`, `_plans/archive/2026-03-06-agentic-v2-simplify-and-3-case-eval.md`.
+- **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
 
 ## [D-027] Agentic pipeline added as an opt-in engine; generated skills remain the primary artifact
 
@@ -82,6 +87,7 @@ see `_plans/archive/` for historical plans.
 - **Non-goal for v1:** The pivot does not replace generated skills with platform-specific agent packs and does not adopt the Squad SDK as a runtime dependency. Squad informs the architecture, but cogworks keeps a platform-agnostic core and defers native Copilot adapter work.
 - **Rationale:** This preserves cogworks' current portability and benchmarkability while allowing the generation pipeline itself to become agentic. The pivot is deliberately asymmetric: internal execution changes first, product artifact changes later only if benchmarks justify them.
 - **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/agentic-runtime.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/README.md`, `skills/cogworks/metadata.json`, `README.md`, `TESTING.md`, `_plans/archive/2026-03-06-cogworks-agentic-pivot.md`.
+- **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
 
 ## [D-026] `quality_score` schema defined — behavioral delta replaces null field
 
