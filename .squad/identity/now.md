@@ -17,6 +17,8 @@ active_issues:
   - M11 cross-source connection count (Dallas)
 ---
 
+> Scope warning: this is a Squad-local focus snapshot, not the canonical repo-wide current state. Check `_plans/DECISIONS.md` and active `_plans/*.md` first for project-level truth.
+
 # What We're Focused On
 
 Implementing the 12 prioritised mitigations from `docs/cogworks-agent-risk-analysis.md`. Team assembled: Ripley (Lead), Ash (Security), Dallas (Pipeline), Hudson (Tests), Lambert (Compatibility). See `.squad/routing.md` for work assignment.

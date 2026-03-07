@@ -95,3 +95,4 @@ Allowed outcomes after the rerun:
 2. `simplify`
 
 Do **not** recommend or implement `kill` without explicit user confirmation.
+<!-- archived: 2026-03-07 during context-hygiene cleanup; this is historical session handoff material, not an active in-flight plan -->

@@ -1,5 +1,7 @@
 # Cogworks Squad Decisions
 
+> Scope warning: this is Squad-local coordination memory, not the repo-wide decision ledger. For canonical project decisions, load `_plans/DECISIONS.md` first.
+
 Consolidated decision record for cross-agent coordination and architectural choices.
 
 **Last audited:** 2026-03-05T00:46:55Z

@@ -2,16 +2,18 @@
 
 ## Current Testing Surface
 
-The benchmark implementation has been removed. The active testing strategy for cogworks is now:
+The active testing strategy for cogworks is now:
 
 | Layer | What it tests | Invokes live agent? | Cost |
 |---|---|---|---|
 | **1 — Deterministic** | Skill file structure, YAML, citations, sections, metadata | No | Free / instant |
 | **2 — Trigger smoke** | Whether the right skill activates on representative prompts | Yes | Low |
 | **3 — Agentic contract smoke** | Whether the new `--engine agentic` flow writes the required runtime artifacts and still produces a generated skill | Optional live run | Low to medium |
-| **4 — Behavioral evaluation** | Quality/activation judged against external rubrics | Pending harness completion | High |
+| **4 — Skill benchmark (pilot harness)** | Paired skill-vs-skill efficacy comparison with separate activation diagnostics | Optional live run | Medium to high |
+| **5 — Behavioral evaluation (broader harness)** | Quality/activation judged against external rubrics outside the skill benchmark surface | Pending reconstruction | High |
 
 Use these layers in order. Do not make quality or performance claims from Layer 1 or Layer 3 alone.
+The canonical skill-benchmark specification now lives under `evals/`. See `evals/README.md` and `evals/skill-benchmark/README.md`.
 
 ---
 
@@ -20,6 +22,8 @@ Use these layers in order. Do not make quality or performance claims from Layer 
 > Before opening an AI coding session: `git clean -fdx tests/results/`
 
 These cached outputs are gitignored, but on-disk files can still leak into agent context.
+
+Prefer disposable output roots outside the repository for live smoke runs and benchmark runs. Do not use repo-local `.cogworks-runs/` or `tmp-agentic-output/` as your default scratch paths.
 
 ---
 
@@ -199,7 +203,44 @@ It is **not** sufficient on its own to claim quality superiority.
 
 ---
 
-## Layer 4 — Behavioral Evaluation
+## Layer 4 — Skill Benchmark (Pilot Harness)
+
+The repository now includes a runnable pilot harness for objective skill-vs-skill comparison.
+
+Authoritative references:
+
+- `evals/README.md`
+- `evals/skill-benchmark/README.md`
+- `evals/skill-benchmark/runbook.md`
+- `tests/framework/README.md`
+
+Primary runner:
+
+```bash
+python3 scripts/run-skill-benchmark.py \
+  --cases-file tests/test-data/skill-benchmark-pilot/cases.jsonl \
+  --candidate-a skill-a \
+  --candidate-a-command "python3 tests/test-data/skill-benchmark-pilot/fake-runner.py" \
+  --candidate-b skill-b \
+  --candidate-b-command "python3 tests/test-data/skill-benchmark-pilot/fake-runner.py" \
+  --model gpt-5-codex \
+  --agent-surface codex-cli \
+  --trials 3
+```
+
+This pilot harness is the current canonical surface for objective skill comparison.
+It is intentionally narrower than the older broad behavioral-eval concept:
+
+- fixed model, fixed agent surface, fixed environment
+- skill changes only
+- efficacy scored separately from activation
+- normalized observation artifacts required
+
+Do not treat old docs that mention `benchmarks/comparison/**` or deleted trace folders as current benchmark instructions.
+
+---
+
+## Layer 5 — Behavioral Evaluation
 
 Behavioral evaluation remains under reconstruction after D-022/D-026. Current authoritative references:
 

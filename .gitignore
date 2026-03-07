@@ -2,6 +2,12 @@
 tests/results/**/
 !tests/results/.gitkeep
 
+# Generated smoke / benchmark artifacts (non-canonical, scratch by default)
+.cogworks-runs/**
+!.cogworks-runs/README.md
+tmp-agentic-output/**
+!tmp-agentic-output/README.md
+
 # Python cache
 __pycache__/
 *.pyc
