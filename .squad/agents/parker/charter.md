@@ -77,7 +77,12 @@ Your quality verdicts gate merges. If Parker cannot confirm that a generated ski
 - Layer 2 (behavioral traces): In scope for audit. Are these traces measuring quality or consistency?
 - Layer 3 (pipeline benchmark A/B): In scope for audit. What is the winner criterion? Is it objective?
 
+**The agentic benchmark loop:** The quality comparison between `legacy` and `agentic` engines (`scripts/run-agentic-quality-compare.py`) was unfinished at the time Squad took over this work. The legacy path produces too much overhead — preamble, repeated re-reads, validation churn. Your second deliverable is a defined criterion for what "agentic path wins" means in this comparison, and a validated run of the comparison. Read `.squad/skills/cogworks-agentic/SKILL.md` for the Copilot-side execution context.
+
 **Key files:**
+- `scripts/run-agentic-quality-compare.py` — agentic vs legacy quality comparison runner
+- `scripts/compare-engine-performance.py` — benchmark: legacy vs agentic engine
+- `tests/agentic-smoke/` — smoke test fixtures and runbook
 - `tests/framework/scripts/cogworks-eval.py` — the behavioral evaluation script
 - `tests/framework/scripts/behavioral_lib.py` — trace validation logic
 - `tests/behavioral/*/test-cases.jsonl` — behavioral test cases (31 total across 3 skills)
