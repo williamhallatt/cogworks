@@ -45,7 +45,7 @@ Provide sources -> choose an execution engine -> `cogworks` synthesises them via
 7. Example Collection
 8. Narrative Construction
 
-For a full system deep dive, see [this](./docs/cogworks-system-deep-dive-2026-02-26.md)
+For the current system architecture, see [agentic-runtime.md](./skills/cogworks/agentic-runtime.md).
 
 ## Using `cogworks`
 

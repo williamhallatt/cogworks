@@ -63,6 +63,8 @@
 - `python3 tests/framework/scripts/cogworks-eval.py behavioral scaffold --skill <slug>` scaffolds behavioral test cases for new skills. *(Behavioral evaluation pending reconstruction — D-022/D-023)*
 - `bash scripts/run-recursive-round.sh --round-manifest tests/datasets/recursive-round/round-manifest.local.json --mode fast` runs a fast recursive round.
 - `bash scripts/validate-recursive-docs.sh` validates recursive workflow docs consistency.
+- `bash scripts/test-agentic-contract.sh` validates the agentic runtime contract surface (docs, stage graph, adapters, deterministic checks).
+- `bash scripts/validate-agentic-run.sh --run-root <run-root> --skill-path <skill-path>` validates a completed agentic run's artifacts. See `tests/agentic-smoke/README.md` for the live smoke runbook.
 
 ## Coding Style & Naming Conventions
 - Prefer Markdown + Bash clarity: short sections, explicit headings, and executable examples.
