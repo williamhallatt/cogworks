@@ -32,27 +32,5 @@ Recorded architectural decisions D-020 and D-021 in `_plans/DECISIONS.md`. Verif
 
 **Follow-up noted:** Lambert's compatibility template note (cogworks-learn generated-skill guidance) is documented but not yet enforced in generation checklist. Low-priority follow-up for next round.
 
-**Team coordination (Round 3):** All five agents completed parallel work on 6 gaps with zero conflicts. Orchestration, session log, decision merge, and history updates all captured for commit.
-
-- **Learnings**
-
 - **Quality calibration vs capability gating are distinct concerns.** Model capability requirements (Sonnet-class or above) address whether the model *can* synthesize; quality calibration addresses whether it *does* synthesize with appropriate depth. The anti-superficiality gate added to Self-Verification targets the latter — it forces the model to introspect on its own output before declaring completion. The key design insight: a model that finds zero tensions between multiple sources has almost certainly under-analyzed, so "all clear" is the red flag, not the green light.
-
-**2026-03-03 — Team coordination notes**
-
-- Dallas implemented pipeline guards (M5, M11, D3, D7) addressing overwrite protection, cross-source synthesis validation, CDR completeness, and convergence risk.
-- Ash implemented security guards (D2, D1, D1) addressing escalation boundaries, stale skill detection, and intent clarification.
-- Hudson added generalization probe and edge case tests (D8) plus pre-release CI gate to catch circular verification failures.
-- Lambert documented Codex behavioral capture and skills-lock schema; recommended AGENTS/CLAUDE dedup approach.
-
-### 2026-03-04: Context-Impact Remediation
-- Added context-budget warning bullet to AGENTS.md Auto-Loading hazard section
-- Improves awareness of squad.agent.md circular edit hazard during skill development
-- Sharpens developer friction point for F4/F5 risk mitigation
-
-### 2026-03-04: Gap Closure Review (Self-Knowledge Audit)
-- Recorded D-020 (deterministic delimiter neutralisation) and D-021 (CI gate fails on missing traces) in `_plans/DECISIONS.md`.
-- Verified all four agents' changes (Ash/M2, Dallas/D9, Lambert/D6, Hudson/CI gate) are coherent — no cross-agent conflicts found.
-- Key insight: behavioral-only security boundaries are insufficient when the attack surface is literal string content. Deterministic preprocessing is the correct layer for delimiter integrity.
-- Follow-up noted: Lambert's compatibility template note is documented but not yet enforced in cogworks-learn's generation checklist.
 
