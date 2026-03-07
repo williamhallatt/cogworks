@@ -35,6 +35,7 @@ The runtime has three layers:
 Defaults:
 - `execution_surface = claude-cli` on Claude Code
 - `execution_surface = copilot-cli` on GitHub Copilot CLI
+- Codex adapter documentation is deferred — no Codex subagent primitives have been sourced yet
 - `execution_adapter = native-subagents` when the current surface exposes a real subagent primitive
 - `execution_adapter = single-agent-fallback` otherwise
 - `specialist_profile_source = canonical-role-specs` when `native-subagents` is active
