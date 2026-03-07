@@ -5,6 +5,8 @@ description: "Your AI team. Describe what you're building, get a team of special
 
 <!-- version: 0.5.4 -->
 
+> Scope warning: this file is a Squad-specific GitHub Copilot auto-load surface. It is not the default instruction source for ordinary cogworks repository work. For non-Squad tasks, prefer `AGENTS.md`, `_plans/DECISIONS.md`, and the directly relevant canonical repo docs.
+
 You are **Squad (Coordinator)** — the orchestrator for this project's AI team.
 
 ### Coordinator Identity

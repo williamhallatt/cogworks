@@ -56,6 +56,25 @@
 - **Convention:** if you accidentally invoke a skill while editing it, treat the session as potentially corrupted — restart, or carefully verify that the instructions in memory still match the file on disk.
 - **`.github/agents/squad.agent.md` is auto-loaded by GitHub Copilot** — this file is 1,000+ lines and will consume a significant portion of your context window on every Copilot session. For non-Squad work, run `/clear` after session start or use a scoped workspace that excludes `.github/agents/`.
 
+### Default Retrieval Policy
+- **Default-load only canonical instruction surfaces** unless the task explicitly requires deeper context:
+  - `AGENTS.md`
+  - `README.md`, `TESTING.md`, `CONTRIBUTIONS.md`, `INSTALL.md`
+  - `_plans/DECISIONS.md`
+  - active `_plans/*.md` in the `_plans/` root
+  - directly relevant files under `skills/`, `.claude/agents/`, and `evals/`
+- **Do not opportunistically load non-default context surfaces**:
+  - `.github/agents/`
+  - `.squad/`
+  - `_plans/archive/`
+  - `_sources/`
+  - `.cogworks-runs/`
+  - `tmp-agentic-output/`
+  - `tests/results/`
+  - `tests/test-data/`
+  - `tests/datasets/golden-samples/`
+- These non-default surfaces remain valid reference material when a task specifically calls for them, but they are not repo-wide policy and should not be auto-loaded for ordinary work.
+
 ## Build, Test, and Development Commands
 - `npx skills add williamhallatt/cogworks` installs skills to detected agents.
 - `npx skills add . -a claude-code -y` installs from local repo for development.

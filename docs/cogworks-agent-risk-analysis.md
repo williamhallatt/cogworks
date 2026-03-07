@@ -1,5 +1,7 @@
 # Cogworks Agent Risk Analysis
 
+> Historical note: this is a point-in-time risk analysis from 2026-03-03, not the canonical current-state runbook. For settled decisions and current repo policy, load `_plans/DECISIONS.md` and `AGENTS.md` first.
+
 *Analyst: GitHub Copilot (solution architect mode)*
 *Date: 2026-03-03*
 *Scope: cogworks v3.3.0 — agents working on and using the toolchain*
