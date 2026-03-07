@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogworks.dev/evals/skill-benchmark/judge-output.schema.json",
+  "title": "Skill Benchmark Judge Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "score",
+    "verdict",
+    "confidence",
+    "dimension_scores",
+    "issues"
+  ],
+  "properties": {
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "fail",
+        "tie",
+        "uncertain"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "dimension_scores": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reasoning_summary": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    }
+  }
+}

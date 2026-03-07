@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogworks.dev/evals/skill-benchmark/observation.schema.json",
+  "title": "Skill Benchmark Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "benchmark_id",
+    "case_id",
+    "candidate_id",
+    "trial_id",
+    "model",
+    "agent_surface",
+    "invoked",
+    "completed",
+    "commands",
+    "tool_calls",
+    "files_written",
+    "timing",
+    "cost"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "benchmark_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trial_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_surface": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tool_inventory": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "invoked": {
+      "type": "boolean"
+    },
+    "completed": {
+      "type": "boolean"
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/commandEvent"
+      }
+    },
+    "tool_calls": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/toolCall"
+      }
+    },
+    "files_written": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fileWrite"
+      }
+    },
+    "process_violations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "safety_violations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "timing": {
+      "$ref": "#/$defs/timing"
+    },
+    "cost": {
+      "$ref": "#/$defs/cost"
+    },
+    "output_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "artifact_root": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    }
+  },
+  "$defs": {
+    "commandEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "exit_code"
+      ],
+      "properties": {
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cwd": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "duration_ms": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "default": null
+        }
+      }
+    },
+    "toolCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_name",
+        "success"
+      ],
+      "properties": {
+        "tool_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "success": {
+          "type": "boolean"
+        },
+        "duration_ms": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "default": null
+        }
+      }
+    },
+    "fileWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes_written"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes_written": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "wall_clock_ms"
+      ],
+      "properties": {
+        "wall_clock_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "step_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "default": null
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_tokens",
+        "output_tokens"
+      ],
+      "properties": {
+        "input_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "output_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "estimated_usd": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "default": null
+        }
+      }
+    }
+  }
+}
