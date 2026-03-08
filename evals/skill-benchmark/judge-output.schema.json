@@ -5,6 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "judge_model",
     "score",
     "verdict",
     "confidence",
@@ -12,6 +13,10 @@
     "issues"
   ],
   "properties": {
+    "judge_model": {
+      "type": "string",
+      "minLength": 1
+    },
     "score": {
       "type": "number",
       "minimum": 0,

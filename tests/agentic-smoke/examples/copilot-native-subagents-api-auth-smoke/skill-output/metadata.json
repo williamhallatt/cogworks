@@ -5,8 +5,8 @@
   "execution_surface": "copilot-cli",
   "execution_adapter": "native-subagents",
   "generated_at": "2026-03-07T09:47:28Z",
-  "run_root": ".cogworks-runs/api-auth-smoke-copilot-smoke",
-  "skill_path": "tmp-agentic-output/api-auth-smoke",
+  "run_root": "tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/run-root",
+  "skill_path": "tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/skill-output",
   "stage_completed": "skill-packaging",
   "sources": [
     {

@@ -121,6 +121,9 @@
         "null"
       ],
       "default": null
+    },
+    "integrity": {
+      "$ref": "#/$defs/integrity"
     }
   },
   "$defs": {
@@ -243,6 +246,36 @@
           ],
           "minimum": 0,
           "default": null
+        }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trace_mode",
+        "raw_event_count",
+        "raw_event_parse_errors",
+        "observation_complete"
+      ],
+      "properties": {
+        "trace_mode": {
+          "type": "string",
+          "enum": [
+            "live",
+            "replay"
+          ]
+        },
+        "raw_event_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "raw_event_parse_errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observation_complete": {
+          "type": "boolean"
         }
       }
     }

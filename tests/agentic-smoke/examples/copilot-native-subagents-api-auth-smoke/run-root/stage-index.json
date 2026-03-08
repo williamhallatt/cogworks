@@ -1,5 +1,5 @@
 {
-  "run_id": "api-auth-smoke-copilot-smoke-20260307",
+  "run_id": "copilot-native-subagents-api-auth-smoke-example-20260307",
   "stages": [
     {"stage": "source-intake", "status": "pass", "dir": "source-intake"},
     {"stage": "synthesis", "status": "pass", "dir": "synthesis"},

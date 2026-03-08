@@ -1,5 +1,5 @@
 {
-  "run_id": "api-auth-smoke-copilot-smoke-20260307",
+  "run_id": "copilot-native-subagents-api-auth-smoke-example-20260307",
   "skill_name": "api-auth-smoke",
   "engine_mode": "agentic",
   "agentic_path": "agentic-short-path",
@@ -8,8 +8,8 @@
   "execution_mode": "subagent",
   "specialist_profile_source": "canonical-role-specs",
   "model_policy": "inherit-session-model",
-  "run_root": ".cogworks-runs/api-auth-smoke-copilot-smoke",
-  "skill_path": "tmp-agentic-output/api-auth-smoke",
+  "run_root": "tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/run-root",
+  "skill_path": "tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/skill-output",
   "stages_expected": ["source-intake", "synthesis", "skill-packaging", "deterministic-validation", "final-review"],
   "stages_completed": ["source-intake", "synthesis", "skill-packaging", "deterministic-validation", "final-review"],
   "started_at": "2026-03-07T09:44:00Z",
