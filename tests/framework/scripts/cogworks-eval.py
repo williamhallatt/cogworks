@@ -393,21 +393,6 @@ def behavioral_scaffold(args: argparse.Namespace) -> int:
     return 0
 
 
-def pipeline_benchmark_scaffold(args: argparse.Namespace) -> int:
-    from pipeline_benchmark import scaffold_layout
-    return scaffold_layout(args)
-
-
-def pipeline_benchmark_run(args: argparse.Namespace) -> int:
-    from pipeline_benchmark import run_benchmark
-    return run_benchmark(args)
-
-
-def pipeline_benchmark_summarize(args: argparse.Namespace) -> int:
-    from pipeline_benchmark import summarize_benchmark
-    return summarize_benchmark(args)
-
-
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Cogworks evaluation CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -443,57 +428,12 @@ def build_parser() -> argparse.ArgumentParser:
     scaffold.add_argument("--force", action="store_true")
     scaffold.set_defaults(func=behavioral_scaffold)
 
-    pipeline = sub.add_parser("pipeline-benchmark", help="Cross-pipeline benchmark")
-    pipeline_sub = pipeline.add_subparsers(dest="subcommand", required=True)
-
-    pb_scaffold = pipeline_sub.add_parser("scaffold", help="Scaffold benchmark layout")
-    pb_scaffold.add_argument("--manifest", default="benchmarks/comparison/datasets/pipeline-benchmark/manifest.jsonl")
-    pb_scaffold.add_argument("--results-root", default="benchmarks/comparison/results/pipeline-benchmark")
-    pb_scaffold.add_argument("--run-id", required=True)
-    pb_scaffold.add_argument("--repeats", type=int, default=1)
-    pb_scaffold.add_argument("--variant", action="append", default=[])
-    pb_scaffold.add_argument("--force", action="store_true")
-    pb_scaffold.add_argument("--pipeline", action="append", default=[])
-    pb_scaffold.set_defaults(func=pipeline_benchmark_scaffold)
-
-    pb_run = pipeline_sub.add_parser("run", help="Run benchmark commands")
-    pb_run.add_argument("--manifest", default="benchmarks/comparison/datasets/pipeline-benchmark/manifest.jsonl")
-    pb_run.add_argument("--results-root", default="benchmarks/comparison/results/pipeline-benchmark")
-    pb_run.add_argument("--run-id", required=True)
-    pb_run.add_argument("--repeats", type=int, default=1)
-    pb_run.add_argument("--variant", action="append", default=[])
-    pb_run.add_argument("--pipeline", action="append", default=[])
-    pb_run.add_argument("--command-template", action="append", default=[])
-    pb_run.add_argument("--cwd", default=None)
-    pb_run.add_argument("--dry-run", action="store_true")
-    pb_run.add_argument("--force", action="store_true")
-    pb_run.set_defaults(func=pipeline_benchmark_run)
-
-    pb_summary = pipeline_sub.add_parser("summarize", help="Summarize benchmark")
-    pb_summary.add_argument("--manifest", default="benchmarks/comparison/datasets/pipeline-benchmark/manifest.jsonl")
-    pb_summary.add_argument("--results-root", default="benchmarks/comparison/results/pipeline-benchmark")
-    pb_summary.add_argument("--run-id", required=True)
-    pb_summary.add_argument("--pipeline", action="append", default=[])
-    pb_summary.add_argument("--output-json", default=None)
-    pb_summary.add_argument("--output-md", default=None)
-    pb_summary.set_defaults(func=pipeline_benchmark_summarize)
-
     return parser
 
 
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
-
-    if args.command == "pipeline-benchmark":
-        if not args.pipeline:
-            args.pipeline = ["claude", "codex"]
-        if hasattr(args, "variant") and not args.variant:
-            args.variant = ["clean"]
-        if getattr(args, "output_json", None) is None:
-            args.output_json = f"{args.results_root}/{args.run_id}/benchmark-summary.json"
-        if getattr(args, "output_md", None) is None:
-            args.output_md = f"{args.results_root}/{args.run_id}/benchmark-report.md"
 
     return args.func(args)
 

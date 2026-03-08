@@ -185,10 +185,10 @@ validate_dispatch_record() {
 
 SURFACE="$(jq -r '.execution_surface' "$RUN_ROOT/run-manifest.json")"
 if [[ "$SURFACE" == "claude-cli" ]]; then
-  validate_dispatch_record "source-intake" "intake-analyst" "intake-analyst" "claude-agent-file" ".claude/agents/cogworks-intake-analyst.md" "pinned-haiku"
-  validate_dispatch_record "synthesis" "synthesizer" "synthesizer" "claude-agent-file" ".claude/agents/cogworks-synthesizer.md" "pinned-sonnet"
-  validate_dispatch_record "skill-packaging" "composer" "composer" "claude-agent-file" ".claude/agents/cogworks-composer.md" "pinned-sonnet"
-  validate_dispatch_record "deterministic-validation" "validator" "validator" "claude-agent-file" ".claude/agents/cogworks-validator.md" "pinned-haiku"
+  validate_dispatch_record "source-intake" "intake-analyst" "intake-analyst" "claude-role-profile" "skills/cogworks/role-profiles.json#intake-analyst" "pinned-haiku"
+  validate_dispatch_record "synthesis" "synthesizer" "synthesizer" "claude-role-profile" "skills/cogworks/role-profiles.json#synthesizer" "pinned-sonnet"
+  validate_dispatch_record "skill-packaging" "composer" "composer" "claude-role-profile" "skills/cogworks/role-profiles.json#composer" "pinned-sonnet"
+  validate_dispatch_record "deterministic-validation" "validator" "validator" "claude-role-profile" "skills/cogworks/role-profiles.json#validator" "pinned-haiku"
 elif [[ "$SURFACE" == "copilot-cli" ]]; then
   validate_dispatch_record "source-intake" "intake-analyst" "intake-analyst" "copilot-inline-prompt" "skills/cogworks/role-profiles.json#intake-analyst" "inherit-session-model"
   validate_dispatch_record "synthesis" "synthesizer" "synthesizer" "copilot-inline-prompt" "skills/cogworks/role-profiles.json#synthesizer" "inherit-session-model"

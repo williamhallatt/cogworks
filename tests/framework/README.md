@@ -70,6 +70,7 @@ bash scripts/run-recursive-round.sh \
 python3 tests/framework/scripts/cogworks-eval.py behavioral scaffold --skill cogworks-newskill
 bash scripts/run-trigger-smoke-tests.sh claude
 bash scripts/run-trigger-smoke-tests.sh codex
+bash tests/run-trigger-smoke-parser-smoke.sh
 ```
 
 > **Note:** `cogworks-eval.py behavioral run` is blocked — traces were deleted (D-022). Capture scripts have been removed (D-023). See Parker's mandate: `.squad/agents/parker/charter.md`.

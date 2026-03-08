@@ -7,6 +7,16 @@ audited_through: 2026-03-08
 Settled decisions for the cogworks project. Agents load this file for context;
 see `_plans/archive/` for historical plans.
 
+## [D-038] Test surface subtraction removes dead contracts and keeps only maintained validation paths
+
+- **Date:** 2026-03-08 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** The maintained test surface is reduced to the validation paths that still correspond to live product/runtime contracts. File-backed Claude specialist bindings under `.claude/agents/` are retired in favor of canonical role-profile bindings recorded directly from `skills/cogworks/role-profiles.json`. The dead `benchmarks/comparison/**` pipeline-benchmark surface is retired rather than restored. Recursive rounds remain maintained only in `--mode fast`; the local recursive manifest hash is re-pinned to the current frozen bundle. The stale pre-release CI gate script is deleted because it hard-failed on behavioral traces that D-022 intentionally removed. Trigger smoke remains active, but its runner execution and activation parsing must be runner-specific for current Claude and Codex CLIs.
+- **Rationale:** Several failing tests were not exposing product regressions; they were enforcing contracts that the repository had already abandoned in practice. Restoring every removed surface would add complexity without improving trust. Subtracting dead paths leaves one coherent, documented test story.
+- **Operational implication:** Maintainers should rely on deterministic checks, black-box tests, the live sub-agent contract smoke, the skill benchmark smoke, trigger smoke, and the fast recursive round. They should not expect `.claude/agents/**`, `tests/ci-gate-check.sh`, `tests/run-pipeline-benchmark-smoke.sh`, or recursive deep-mode benchmark wiring to exist.
+- **Supersedes:** D-029 for the file-backed Claude binding detail, D-018 for the behavioral-trace CI gate, and any live docs/scripts still treating `benchmarks/comparison/**` as an active benchmark surface.
+- **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/copilot-adapter.md`, `skills/cogworks/role-profiles.json`, `scripts/validate-agentic-run.sh`, `scripts/test-agentic-contract.sh`, `scripts/render-agentic-role-bindings.py`, `scripts/run-recursive-round.sh`, `scripts/recursive-env.example.sh`, `scripts/run-trigger-smoke-tests.sh`, `tests/framework/scripts/cogworks-eval.py`, `tests/datasets/recursive-round/README.md`, `tests/datasets/recursive-round/round-manifest.local.json`, `TESTING.md`, `AGENTS.md`, `tests/run-pipeline-benchmark-smoke.sh` (deleted), `tests/ci-gate-check.sh` (deleted), `_plans/archive/2026-03-08-test-surface-subtraction-and-harness-refresh.md`.
+
 ## [D-037] Cogworks resets to one trust-first product entry point; sub-agent build path becomes internal maintainer machinery
 
 - **Date:** 2026-03-08 | **By:** William (owner)

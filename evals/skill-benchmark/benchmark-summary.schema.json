@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogworks.dev/evals/skill-benchmark/benchmark-summary.schema.json",
+  "title": "Skill Benchmark Summary",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "benchmark_id",
+    "skills_compared",
+    "model",
+    "judge_model",
+    "agent_surface",
+    "trial_count",
+    "case_count",
+    "mean_delta",
+    "win_rate",
+    "candidate_a_win_rate",
+    "candidate_b_win_rate",
+    "tie_rate",
+    "confidence_interval_95",
+    "activation_metrics",
+    "safety_metrics",
+    "cost_metrics",
+    "verdict",
+    "ranking_eligible",
+    "decision_eligible",
+    "activation_gate_passed",
+    "schema_validation_passed",
+    "invalid_trial_policy_applied",
+    "valid_trials",
+    "invalid_trials",
+    "replay_evidence_present",
+    "terminal_status"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "benchmark_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "skills_compared": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_a",
+        "candidate_b"
+      ],
+      "properties": {
+        "candidate_a": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_b": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "judge_model": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "agent_surface": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trial_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "case_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "mean_delta": {
+      "type": "number"
+    },
+    "win_rate": {
+      "type": "number"
+    },
+    "candidate_a_win_rate": {
+      "type": "number"
+    },
+    "candidate_b_win_rate": {
+      "type": "number"
+    },
+    "tie_rate": {
+      "type": "number"
+    },
+    "confidence_interval_95": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number"
+      }
+    },
+    "activation_metrics": {
+      "type": "object"
+    },
+    "safety_metrics": {
+      "type": "object"
+    },
+    "cost_metrics": {
+      "type": "object"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "candidate_a",
+        "candidate_b",
+        "no_clear_winner",
+        "insufficient_evidence"
+      ]
+    },
+    "ranking_eligible": {
+      "type": "boolean"
+    },
+    "decision_eligible": {
+      "type": "boolean"
+    },
+    "activation_gate_passed": {
+      "type": "object"
+    },
+    "schema_validation_passed": {
+      "type": "boolean"
+    },
+    "invalid_trial_policy_applied": {
+      "type": "boolean"
+    },
+    "valid_trials": {
+      "type": "object"
+    },
+    "invalid_trials": {
+      "type": "object"
+    },
+    "replay_evidence_present": {
+      "type": "boolean"
+    },
+    "terminal_status": {
+      "type": "string",
+      "enum": [
+        "completed"
+      ]
+    }
+  }
+}

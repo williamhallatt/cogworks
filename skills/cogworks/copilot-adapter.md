@@ -20,14 +20,8 @@ This adapter is valid only when Copilot exposes the delegated-task behavior
 required for the sub-agent build path. If it does not, stop and surface that
 limitation rather than inventing an equivalent-looking fallback.
 
-## Agent Registration
-
-Copilot CLI reads `.claude/agents/` for specialist definitions. The four
-`cogworks` specialist files in that directory are available to Copilot's task
-surface under the same names.
-
-Copilot ignores Claude-specific frontmatter such as pinned model selections, so
-`inherit-session-model` is the truthful default policy.
+Copilot ignores Claude-specific model pinning, so `inherit-session-model` is
+the truthful default policy.
 
 ## Canonical Role Bindings
 

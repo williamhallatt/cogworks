@@ -1,0 +1,4 @@
+WARNING: failed to clean up stale arg0 temp dirs: Permission denied (os error 13)
+{"type":"thread.started","thread_id":"fixture-thread"}
+2026-03-08T05:37:55.058798Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: Operation not permitted (os error 1), url: wss://chatgpt.com/backend-api/codex/responses
+{"type":"error","message":"Reconnecting... 2/5 (stream disconnected before completion: Operation not permitted (os error 1))"}
