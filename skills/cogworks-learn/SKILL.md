@@ -40,6 +40,15 @@ Load [reference.md](reference.md) only if one of these is true:
 
 Do not load `patterns.md`, `examples.md`, or `persuasion-principles.md` unless blocked on a concrete issue they uniquely answer.
 
+## Response Calibration (Standalone Invocation)
+
+When invoked directly (not via cogworks), match response length to the scope:
+- Single-gate review or checklist check: one concise block, not a full report.
+- Full skill generation: produce all staged artifacts; keep coordinator-visible
+  logs out of the user-facing response unless requested.
+- Rewrite diffs: show the changed lines, not the full file, unless the file is
+  short.
+
 ## Core Expertise Areas
 
 1. **Skill Architecture** - Directory-based system with SKILL.md entrypoint and supporting files
