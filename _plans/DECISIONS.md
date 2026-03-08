@@ -1,11 +1,26 @@
 ---
-audited_through: 2026-03-07
+audited_through: 2026-03-08
 ---
 
 # Architectural Decisions
 
 Settled decisions for the cogworks project. Agents load this file for context;
 see `_plans/archive/` for historical plans.
+
+## [D-035] Infrastructure debt removed; untrusted-data gate implemented at source-intake; next cycle must run the experiment
+
+- **Date:** 2026-03-08 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** Three retrospective actions taken following a review of commits b6208ff → HEAD:
+  1. **`skill-benchmark-codex-adapter.py` deleted.** The 279-line Codex CLI adapter was premature implementation — it targeted a platform with no subagent primitives. The design intent is preserved as a spec doc at `evals/skill-benchmark/codex-adapter-spec.md`. Re-implement once Codex ships a stable subagent primitive.
+  2. **`compare-engine-performance.py` and `run-engine-performance-compare.sh` deleted.** Three scripts targeted the same concern (comparing legacy vs agentic engine) with no evidence any comparison was run. `scripts/run-agentic-quality-compare.py` is the single canonical comparison script. One script; one experiment; results before more tooling.
+  3. **Explicit untrusted-data classification gate added at `source-intake`.** The `intake-analyst` must now produce `source-intake/source-trust-gate.json` with `gate_passed: true` and each source explicitly classified before synthesis can start. This closes the gap Ash's charter identified: source provenance labels existed in the run artifacts but were not enforced as a hard blocking gate. The gate is deterministically validated by `validate-agentic-run.sh`.
+- **Rationale:** The agentic engine v2 is essentially unvalidated against the objective. D-030/D-031/D-032 produced a benchmark framework with no benchmark results. D-028/D-029 produced an engine with no quality comparison against the legacy path. The infrastructure debt was making the gap harder to see. Removing dead code and enforcing the security gate makes the remaining gap explicit: the experiment has not been run.
+- **What the next cycle must do (non-negotiable):**
+  - Run the native Claude Code end-to-end agentic smoke (all four subagents, `execution_adapter = native-subagents`, `dispatch-manifest.json` produced). This has not been demonstrated.
+  - Run the 3-case quality comparison via `scripts/run-agentic-quality-compare.py` and produce `benchmark-summary.json` + `benchmark-report.md`. Without this, the agentic engine has no evidence it earns its complexity.
+- **What was explicitly deferred:** Behavioral evaluation reconstruction (D-022/D-023 long-deferred item) and Codex adapter implementation remain future work, blocked on native quality proof first.
+- **Scope:** `scripts/skill-benchmark-codex-adapter.py` (deleted), `scripts/compare-engine-performance.py` (deleted), `scripts/run-engine-performance-compare.sh` (deleted), `evals/skill-benchmark/codex-adapter-spec.md` (added), `skills/cogworks/role-profiles.json`, `.claude/agents/cogworks-intake-analyst.md`, `skills/cogworks/agentic-runtime.md`, `scripts/validate-agentic-run.sh`, `_plans/DECISIONS.md`.
 
 ## [D-033] Default agent retrieval is restricted to canonical instruction surfaces; research, history, and generated artifacts are non-default
 

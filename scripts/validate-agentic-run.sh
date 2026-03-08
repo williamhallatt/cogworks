@@ -425,6 +425,14 @@ done
 check_nonempty_file "$RUN_ROOT/source-intake/source-inventory.json" "source-intake/source-inventory.json exists and is non-empty"
 check_nonempty_file "$RUN_ROOT/source-intake/source-manifest.json" "source-intake/source-manifest.json exists and is non-empty"
 check_nonempty_file "$RUN_ROOT/source-intake/source-trust-report.md" "source-intake/source-trust-report.md exists and is non-empty"
+check_nonempty_file "$RUN_ROOT/source-intake/source-trust-gate.json" "source-intake/source-trust-gate.json exists and is non-empty"
+if [[ -f "$RUN_ROOT/source-intake/source-trust-gate.json" ]]; then
+  if jq -e '.gate_passed == true and ((.gate_version | type) == "string") and ((.sources | type) == "array") and ((.sources | length) > 0)' "$RUN_ROOT/source-intake/source-trust-gate.json" >/dev/null; then
+    pass "source-trust-gate.json has gate_passed: true with classified sources"
+  else
+    fail "source-trust-gate.json missing gate_passed: true or classified sources"
+  fi
+fi
 
 check_nonempty_file "$RUN_ROOT/synthesis/synthesis.md" "synthesis/synthesis.md exists and is non-empty"
 check_nonempty_file "$RUN_ROOT/synthesis/cdr-registry.md" "synthesis/cdr-registry.md exists and is non-empty"
