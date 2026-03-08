@@ -172,34 +172,19 @@ Layer 3 proves that the flow works. It does **not** prove it is better than lega
 
 ## Engine Comparison
 
-Once you have one completed legacy run and one completed agentic run for the
-same fixture, generate saved comparison artifacts with:
+Run the 3-case quality comparison with:
 
 ```bash
-python3 scripts/compare-engine-performance.py \
-  --legacy-skill-path <legacy-skill-path> \
-  --legacy-log <legacy-claude-jsonl-log> \
-  --agentic-skill-path <agentic-skill-path> \
-  --agentic-log <agentic-claude-jsonl-log> \
-  --agentic-run-root <agentic-run-root> \
-  --out-dir tests/results/engine-comparison/<run-id>
+python3 scripts/run-agentic-quality-compare.py \
+  --work-root /tmp/cogworks-agentic-quality \
+  --claude-workdir /tmp/cogworks-agentic-live
 ```
 
-This emits:
-- `benchmark-summary.json`
-- `benchmark-report.md`
+This emits `benchmark-summary.json` and `benchmark-report.md`. Both files are required before any quality claim about the agentic engine is considered valid.
 
-Use the same fixture and destination style for both runs. Do not compare runs
-from different source sets or prompt surfaces.
+Use the same fixture and destination style for both runs. Do not compare runs from different source sets or prompt surfaces.
 
-The comparison report is suitable for:
-- total duration
-- API duration
-- billed token counts aggregated from Claude `modelUsage`
-- cost
-- agentic stage timing approximations
-
-It is **not** sufficient on its own to claim quality superiority.
+> **D-035:** The performance comparison script (`compare-engine-performance.py`) was deleted as infrastructure debt — three scripts with no results. `run-agentic-quality-compare.py` is the single canonical comparison script. Quality evidence must exist before performance evidence is worth collecting.
 
 ---
 

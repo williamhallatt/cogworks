@@ -46,7 +46,7 @@ For each case:
 
 For the pilot harness, candidate commands are responsible for writing the normalized observation JSON to `COGWORKS_BENCHMARK_OBSERVATION_PATH`. If the case contains `judge_only` checks, they must also write judge output to `COGWORKS_BENCHMARK_JUDGE_OUTPUT_PATH`.
 
-Codex candidate commands can use [`scripts/skill-benchmark-codex-adapter.py`](/home/will/code/cogworks/scripts/skill-benchmark-codex-adapter.py) as the bridge layer. In live mode it runs `codex exec --json`; in replay mode it converts a saved Codex event stream into the normalized observation contract for offline smoke tests.
+Codex candidate commands will use the adapter described in [`evals/skill-benchmark/codex-adapter-spec.md`](codex-adapter-spec.md) once it is implemented. Implementation is deferred until Codex exposes stable subagent primitives (D-035).
 
 If a run crashes or the environment is invalid, mark the trial invalid and rerun until both candidates have the same valid trial count.
 
@@ -153,15 +153,4 @@ python3 scripts/run-skill-benchmark.py \
 
 Codex replay smoke:
 
-```bash
-python3 scripts/run-skill-benchmark.py \
-  --benchmark-id skill-benchmark-codex-replay \
-  --cases-file tests/test-data/skill-benchmark-codex-adapter/cases.jsonl \
-  --candidate-a codex-skill \
-  --candidate-a-command "python3 scripts/skill-benchmark-codex-adapter.py --replay-events tests/test-data/skill-benchmark-codex-adapter/candidate-a-events.jsonl" \
-  --candidate-b codex-baseline \
-  --candidate-b-command "python3 scripts/skill-benchmark-codex-adapter.py --replay-events tests/test-data/skill-benchmark-codex-adapter/candidate-b-events.jsonl" \
-  --model gpt-5-codex \
-  --agent-surface codex-cli \
-  --trials 1
-```
+> **Deferred (D-035):** The Codex adapter implementation was removed as premature. This example will be restored once the adapter is implemented against a stable Codex subagent primitive. See `evals/skill-benchmark/codex-adapter-spec.md` for the design.

@@ -10,6 +10,7 @@
         "source-intake/source-inventory.json",
         "source-intake/source-manifest.json",
         "source-intake/source-trust-report.md",
+        "source-intake/source-trust-gate.json",
         "source-intake/stage-status.json"
       ],
       "tool_scope": "read, grep/search, directory traversal, stage-artifact writes only",
