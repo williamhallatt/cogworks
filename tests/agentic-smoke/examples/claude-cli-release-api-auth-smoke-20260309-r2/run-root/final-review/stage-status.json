@@ -1,0 +1,27 @@
+{
+  "stage": "final-review",
+  "status": "pass",
+  "timestamp": "2026-03-09T00:00:00Z",
+  "run_id": "claude-cli-release-api-auth-smoke-20260309-r2",
+  "role": "coordinator",
+  "artifacts": [
+    "final-summary.md",
+    "stage-index.json",
+    "final-review/stage-status.json"
+  ],
+  "overall_build_status": "pass",
+  "stages_completed": 5,
+  "stages_passed": 5,
+  "stages_failed": 0,
+  "total_blocking_failures": 0,
+  "total_warnings": 3,
+  "skill_validation_status": "pass",
+  "installation_ready": true,
+  "blocking_failures": [],
+  "warnings": [
+    "No numbered entries found in Sources section",
+    "SKILL.md missing sections: Invocation",
+    "metadata.json: slug 'api-auth-smoke-claude-bridge' != directory 'skill-output'"
+  ],
+  "recommendation": "Skill generation complete and validated. Ready for installation or further testing."
+}

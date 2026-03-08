@@ -1,0 +1,48 @@
+{
+  "stage": "deterministic-validation",
+  "timestamp": "2026-03-09T00:00:00Z",
+  "validators_run": [
+    {
+      "name": "synthesis-validator",
+      "script": "/home/will/code/cogworks/.claude/skills/cogworks-encode/scripts/validate-synthesis.sh",
+      "target": "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/skill-output/reference.md",
+      "status": "pass",
+      "critical_failures": [],
+      "warnings": [
+        "No numbered entries found in Sources section"
+      ],
+      "checks_passed": [
+        "All required sections present",
+        "Citations present (44 found)",
+        "Code fences balanced",
+        "No forbidden patterns"
+      ]
+    },
+    {
+      "name": "skill-packaging-validator",
+      "script": "/home/will/code/cogworks/.claude/skills/cogworks-learn/scripts/validate-skill.sh",
+      "target": "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/skill-output",
+      "status": "pass",
+      "critical_failures": [],
+      "warnings": [
+        "SKILL.md missing sections: Invocation",
+        "metadata.json: slug 'api-auth-smoke-claude-bridge' != directory 'skill-output'"
+      ],
+      "checks_passed": [
+        "SKILL.md exists",
+        "Frontmatter delimiters present",
+        "Required frontmatter fields present (name, description)",
+        "Line count within limit (44/500)",
+        "reference.md required sections present",
+        "Citations present (44 found)",
+        "No forbidden patterns",
+        "Code fences balanced",
+        "Description length adequate (23 words)"
+      ]
+    }
+  ],
+  "overall_status": "pass",
+  "total_warnings": 3,
+  "total_critical_failures": 0,
+  "blocking": false
+}
