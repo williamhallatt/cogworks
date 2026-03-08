@@ -290,7 +290,7 @@ For maintainer-visible supported runs, also write run artifacts under
 
 ### 6. Validate Generated Output
 
-Run automated validation on the generated skill:
+Run automated validation on the generated skill (run steps 1 and 2 in parallel):
 
 1. **Synthesis deterministic checks (blocking)**
    ```bash
@@ -320,6 +320,10 @@ On success, return a concise result containing:
 For supported maintainer-visible sub-agent runs, you may also mention the run
 root if relevant for smoke validation. Keep that secondary to the generated
 skill path.
+
+Run artifacts under `.cogworks-runs/` are diagnostic — they are not part of
+the generated skill. The user may delete old run directories at any time.
+Do not clean up automatically; let the user decide retention.
 
 ## Success Criteria
 

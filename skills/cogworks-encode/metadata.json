@@ -1,6 +1,7 @@
 {
   "slug": "cogworks-encode",
-  "version": "v3.1.5",
+  "version": "v3.3.0",
+  "cogworks_version": "4.2.0",
   "snapshot_date": "2026-02-24",
   "topic": "Topic Synthesis Expertise",
   "author": "cogworks",

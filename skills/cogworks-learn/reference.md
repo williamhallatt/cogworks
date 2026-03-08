@@ -28,33 +28,7 @@ Agent skills are SKILL.md files that extend agent capabilities through YAML fron
 
 ## Prompt Quality Gates for Generated Skills (Required)
 
-When this skill is used by `cogworks` to generate skills, these gates are mandatory:
-
-1. **Instruction Clarity**
-- Required behaviors are written as concrete directives.
-- Normative sections avoid soft phrasing that weakens compliance.
-- Hard constraints are explicit and testable.
-- Directives include rationale ("Do X because Y") — bare directives are followed literally; rationale enables generalization.
-
-2. **Source-Faithful Reasoning**
-- Normative claims are source-backed.
-- Source contradictions are surfaced and resolved with rationale.
-- Uncertainty is stated explicitly rather than filled with unsupported inference.
-
-3. **Runtime Contract Correctness**
-- Tool names and command/schema examples match runtime behavior.
-- Guidance avoids runtime-invalid examples.
-- Safety boundaries for side-effectful actions remain explicit.
-
-4. **Canonical Placement**
-- Each rule has one canonical home.
-- Supporting files add net-new context, not restated doctrine.
-- Reference remains the source of truth.
-
-5. **Token-Dense Quality**
-- Remove ornamental prose and section bloat.
-- Preserve critical constraints while compressing wording.
-- Optimize for decision utility per token, not section count.
+See SKILL.md § Integrated Prompt Quality Gates for the mandatory gate definitions, priority order, quantitative thresholds, and the instruction quality rewrite pass. The gates below are a summary — SKILL.md is canonical.
 
 ### Instruction Quality Rewrite Pass (Required)
 
