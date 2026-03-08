@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogworks.dev/evals/skill-benchmark/case.schema.json",
+  "title": "Skill Benchmark Case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "case_id",
+    "title",
+    "category",
+    "task_prompt",
+    "expected_activation",
+    "observable_checks"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "invoked-task",
+        "hard-negative",
+        "boundary"
+      ]
+    },
+    "task_prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expected_activation": {
+      "type": "string",
+      "enum": [
+        "must_activate",
+        "may_activate",
+        "must_not_activate"
+      ]
+    },
+    "observable_checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "id",
+          "kind",
+          "weight"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "file_exists",
+              "file_contains",
+              "file_not_contains",
+              "tool_called",
+              "tool_not_called",
+              "command_called",
+              "command_not_called",
+              "json_field_equals",
+              "state_assertion",
+              "judge_only"
+            ]
+          },
+          "target": {},
+          "value": {},
+          "weight": {
+            "type": "number"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "rubric_dimensions": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "allowed_tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

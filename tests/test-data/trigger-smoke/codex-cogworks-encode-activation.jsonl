@@ -1,0 +1,3 @@
+{"type":"thread.started","thread_id":"fixture-thread"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"Using `cogworks-encode` for this turn. I’m loading the skill instructions first."}}

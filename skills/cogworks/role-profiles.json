@@ -33,9 +33,9 @@
       ],
       "bindings": {
         "claude-cli": {
-          "binding_type": "claude-agent-file",
-          "binding_ref": ".claude/agents/cogworks-intake-analyst.md",
-          "display_name": "cogworks-intake-analyst",
+          "binding_type": "claude-role-profile",
+          "binding_ref": "skills/cogworks/role-profiles.json#intake-analyst",
+          "display_name": "intake-analyst",
           "model_policy": "pinned-haiku",
           "preferred_dispatch_mode": "background",
           "tools": [
@@ -87,9 +87,9 @@
       ],
       "bindings": {
         "claude-cli": {
-          "binding_type": "claude-agent-file",
-          "binding_ref": ".claude/agents/cogworks-synthesizer.md",
-          "display_name": "cogworks-synthesizer",
+          "binding_type": "claude-role-profile",
+          "binding_ref": "skills/cogworks/role-profiles.json#synthesizer",
+          "display_name": "synthesizer",
           "model_policy": "pinned-sonnet",
           "preferred_dispatch_mode": "foreground",
           "tools": [
@@ -143,9 +143,9 @@
       ],
       "bindings": {
         "claude-cli": {
-          "binding_type": "claude-agent-file",
-          "binding_ref": ".claude/agents/cogworks-composer.md",
-          "display_name": "cogworks-composer",
+          "binding_type": "claude-role-profile",
+          "binding_ref": "skills/cogworks/role-profiles.json#composer",
+          "display_name": "composer",
           "model_policy": "pinned-sonnet",
           "preferred_dispatch_mode": "foreground",
           "tools": [
@@ -196,9 +196,9 @@
       ],
       "bindings": {
         "claude-cli": {
-          "binding_type": "claude-agent-file",
-          "binding_ref": ".claude/agents/cogworks-validator.md",
-          "display_name": "cogworks-validator",
+          "binding_type": "claude-role-profile",
+          "binding_ref": "skills/cogworks/role-profiles.json#validator",
+          "display_name": "validator",
           "model_policy": "pinned-haiku",
           "preferred_dispatch_mode": "background",
           "tools": [

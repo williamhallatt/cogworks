@@ -148,12 +148,6 @@ If the current surface is GitHub Copilot CLI, load:
 Resolve canonical role definitions before any specialist dispatch:
 - `role-profiles.json`
 
-If the current surface is Claude Code, also resolve these role bindings:
-- `../../.claude/agents/cogworks-intake-analyst.md`
-- `../../.claude/agents/cogworks-synthesizer.md`
-- `../../.claude/agents/cogworks-composer.md`
-- `../../.claude/agents/cogworks-validator.md`
-
 If the current surface cannot provide the validated sub-agent build path for the
 current request, stop and explain that this surface is not supported for the
 trust-first build flow yet. Do not silently degrade to a monolithic best-effort
