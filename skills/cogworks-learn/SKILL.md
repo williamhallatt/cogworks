@@ -101,21 +101,43 @@ Delegate this task to a subagent; only a summary should return to the parent con
 
 This preserves the parent context window for reasoning, not raw output.
 
+**Claude Code subagent type selection** — use the lightest type that fits:
+
+| Type | Model | Tools | Use when |
+|------|-------|-------|----------|
+| Explore | Haiku | Read, Grep, Glob | Read-only research, log scanning |
+| Plan | Inherits parent | Read, Grep, Glob | Planning requiring full reasoning |
+| General-purpose | Inherits parent | All tools | Tasks requiring writes or execution |
+
+**Orchestration patterns:**
+- **Parallel research** — spawn independent subagents simultaneously (background dispatch) to investigate different questions concurrently.
+- **Chaining** — sequential foreground handoff where each subagent's output feeds the next.
+
 **Claude Code:** Use `context: fork` frontmatter (Claude Code-specific) or include an `agent: Explore` instruction in the skill body.
 **Other agents:** Natural language delegation only — no frontmatter equivalent.
 
+For dispatch modes, skill preloading, failure handling, and cross-agent notes, see [reference.md § Subagent Orchestration](reference.md#subagent-orchestration).
+
 ## When NOT to Use a Skill
 
-If the instructions should apply to nearly every session in the project, use your agent's persistent configuration file instead of a skill:
-- Claude Code: `CLAUDE.md`
-- GitHub Copilot: `.github/copilot-instructions.md`
-- OpenAI Codex: `AGENTS.md`
-- Most others: check your agent's documentation for "custom instructions" or "system prompt"
+Not every use case belongs in a skill. Choose the right mechanism:
 
-Skills are for task-specific, on-demand context — loaded only when relevant.
-Persistent configuration is for always-on rules — loaded every session, minimal overhead.
+| Mechanism | Use when | Example |
+|-----------|----------|---------|
+| Persistent config (CLAUDE.md, copilot-instructions.md, AGENTS.md) | Always-on rules for every session | Style conventions, project context |
+| Skill (SKILL.md) | Task-specific, loaded on demand | Domain workflow, code generation template |
+| Hook [Claude Code] | Deterministic enforcement, zero AI discretion | Block git push without tests (exit code 2 blocks) |
+| Subagent definition [Claude Code] | Custom agent with restricted tools/model | Code review agent on Haiku with Read + Grep only |
 
-Generated skills should include a brief "Why a skill?" note explaining this distinction.
+**Decision aid:**
+- Instruction applies to nearly every session → persistent config
+- Instruction is task-specific, loaded when relevant → skill
+- Enforcement must be 100% reliable, no AI interpretation → hook
+- Use case is a custom agent with specific tools/permissions → subagent definition
+
+Generated skills should include a brief "Why a skill?" note when the use case is borderline.
+
+For detailed rationale, hook lifecycle events, and anti-patterns, see [reference.md § Choosing the Right Mechanism](reference.md#choosing-the-right-mechanism).
 
 ## Reference Escalation
 

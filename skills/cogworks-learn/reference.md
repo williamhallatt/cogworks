@@ -15,7 +15,7 @@ Agent skills are SKILL.md files that extend agent capabilities through YAML fron
 - [Prompt Quality Gates](#prompt-quality-gates-for-generated-skills-required) - Mandatory integrated prompt-quality checks
 - [Core Concepts](#core-concepts) - Architecture, frontmatter, invocation, scope, content types
 - [Concept Map](#concept-map) - Relationships between concepts
-- [Deep Dives](#deep-dives) - Context budget, discovery, specificity, rationalization resistance
+- [Deep Dives](#deep-dives) - Context budget, discovery, specificity, rationalization resistance, subagent orchestration, mechanism selection
 - [Quick Reference](#quick-reference) - Frontmatter fields, substitutions, paths
 - [Sources](#sources) - Bibliography
 
@@ -308,6 +308,56 @@ When skills share names across scopes:
 3. Project overrides Plugin
 4. Plugin uses namespace (`plugin-name:skill-name`) so can't conflict
 
+### Subagent Orchestration
+
+**[Claude Code]** Claude Code provides a structured subagent system for delegating work from a parent conversation. Other agents use natural language delegation only — no structured dispatch.
+
+**Built-in subagent types** — use the lightest type that fits the task:
+
+| Type | Model | Tools | Use when |
+|------|-------|-------|----------|
+| Explore | Haiku (fast, cheap) | Read, Grep, Glob only | Codebase research, log scanning, read-only analysis |
+| Plan | Inherits parent model | Read, Grep, Glob only | Strategic planning requiring full reasoning but no writes |
+| General-purpose | Inherits parent model | All tools | Tasks requiring file creation, edits, or command execution |
+
+**Foreground vs background dispatch:**
+- **Foreground** — blocks the parent conversation. Permissions pass through to the user (prompts appear as normal). Use for tasks where the parent needs the result before continuing.
+- **Background** — runs concurrently with the parent. Pre-approved permissions execute silently; unapproved permissions are auto-denied (not prompted). Use for independent research or batch operations that don't gate the main workflow.
+
+**Orchestration patterns:**
+- **Parallel research** — spawn multiple independent subagents simultaneously (background), each investigating a different question. Collect summaries when all complete.
+- **Chaining** — sequential handoff where each subagent's output feeds the next. Use foreground dispatch to ensure ordering.
+- **Skill preloading** — the `skills:` array in subagent configuration injects full skill content at startup, giving the subagent domain knowledge without requiring it to discover and load skills.
+
+**Failure modes:**
+- Background subagent failure does not crash the parent — the parent resumes in foreground and can retry or take a different approach.
+- Subagents cannot nest — a subagent cannot spawn its own subagents. Design orchestration as a single level of fan-out.
+
+**Cross-agent note:** All structured dispatch above is Claude Code-specific. For cross-agent skills, use natural language delegation ("Delegate this task to a subagent") which works on any agent that supports delegation. [Source 4] [Source 5]
+
+### Choosing the Right Mechanism
+
+Not every use case belongs in a skill. Claude Code offers four mechanisms for extending agent behaviour; choosing the wrong one wastes tokens, reduces reliability, or bypasses enforcement guarantees.
+
+| Mechanism | Loaded | Best for | Example |
+|-----------|--------|----------|---------|
+| Persistent config (CLAUDE.md) | Every session, automatically | Always-on rules: style, conventions, project context | "Use British spelling in all comments" |
+| Skill (SKILL.md) | On-demand, when relevant | Task-specific workflows and domain knowledge | "Generate a database migration from this schema diff" |
+| Hook [Claude Code] | Every matching lifecycle event | Deterministic enforcement with zero AI discretion | "Block git push if tests haven't passed" (exit code 2 blocks the action) |
+| Subagent definition [Claude Code] | When orchestrator dispatches | Custom agent configs with specific tools, permissions, model | "Code review agent restricted to Read + Grep, running Haiku" |
+
+**Hooks** fire on lifecycle events (PreToolUse, PostToolUse, Stop) and run shell commands deterministically. They are not AI-mediated — the shell command's exit code controls the outcome. Use hooks when enforcement must be 100% reliable regardless of prompt interpretation.
+
+**Subagent definitions** configure reusable agent profiles with constrained tools, permissions, and model selection. They orchestrate task execution, not knowledge injection — use skills for knowledge, subagent definitions for dispatch.
+
+**Decision aid:**
+- If the instruction should apply to nearly every session → persistent config
+- If the instruction is task-specific, loaded on demand → skill
+- If enforcement must be deterministic with no AI discretion → hook
+- If the use case is a custom agent with restricted tools/model → subagent definition
+
+**Anti-pattern:** Generating a skill for a use case better served by persistent config, hooks, or subagent definitions. Generated skills should include a "Why a skill?" note when the use case is borderline. [Source 4] [Source 5]
+
 ---
 
 ## Quick Reference
@@ -364,3 +414,9 @@ _Other agents use their own paths. Use `npx skills add` to install to all detect
 
 3. **OpenAI Codex Skills** - https://developers.openai.com/codex/skills
    - Codex discovery, invocation, and skill authoring best practices
+
+4. **Claude Code Sub-Agents Documentation** - https://docs.anthropic.com/en/docs/claude-code/sub-agents
+   - Subagent types, configuration, context management, orchestration patterns
+
+5. **Claude Code Best Practices** - https://docs.anthropic.com/en/docs/claude-code/best-practices
+   - Hooks, context management, verification patterns, mechanism selection
