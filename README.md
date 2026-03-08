@@ -2,7 +2,7 @@
 
 Turn source material into trustworthy agent skills.
 
-`cogworks` is a single skill-building product surface. The user provides links,
+`cogworks` is one skill-building product surface. The user provides links,
 files, or source directories. `cogworks` either produces a production-ready
 generated skill or stops with a clear trust report explaining why it will not.
 
@@ -37,6 +37,19 @@ your agent's native style.
 - run deterministic validation before presenting the final output
 
 The default output location is `_generated-skills/{slug}/`.
+
+## Support At A Glance
+
+Separate three things when evaluating support:
+
+| Surface | Can install generated skills? | Product support status | Can run the internal trust-first sub-agent build path? |
+|---|---|---|---|
+| Claude Code | Yes | Yes | Yes |
+| GitHub Copilot CLI | Yes | Yes | Yes, when its delegated-task behavior is locally validated |
+| Codex | Yes | Portable generated-skill target only | No |
+
+Codex can consume generated skills, but Codex sub-agent build support is **not**
+part of the current trust-first internal build flow.
 
 ## Product Contract
 
@@ -79,18 +92,6 @@ Sub-agents are implementation machinery, not a public interface. They are used
 to keep the coordinator context small and to give source intake, synthesis,
 packaging, and validation explicit ownership.
 
-## Supported Execution Surfaces
-
-Current product direction:
-- **Claude Code**: first-class target for the trust-first sub-agent build path
-- **GitHub Copilot CLI**: first-class only when its delegated-task behavior is
-  proven by local maintainer smoke evidence
-- **Codex**: generated skills remain portable there, but Codex sub-agent build
-  support is deferred for now
-
-`cogworks` should not claim cross-agent parity unless the surface has a real,
-tested path.
-
 ## Supporting Skills
 
 The repository ships three skills:
@@ -132,9 +133,13 @@ point.
   accessing them
 - source quality limits output quality; cogworks can fail closed, but it cannot
   invent trustworthy evidence
-- generated skills aim to follow the [Agent Skills standard](https://agentskills.io)
-  where the artifact format is portable, but the build system itself is not
-  assumed to be equally portable across agent surfaces
+- generated skills aim to follow the [Agent Skills standard](https://agentskills.io),
+  so the artifact format is portable across agents that support skills
+- build-surface support is narrower than artifact portability; the current
+  trust-first internal build flow is supported only on Claude Code and GitHub
+  Copilot CLI
+- Codex support is currently limited to consuming portable generated skills, not
+  running the trust-first internal build flow
 
 ## Contributing
 

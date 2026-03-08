@@ -11,6 +11,18 @@ The intended product model is simple:
 This guide describes the product surface. Maintainer-only runtime details live
 in the adapter and smoke docs.
 
+## Support Boundaries
+
+Keep these three ideas separate:
+
+- `cogworks` is the normal product entry point
+- generated skills are portable across agents that support skills
+- the trust-first internal sub-agent build flow is currently supported only on
+  Claude Code and GitHub Copilot CLI
+
+Codex can consume generated skills, but it is not a supported surface for the
+current trust-first internal build flow.
+
 ## The Three Shipped Skills
 
 | Skill | Role |
@@ -65,6 +77,15 @@ The normal flow should ask only when necessary:
 
 Everything else should run with strong defaults.
 
+### Support expectations by surface
+
+- **Claude Code**: supported for the normal user flow and the internal
+  trust-first build path
+- **GitHub Copilot CLI**: supported for the normal user flow and the internal
+  trust-first build path when its delegated-task behavior is locally validated
+- **Codex**: supported as a destination for portable generated skills, not as a
+  surface for the internal trust-first build path
+
 ## Supporting Skills As Expert Surfaces
 
 ### `cogworks-encode`
@@ -93,6 +114,9 @@ Claude Code and GitHub Copilot may use specialist sub-agents internally for:
 
 Those are implementation details used to improve quality and context isolation.
 They are not a user-facing mode switch.
+
+If you are using Codex, treat generated-skill portability and benchmark support
+as separate from this internal build path.
 
 Maintainer-only references:
 - [agentic-runtime.md](agentic-runtime.md)
