@@ -28,9 +28,8 @@
 | Field | Result |
 |---|---|
 | `skill_name` | ✅ `api-auth-smoke` |
-| `engine_mode` | ✅ `agentic` |
-| `execution_surface` | ✅ `copilot-cli` |
 | `generated_at` | ✅ `2026-03-07T09:47:28Z` |
+| runtime metadata excluded | ✅ no `engine_mode`, `execution_surface`, `execution_adapter`, `run_root`, or `skill_path` |
 
 ## Check 4 — Prior stage gate status
 

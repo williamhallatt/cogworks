@@ -2,8 +2,8 @@
 
 **Stage:** skill-packaging
 **Skill:** api-auth-smoke
-**Surface:** copilot-cli / agentic
-**Composer run:** native-subagents
+**Surface:** copilot-cli
+**Execution style:** sub-agent build
 
 ---
 
@@ -33,7 +33,7 @@ Decision dec-04 is rendered as a best-practice advisory note, explicitly differe
 
 ## SKILL.md Composition Choices
 
-- **YAML frontmatter** includes `name`, `description`, `version`, `engine_mode`, `execution_surface`, and `sources`.
+- **YAML frontmatter** includes `name`, `description`, `version`, and `sources`.
 - **Structure:** Overview → Core Rules (normative) → Conditional Rules → Best Practices → Out-of-Scope → Quick-Reference Table.
 - The 401/403 boundary is foregrounded as the primary decision rule because both sources assert it with equal normative weight.
 - Expired and malformed token cases are called out explicitly in a dedicated warning block, honouring the synthesis note that "returning 403 for expired or malformed tokens is treated as incorrect behaviour."

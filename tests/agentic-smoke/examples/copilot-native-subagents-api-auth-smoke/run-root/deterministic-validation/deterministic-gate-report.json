@@ -9,9 +9,8 @@
     {"check": "reference.md exists and is non-empty", "result": "pass"},
     {"check": "metadata.json exists", "result": "pass"},
     {"check": "metadata.json has skill_name", "result": "pass"},
-    {"check": "metadata.json has engine_mode", "result": "pass"},
-    {"check": "metadata.json has execution_surface", "result": "pass"},
     {"check": "metadata.json has generated_at", "result": "pass"},
+    {"check": "generated skill metadata excludes runtime fields", "result": "pass"},
     {"check": "source-intake stage-status.json is pass", "result": "pass"},
     {"check": "synthesis stage-status.json is pass", "result": "pass"},
     {"check": "skill-packaging stage-status.json is pass", "result": "pass"}

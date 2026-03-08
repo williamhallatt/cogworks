@@ -1,8 +1,6 @@
 {
   "profile_source": "canonical-role-specs",
   "execution_surface": "copilot-cli",
-  "execution_adapter": "native-subagents",
-  "model_policy": "inherit-session-model",
   "agent_definition_source": ".claude/agents/",
   "dispatches": [
     {

@@ -8,7 +8,9 @@ Use the [`npx skills`](https://www.npmjs.com/package/skills) CLI to add all cogw
 npx skills add williamhallatt/cogworks
 ```
 
-> NOTE: `cogworks-encode` and `cogworks-learn` can be used independently, but the full `cogworks` skill requires both to function properly.
+> NOTE: `cogworks` is the normal user-facing entry point. `cogworks-encode` and
+> `cogworks-learn` ship as supporting doctrine skills and can still be used
+> independently as expert surfaces.
 
 To update or remove, see the [npx skills documentation](https://www.npmjs.com/package/skills).
 
@@ -67,11 +69,11 @@ ls your-project/.agents/skills/cogworks-learn/SKILL.md
 
 ## Invoking Skills
 
-After installation, invoke skills using your agent's command prefix:
+After installation, invoke `cogworks` using your agent's native skill style:
 
 | Agent | Prefix | Example |
 |-------|--------|---------|
-| Claude Code | `/` | `/cogworks encode ...` |
+| Claude Code | `/` | `/cogworks Turn these docs into an agent skill for incident triage.` |
 | Codex CLI | varies | natural language or see Codex docs |
 | Other agents | varies | consult agent documentation |
 
@@ -79,9 +81,9 @@ After installation, invoke skills using your agent's command prefix:
 
 | Skill                       | Purpose                                   | Required |
 | --------------------------- | ----------------------------------------- | -------- |
-| `cogworks`                  | Orchestrator - full encode workflow       | Yes      |
-| `cogworks-encode`           | Synthesis methodology (8-phase process)   | Yes      |
-| `cogworks-learn`            | Skill writing expertise and quality gates | Yes      |
+| `cogworks`                  | Product entry point for generating skills from source material | Yes      |
+| `cogworks-encode`           | Synthesis doctrine and source-fidelity methodology | Yes      |
+| `cogworks-learn`            | Skill-authoring doctrine and quality gates | Yes      |
 
 ## Test Generated Skills
 
@@ -92,7 +94,9 @@ bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill --with
 
 ## Installing Generated Skills
 
-When you use `cogworks encode`, generated skills are written to the `_generated-skills/` staging directory. The workflow automatically installs them to detected agents via `npx skills add`.
+When you use `cogworks`, generated skills are written to the
+`_generated-skills/` staging directory. The workflow automatically installs them
+to detected agents via `npx skills add`.
 
 If automatic installation fails (e.g. Node.js not available), install manually:
 

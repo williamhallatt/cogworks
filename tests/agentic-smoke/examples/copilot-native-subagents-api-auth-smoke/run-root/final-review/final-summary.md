@@ -2,9 +2,8 @@
 
 **Run ID:** copilot-native-subagents-api-auth-smoke-example-20260307
 **Surface:** copilot-cli
-**Adapter:** native-subagents
+**Execution style:** sub-agent build
 **Model policy:** inherit-session-model
-**Agentic path:** agentic-short-path
 
 ## Stage Outcomes
 
@@ -24,4 +23,4 @@ The skill covers HTTP 401/403 semantics for API authentication, token failure ha
 
 ## Execution Notes
 
-Dispatches ran in foreground mode. Copilot CLI does not expose background parallel dispatch in v1; `actual_dispatch_mode = foreground` for all stages. `native-subagents` adapter confirmed: specialist agents sourced from `.claude/agents/` and dispatched via Copilot `task` tool.
+Dispatches ran in foreground mode. Copilot CLI does not expose background parallel dispatch in v1; `actual_dispatch_mode = foreground` for all stages. The specialist build path was confirmed via Copilot `task` dispatches backed by the canonical role bindings.
