@@ -1,8 +1,8 @@
 # Deterministic Validation Report — api-auth-smoke
 
 **Stage:** deterministic-validation  
-**Run root:** `.cogworks-runs/api-auth-smoke-copilot-smoke/`  
-**Skill path:** `tmp-agentic-output/api-auth-smoke/`  
+**Run root:** `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/run-root/`  
+**Skill path:** `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/skill-output/`  
 **Overall result:** PASS
 
 ---

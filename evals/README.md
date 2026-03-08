@@ -22,3 +22,10 @@ This directory holds the repo's first-principles research and benchmark specific
 ## Status
 
 This package now includes a pilot harness at [`scripts/run-skill-benchmark.py`](/home/will/code/cogworks/scripts/run-skill-benchmark.py). The runner is intentionally narrow: it expects candidate commands to emit normalized observation artifacts, then it scores, aggregates, and reports the paired comparison.
+
+Current integrity rules for that runner:
+- `judge_only` cases require an explicit `--judge-model`
+- judge and generator model families must differ
+- invalid trials are rerun rather than scored
+- replay traces are valid for smoke coverage but make the result non-decision-grade
+- benchmark claims should rely on `decision_eligible = true`, not just `verdict`

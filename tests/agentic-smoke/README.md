@@ -14,6 +14,8 @@ It does **not** prove the agentic engine is better than legacy.
 
 > Context hygiene: prefer a disposable output root outside the repository, for example `/tmp/cogworks-agentic-smoke/`. Repo-local `.cogworks-runs/` and `tmp-agentic-output/` are non-canonical artifact surfaces and should not be your default scratch locations.
 
+If you need a preserved in-repo example artifact set for contract inspection, use `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/` rather than repo-root scratch paths.
+
 ## Fixture Sources
 
 Use the tiny source set under:

@@ -31,7 +31,7 @@ Prefer disposable output roots outside the repository for live smoke runs and be
 
 - `python3`
 - `jq`
-- Python package `PyYAML`
+- Python packages `PyYAML`, `jsonschema`
 - Optional for live tests: the target agent surface CLI (for example `claude`, Copilot CLI, or another compatible surface)
 
 ---
@@ -209,6 +209,7 @@ python3 scripts/run-skill-benchmark.py \
   --candidate-b skill-b \
   --candidate-b-command "python3 tests/test-data/skill-benchmark-pilot/fake-runner.py" \
   --model gpt-5-codex \
+  --judge-model claude-3-7-sonnet \
   --agent-surface codex-cli \
   --trials 3
 ```
@@ -220,6 +221,20 @@ It is intentionally narrower than the older broad behavioral-eval concept:
 - skill changes only
 - efficacy scored separately from activation
 - normalized observation artifacts required
+
+Integrity rules:
+
+- `--judge-model` is required whenever any case contains `judge_only` checks
+- the judge model family must differ from the generator model family
+- invalid trials are rerun and excluded from scoring
+- replay evidence is valid for smoke coverage but not for decision-grade ranking
+- `decision_eligible = true` is the minimum bar for publishing benchmark conclusions
+
+Deterministic smoke coverage for the benchmark runner:
+
+```bash
+bash tests/run-skill-benchmark-smoke.sh
+```
 
 Do not treat old docs that mention `benchmarks/comparison/**` or deleted trace folders as current benchmark instructions.
 

@@ -2,8 +2,8 @@
   "stage": "deterministic-validation",
   "status": "pass",
   "artifacts": [
-    "/home/will/code/cogworks/.cogworks-runs/api-auth-smoke-copilot-smoke/deterministic-validation/validation-report.md",
-    "/home/will/code/cogworks/.cogworks-runs/api-auth-smoke-copilot-smoke/deterministic-validation/stage-status.json"
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/run-root/deterministic-validation/validation-report.md",
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/run-root/deterministic-validation/stage-status.json"
   ],
   "blocking_failures": [],
   "warnings": [

@@ -10,6 +10,7 @@
     "benchmark_id",
     "skills_compared",
     "model",
+    "judge_model",
     "agent_surface",
     "trial_count",
     "case_count",
@@ -23,7 +24,15 @@
     "safety_metrics",
     "cost_metrics",
     "verdict",
-    "ranking_eligible"
+    "ranking_eligible",
+    "decision_eligible",
+    "activation_gate_passed",
+    "schema_validation_passed",
+    "invalid_trial_policy_applied",
+    "valid_trials",
+    "invalid_trials",
+    "replay_evidence_present",
+    "terminal_status"
   ],
   "properties": {
     "schema_version": {
@@ -59,6 +68,13 @@
     "model": {
       "type": "string",
       "minLength": 1
+    },
+    "judge_model": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
     },
     "agent_surface": {
       "type": "string",
@@ -137,6 +153,33 @@
     "ranking_eligible": {
       "type": "boolean"
     },
+    "decision_eligible": {
+      "type": "boolean"
+    },
+    "activation_gate_passed": {
+      "$ref": "#/$defs/activationGate"
+    },
+    "schema_validation_passed": {
+      "type": "boolean"
+    },
+    "invalid_trial_policy_applied": {
+      "type": "boolean"
+    },
+    "valid_trials": {
+      "$ref": "#/$defs/trialCounts"
+    },
+    "invalid_trials": {
+      "$ref": "#/$defs/trialCounts"
+    },
+    "replay_evidence_present": {
+      "type": "boolean"
+    },
+    "terminal_status": {
+      "type": "string",
+      "enum": [
+        "completed"
+      ]
+    },
     "limitations": {
       "type": "array",
       "items": {
@@ -146,6 +189,44 @@
     }
   },
   "$defs": {
+    "trialCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_a",
+        "candidate_b"
+      ],
+      "properties": {
+        "candidate_a": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidate_b": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "activationGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_a",
+        "candidate_b",
+        "winner"
+      ],
+      "properties": {
+        "candidate_a": {
+          "type": "boolean"
+        },
+        "candidate_b": {
+          "type": "boolean"
+        },
+        "winner": {
+          "type": "boolean"
+        }
+      }
+    },
     "activationMetrics": {
       "type": "object",
       "additionalProperties": false,

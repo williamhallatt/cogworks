@@ -29,13 +29,30 @@ python3 scripts/run-skill-benchmark.py \
   --candidate-b skill-b \
   --candidate-b-command "python3 tests/test-data/skill-benchmark-pilot/fake-runner.py" \
   --model gpt-5-codex \
+  --judge-model claude-3-7-sonnet \
   --agent-surface codex-cli \
   --trials 3
 ```
 
 Codex replay adapter smoke:
 
-> **Deferred (D-035):** The Codex adapter was removed as premature implementation. See `evals/skill-benchmark/codex-adapter-spec.md` for the design spec.
+```bash
+python3 scripts/run-skill-benchmark.py \
+  --cases-file tests/test-data/skill-benchmark-codex-adapter/cases.jsonl \
+  --candidate-a codex-skill \
+  --candidate-a-command "python3 scripts/skill-benchmark-codex-adapter.py --replay-events tests/test-data/skill-benchmark-codex-adapter/candidate-a-events.jsonl" \
+  --candidate-b codex-baseline \
+  --candidate-b-command "python3 scripts/skill-benchmark-codex-adapter.py --replay-events tests/test-data/skill-benchmark-codex-adapter/candidate-b-events.jsonl" \
+  --model gpt-5-codex \
+  --agent-surface codex-cli \
+  --trials 1
+```
+
+Benchmark runner integrity smoke:
+
+```bash
+bash tests/run-skill-benchmark-smoke.sh
+```
 
 Recursive TDD round:
 

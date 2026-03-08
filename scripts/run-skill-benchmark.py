@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
 import random
 import re
@@ -28,6 +27,11 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from jsonschema import Draft202012Validator
+
+
+DEFAULT_MAX_INVALID_RETRIES = 2
 
 
 def iso_now() -> str:
@@ -56,7 +60,44 @@ def bootstrap_ci(values: list[float], resamples: int = 2000) -> tuple[float, flo
     return (means[lower_idx], means[upper_idx])
 
 
-def load_cases(path: Path) -> list[dict[str, Any]]:
+def write_json(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def schema_errors(validator: Draft202012Validator, payload: Any) -> list[str]:
+    return [error.message for error in validator.iter_errors(payload)]
+
+
+def load_validator(schema_root: Path, schema_name: str) -> Draft202012Validator:
+    return Draft202012Validator(json.loads((schema_root / schema_name).read_text(encoding="utf-8")))
+
+
+def any_judge_only_checks(case: dict[str, Any]) -> bool:
+    return any(str(check.get("kind", "")) == "judge_only" for check in case.get("observable_checks", []))
+
+
+def infer_model_family(model: str) -> str:
+    normalized = model.strip().lower()
+    if not normalized:
+        return "unknown"
+    if any(token in normalized for token in ("gpt", "openai", "codex", "o1", "o3", "o4")):
+        return "openai"
+    if any(token in normalized for token in ("claude", "anthropic")):
+        return "anthropic"
+    if any(token in normalized for token in ("gemini", "google")):
+        return "google"
+    if any(token in normalized for token in ("llama", "meta")):
+        return "meta"
+    match = re.match(r"[a-z0-9]+", normalized)
+    return match.group(0) if match else normalized
+
+
+def load_cases(path: Path, case_validator: Draft202012Validator) -> list[dict[str, Any]]:
     text = path.read_text(encoding="utf-8").strip()
     if not text:
         raise SystemExit(f"Empty cases file: {path}")
@@ -72,25 +113,19 @@ def load_cases(path: Path) -> list[dict[str, Any]]:
             if not stripped:
                 continue
             cases.append(json.loads(stripped))
+
     seen: set[str] = set()
-    for case in cases:
-        for field in ("schema_version", "case_id", "title", "category", "task_prompt", "expected_activation", "observable_checks"):
-            if field not in case:
-                raise SystemExit(f"Case missing required field '{field}': {case}")
-        case_id = str(case["case_id"])
+    issues: list[str] = []
+    for index, case in enumerate(cases, start=1):
+        case_id = str(case.get("case_id", f"<missing-{index}>"))
         if case_id in seen:
-            raise SystemExit(f"Duplicate case_id in {path}: {case_id}")
+            issues.append(f"Duplicate case_id in {path}: {case_id}")
         seen.add(case_id)
+        for error in schema_errors(case_validator, case):
+            issues.append(f"{case_id}: {error}")
+    if issues:
+        raise SystemExit("\n".join(issues))
     return cases
-
-
-def write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def _pattern_matches(expected: str, actual: str) -> bool:
@@ -120,39 +155,6 @@ def _resolve_target(target: str | None, artifact_root: Path, work_dir: Path) -> 
     return artifact_root / candidate
 
 
-def _fallback_observation(
-    benchmark_id: str,
-    case_id: str,
-    candidate_id: str,
-    trial_id: str,
-    model: str,
-    agent_surface: str,
-    work_dir: Path,
-) -> dict[str, Any]:
-    return {
-        "schema_version": "1.0",
-        "benchmark_id": benchmark_id,
-        "case_id": case_id,
-        "candidate_id": candidate_id,
-        "trial_id": trial_id,
-        "model": model,
-        "agent_surface": agent_surface,
-        "tool_inventory": [],
-        "invoked": False,
-        "completed": False,
-        "commands": [],
-        "tool_calls": [],
-        "files_written": [],
-        "process_violations": ["command_failed"],
-        "safety_violations": [],
-        "timing": {"wall_clock_ms": 0, "step_count": 0},
-        "cost": {"input_tokens": 0, "output_tokens": 0, "estimated_usd": 0},
-        "artifact_root": str(work_dir / "artifacts"),
-        "output_ref": None,
-        "notes": "Synthesized fallback observation because candidate command did not produce one.",
-    }
-
-
 def validate_observation(
     observation: dict[str, Any],
     benchmark_id: str,
@@ -161,27 +163,9 @@ def validate_observation(
     trial_id: str,
     model: str,
     agent_surface: str,
+    observation_validator: Draft202012Validator,
 ) -> list[str]:
-    issues: list[str] = []
-    required = (
-        "schema_version",
-        "benchmark_id",
-        "case_id",
-        "candidate_id",
-        "trial_id",
-        "model",
-        "agent_surface",
-        "invoked",
-        "completed",
-        "commands",
-        "tool_calls",
-        "files_written",
-        "timing",
-        "cost",
-    )
-    for field in required:
-        if field not in observation:
-            issues.append(f"missing observation field: {field}")
+    issues = [f"observation schema: {error}" for error in schema_errors(observation_validator, observation)]
     checks = {
         "benchmark_id": benchmark_id,
         "case_id": case_id,
@@ -197,14 +181,24 @@ def validate_observation(
     return issues
 
 
-def validate_judge_output(judge_output: dict[str, Any]) -> list[str]:
-    issues: list[str] = []
-    for field in ("score", "verdict", "confidence", "dimension_scores", "issues"):
-        if field not in judge_output:
-            issues.append(f"missing judge field: {field}")
-    score = judge_output.get("score")
-    if score is not None and not isinstance(score, (int, float)):
-        issues.append("judge score must be numeric")
+def validate_judge_output(
+    judge_output: dict[str, Any],
+    judge_validator: Draft202012Validator,
+    generator_model: str,
+    expected_judge_model: str,
+) -> list[str]:
+    issues = [f"judge schema: {error}" for error in schema_errors(judge_validator, judge_output)]
+    actual_judge_model = str(judge_output.get("judge_model", "")).strip()
+    if actual_judge_model != expected_judge_model:
+        issues.append(
+            "judge_model mismatch: "
+            f"expected={expected_judge_model!r}, actual={actual_judge_model!r}"
+        )
+    if infer_model_family(generator_model) == infer_model_family(expected_judge_model):
+        issues.append(
+            "judge model family must differ from generator model family: "
+            f"generator={generator_model!r}, judge={expected_judge_model!r}"
+        )
     return issues
 
 
@@ -342,25 +336,28 @@ def score_trial(
     }
 
 
-def run_candidate(
+def execute_candidate_attempt(
     repo_root: Path,
     benchmark_id: str,
     candidate_id: str,
     command: str,
     case: dict[str, Any],
     trial_index: int,
+    attempt_index: int,
     model: str,
+    judge_model: str | None,
     agent_surface: str,
     work_root: Path,
 ) -> dict[str, Any]:
     case_id = str(case["case_id"])
     trial_id = f"trial-{trial_index:03d}"
-    work_dir = work_root / case_id / trial_id / candidate_id
-    case_file = work_dir / "case.json"
-    observation_path = work_dir / "observation.json"
-    judge_output_path = work_dir / "judge-output.json"
-    log_path = work_dir / "command.log"
-    work_dir.mkdir(parents=True, exist_ok=True)
+    attempt_id = f"attempt-{attempt_index:03d}"
+    attempt_dir = work_root / case_id / trial_id / candidate_id / attempt_id
+    case_file = attempt_dir / "case.json"
+    observation_path = attempt_dir / "observation.json"
+    judge_output_path = attempt_dir / "judge-output.json"
+    log_path = attempt_dir / "command.log"
+    attempt_dir.mkdir(parents=True, exist_ok=True)
     write_json(case_file, case)
 
     env = os.environ.copy()
@@ -371,13 +368,15 @@ def run_candidate(
             "COGWORKS_BENCHMARK_CASE_FILE": str(case_file),
             "COGWORKS_BENCHMARK_CANDIDATE_ID": candidate_id,
             "COGWORKS_BENCHMARK_TRIAL_ID": trial_id,
-            "COGWORKS_BENCHMARK_WORK_DIR": str(work_dir),
+            "COGWORKS_BENCHMARK_WORK_DIR": str(attempt_dir),
             "COGWORKS_BENCHMARK_OBSERVATION_PATH": str(observation_path),
             "COGWORKS_BENCHMARK_JUDGE_OUTPUT_PATH": str(judge_output_path),
             "COGWORKS_BENCHMARK_MODEL": model,
             "COGWORKS_BENCHMARK_AGENT_SURFACE": agent_surface,
         }
     )
+    if judge_model:
+        env["COGWORKS_BENCHMARK_JUDGE_MODEL"] = judge_model
 
     result = subprocess.run(
         ["bash", "-lc", command],
@@ -389,45 +388,11 @@ def run_candidate(
     )
     log_path.write_text((result.stdout + result.stderr).strip() + "\n", encoding="utf-8")
 
-    issues: list[str] = []
-    if observation_path.exists():
-        observation = load_json(observation_path)
-    else:
-        observation = _fallback_observation(
-            benchmark_id=benchmark_id,
-            case_id=case_id,
-            candidate_id=candidate_id,
-            trial_id=trial_id,
-            model=model,
-            agent_surface=agent_surface,
-            work_dir=work_dir,
-        )
-        issues.append("candidate command did not produce observation.json")
-
-    if result.returncode != 0:
-        issues.append(f"candidate command failed with exit code {result.returncode}")
-
-    issues.extend(
-        validate_observation(
-            observation=observation,
-            benchmark_id=benchmark_id,
-            case_id=case_id,
-            candidate_id=candidate_id,
-            trial_id=trial_id,
-            model=model,
-            agent_surface=agent_surface,
-        )
-    )
-
-    judge_output = None
-    if judge_output_path.exists():
-        judge_output = load_json(judge_output_path)
-        issues.extend(validate_judge_output(judge_output))
-
-    scored = score_trial(case=case, observation=observation, judge_output=judge_output, work_dir=work_dir)
-    issues.extend(observation.get("process_violations", []))
-
+    observation = load_json(observation_path) if observation_path.exists() else None
+    judge_output = load_json(judge_output_path) if judge_output_path.exists() else None
     return {
+        "attempt_id": attempt_id,
+        "attempt_index": attempt_index,
         "case_id": case_id,
         "candidate_id": candidate_id,
         "trial_id": trial_id,
@@ -436,18 +401,175 @@ def run_candidate(
         "log_path": str(log_path),
         "observation_path": str(observation_path),
         "judge_output_path": str(judge_output_path) if judge_output_path.exists() else None,
-        "work_dir": str(work_dir),
+        "work_dir": str(attempt_dir),
         "observation": observation,
         "judge_output": judge_output,
-        "score": scored["score"],
-        "issues": issues + scored["issues"],
-        "required_failures": scored["required_failures"],
-        "check_results": scored["check_results"],
     }
 
 
+def invalid_reasons_for_attempt(
+    attempt: dict[str, Any],
+    case: dict[str, Any],
+    benchmark_id: str,
+    model: str,
+    judge_model: str | None,
+    agent_surface: str,
+    observation_validator: Draft202012Validator,
+    judge_validator: Draft202012Validator,
+) -> list[str]:
+    reasons: list[str] = []
+    if attempt["return_code"] != 0:
+        reasons.append(f"candidate command failed with exit code {attempt['return_code']}")
+
+    observation = attempt.get("observation")
+    if observation is None:
+        reasons.append("candidate command did not produce observation.json")
+    else:
+        reasons.extend(
+            validate_observation(
+                observation=observation,
+                benchmark_id=benchmark_id,
+                case_id=str(case["case_id"]),
+                candidate_id=str(attempt["candidate_id"]),
+                trial_id=str(attempt["trial_id"]),
+                model=model,
+                agent_surface=agent_surface,
+                observation_validator=observation_validator,
+            )
+        )
+
+    needs_judge = any_judge_only_checks(case)
+    judge_output = attempt.get("judge_output")
+    if needs_judge:
+        if judge_model is None:
+            reasons.append("judge_only case requires --judge-model")
+        elif judge_output is None:
+            reasons.append("candidate command did not produce judge-output.json")
+        else:
+            reasons.extend(
+                validate_judge_output(
+                    judge_output=judge_output,
+                    judge_validator=judge_validator,
+                    generator_model=model,
+                    expected_judge_model=judge_model,
+                )
+            )
+    elif judge_output is not None and judge_model is not None:
+        reasons.extend(
+            validate_judge_output(
+                judge_output=judge_output,
+                judge_validator=judge_validator,
+                generator_model=model,
+                expected_judge_model=judge_model,
+            )
+        )
+    return reasons
+
+
+def run_candidate_trial(
+    repo_root: Path,
+    benchmark_id: str,
+    candidate_id: str,
+    command: str,
+    case: dict[str, Any],
+    trial_index: int,
+    model: str,
+    judge_model: str | None,
+    agent_surface: str,
+    work_root: Path,
+    observation_validator: Draft202012Validator,
+    judge_validator: Draft202012Validator,
+    max_invalid_retries: int,
+) -> dict[str, Any]:
+    attempts: list[dict[str, Any]] = []
+    invalid_attempts: list[dict[str, Any]] = []
+
+    for attempt_index in range(1, max_invalid_retries + 2):
+        attempt = execute_candidate_attempt(
+            repo_root=repo_root,
+            benchmark_id=benchmark_id,
+            candidate_id=candidate_id,
+            command=command,
+            case=case,
+            trial_index=trial_index,
+            attempt_index=attempt_index,
+            model=model,
+            judge_model=judge_model,
+            agent_surface=agent_surface,
+            work_root=work_root,
+        )
+        invalid_reasons = invalid_reasons_for_attempt(
+            attempt=attempt,
+            case=case,
+            benchmark_id=benchmark_id,
+            model=model,
+            judge_model=judge_model,
+            agent_surface=agent_surface,
+            observation_validator=observation_validator,
+            judge_validator=judge_validator,
+        )
+        attempt["invalid"] = bool(invalid_reasons)
+        attempt["invalid_reasons"] = invalid_reasons
+        attempts.append(attempt)
+
+        if invalid_reasons:
+            invalid_attempts.append(attempt)
+            continue
+
+        observation = attempt["observation"]
+        judge_output = attempt["judge_output"]
+        scored = score_trial(
+            case=case,
+            observation=observation,
+            judge_output=judge_output,
+            work_dir=Path(attempt["work_dir"]),
+        )
+        issues = list(observation.get("process_violations", [])) + scored["issues"]
+        return {
+            "case_id": str(case["case_id"]),
+            "candidate_id": candidate_id,
+            "trial_id": attempt["trial_id"],
+            "command": command,
+            "return_code": attempt["return_code"],
+            "log_path": attempt["log_path"],
+            "observation_path": attempt["observation_path"],
+            "judge_output_path": attempt["judge_output_path"],
+            "work_dir": attempt["work_dir"],
+            "observation": observation,
+            "judge_output": judge_output,
+            "score": scored["score"],
+            "issues": issues,
+            "required_failures": scored["required_failures"],
+            "check_results": scored["check_results"],
+            "attempts": [
+                {
+                    "attempt_id": item["attempt_id"],
+                    "return_code": item["return_code"],
+                    "work_dir": item["work_dir"],
+                    "log_path": item["log_path"],
+                    "invalid": item["invalid"],
+                    "invalid_reasons": item["invalid_reasons"],
+                }
+                for item in attempts
+            ],
+            "valid_trials": 1,
+            "invalid_trials": len(invalid_attempts),
+            "invalid_reasons": sorted({reason for item in invalid_attempts for reason in item["invalid_reasons"]}),
+            "scored_trials": 1,
+        }
+
+    joined = "; ".join(
+        sorted({reason for item in invalid_attempts for reason in item["invalid_reasons"]})
+    )
+    raise SystemExit(
+        "Benchmark aborted after invalid trial retry exhaustion for "
+        f"{case['case_id']} / {candidate_id} / trial-{trial_index:03d}: {joined}"
+    )
+
+
 def summarize_activation(observations: list[dict[str, Any]], expectations: dict[str, str]) -> dict[str, float]:
-    tp = fp = fn = tn = ambiguous = 0
+    tp = fp = fn = tn = 0
+    ambiguous_total = ambiguous_triggered = 0
     for entry in observations:
         case_id = str(entry["case_id"])
         expected = expectations[case_id]
@@ -463,14 +585,15 @@ def summarize_activation(observations: list[dict[str, Any]], expectations: dict[
             else:
                 tn += 1
         else:
-            ambiguous += 1
+            ambiguous_total += 1
+            if invoked:
+                ambiguous_triggered += 1
 
     precision = tp / (tp + fp) if (tp + fp) else 0.0
     recall = tp / (tp + fn) if (tp + fn) else 0.0
     false_positive_rate = fp / (fp + tn) if (fp + tn) else 0.0
     false_negative_rate = fn / (fn + tp) if (fn + tp) else 0.0
-    total = tp + fp + fn + tn + ambiguous
-    ambiguous_trigger_rate = ambiguous / total if total else 0.0
+    ambiguous_trigger_rate = ambiguous_triggered / ambiguous_total if ambiguous_total else 0.0
     return {
         "precision": precision,
         "recall": recall,
@@ -480,6 +603,18 @@ def summarize_activation(observations: list[dict[str, Any]], expectations: dict[
     }
 
 
+def replay_evidence_present(runs: list[dict[str, Any]]) -> bool:
+    for run in runs:
+        integrity = run["observation"].get("integrity", {})
+        if isinstance(integrity, dict) and integrity.get("trace_mode") == "replay":
+            return True
+    return False
+
+
+def count_trials(trial_runs: list[dict[str, Any]], candidate_id: str, key: str) -> int:
+    return sum(int(run.get(key, 0)) for run in trial_runs if run["candidate_id"] == candidate_id)
+
+
 def write_report(path: Path, summary: dict[str, Any], results: dict[str, Any]) -> None:
     lines = [
         "# Skill Benchmark Report",
@@ -487,10 +622,12 @@ def write_report(path: Path, summary: dict[str, Any], results: dict[str, Any]) -
         f"Generated: {summary['generated_at']}",
         f"Benchmark ID: `{summary['benchmark_id']}`",
         f"Model: `{summary['model']}`",
+        f"Judge model: `{summary['judge_model']}`" if summary.get("judge_model") else "Judge model: `none`",
         f"Agent surface: `{summary['agent_surface']}`",
         "",
         "## Decision",
         "",
+        f"- Terminal status: `{summary['terminal_status']}`",
         f"- Verdict: `{summary['verdict']}`",
         f"- Mean delta (`candidate_a - candidate_b`): `{summary['mean_delta']:.3f}`",
         f"- 95% bootstrap CI: `[{summary['confidence_interval_95'][0]:.3f}, {summary['confidence_interval_95'][1]:.3f}]`",
@@ -498,6 +635,16 @@ def write_report(path: Path, summary: dict[str, Any], results: dict[str, Any]) -
         f"- Candidate B win rate: `{summary['candidate_b_win_rate']:.3f}`",
         f"- Tie rate: `{summary['tie_rate']:.3f}`",
         f"- Ranking eligible: `{summary['ranking_eligible']}`",
+        f"- Decision eligible: `{summary['decision_eligible']}`",
+        f"- Activation gate passed for winning conclusion: `{summary['activation_gate_passed']['winner']}`",
+        "",
+        "## Integrity",
+        "",
+        f"- Schema validation passed: `{summary['schema_validation_passed']}`",
+        f"- Invalid-trial policy applied: `{summary['invalid_trial_policy_applied']}`",
+        f"- Replay evidence present: `{summary['replay_evidence_present']}`",
+        f"- Valid trials A/B: `{summary['valid_trials']['candidate_a']}` / `{summary['valid_trials']['candidate_b']}`",
+        f"- Invalid attempts A/B: `{summary['invalid_trials']['candidate_a']}` / `{summary['invalid_trials']['candidate_b']}`",
         "",
         "## Activation Diagnostics",
         "",
@@ -505,6 +652,10 @@ def write_report(path: Path, summary: dict[str, Any], results: dict[str, Any]) -
         f"- Candidate B precision/recall: `{summary['activation_metrics']['candidate_b']['precision']:.3f}` / `{summary['activation_metrics']['candidate_b']['recall']:.3f}`",
         f"- Candidate A false-positive rate: `{summary['activation_metrics']['candidate_a']['false_positive_rate']:.3f}`",
         f"- Candidate B false-positive rate: `{summary['activation_metrics']['candidate_b']['false_positive_rate']:.3f}`",
+        f"- Candidate A ambiguous-trigger rate: `{summary['activation_metrics']['candidate_a']['ambiguous_trigger_rate']:.3f}`",
+        f"- Candidate B ambiguous-trigger rate: `{summary['activation_metrics']['candidate_b']['ambiguous_trigger_rate']:.3f}`",
+        f"- Candidate A activation gate: `{summary['activation_gate_passed']['candidate_a']}`",
+        f"- Candidate B activation gate: `{summary['activation_gate_passed']['candidate_b']}`",
         "",
         "## Safety And Cost",
         "",
@@ -515,14 +666,15 @@ def write_report(path: Path, summary: dict[str, Any], results: dict[str, Any]) -
         "",
         "## Per-Case Deltas",
         "",
-        "| Case | Category | A mean | B mean | Delta | Winner |",
-        "|---|---|---:|---:|---:|---|",
+        "| Case | Category | A mean | B mean | Delta | Winner | A invalid | B invalid |",
+        "|---|---|---:|---:|---:|---|---:|---:|",
     ]
 
     for case in results["cases"]:
         lines.append(
             f"| {case['case_id']} | {case['category']} | {case['candidate_a_mean_score']:.3f} | "
-            f"{case['candidate_b_mean_score']:.3f} | {case['delta']:.3f} | {case['winner']} |"
+            f"{case['candidate_b_mean_score']:.3f} | {case['delta']:.3f} | {case['winner']} | "
+            f"{case['candidate_a_invalid_trials']} | {case['candidate_b_invalid_trials']} |"
         )
 
     if summary["limitations"]:
@@ -542,17 +694,42 @@ def main() -> int:
     parser.add_argument("--candidate-b", required=True, help="Candidate B label.")
     parser.add_argument("--candidate-b-command", required=True, help="Shell command used to run candidate B.")
     parser.add_argument("--model", required=True, help="Fixed generator model identifier.")
+    parser.add_argument("--judge-model", default=None, help="Independent judge model used for judge_only checks.")
     parser.add_argument("--agent-surface", required=True, help="Fixed agent surface identifier.")
-    parser.add_argument("--trials", type=int, default=3, help="Trials per case per candidate.")
+    parser.add_argument("--trials", type=int, default=3, help="Valid trials per case per candidate.")
+    parser.add_argument(
+        "--max-invalid-retries",
+        type=int,
+        default=DEFAULT_MAX_INVALID_RETRIES,
+        help="Additional retries after an invalid trial attempt.",
+    )
     parser.add_argument("--out-dir", default=None, help="Directory for benchmark artifacts.")
     parser.add_argument("--work-root", default="/tmp/cogworks-skill-benchmark", help="Scratch directory.")
     args = parser.parse_args()
 
     if args.trials < 1:
         raise SystemExit("--trials must be >= 1")
+    if args.max_invalid_retries < 0:
+        raise SystemExit("--max-invalid-retries must be >= 0")
 
     repo_root = Path(__file__).resolve().parents[1]
-    cases = load_cases(repo_root / args.cases_file if not Path(args.cases_file).is_absolute() else Path(args.cases_file))
+    schema_root = repo_root / "evals" / "skill-benchmark"
+    case_validator = load_validator(schema_root, "case.schema.json")
+    observation_validator = load_validator(schema_root, "observation.schema.json")
+    judge_validator = load_validator(schema_root, "judge-output.schema.json")
+    summary_validator = load_validator(schema_root, "benchmark-summary.schema.json")
+
+    cases_path = repo_root / args.cases_file if not Path(args.cases_file).is_absolute() else Path(args.cases_file)
+    cases = load_cases(cases_path, case_validator)
+    if any(any_judge_only_checks(case) for case in cases):
+        if not args.judge_model:
+            raise SystemExit("--judge-model is required when any case contains judge_only checks")
+        if infer_model_family(args.model) == infer_model_family(args.judge_model):
+            raise SystemExit(
+                "judge model family must differ from generator model family: "
+                f"generator={args.model!r}, judge={args.judge_model!r}"
+            )
+
     benchmark_id = args.benchmark_id or f"skill-benchmark-{timestamp_id()}"
     out_dir = Path(args.out_dir) if args.out_dir else repo_root / "tests" / "results" / "skill-benchmark" / benchmark_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -565,7 +742,7 @@ def main() -> int:
     for case in cases:
         for trial_index in range(1, args.trials + 1):
             trial_runs.append(
-                run_candidate(
+                run_candidate_trial(
                     repo_root=repo_root,
                     benchmark_id=benchmark_id,
                     candidate_id=args.candidate_a,
@@ -573,12 +750,16 @@ def main() -> int:
                     case=case,
                     trial_index=trial_index,
                     model=args.model,
+                    judge_model=args.judge_model,
                     agent_surface=args.agent_surface,
                     work_root=work_root,
+                    observation_validator=observation_validator,
+                    judge_validator=judge_validator,
+                    max_invalid_retries=args.max_invalid_retries,
                 )
             )
             trial_runs.append(
-                run_candidate(
+                run_candidate_trial(
                     repo_root=repo_root,
                     benchmark_id=benchmark_id,
                     candidate_id=args.candidate_b,
@@ -586,8 +767,12 @@ def main() -> int:
                     case=case,
                     trial_index=trial_index,
                     model=args.model,
+                    judge_model=args.judge_model,
                     agent_surface=args.agent_surface,
                     work_root=work_root,
+                    observation_validator=observation_validator,
+                    judge_validator=judge_validator,
+                    max_invalid_retries=args.max_invalid_retries,
                 )
             )
 
@@ -625,6 +810,8 @@ def main() -> int:
                 "candidate_b_mean_score": b_mean,
                 "delta": delta,
                 "winner": winner,
+                "candidate_a_invalid_trials": sum(run["invalid_trials"] for run in a_runs),
+                "candidate_b_invalid_trials": sum(run["invalid_trials"] for run in b_runs),
             }
         )
 
@@ -661,14 +848,23 @@ def main() -> int:
     candidate_a_violation_rate = violation_rate(args.candidate_a)
     candidate_b_violation_rate = violation_rate(args.candidate_b)
     ranking_eligible = case_count >= 10 and args.trials >= 5
+    replay_present = replay_evidence_present(trial_runs)
+    candidate_a_activation_gate = (
+        candidate_a_activation["false_positive_rate"] <= candidate_b_activation["false_positive_rate"]
+    )
+    candidate_b_activation_gate = (
+        candidate_b_activation["false_positive_rate"] <= candidate_a_activation["false_positive_rate"]
+    )
 
     if not ranking_eligible:
         verdict = "insufficient_evidence"
+    elif replay_present:
+        verdict = "insufficient_evidence"
     elif ci_lower <= 0 <= ci_upper:
         verdict = "no_clear_winner"
-    elif mean_delta > 0 and candidate_a_violation_rate <= candidate_b_violation_rate:
+    elif mean_delta > 0 and candidate_a_violation_rate <= candidate_b_violation_rate and candidate_a_activation_gate:
         verdict = "candidate_a"
-    elif mean_delta < 0 and candidate_b_violation_rate <= candidate_a_violation_rate:
+    elif mean_delta < 0 and candidate_b_violation_rate <= candidate_a_violation_rate and candidate_b_activation_gate:
         verdict = "candidate_b"
     else:
         verdict = "no_clear_winner"
@@ -682,8 +878,14 @@ def main() -> int:
     limitations = []
     if not ranking_eligible:
         limitations.append("Ranking ineligible by default policy: requires at least 10 cases and 5 trials per case.")
+    if replay_present:
+        limitations.append("Replay evidence present; replay smoke is not decision-grade benchmark evidence.")
     if ci_lower <= 0 <= ci_upper:
         limitations.append("Confidence interval overlaps zero; paired result is not decision-grade.")
+    if mean_delta > 0 and not candidate_a_activation_gate:
+        limitations.append("Candidate A showed disqualifying false-positive regression on must_not_activate cases.")
+    if mean_delta < 0 and not candidate_b_activation_gate:
+        limitations.append("Candidate B showed disqualifying false-positive regression on must_not_activate cases.")
 
     summary = {
         "schema_version": "1.0",
@@ -694,6 +896,7 @@ def main() -> int:
             "candidate_b": args.candidate_b,
         },
         "model": args.model,
+        "judge_model": args.judge_model,
         "agent_surface": args.agent_surface,
         "trial_count": args.trials,
         "case_count": case_count,
@@ -721,8 +924,35 @@ def main() -> int:
         },
         "verdict": verdict,
         "ranking_eligible": ranking_eligible,
+        "decision_eligible": ranking_eligible and not replay_present,
+        "activation_gate_passed": {
+            "candidate_a": candidate_a_activation_gate,
+            "candidate_b": candidate_b_activation_gate,
+            "winner": (
+                candidate_a_activation_gate
+                if verdict == "candidate_a"
+                else candidate_b_activation_gate
+                if verdict == "candidate_b"
+                else True
+            ),
+        },
+        "schema_validation_passed": True,
+        "invalid_trial_policy_applied": True,
+        "valid_trials": {
+            "candidate_a": count_trials(trial_runs, args.candidate_a, "valid_trials"),
+            "candidate_b": count_trials(trial_runs, args.candidate_b, "valid_trials"),
+        },
+        "invalid_trials": {
+            "candidate_a": count_trials(trial_runs, args.candidate_a, "invalid_trials"),
+            "candidate_b": count_trials(trial_runs, args.candidate_b, "invalid_trials"),
+        },
+        "replay_evidence_present": replay_present,
+        "terminal_status": "completed",
         "limitations": limitations,
     }
+    summary_errors = schema_errors(summary_validator, summary)
+    if summary_errors:
+        raise SystemExit("\n".join(f"summary schema: {error}" for error in summary_errors))
 
     results = {
         "benchmark_id": benchmark_id,
