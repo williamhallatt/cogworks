@@ -21,9 +21,13 @@ It does **not** prove the build path is better than alternatives.
 
 If you need preserved in-repo artifact sets for contract inspection, use:
 
-- `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/`
 - `tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/`
+- `tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/`
 - `tests/agentic-smoke/examples/claude-cli-no-task-fail-closed-20260308/`
+
+The Claude example keeps its historical path name, but the later root-cause
+investigation showed the real blocker was missing Claude custom-agent
+provisioning, not absence of the delegated-agent primitive itself.
 
 ## Fixture Sources
 
@@ -43,6 +47,13 @@ Optional local install command from this repo:
 
 ```bash
 npx skills add . -a claude-code -y
+```
+
+For Claude Code live runs, also render the project-scoped Claude agents from
+the canonical role profiles:
+
+```bash
+python3 scripts/render-agentic-role-bindings.py
 ```
 
 ## Live Smoke Procedure
@@ -147,8 +158,8 @@ Confirm all of the following:
 The repository keeps canonical maintainer evidence under:
 
 ```text
-tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/
 tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/
+tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/
 tests/agentic-smoke/examples/claude-cli-no-task-fail-closed-20260308/
 ```
 

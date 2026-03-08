@@ -61,6 +61,14 @@ before anything is presented as production-ready. [Source 1] [Source 2]
   deterministic-validation -> final-review
 - Supported trust-first build surfaces: Claude Code and GitHub Copilot CLI
 - Required generated outputs: `SKILL.md`, `reference.md`, `metadata.json`
+- Required deterministic-validation outputs:
+  `deterministic-gate-report.json`, `final-gate-report.json`,
+  `targeted-probe-report.md`
+- Dispatch-manifest construction:
+  read `role-profiles.json` directly and copy `binding_ref`, `model_policy`,
+  `preferred_dispatch_mode`, and the canonical top-level `tool_scope` string
+- Dispatch-manifest `tool_scope`: do not substitute the Claude agent `tools`
+  list
 - Dependency check:
   ```bash
   cat ../cogworks-encode/SKILL.md | head -5

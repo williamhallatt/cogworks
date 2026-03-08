@@ -1,0 +1,55 @@
+{
+  "profile_source": "canonical-role-specs",
+  "execution_surface": "claude-cli",
+  "agent_definition_source": "skills/cogworks/role-profiles.json",
+  "dispatches": [
+    {
+      "stage": "source-intake",
+      "role": "intake-analyst",
+      "profile_id": "intake-analyst",
+      "binding_type": "claude-role-profile",
+      "binding_ref": "skills/cogworks/role-profiles.json#intake-analyst",
+      "model_policy": "pinned-haiku",
+      "preferred_dispatch_mode": "background",
+      "actual_dispatch_mode": "background",
+      "tool_scope": "Bash, Glob, Grep, Read, Edit, Write",
+      "status": "completed"
+    },
+    {
+      "stage": "synthesis",
+      "role": "synthesizer",
+      "profile_id": "synthesizer",
+      "binding_type": "claude-role-profile",
+      "binding_ref": "skills/cogworks/role-profiles.json#synthesizer",
+      "model_policy": "pinned-sonnet",
+      "preferred_dispatch_mode": "foreground",
+      "actual_dispatch_mode": "foreground",
+      "tool_scope": "Bash, Glob, Grep, Read, Edit, Write",
+      "status": "completed"
+    },
+    {
+      "stage": "skill-packaging",
+      "role": "composer",
+      "profile_id": "composer",
+      "binding_type": "claude-role-profile",
+      "binding_ref": "skills/cogworks/role-profiles.json#composer",
+      "model_policy": "pinned-sonnet",
+      "preferred_dispatch_mode": "foreground",
+      "actual_dispatch_mode": "foreground",
+      "tool_scope": "Bash, Glob, Grep, Read, Edit, Write",
+      "status": "completed"
+    },
+    {
+      "stage": "deterministic-validation",
+      "role": "validator",
+      "profile_id": "validator",
+      "binding_type": "claude-role-profile",
+      "binding_ref": "skills/cogworks/role-profiles.json#validator",
+      "model_policy": "pinned-haiku",
+      "preferred_dispatch_mode": "background",
+      "actual_dispatch_mode": "background",
+      "tool_scope": "Bash, Glob, Grep, Read, Edit, Write",
+      "status": "completed"
+    }
+  ]
+}

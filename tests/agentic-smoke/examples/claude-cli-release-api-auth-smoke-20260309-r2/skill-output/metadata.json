@@ -1,0 +1,25 @@
+{
+  "slug": "api-auth-smoke-claude-bridge",
+  "name": "api-auth-smoke-claude-bridge",
+  "version": "v1.0.0",
+  "snapshot_date": "2026-03-09",
+  "cogworks_version": "v3.3.0",
+  "cogworks_generated": true,
+  "generation_timestamp": "2026-03-09T00:00:00Z",
+  "topic": "API Authentication Status Code and Token Handling",
+  "author": "cogworks",
+  "license": "MIT",
+  "description": "Use when implementing or debugging API authentication status codes (401 vs 403), token expiration handling, or WWW-Authenticate header requirements for HTTP authentication failures.",
+  "sources": [
+    {
+      "type": "file",
+      "uri": "tests/agentic-smoke/fixtures/api-auth-smoke/01-status-codes.md",
+      "description": "API authentication status code guidance covering 401 vs 403 distinction and WWW-Authenticate header requirements"
+    },
+    {
+      "type": "file",
+      "uri": "tests/agentic-smoke/fixtures/api-auth-smoke/02-token-handling.md",
+      "description": "Token lifecycle guidance covering short-lived token preference, expired token handling, and authentication vs authorization failure semantics"
+    }
+  ]
+}

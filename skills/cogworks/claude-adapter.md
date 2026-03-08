@@ -35,10 +35,30 @@ Claude resolves them directly from the canonical role profiles:
 | `skill-packaging` | `composer` | `composer` | `claude-role-profile` | `skills/cogworks/role-profiles.json#composer` | `pinned-sonnet` | `foreground` |
 | `deterministic-validation` | `validator` | `validator` | `claude-role-profile` | `skills/cogworks/role-profiles.json#validator` | `pinned-haiku` | `background` |
 
+Executable project-scoped Claude agents are generated from those canonical role
+profiles with:
+
+```bash
+python3 scripts/render-agentic-role-bindings.py
+```
+
+This materializes `.claude/agents/cogworks-*.md` files. The JSON role profiles
+remain canonical; the `.claude/agents/` files are the executable bridge Claude
+Code actually consumes.
+
 Before the first specialist dispatch, the coordinator must write
 `{run_root}/dispatch-manifest.json` recording the canonical profile ID, binding
 type, binding ref, model policy, preferred dispatch mode, actual dispatch mode,
 and tool scope.
+
+Dispatch-manifest field discipline:
+- `tool_scope` must be copied from the canonical top-level `tool_scope` string
+  in `skills/cogworks/role-profiles.json`.
+- Do not replace that string with the Claude custom-agent frontmatter `tools`
+  array.
+- If the generated Claude agent file and `role-profiles.json` disagree or
+  overlap, `role-profiles.json` is the source of truth for dispatch-manifest
+  fields.
 
 ## Dispatch Rules
 
@@ -67,6 +87,13 @@ Recommended next action: <single sentence>
 ```
 
 Each specialist must also write its own `stage-status.json`.
+
+For the validator stage, the required artifact filenames are contractual:
+- `deterministic-validation/deterministic-gate-report.json`
+- `deterministic-validation/final-gate-report.json`
+- `deterministic-validation/targeted-probe-report.md`
+
+Human-readable logs are allowed, but only in addition to these required files.
 
 ## What Counts As Success
 

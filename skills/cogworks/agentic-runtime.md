@@ -60,6 +60,14 @@ Execute stages in this order:
 | `deterministic-validation` | `validator` | deterministic report, final gate report |
 | `final-review` | `coordinator` | `final-summary.md`, `stage-index.json` |
 
+For `deterministic-validation`, the contractual filenames are:
+- `deterministic-validation/deterministic-gate-report.json`
+- `deterministic-validation/final-gate-report.json`
+- `deterministic-validation/targeted-probe-report.md`
+
+Auxiliary logs are allowed only in addition to these files, not instead of
+them.
+
 ## Blocking Rules
 
 - A stage may not start until all required inputs exist and are non-empty.
@@ -151,6 +159,13 @@ Each dispatch record must include:
 - `actual_dispatch_mode`
 - `tool_scope`
 - `status`
+
+Field discipline:
+- `tool_scope` must be the canonical role-contract string from
+  `skills/cogworks/role-profiles.json`.
+- Do not serialize the Claude custom-agent `tools` array into `tool_scope`.
+- Adapter-specific execution metadata may appear elsewhere, but the dispatch
+  record must preserve the canonical string contract.
 
 ## Success Criteria
 

@@ -55,6 +55,9 @@ Use `cogworks` to:
 
 - verify both dependency skills are present and readable
 - resolve topic, sources, destination, and metadata defaults
+- build `dispatch-manifest.json` from `role-profiles.json` as the canonical
+  source for `binding_ref`, `model_policy`, `preferred_dispatch_mode`, and the
+  top-level `tool_scope` string
 - classify trust before synthesis using `cogworks-encode`
 - run the fixed internal build through packaging and deterministic validation
 - apply `cogworks-learn` packaging rules to the final skill
@@ -65,6 +68,9 @@ advice unless the user explicitly wants generation.
 
 For the stable operator checklist, failure conditions, and stage contract, use
 [reference.md](reference.md).
+
+When runtime adapters expose overlapping metadata, the canonical fields from
+[role-profiles.json](role-profiles.json) win over generated adapter files.
 
 ## Compatibility
 

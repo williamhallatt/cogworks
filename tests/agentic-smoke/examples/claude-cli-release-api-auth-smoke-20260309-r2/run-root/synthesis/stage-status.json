@@ -1,0 +1,33 @@
+{
+  "stage": "synthesis",
+  "status": "pass",
+  "timestamp": "2026-03-09T00:00:00Z",
+  "run_id": "claude-cli-release-api-auth-smoke-20260309-r2",
+  "topic": "api-auth-smoke-claude-bridge",
+  "artifacts_created": [
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/run-root/synthesis/synthesis.md",
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/run-root/synthesis/cdr-registry.md",
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/run-root/synthesis/traceability-map.md",
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/run-root/synthesis/stage-status.json"
+  ],
+  "synthesis_metrics": {
+    "source_count": 2,
+    "decision_rules_extracted": 5,
+    "anti_patterns_documented": 3,
+    "critical_distinctions_registered": 5,
+    "cross_source_relationships": 6,
+    "contradictions_found": 0,
+    "gaps_identified": 5
+  },
+  "quality_gates": {
+    "all_critical_distinctions_in_cdr": true,
+    "all_cdr_items_map_to_decision_rules": true,
+    "all_decision_rules_cited": true,
+    "contradictions_preserved": true,
+    "traceability_complete": true,
+    "required_sections_present": true
+  },
+  "blocking_failures": [],
+  "warnings": [],
+  "next_stage": "composition"
+}

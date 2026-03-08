@@ -68,6 +68,11 @@ require_file "tests/agentic-smoke/README.md"
 require_dir "tests/agentic-smoke/fixtures/api-auth-smoke"
 require_file "scripts/render-agentic-role-bindings.py"
 require_file "scripts/validate-agentic-run.sh"
+require_dir ".claude/agents"
+require_file ".claude/agents/cogworks-intake-analyst.md"
+require_file ".claude/agents/cogworks-synthesizer.md"
+require_file ".claude/agents/cogworks-composer.md"
+require_file ".claude/agents/cogworks-validator.md"
 
 require_pattern "skills/cogworks/SKILL.md" 'turn source material into a validated generated skill' 'orchestrator exposes the single product purpose'
 require_pattern "skills/cogworks/SKILL.md" 'fail closed when trust, provenance, contradiction handling, or validation is' 'orchestrator is fail-closed'
@@ -98,6 +103,7 @@ forbid_pattern "skills/cogworks/agentic-runtime.md" 'engine_mode' 'runtime no lo
 require_pattern "skills/cogworks/claude-adapter.md" 'execution_surface = claude-cli' 'Claude adapter declares claude-cli surface'
 require_pattern "skills/cogworks/claude-adapter.md" 'If the `Task` tool is unavailable' 'Claude adapter fails closed without Task'
 require_pattern "skills/cogworks/claude-adapter.md" 'claude-role-profile' 'Claude adapter records canonical profile bindings'
+require_pattern "skills/cogworks/claude-adapter.md" 'python3 scripts/render-agentic-role-bindings.py' 'Claude adapter documents provisioning bridge'
 forbid_pattern "skills/cogworks/claude-adapter.md" 'single-agent-fallback' 'Claude adapter no longer claims single-agent fallback'
 
 require_pattern "skills/cogworks/copilot-adapter.md" 'execution_surface = copilot-cli' 'Copilot adapter declares copilot-cli surface'
@@ -147,6 +153,12 @@ then
   pass 'role-profiles.json defines the four canonical roles with Claude and Copilot bindings'
 else
   fail 'role-profiles.json is missing required canonical role bindings'
+fi
+
+if python3 "$ROOT_DIR/scripts/render-agentic-role-bindings.py" --check >/dev/null 2>&1; then
+  pass 'render-agentic-role-bindings.py is in sync with committed Claude agent files'
+else
+  fail 'render-agentic-role-bindings.py output differs from committed Claude agent files'
 fi
 
 DET_EXIT=0
