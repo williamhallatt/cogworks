@@ -131,8 +131,8 @@ state = {
     "test_bundle_expected_hash": expected,
     "test_bundle_match": (expected is None) or (expected == computed),
     "pipeline_paths": manifest.get("pipeline_paths", {
-        "claude_skills_root": ".claude/skills",
-        "codex_skills_root": ".agents/skills",
+        "claude_skills_root": "skills",
+        "codex_skills_root": "skills",
     }),
     "skill_slugs": manifest.get("skill_slugs", ["cogworks-encode", "cogworks-learn"]),
     "hooks": manifest.get("hooks", {}),

@@ -65,11 +65,6 @@ def _collect_skills(skills_root: str, prefixes: List[str]) -> List[str]:
 
 
 def _infer_pipeline_from_skills_root(skills_root: str) -> Optional[str]:
-    normalized = os.path.normpath(skills_root)
-    if normalized.endswith(os.path.normpath(".claude/skills")):
-        return "claude"
-    if normalized.endswith(os.path.normpath(".agents/skills")):
-        return "codex"
     return None
 
 
@@ -401,7 +396,7 @@ def build_parser() -> argparse.ArgumentParser:
     behavioral_sub = behavioral.add_subparsers(dest="subcommand", required=True)
 
     run = behavioral_sub.add_parser("run", help="Run behavioral tests")
-    run.add_argument("--skills-root", default=".agents/skills")
+    run.add_argument("--skills-root", default="skills")
     run.add_argument("--tests-root", default="tests/behavioral")
     run.add_argument("--results-root", default="tests/results/behavioral")
     run.add_argument("--timestamp", default=None)
@@ -421,7 +416,7 @@ def build_parser() -> argparse.ArgumentParser:
     validate.set_defaults(func=behavioral_validate)
 
     scaffold = behavioral_sub.add_parser("scaffold", help="Scaffold behavioral test cases")
-    scaffold.add_argument("--skills-root", default=".agents/skills")
+    scaffold.add_argument("--skills-root", default="skills")
     scaffold.add_argument("--tests-root", default="tests/behavioral")
     scaffold.add_argument("--skill", action="append", default=[], help="Specific skill slug (repeatable)")
     scaffold.add_argument("--skill-prefix", action="append", default=[], help="Only include skills with this prefix (repeatable)")

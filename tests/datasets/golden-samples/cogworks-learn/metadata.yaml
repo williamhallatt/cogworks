@@ -99,4 +99,4 @@ usage_notes: |
   - Maintains minimal but sufficient citations (3 ±1)
 
   Regression testing:
-  bash scripts/test-generated-skill.sh --skill-path .agents/skills/cogworks-learn
+  bash scripts/test-generated-skill.sh --skill-path skills/cogworks-learn
