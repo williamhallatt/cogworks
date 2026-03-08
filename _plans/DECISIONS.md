@@ -4,8 +4,19 @@ audited_through: 2026-03-08
 
 # Architectural Decisions
 
-Settled decisions for the cogworks project. Agents load this file for context;
-see `_plans/archive/` for historical plans.
+Settled decisions for the cogworks project. Agents load this file for context.
+Archive plan files are deleted once their decision is extracted here; git history is the recovery path.
+
+## [D-040] `AGENTS.md` now defines staged retrieval, stop rules, and authority order at first touch
+
+- **Date:** 2026-03-08 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** `AGENTS.md` now defines a first-touch retrieval contract near the top of the file. Default retrieval is staged rather than broad: agents load `AGENTS.md`, then `_plans/DECISIONS.md`, then at most one matching active root plan, then one task-matched canonical doc or leaf file. Agents must not preload all top-level docs, must prefer named entrypoint files over directory scans, and must stop loading once they have enough context to act safely. `AGENTS.md` also now defines an explicit authority order for resolving conflicts between canonical surfaces.
+- **Rationale:** The prior retrieval policy still encouraged unnecessary first-touch expansion by listing all top-level docs as default reads and by using broad wording like “directly relevant files under `skills/` and `evals/`”. It also contained a contradictory pull-through into `.squad/`, a surface explicitly marked non-default. Tightening the contract reduces context pollution and gives agents fewer opportunities to improvise authority or over-read.
+- **Operational implication:** Agents should treat the top-level product docs as task-matched follow-on reads, not startup context. Non-default surfaces remain scoped references only. `AGENTS.md` should avoid routine references that send agents into non-default trees.
+- **Builds on:** D-033 and D-034 by turning the allowlist into an explicit staged retrieval algorithm with stop conditions and precedence.
+- **Scope:** `AGENTS.md`, `_plans/archive/2026-03-08-agents-retrieval-contract-tightening.md`.
+- **D-025 audit (Scribe, 2026-03-08):** Clean — no stale refs remain in the owned files touched by this decision.
 
 ## [D-039] Public docs now state surface support boundaries explicitly at first touch
 
@@ -64,16 +75,7 @@ see `_plans/archive/` for historical plans.
 - **Operational implication:** Future smoke runs and benchmark runs should default to disposable output roots, and any preserved in-repo artifacts should be treated as deliberate examples, not ambient scratch state. Historical handoff material no longer belongs in active `_plans/`.
 - **Scope:** `.gitignore`, `AGENTS.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `.github/agents/squad.agent.md`, `.squad/decisions.md`, `.squad/identity/now.md`, `.squad/README.md`, `_sources/README.md`, `.cogworks-runs/README.md`, `tmp-agentic-output/README.md`, `tests/test-data/README.md`, `tests/datasets/golden-samples/README.md`, `docs/testing-workflow-guide.md`, `docs/cogworks-agent-risk-analysis.md`, `_plans/archive/2026-03-06-agentic-v2-next-session.md`, `_plans/archive/2026-03-07-context-hygiene-cleanup.md`
 
-## [D-029] Agentic runtime generalized to canonical role specs with Claude and Copilot CLI adapters
-
-- **Date:** 2026-03-07 | **By:** William (owner)
-- **Status:** Accepted
-- **Decision:** The agentic runtime contract is generalized from a Claude-specific schema to a surface-neutral model with `execution_surface`, `execution_adapter`, `execution_mode`, and `specialist_profile_source`. Canonical role definitions now live in `skills/cogworks/role-profiles.json`, Claude role-agent files under `.claude/agents/` are derived bindings rather than the source of truth, and GitHub Copilot CLI is added as a first-class adapter using inline bindings from the same canonical role specs. Native-subagent runs must emit a generalized `dispatch-manifest.json` recording `profile_id`, `binding_type`, `binding_ref`, `model_policy`, dispatch modes, tool scope, and status for each specialist stage.
-- **Rationale:** The earlier runtime borrowed Squad-style control-plane ideas but still encoded too much Claude-specific execution detail in the core contract. That made Copilot support look like an afterthought and left the repo without a single authoritative definition of role ownership, model policy, and dispatch evidence. Canonical role specs plus adapter-specific bindings keep the shared stage graph intact while making capability differences explicit instead of implicit.
-- **Surface policy:** Claude Code may pin cheaper or deeper specialist models through generated agent files when native subagents are available. Copilot CLI must not claim per-role model pinning unless the surface proves it; its default native binding policy is `inherit-session-model`, and it must honestly fall back to `single-agent-fallback` when no real spawn primitive exists.
-- **Live proof (Copilot CLI):** Squad validated a Copilot CLI agentic smoke run on 2026-03-07 — preserved example root `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/run-root/`, 50/50 validator checks passed, `execution_adapter = native-subagents`, `model_policy = inherit-session-model`. `.claude/agents/` confirmed as shared agent registration source for both surfaces.
-- **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/agentic-runtime.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/copilot-adapter.md`, `skills/cogworks/role-profiles.json`, `.claude/agents/cogworks-*.md`, `scripts/render-agentic-role-bindings.py`, `scripts/validate-agentic-run.sh`, `scripts/run-agentic-quality-compare.py`, `scripts/compare-engine-performance.py`, `scripts/test-agentic-contract.sh`, `README.md`, `skills/cogworks/README.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `_plans/archive/2026-03-07-copilot-cli-agentic-adapter.md`.
-- **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
+## [D-029] Generalised agentic runtime with adapters — *Superseded by D-037 and D-038*
 
 ## [D-030] Skill evaluation benchmark isolated to skill-vs-skill efficacy with separate activation diagnostics
 
@@ -106,26 +108,9 @@ see `_plans/archive/` for historical plans.
 - **Scope:** `scripts/skill-benchmark-codex-adapter.py`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `tests/framework/README.md`, `tests/test-data/skill-benchmark-codex-adapter/*`.
 - **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
 
-## [D-028] Agentic runtime simplified to a selective 5-stage v2; quality reruns constrained to 3 cases
+## [D-028] Agentic runtime v2 simplified — *Superseded by D-037*
 
-- **Date:** 2026-03-06 | **By:** William (owner)
-- **Status:** Accepted
-- **Decision:** The agentic runtime is simplified from the original 9-stage architecture to a selective 5-stage v2: `source-intake`, `synthesis`, `skill-packaging`, `deterministic-validation`, and `final-review`. Agentic runs must now record `agentic_path` as either `agentic-short-path` or `agentic-full-path`. The quality comparison surface is also narrowed from a default 5-case set to a targeted 3-case synthesis set, and the decision tool may recommend only `continue` or `simplify` unless the user explicitly authorizes a kill decision.
-- **Rationale:** The original agentic architecture worked, but its operational cost was too high relative to the decision needed. Performance evidence already showed a substantial latency/cost penalty, and live comparative evaluation itself began to exhibit the same pathology: too much orchestration for too little signal. Simplifying the runtime before broadening the benchmark surface keeps the pivot alive while forcing it to earn its complexity.
-- **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/agentic-runtime.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/README.md`, `skills/cogworks/metadata.json`, `README.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `scripts/test-agentic-contract.sh`, `scripts/validate-agentic-run.sh`, `scripts/run-agentic-quality-compare.py`, `_plans/archive/2026-03-06-agentic-v2-simplify-and-3-case-eval.md`.
-- **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
-
-## [D-027] Agentic pipeline added as an opt-in engine; generated skills remain the primary artifact
-
-- **Date:** 2026-03-06 | **By:** William (owner)
-- **Status:** Accepted
-- **Decision:** Cogworks now has two execution engines: `legacy` remains the default prompt-orchestrated path, and `agentic` is added as an opt-in stage-driven runtime. The first release of the pivot preserves generated skills as the primary output artifact and keeps `npx skills add` as the installation path.
-- **Core architecture:** The agentic engine is defined by a coordinator-owned stage graph (`source-ingest`, `source-audit`, `synthesis`, `synthesis-critique`, `decision-architecture`, `skill-composition`, `deterministic-validation`, `generalization-probe`, `final-review-package`), strict role ownership (`ingest-researcher`, `synthesizer`, `skeptic`, `decision-architect`, `skill-composer`, `validator`, `coordinator`), and mandatory run artifacts under `{skill_path_parent}/.cogworks-runs/{slug}/{run_id}/`.
-- **Adapter strategy:** Claude subagents are the first-class execution adapter. If subagents are unavailable, cogworks runs the same stage graph in degraded single-context mode and records that explicitly in run metadata; it does not silently claim subagent execution.
-- **Non-goal for v1:** The pivot does not replace generated skills with platform-specific agent packs and does not adopt the Squad SDK as a runtime dependency. Squad informs the architecture, but cogworks keeps a platform-agnostic core and defers native Copilot adapter work.
-- **Rationale:** This preserves cogworks' current portability and benchmarkability while allowing the generation pipeline itself to become agentic. The pivot is deliberately asymmetric: internal execution changes first, product artifact changes later only if benchmarks justify them.
-- **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/agentic-runtime.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/README.md`, `skills/cogworks/metadata.json`, `README.md`, `TESTING.md`, `_plans/archive/2026-03-06-cogworks-agentic-pivot.md`.
-- **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
+## [D-027] Agentic pipeline as opt-in engine — *Superseded by D-037*
 
 ## [D-026] `quality_score` schema defined — behavioral delta replaces null field
 
@@ -193,11 +178,4 @@ see `_plans/archive/` for historical plans.
 - **Next step:** Parker defines replacement quality ground truth from first principles. `quality_score` field requires a definition before any behavioral evaluation is meaningful.
 - **Scope:** `tests/behavioral/*/traces/*.json` (deleted), `tests/ci-gate-check.sh` (Step 2 message updated).
 
-## [D-021] CI gate fails on missing behavioral traces
-
-- **Date:** 2026-03-04 | **By:** Ripley (Lead), implementing Hudson's CI gate remediation
-- **Decision:** The pre-release CI gate (`tests/ci-gate-check.sh`) now exits non-zero when behavioral traces are missing, replacing the previous warn-only behavior.
-- **Old behavior:** Missing traces produced a warning (`⚠ Warning: No behavioral traces found`) but the gate exited 0 — structurally a no-op that could never fail on trace coverage.
-- **New behavior:** Missing traces produce an actionable error message pointing to the trace capture command and the gate exits 1.
-- **Rationale:** A quality gate that never fails isn't a gate. The warn-only path allowed releases with zero behavioral validation, undermining the purpose of the gate infrastructure.
-- **Scope:** `tests/ci-gate-check.sh` step 2.
+## [D-021] CI gate fails on missing behavioral traces — *Superseded by D-038*
