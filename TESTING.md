@@ -13,14 +13,16 @@ The active testing strategy is:
 | **2 — Trigger smoke** | Whether the right skill activates on representative prompts | Yes | Low |
 | **3 — Sub-agent build smoke** | Whether the maintainer-only Claude/Copilot sub-agent build path still produces a valid generated skill and truthful run artifacts | Optional live run | Low to medium |
 | **4 — Skill benchmark** | Paired skill-vs-skill efficacy comparison with separate activation diagnostics | Optional live run | Medium to high |
-| **5 — Behavioral evaluation** | Broader judged quality work outside the benchmark harness | Pending reconstruction | High |
-
+| **5a — Behavioral deterministic** | Structural validation of behavioral test case definitions: activation consistency, category coverage, field completeness | No | Free / instant |
+| **5b — Behavioral judge** | LLM-judged quality evaluation with cross-model independence enforcement | Yes (judge model) | Medium to high |
 | **Static contract** | Agentic contract surface (docs, adapters, deterministic checks) | No | Free / instant |
 
 Use these layers in order. Do not make quality claims from Layer 1 or Layer 3
 alone.
 
-## One-Command Test Invocation
+## Maintained Bars
+
+### Offline bar
 
 ```bash
 bash tests/run-all.sh
@@ -28,6 +30,26 @@ bash tests/run-all.sh
 
 Runs all headless suites (Layers 1-4 + schema validation) in sequence. Exit 0
 means all passed.
+
+### Release bar
+
+Use this only after collecting live evidence on the two supported build
+surfaces plus one fail-closed blocking report and one decision-grade benchmark
+summary:
+
+```bash
+bash tests/run-release-validation.sh \
+  --claude-run-root <claude-run-root> \
+  --claude-skill-path <claude-skill-path> \
+  --copilot-run-root <copilot-run-root> \
+  --copilot-skill-path <copilot-skill-path> \
+  --fail-closed-report <blocking-report-path> \
+  --benchmark-summary <benchmark-summary.json>
+```
+
+This validates the offline bar first, then validates live Claude and Copilot
+artifact contracts, a fail-closed negative-path report, and decision-grade
+benchmark evidence.
 
 The canonical benchmark specification lives under `evals/`.
 
@@ -71,9 +93,14 @@ Maintained recursive tooling:
 The maintained recursive surface is the fast round:
 
 ```bash
+cp tests/datasets/recursive-round/round-manifest.example.json \
+  /tmp/round-manifest.local.json
+
+bash scripts/pin-test-bundle-hash.sh /tmp/round-manifest.local.json
+
 source scripts/recursive-env.example.sh
 bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --round-manifest /tmp/round-manifest.local.json \
   --mode fast
 ```
 
@@ -257,11 +284,77 @@ Smoke coverage:
 
 ```bash
 bash tests/run-skill-benchmark-smoke.sh
+bash tests/run-schema-validation-smoke.sh
 ```
+
+Decision-grade benchmark claims must rely on the canonical `evals/` surface,
+cross-family judging when `judge_only` checks are used, and
+`decision_eligible = true`.
 
 ## Layer 5 — Behavioral Evaluation
 
-Broader behavioral evaluation remains under reconstruction.
+Behavioral evaluation is split into two tiers based on the grader-cost ladder
+(DR-3: cheapest reliable grader first).
 
-Until that work is rebuilt, do not treat older behavioral-eval planning surfaces
-as an active quality gate.
+### Layer 5a — Deterministic behavioral checks
+
+Validates the 47 behavioral test case definitions across 3 skills for structural
+correctness, activation keyword consistency, and category coverage. Included in
+the offline bar via `tests/run-all.sh`. No API key required.
+
+```bash
+bash tests/run-behavioral-deterministic.sh
+```
+
+What it checks:
+- **Explicit activation**: explicit cases reference the skill slug in user_request
+- **Negative controls**: negative_control cases do NOT reference the skill slug
+- **Implicit boundary**: implicit/contextual cases do not accidentally reference
+  the skill slug (would indicate wrong category)
+- **Category coverage**: each skill has explicit + negative_control categories
+- **Negative control ratio**: ≥ 15% per skill
+- **Case ID uniqueness**: no duplicates
+- **Field completeness**: quality_gate/edge_case cases have ground_truth and
+  evaluator_notes; quality cases have expected_content
+- **Forbidden commands format**: regex patterns compile
+
+Cases in judge-required categories (quality_gate, edge_case, quality) are
+validated structurally but their content evaluation is deferred to Layer 5b.
+
+### Layer 5b — LLM-judged quality evaluation
+
+For quality_gate, edge_case, and quality test cases that require semantic
+evaluation of actual agent output. Uses the per-skill judge-prompt.md files with
+cross-model independence enforcement (D-036).
+
+**Prepare a judge prompt:**
+
+```bash
+python3 tests/framework/scripts/cogworks-eval.py behavioral judge-prepare \
+  --skill cogworks \
+  --case-id cogworks-qual-001 \
+  --trace path/to/agent-trace.json \
+  --generator-family claude
+```
+
+This outputs a JSON payload with `system_prompt` and `user_message` ready for
+any LLM client, plus cross-model independence constraints.
+
+**Validate judge output:**
+
+```bash
+python3 tests/framework/scripts/cogworks-eval.py behavioral judge-validate \
+  --skill cogworks \
+  --judge-output path/to/judge-output.json \
+  --generator-family claude \
+  --judge-model gpt-4.1
+```
+
+Validates against the per-skill JSON Schema (`evals/behavioral/*.judge-output.schema.json`),
+checks verdict rules (all dimensions ≥ 0.7 for pass, any < 0.5 for fail),
+enforces cross-model independence, and verifies reasoning quality.
+
+**Judge output schemas:** `evals/behavioral/`
+**Judge prompts:** `tests/behavioral/<skill>/judge-prompt.md`
+**Test cases:** `tests/behavioral/<skill>/test-cases.jsonl`
+**Success criteria:** `evals/SUCCESS-CRITERIA.md`

@@ -4,7 +4,8 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCHEMA_DIR="$ROOT_DIR/evals/skill-benchmark"
-EXAMPLES_DIR="$ROOT_DIR/_sources/evals/skill-benchmark/examples"
+BEHAVIORAL_SCHEMA_DIR="$ROOT_DIR/evals/behavioral"
+EXAMPLES_DIR="$ROOT_DIR/evals/skill-benchmark/examples"
 PILOT_CASES="$ROOT_DIR/tests/test-data/skill-benchmark-pilot/cases.jsonl"
 
 FAILURES=0
@@ -79,6 +80,28 @@ Draft202012Validator(schema).validate(instance)
     echo "PASS  pilot cases.jsonl ($line_num lines) validates against case.schema.json"
   fi
 fi
+
+if [[ $FAILURES -gt 0 ]]; then
+  echo ""
+  echo "Schema validation failed with $FAILURES issue(s)." >&2
+  exit 1
+fi
+
+# 4. Behavioral judge output schemas parse as valid JSON Schema
+for schema in "$BEHAVIORAL_SCHEMA_DIR"/*.schema.json; do
+  [[ -f "$schema" ]] || continue
+  name=$(basename "$schema")
+  if python3 -c "
+from jsonschema import Draft202012Validator
+import json, sys
+schema = json.load(open(sys.argv[1]))
+Draft202012Validator.check_schema(schema)
+" "$schema" 2>/dev/null; then
+    echo "PASS  $name is valid JSON Schema"
+  else
+    fail "$name is not valid JSON Schema"
+  fi
+done
 
 if [[ $FAILURES -gt 0 ]]; then
   echo ""

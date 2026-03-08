@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogworks.dev/evals/behavioral/cogworks-learn.judge-output.schema.json",
+  "title": "Cogworks-Learn Judge Output",
+  "description": "Output schema for LLM-as-judge evaluation of cogworks-learn skill authoring outputs. Six dimensions (nullable when not applicable): parallel_instruction, subagent_delegation, cc_feature_labeling, allowed_tools_accuracy, compatibility_field, scope_appropriateness.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "verdict",
+    "confidence",
+    "dimension_scores",
+    "reasoning",
+    "applicable_dimensions"
+  ],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["pass", "fail", "uncertain"]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "dimension_scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parallel_instruction",
+        "subagent_delegation",
+        "cc_feature_labeling",
+        "allowed_tools_accuracy",
+        "compatibility_field",
+        "scope_appropriateness"
+      ],
+      "properties": {
+        "parallel_instruction": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          ]
+        },
+        "subagent_delegation": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          ]
+        },
+        "cc_feature_labeling": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          ]
+        },
+        "allowed_tools_accuracy": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          ]
+        },
+        "compatibility_field": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          ]
+        },
+        "scope_appropriateness": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          ]
+        }
+      }
+    },
+    "reasoning": {
+      "type": "string",
+      "minLength": 1
+    },
+    "applicable_dimensions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "parallel_instruction",
+          "subagent_delegation",
+          "cc_feature_labeling",
+          "allowed_tools_accuracy",
+          "compatibility_field",
+          "scope_appropriateness"
+        ]
+      }
+    }
+  }
+}

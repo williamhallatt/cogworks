@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogworks.dev/evals/behavioral/cogworks.judge-output.schema.json",
+  "title": "Cogworks Judge Output",
+  "description": "Output schema for LLM-as-judge evaluation of cogworks orchestrator runs. Five dimensions: dependency_check, correct_delegation, pipeline_completeness, security_boundary, skill_content_fidelity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "verdict",
+    "confidence",
+    "dimension_scores",
+    "reasoning",
+    "missing_artifacts"
+  ],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["pass", "fail", "uncertain"]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "dimension_scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dependency_check",
+        "correct_delegation",
+        "pipeline_completeness",
+        "security_boundary",
+        "skill_content_fidelity"
+      ],
+      "properties": {
+        "dependency_check": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "correct_delegation": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "pipeline_completeness": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "security_boundary": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "skill_content_fidelity": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "reasoning": {
+      "type": "string",
+      "minLength": 1
+    },
+    "missing_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

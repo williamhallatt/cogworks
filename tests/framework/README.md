@@ -9,9 +9,16 @@ Canonical recursive round runbook: `tests/datasets/recursive-round/README.md`
 This framework supports two test tracks:
 
 - Layer 1 deterministic checks for generated skills
-- Behavioral activation tests (pending reconstruction — see D-022/D-023)
+- headless smoke coverage for trigger parsing, benchmark integrity, and schema
+  validation
 
 ## Primary Commands
+
+Headless offline bar:
+
+```bash
+bash tests/run-all.sh
+```
 
 Generated skill tests:
 
@@ -57,9 +64,14 @@ bash tests/run-skill-benchmark-smoke.sh
 Recursive TDD round:
 
 ```bash
+cp tests/datasets/recursive-round/round-manifest.example.json \
+  /tmp/round-manifest.local.json
+
+bash scripts/pin-test-bundle-hash.sh /tmp/round-manifest.local.json
+
 source scripts/recursive-env.example.sh
 bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --round-manifest /tmp/round-manifest.local.json \
   --mode fast \
   --run-id rr-20260220-fast1
 ```
@@ -73,7 +85,13 @@ bash scripts/run-trigger-smoke-tests.sh codex
 bash tests/run-trigger-smoke-parser-smoke.sh
 ```
 
-> **Note:** `cogworks-eval.py behavioral run` is blocked — traces were deleted (D-022). Capture scripts have been removed (D-023). See Parker's mandate: `.squad/agents/parker/charter.md`.
+> **Layer 5b judge evaluation** requires a captured agent trace and a cross-model
+> judge. Use `cogworks-eval.py behavioral judge-prepare` to construct the prompt
+> and `judge-validate` to validate the output. See `evals/SUCCESS-CRITERIA.md`
+> for pass thresholds.
+
+The canonical benchmark contract, decision-grade policy, schemas, and examples
+live under `evals/skill-benchmark/`.
 
 ## Framework Layout
 
@@ -82,6 +100,7 @@ tests/framework/
 ├── graders/
 │   └── deterministic-checks.sh
 ├── scripts/
+│   ├── behavioral_deterministic.py
 │   ├── behavioral_lib.py
 │   └── cogworks-eval.py
 └── templates/

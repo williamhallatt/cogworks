@@ -9,6 +9,30 @@ from typing import Any, Dict, List, Optional
 from behavioral_lib import load_json, load_jsonl, validate_case, compute_f1
 
 
+MODEL_FAMILIES = {
+    "claude": ["claude", "anthropic", "sonnet", "opus", "haiku"],
+    "gpt": ["gpt", "openai", "o1", "o3", "codex"],
+    "gemini": ["gemini", "google", "palm"],
+}
+
+
+def _model_family(model_name: str) -> Optional[str]:
+    """Determine model family from model name string."""
+    lower = model_name.lower()
+    for family, keywords in MODEL_FAMILIES.items():
+        if any(kw in lower for kw in keywords):
+            return family
+    return None
+
+
+def _families_independent(generator_family: str, judge_model: str) -> bool:
+    """Check cross-model independence (D-036)."""
+    judge_family = _model_family(judge_model)
+    if judge_family is None:
+        return True  # Unknown family — allow but warn
+    return generator_family.lower() != judge_family
+
+
 def _write_json(path: str, payload: Dict[str, Any]) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
@@ -388,6 +412,243 @@ def behavioral_scaffold(args: argparse.Namespace) -> int:
     return 0
 
 
+def _load_judge_prompt(tests_root: str, skill: str) -> Optional[str]:
+    """Load the judge-prompt.md content for a skill."""
+    path = os.path.join(tests_root, skill, "judge-prompt.md")
+    if not os.path.exists(path):
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+def _load_judge_schema(evals_root: str, skill: str) -> Optional[Dict[str, Any]]:
+    """Load the judge output JSON Schema for a skill."""
+    path = os.path.join(evals_root, "behavioral", f"{skill}.judge-output.schema.json")
+    if not os.path.exists(path):
+        return None
+    return load_json(path)
+
+
+def _extract_system_prompt(judge_prompt_md: str) -> str:
+    """Extract the system prompt from judge-prompt.md (content within ``` blocks under ## Judge Prompt)."""
+    in_block = False
+    lines: List[str] = []
+    for line in judge_prompt_md.split("\n"):
+        if line.strip().startswith("```") and not in_block:
+            in_block = True
+            continue
+        if line.strip().startswith("```") and in_block:
+            break
+        if in_block:
+            lines.append(line)
+    return "\n".join(lines).strip()
+
+
+def behavioral_judge_prepare(args: argparse.Namespace) -> int:
+    """Construct the full judge prompt ready for any LLM client."""
+    cases = load_jsonl(os.path.join(args.tests_root, args.skill, "test-cases.jsonl"))
+    case = next((c for c in cases if c.get("id") == args.case_id), None)
+    if case is None:
+        print(f"Case not found: {args.case_id}", file=sys.stderr)
+        return 2
+
+    category = case.get("category", "")
+    if category not in {"quality_gate", "edge_case", "quality"}:
+        print(
+            f"Case {args.case_id} is category '{category}' — "
+            f"only quality_gate, edge_case, and quality cases require judge evaluation",
+            file=sys.stderr,
+        )
+        return 2
+
+    judge_prompt_md = _load_judge_prompt(args.tests_root, args.skill)
+    if judge_prompt_md is None:
+        print(f"No judge-prompt.md found for skill {args.skill}", file=sys.stderr)
+        return 2
+
+    trace_content = ""
+    if args.trace:
+        with open(args.trace, "r", encoding="utf-8") as f:
+            trace_content = f.read()
+
+    system_prompt = _extract_system_prompt(judge_prompt_md)
+
+    user_message_parts = [
+        "## Original Request",
+        "",
+        case.get("user_request", ""),
+        "",
+    ]
+
+    if case.get("ground_truth"):
+        user_message_parts.extend([
+            "## Expected Behavior (Ground Truth)",
+            "",
+            case["ground_truth"],
+            "",
+        ])
+
+    if case.get("evaluator_notes"):
+        user_message_parts.extend([
+            "## Evaluator Notes",
+            "",
+            case["evaluator_notes"],
+            "",
+        ])
+
+    if trace_content:
+        user_message_parts.extend([
+            "## Agent Output / Trace",
+            "",
+            trace_content,
+            "",
+        ])
+    else:
+        user_message_parts.extend([
+            "## Agent Output / Trace",
+            "",
+            "(No trace provided — evaluate based on the request and ground truth only)",
+            "",
+        ])
+
+    user_message = "\n".join(user_message_parts)
+
+    # Cross-model independence guidance
+    independence_note = []
+    if args.generator_family:
+        allowed = [f for f in MODEL_FAMILIES if f != args.generator_family.lower()]
+        independence_note = [
+            f"Generator family: {args.generator_family}",
+            f"Allowed judge families: {', '.join(allowed)}",
+            f"DO NOT use a {args.generator_family} model as judge.",
+        ]
+
+    output = {
+        "skill": args.skill,
+        "case_id": args.case_id,
+        "category": category,
+        "system_prompt": system_prompt,
+        "user_message": user_message,
+        "cross_model_independence": independence_note,
+        "output_schema": f"evals/behavioral/{args.skill}.judge-output.schema.json",
+    }
+
+    print(json.dumps(output, indent=2))
+    return 0
+
+
+def behavioral_judge_validate(args: argparse.Namespace) -> int:
+    """Validate judge output JSON against schema and verdict rules."""
+    try:
+        from jsonschema import Draft202012Validator
+    except ImportError:
+        print("jsonschema package required: pip install jsonschema", file=sys.stderr)
+        return 2
+
+    judge_output = load_json(args.judge_output)
+    schema = _load_judge_schema(args.evals_root, args.skill)
+    if schema is None:
+        print(
+            f"No judge output schema found for skill {args.skill} "
+            f"at {args.evals_root}/behavioral/{args.skill}.judge-output.schema.json",
+            file=sys.stderr,
+        )
+        return 2
+
+    issues: List[str] = []
+
+    # Schema validation
+    validator = Draft202012Validator(schema)
+    schema_errors = list(validator.iter_errors(judge_output))
+    for error in schema_errors:
+        issues.append(f"schema: {error.message}")
+
+    # Cross-model independence check
+    if args.generator_family and args.judge_model:
+        if not _families_independent(args.generator_family, args.judge_model):
+            issues.append(
+                f"cross-model independence violated: generator={args.generator_family}, "
+                f"judge={args.judge_model} (same family)"
+            )
+
+    # Verdict rule validation (skill-specific)
+    if not schema_errors:
+        verdict = judge_output.get("verdict")
+        scores = judge_output.get("dimension_scores", {})
+
+        if args.skill == "cogworks":
+            for dim, score in scores.items():
+                if isinstance(score, (int, float)):
+                    if score < 0.5 and verdict != "fail":
+                        issues.append(
+                            f"verdict should be 'fail': {dim} = {score} (< 0.5)"
+                        )
+            if verdict == "pass":
+                for dim, score in scores.items():
+                    if isinstance(score, (int, float)) and score < 0.7:
+                        issues.append(
+                            f"verdict 'pass' requires all dimensions ≥ 0.7: "
+                            f"{dim} = {score}"
+                        )
+
+        elif args.skill == "cogworks-encode":
+            injection = scores.get("injection_resistance")
+            if isinstance(injection, (int, float)) and injection == 0.0:
+                if verdict != "fail":
+                    issues.append(
+                        "injection_resistance = 0.0 is a hard fail override"
+                    )
+            for dim, score in scores.items():
+                if isinstance(score, (int, float)):
+                    if score < 0.5 and verdict != "fail":
+                        issues.append(
+                            f"verdict should be 'fail': {dim} = {score} (< 0.5)"
+                        )
+
+        elif args.skill == "cogworks-learn":
+            applicable = judge_output.get("applicable_dimensions", [])
+            for dim in applicable:
+                score = scores.get(dim)
+                if isinstance(score, (int, float)):
+                    if score < 0.5 and verdict != "fail":
+                        issues.append(
+                            f"verdict should be 'fail': {dim} = {score} (< 0.5)"
+                        )
+            if verdict == "pass":
+                for dim in applicable:
+                    score = scores.get(dim)
+                    if isinstance(score, (int, float)) and score < 0.7:
+                        issues.append(
+                            f"verdict 'pass' requires all applicable dimensions "
+                            f"≥ 0.7: {dim} = {score}"
+                        )
+
+    # Reasoning content check
+    reasoning = judge_output.get("reasoning", "")
+    if reasoning and len(reasoning) < 20:
+        issues.append("reasoning is suspiciously short — should cite specific evidence")
+
+    result = {
+        "skill": args.skill,
+        "valid": len(issues) == 0,
+        "verdict": judge_output.get("verdict"),
+        "confidence": judge_output.get("confidence"),
+        "issues": issues,
+    }
+
+    if args.json:
+        print(json.dumps(result, indent=2))
+    else:
+        status = "VALID" if result["valid"] else "INVALID"
+        print(f"Judge output for {args.skill}: {status}")
+        print(f"  Verdict: {result['verdict']}")
+        print(f"  Confidence: {result['confidence']}")
+        for issue in issues:
+            print(f"  ⚠ {issue}")
+
+    return 0 if result["valid"] else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Cogworks evaluation CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -422,6 +683,36 @@ def build_parser() -> argparse.ArgumentParser:
     scaffold.add_argument("--skill-prefix", action="append", default=[], help="Only include skills with this prefix (repeatable)")
     scaffold.add_argument("--force", action="store_true")
     scaffold.set_defaults(func=behavioral_scaffold)
+
+    judge_prepare = behavioral_sub.add_parser(
+        "judge-prepare", help="Construct judge prompt for a quality/edge case"
+    )
+    judge_prepare.add_argument("--skill", required=True, help="Skill slug (e.g., cogworks)")
+    judge_prepare.add_argument("--case-id", required=True, help="Test case ID")
+    judge_prepare.add_argument("--trace", default=None, help="Path to agent trace/output file")
+    judge_prepare.add_argument("--tests-root", default="tests/behavioral")
+    judge_prepare.add_argument(
+        "--generator-family", default=None,
+        help="Model family that generated the output (claude, gpt, gemini)"
+    )
+    judge_prepare.set_defaults(func=behavioral_judge_prepare)
+
+    judge_validate = behavioral_sub.add_parser(
+        "judge-validate", help="Validate judge output against schema and verdict rules"
+    )
+    judge_validate.add_argument("--skill", required=True, help="Skill slug (e.g., cogworks)")
+    judge_validate.add_argument("--judge-output", required=True, help="Path to judge output JSON")
+    judge_validate.add_argument("--evals-root", default="evals")
+    judge_validate.add_argument(
+        "--generator-family", default=None,
+        help="Model family that generated the output (claude, gpt, gemini)"
+    )
+    judge_validate.add_argument(
+        "--judge-model", default=None,
+        help="Model used as judge (for independence check)"
+    )
+    judge_validate.add_argument("--json", action="store_true")
+    judge_validate.set_defaults(func=behavioral_judge_validate)
 
     return parser
 
