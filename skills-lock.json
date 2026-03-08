@@ -1,15 +1,20 @@
 {
   "version": 1,
   "skills": {
-    "ibm-prompt-guide": {
-      "source": "/home/williamh/code/cogworks/_generated-skills",
+    "cogworks": {
+      "source": "/home/will/code/cogworks/skills",
       "sourceType": "local",
-      "computedHash": "ff34ab9458fdfe81429301693c8faa6b833a960b2254a76b7f6e356d0f8371c9"
+      "computedHash": "3c36e4f5814659daa0d20fb39ef995c06c03c45623a14dc6a146ed8206f9f818"
     },
-    "tdd": {
-      "source": "/home/williamh/code/cogworks/_generated-skills",
+    "cogworks-encode": {
+      "source": "/home/will/code/cogworks/skills",
       "sourceType": "local",
-      "computedHash": "068412296cfe5068aa30c2884354e6e77bd4d35cabcf0f6f478ea0587dfb3e8a"
+      "computedHash": "72f0a7c38222e1be53c382670e496044fa4def8a9bc99c9e4e26cf1166fec05e"
+    },
+    "cogworks-learn": {
+      "source": "/home/will/code/cogworks/skills",
+      "sourceType": "local",
+      "computedHash": "a71b1f64947ad1aeb80a0f6f5ba1ece96da7657f3e4529f5b278959597b93c2e"
     }
   }
 }
