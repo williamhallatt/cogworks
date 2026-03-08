@@ -1,6 +1,10 @@
 # cogworks
 
-Encode knowledge from diverse sources and automate creation of high-quality agent skills.
+Turn source material into trustworthy agent skills.
+
+`cogworks` is a single skill-building product surface. The user provides links,
+files, or source directories. `cogworks` either produces a production-ready
+generated skill or stops with a clear trust report explaining why it will not.
 
 ## Installation
 
@@ -8,158 +12,134 @@ Encode knowledge from diverse sources and automate creation of high-quality agen
 npx skills add williamhallatt/cogworks
 ```
 
-Requires Node.js 18+. See [INSTALL.md](INSTALL.md) for options including specific skills, specific agents, global scope, and manual installation.
+Requires Node.js 18+. See [INSTALL.md](INSTALL.md) for installation options and
+manual verification steps.
 
 ## Quick Start
 
-Start your agent in your project directory and invoke:
+Start your agent in your project directory and invoke the `cogworks` skill in
+your agent's native style.
 
-> **Note:** The skill prefix is agent-specific. Examples use `/` (Claude Code) and `$` (Codex CLI). Other agents may use a different prefix — consult your agent's documentation.
+> **Note:** Skill prefixes are agent-specific. Examples use `/` for Claude Code.
+> Other agents may use a different prefix or natural-language invocation style.
 
-```bash
-# Claude Code
-/cogworks encode <sources> as <skill_name>
-
-# Codex CLI
-$cogworks encode <sources> as <skill_name>
+```text
+/cogworks Turn these API docs into a deployable agent skill for handling webhook retries.
+/cogworks Build a skill from `_sources/auth/` that teaches correct OAuth callback handling.
+/cogworks Use these sources to create a skill named `incident-triage-playbook`.
 ```
 
-`<sources>` can be a mix of URLs, local files, directories, and files containing URLs. `as <skill_name>` is optional — if omitted, `cogworks` generates a slug from the source topic.
+`cogworks` will:
+- gather the source material
+- classify trust and provenance before synthesis
+- synthesize the guidance into decision-ready doctrine
+- package the result as a generated skill
+- run deterministic validation before presenting the final output
 
-## How it Works
+The default output location is `_generated-skills/{slug}/`.
 
-Provide sources -> choose an execution engine -> `cogworks` synthesises them via an 8-phase process -> outputs a multi-file skill package -> the skill becomes auto-discoverable and invokable via `/{slug}`.
+## Product Contract
 
-**Execution engines:**
-- **Legacy** — default prompt-orchestrated pipeline
-- **Agentic** — opt-in stage-driven pipeline using a coordinator plus specialist roles, canonical role profiles, surface-specific bindings, and honest fallback when a surface cannot provide native subagents
+`cogworks` is optimized for two things:
+- quality of the generated skill
+- trust in both the tool and the generated output
 
-**Synthesis phases:**
+That means:
+- there is one stable user-facing entry point: `cogworks`
+- internal orchestration choices are not a user-facing mode
+- the generated skill is the only primary product artifact
+- weak or contradictory source material causes a fail-closed stop, not a
+  production-ready result
 
-1. Content Analysis
-2. Concept Extraction
-3. Relationship Mapping
-4. Pattern Extraction
-5. Anti-Pattern Documentation
-6. Conflict Detection
-7. Example Collection
-8. Narrative Construction
+If trust classification, contradiction handling, or deterministic validation
+fails, `cogworks` returns a blocking trust report instead of shipping a dubious
+skill.
 
-For the current system architecture, see [agentic-runtime.md](./skills/cogworks/agentic-runtime.md).
+## How It Works
 
-## Using `cogworks`
+### User-facing flow
 
-The `cogworks` skill orchestrates a full end-to-end workflow, but you can also use the supporting skills directly.
+The user experience is intentionally concise:
+1. invoke `cogworks`
+2. provide sources and, optionally, a desired skill name or destination
+3. review only when a real overwrite or trust decision is needed
+4. receive either:
+   - a validated generated skill, or
+   - a blocking trust report with the next required action
 
-- **The orchestrator** (`/cogworks`) — runs the complete workflow (source gathering -> synthesis -> review -> skill generation -> validation -> install prompt). It references both supporting skills. Add `--engine agentic` to opt into the new stage-driven runtime while keeping generated skills as the output artifact.
-- **The skills** (`/cogworks-encode`, `/cogworks-learn`) — inject domain expertise into your conversation. You then direct the agent in natural language, applying that expertise however you need. They don't run workflows on their own.
+### Internal build path
 
-### `/cogworks-encode` — Synthesis Expertise
+Internally, `cogworks` uses:
+- `cogworks-encode` for synthesis doctrine
+- `cogworks-learn` for skill-authoring doctrine
+- specialist sub-agents on supported surfaces when that improves quality and
+  context isolation
 
-Loads the 8-phase synthesis methodology.
+Sub-agents are implementation machinery, not a public interface. They are used
+to keep the coordinator context small and to give source intake, synthesis,
+packaging, and validation explicit ownership.
 
-**When to use independently:** when you want synthesis expertise without the full skill-generation workflow — analysing multiple sources, creating a reference document, building a knowledge base outside the skill format, or reconciling conflicting information across documents.
+## Supported Execution Surfaces
 
-**Example invocations:**
+Current product direction:
+- **Claude Code**: first-class target for the trust-first sub-agent build path
+- **GitHub Copilot CLI**: first-class only when its delegated-task behavior is
+  proven by local maintainer smoke evidence
+- **Codex**: generated skills remain portable there, but Codex sub-agent build
+  support is deferred for now
 
-```bash
-# Claude Code
-/cogworks-encode I have three API docs open. Help me synthesise them into a unified reference.
-/cogworks-encode product management best practices from <source_dir> and output results to <output_dir>.
+`cogworks` should not claim cross-agent parity unless the surface has a real,
+tested path.
 
-# Codex CLI
-$cogworks-encode I have three API docs open. Help me synthesise them into a unified reference.
-$cogworks-encode product management best practices from <source_dir> and output results to <output_dir>.
-```
+## Supporting Skills
 
-### `/cogworks-learn` — Skill-Writing Expertise
+The repository ships three skills:
 
-Loads expertise on writing agent skills — SKILL.md files, frontmatter configuration, invocation modes, context management, and best practices.
+| Skill | Role |
+|---|---|
+| `cogworks` | The only normal user-facing product entry point |
+| `cogworks-encode` | Internal synthesis doctrine; also available as an expert surface when you want synthesis help without full skill generation |
+| `cogworks-learn` | Internal skill-authoring doctrine; also available as an expert surface for manual skill design or review |
 
-**When to use independently:** when writing or reviewing skills manually, designing skill architecture, understanding invocation modes, or optimising skill discoverability and context efficiency.
+Most users should start with `cogworks`, not with the support skills directly.
 
-**Example invocations:**
+## Quality And Trust
 
-```bash
-# Claude Code
-/cogworks-learn I've written a deployment skill. Should it use disable-model-invocation?
-/cogworks-learn Review this SKILL.md frontmatter and suggest improvements.
+Trust comes from layered gates:
+- source trust classification before synthesis
+- explicit contradiction handling and traceability
+- deterministic validation of the generated skill structure
+- fail-closed behavior when blocking uncertainty remains
 
-# Codex CLI
-$cogworks-learn I've written a deployment skill. Should it use disable-model-invocation?
-$cogworks-learn Review this SKILL.md frontmatter and suggest improvements.
-```
+Benchmarking and comparative evaluation still matter, but they are maintainer
+surfaces under `evals/` and `scripts/`. They do not change the normal user
+workflow or the generated skill output contract.
 
-## Agentic Mode
+## Maintainer Notes
 
-Use the opt-in agentic engine when you want the pipeline itself to behave like a coordinated team rather than one monolithic prompt-following run.
+For maintainers investigating the internal sub-agent build path:
+- see [skills/cogworks/agentic-runtime.md](skills/cogworks/agentic-runtime.md)
+- see [skills/cogworks/claude-adapter.md](skills/cogworks/claude-adapter.md)
+- see [skills/cogworks/copilot-adapter.md](skills/cogworks/copilot-adapter.md)
+- see [tests/agentic-smoke/README.md](tests/agentic-smoke/README.md)
 
-```bash
-# Claude Code
-/cogworks encode --engine agentic <sources> as <skill_name>
-
-# Codex CLI
-$cogworks encode --engine agentic <sources> as <skill_name>
-```
-
-Agentic mode keeps the product contract intact:
-- the primary artifact is still a generated skill
-- the default staging path is still `_generated-skills/`
-- installation is still done with `npx skills add`
-
-What changes is the execution model:
-- coordinator + specialist roles
-- explicit stage graph
-- per-stage artifacts and summaries under `_generated-skills/.cogworks-runs/`
-- `dispatch-manifest.json` recording canonical role profiles, surface bindings, model policy, and actual dispatch modes
-- surface-specific adapters for Claude Code and GitHub Copilot CLI, with explicit degraded single-agent fallback when native subagents are unavailable
-
-What does not change:
-- the generated skill is still the product artifact
-- `SKILL.md`, `reference.md`, and `metadata.json` still need to pass the same deterministic validators used by the legacy path
-- run artifacts supplement those gates; they do not replace them
-
-## Quality Across Agents and Models
-
-Skill quality varies depending on which agent runs the workflow and which model powers it. The root cause is structural: synthesis and contradiction resolution are reasoning-heavy tasks, and models differ in how reliably they follow abstract quality instructions.
-
-**Model capability requirements:**
-
-| Provider | Reasoning tier (recommended for synthesis) | Workhorse tier (format assembly only) |
-|----------|---------------------------------------------|---------------------------------------|
-| Claude | Opus, Sonnet | Haiku |
-| OpenAI | GPT-4o, GPT-4.1, o3 | GPT-3.5, o1-mini |
-| Gemini | 1.5 Pro, 2.0 Flash Thinking | 1.5 Flash |
-
-If your agent is running a workhorse-tier model, expect reduced synthesis depth — the structural output will be correct, but cross-source connections, contradiction resolution, and operational density in decision rules may be thinner.
-
-**Mitigations built into the workflow:**
-
-- Each skill carries an explicit self-verification checklist that the agent must evaluate against its own output before presenting results (embedded in `cogworks-encode` and `cogworks-learn` SKILL.md files)
-- Portable validation scripts (`scripts/validate-synthesis.sh` in cogworks-encode, `scripts/validate-skill.sh` in cogworks-learn) provide mechanical enforcement of section presence, citation counts, and structural integrity — these ship with the skills and require only standard unix tools
-- The orchestrator (`cogworks`) delegates verification to these per-skill gates rather than relying on a single vague rewrite pass
-- In agentic mode, the simplified runtime keeps only source intake, synthesis, packaging, validation, and final review as explicit stage boundaries
-
-These mitigations narrow the gap but do not eliminate it. For best results, use a reasoning-tier model.
+These are implementation and validation surfaces, not the normal product entry
+point.
 
 ## Limitations
 
-Related to this being a personal workflow tool:
-
-- **Not portable** — `cogworks` assumes Linux (Ubuntu), edit paths throughout skills accordingly
-- **Neutral staging** — generated skills are written to `_generated-skills/` and installed to detected agents via `npx skills add`. You can override the staging path with a custom destination in your command.
-- **Universal skills** — skills generated by cogworks follow the [Agent Skills standard](https://agentskills.io) and work across Claude Code, Codex, GitHub Copilot, Cursor, and other compatible agents
-- **Surface capabilities differ** — Claude Code has repo-local role agent bindings under `.claude/agents/`; GitHub Copilot CLI uses the same canonical role profiles through adapter-rendered inline bindings and may honestly fall back to degraded single-agent execution if native subagents are unavailable
-
-Limitations I'm not planning on addressing:
-
-- **No authenticated sources** — WebFetch cannot access anything behind a login
-- **Context window ceiling** — all sources must fit in the agent's context during synthesis, even when the agentic engine isolates some stage-local verbosity
-- **Snapshot knowledge** — synthesis captures sources at a point in time; no automated updates if the source changes
+- authenticated or private web sources still require a surface capable of
+  accessing them
+- source quality limits output quality; cogworks can fail closed, but it cannot
+  invent trustworthy evidence
+- generated skills aim to follow the [Agent Skills standard](https://agentskills.io)
+  where the artifact format is portable, but the build system itself is not
+  assumed to be equally portable across agent surfaces
 
 ## Contributing
 
-See [CONTRIBUTIONS.md](CONTRIBUTIONS.md) for development setup, coding conventions, and the release process.
+See [CONTRIBUTIONS.md](CONTRIBUTIONS.md) for development setup, conventions, and
+release process.
 
 ## License
 
