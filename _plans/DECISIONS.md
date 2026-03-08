@@ -7,6 +7,17 @@ audited_through: 2026-03-08
 Settled decisions for the cogworks project. Agents load this file for context.
 Archive plan files are deleted once their decision is extracted here; git history is the recovery path.
 
+## [D-041] Closed plans are retained as extracted decisions, not archived files
+
+- **Date:** 2026-03-08 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** The `_plans/` workflow now follows `Decision-Only` retention. Accepted plans may exist temporarily under `_plans/` while work is active. Once the work is complete, the canonical durable record is the extracted entry in `DECISIONS.md`; the closed plan file is deleted rather than preserved as a standalone historical artifact. The repository does not maintain a growing plan archive in the working tree.
+- **Rationale:** Compact, scoped durable memory is easier for agents to retrieve correctly than narrative history. The prior archive model duplicated information already meant to live in `DECISIONS.md`, increased drift risk, and kept a historical surface around long after its decision-grade value had been extracted. Git history is sufficient for recovery when the original plan text is ever needed.
+- **Operational implication:** `_plans/` is now an active-work surface plus `DECISIONS.md`, not a historical document store. Canonical docs and decision entries should no longer point readers at archived plan files as part of the normal workflow.
+- **Builds on:** D-033, D-034, and D-040 by reducing durable memory to the smallest operational surface.
+- **Scope:** `AGENTS.md`, `_plans/DECISIONS.md`.
+- **D-025 audit (Scribe, 2026-03-08):** Clean — owned policy surfaces now agree on the deletion-based lifecycle.
+
 ## [D-040] `AGENTS.md` now defines staged retrieval, stop rules, and authority order at first touch
 
 - **Date:** 2026-03-08 | **By:** William (owner)
@@ -15,7 +26,7 @@ Archive plan files are deleted once their decision is extracted here; git histor
 - **Rationale:** The prior retrieval policy still encouraged unnecessary first-touch expansion by listing all top-level docs as default reads and by using broad wording like “directly relevant files under `skills/` and `evals/`”. It also contained a contradictory pull-through into `.squad/`, a surface explicitly marked non-default. Tightening the contract reduces context pollution and gives agents fewer opportunities to improvise authority or over-read.
 - **Operational implication:** Agents should treat the top-level product docs as task-matched follow-on reads, not startup context. Non-default surfaces remain scoped references only. `AGENTS.md` should avoid routine references that send agents into non-default trees.
 - **Builds on:** D-033 and D-034 by turning the allowlist into an explicit staged retrieval algorithm with stop conditions and precedence.
-- **Scope:** `AGENTS.md`, `_plans/archive/2026-03-08-agents-retrieval-contract-tightening.md`.
+- **Scope:** `AGENTS.md`, `_plans/DECISIONS.md`.
 - **D-025 audit (Scribe, 2026-03-08):** Clean — no stale refs remain in the owned files touched by this decision.
 
 ## [D-039] Public docs now state surface support boundaries explicitly at first touch
@@ -25,7 +36,7 @@ Archive plan files are deleted once their decision is extracted here; git histor
 - **Decision:** Public/user-facing docs must distinguish artifact portability from build-surface support explicitly and early. `README.md`, `INSTALL.md`, `skills/cogworks/README.md`, `TESTING.md`, and `CONTRIBUTIONS.md` now teach one consistent support model: generated skills are portable across agents that support skills; the trust-first internal build flow is currently supported only on Claude Code and GitHub Copilot CLI; Codex may appear as a generated-skill destination or maintainer benchmark/trigger surface, but it must not be presented as a supported trust-first build surface.
 - **Rationale:** The previous docs required readers to infer the Codex restriction by combining public and maintainer-only files. That made the product surface easy to misread and allowed installation or testing examples to imply parity that the runtime does not actually support. Explicit first-touch boundaries reduce user confusion and keep public docs aligned with the live product contract.
 - **Operational implication:** Any future public doc change that mentions Codex, portability, or supported surfaces must preserve the portability-versus-build distinction. Maintainer testing docs may continue to reference Codex where trigger smoke or benchmark tooling genuinely uses it, but those references must remain visibly separate from product support claims.
-- **Scope:** `README.md`, `INSTALL.md`, `skills/cogworks/README.md`, `TESTING.md`, `CONTRIBUTIONS.md`, `_plans/archive/2026-03-08-public-docs-surface-clarity.md`.
+- **Scope:** `README.md`, `INSTALL.md`, `skills/cogworks/README.md`, `TESTING.md`, `CONTRIBUTIONS.md`.
 
 ## [D-038] Test surface subtraction removes dead contracts and keeps only maintained validation paths
 
@@ -35,7 +46,7 @@ Archive plan files are deleted once their decision is extracted here; git histor
 - **Rationale:** Several failing tests were not exposing product regressions; they were enforcing contracts that the repository had already abandoned in practice. Restoring every removed surface would add complexity without improving trust. Subtracting dead paths leaves one coherent, documented test story.
 - **Operational implication:** Maintainers should rely on deterministic checks, black-box tests, the live sub-agent contract smoke, the skill benchmark smoke, trigger smoke, and the fast recursive round. They should not expect `.claude/agents/**`, `tests/ci-gate-check.sh`, `tests/run-pipeline-benchmark-smoke.sh`, or recursive deep-mode benchmark wiring to exist.
 - **Supersedes:** D-029 for the file-backed Claude binding detail, D-018 for the behavioral-trace CI gate, and any live docs/scripts still treating `benchmarks/comparison/**` as an active benchmark surface.
-- **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/copilot-adapter.md`, `skills/cogworks/role-profiles.json`, `scripts/validate-agentic-run.sh`, `scripts/test-agentic-contract.sh`, `scripts/render-agentic-role-bindings.py`, `scripts/run-recursive-round.sh`, `scripts/recursive-env.example.sh`, `scripts/run-trigger-smoke-tests.sh`, `tests/framework/scripts/cogworks-eval.py`, `tests/datasets/recursive-round/README.md`, `tests/datasets/recursive-round/round-manifest.local.json`, `TESTING.md`, `AGENTS.md`, `tests/run-pipeline-benchmark-smoke.sh` (deleted), `tests/ci-gate-check.sh` (deleted), `_plans/archive/2026-03-08-test-surface-subtraction-and-harness-refresh.md`.
+- **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/copilot-adapter.md`, `skills/cogworks/role-profiles.json`, `scripts/validate-agentic-run.sh`, `scripts/test-agentic-contract.sh`, `scripts/render-agentic-role-bindings.py`, `scripts/run-recursive-round.sh`, `scripts/recursive-env.example.sh`, `scripts/run-trigger-smoke-tests.sh`, `tests/framework/scripts/cogworks-eval.py`, `tests/datasets/recursive-round/README.md`, `tests/datasets/recursive-round/round-manifest.local.json`, `TESTING.md`, `AGENTS.md`, `tests/run-pipeline-benchmark-smoke.sh` (deleted), `tests/ci-gate-check.sh` (deleted).
 
 ## [D-037] Cogworks resets to one trust-first product entry point; sub-agent build path becomes internal maintainer machinery
 
@@ -45,7 +56,7 @@ Archive plan files are deleted once their decision is extracted here; git histor
 - **Rationale:** The previous pivot drifted into a pseudo-CLI and runtime-contract product that exposed internal pipeline choices instead of improving the one thing users actually care about: the quality and trustworthiness of generated skills. Making sub-agents internal again preserves their benefits while removing user-facing complexity and context bloat.
 - **Operational implication:** Public docs and the `cogworks` skill now teach one natural invocation surface. Maintainer smoke validation still verifies the Claude/Copilot sub-agent build path, but benchmarking and runtime evidence are explicitly separate from the normal user workflow. Runtime metadata no longer belongs in generated skill frontmatter or generated-skill metadata. Codex sub-agent support is deferred rather than simulated.
 - **Supersedes:** D-027, D-028, and D-029 at the product-surface level. Their history remains valid background, but the active product contract is now the single-entry trust-first model described here.
-- **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/README.md`, `skills/cogworks/metadata.json`, `skills/cogworks/agentic-runtime.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/copilot-adapter.md`, `README.md`, `INSTALL.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/**`, `scripts/test-agentic-contract.sh`, `scripts/validate-agentic-run.sh`, `scripts/run-agentic-quality-compare.py` (deleted), `_plans/archive/2026-03-08-cogworks-reset-single-entry-subagent-trust.md`.
+- **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/README.md`, `skills/cogworks/metadata.json`, `skills/cogworks/agentic-runtime.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/copilot-adapter.md`, `README.md`, `INSTALL.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/**`, `scripts/test-agentic-contract.sh`, `scripts/validate-agentic-run.sh`, `scripts/run-agentic-quality-compare.py` (deleted).
 
 ## [D-036] Benchmark evidence is fail-closed; preserved smoke proof lives in a canonical example surface
 
@@ -54,17 +65,26 @@ Archive plan files are deleted once their decision is extracted here; git histor
 - **Decision:** The skill benchmark surface is now hardened to fail closed. `scripts/run-skill-benchmark.py` validates cases, observations, judge output, and summaries against the canonical schemas; requires `--judge-model` whenever a case uses `judge_only`; enforces cross-family judge/generator separation; reruns invalid trials instead of scoring them; and treats replay evidence as non-decision-grade even when the harness completes. Activation remains a separate scorecard, but a candidate with disqualifying false-positive regression on `must_not_activate` cases may not be declared the winner. The Codex adapter is restored as a replayable/live observation normalizer with explicit integrity metadata rather than a benchmark-fork surface. Preserved Copilot smoke proof artifacts now live under `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/` instead of repo-root scratch paths.
 - **Rationale:** The benchmark was the decision surface for whether agentic complexity earns its keep, but it was weaker than the runtime contract it was meant to judge. Scoring invalid trials, omitting judge provenance, and teaching one context-hygiene policy while embodying another made the repo easier to misread and easier to overclaim from. This decision makes benchmark results and preserved examples honest by construction.
 - **Operational implication:** Benchmark claims should rely on `decision_eligible = true`, not just `verdict`. Replay artifacts remain useful for smoke coverage and offline normalization checks, but they do not support ranking claims. Preserved in-repo smoke evidence is now explicit example material, not ambient scratch state.
-- **Scope:** `scripts/run-skill-benchmark.py`, `scripts/skill-benchmark-codex-adapter.py`, `evals/skill-benchmark/*.schema.json`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `evals/skill-benchmark/examples/benchmark-summary.example.json`, `evals/README.md`, `tests/test-data/skill-benchmark-pilot/*`, `tests/test-data/skill-benchmark-integrity/*`, `tests/test-data/skill-benchmark-codex-adapter/*`, `tests/run-skill-benchmark-smoke.sh`, `tests/framework/README.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/`, `.cogworks-runs/README.md`, `tmp-agentic-output/README.md`, `_plans/archive/2026-03-08-benchmark-truthfulness-and-context-hygiene-hardening.md`.
+- **Scope:** `scripts/run-skill-benchmark.py`, `scripts/skill-benchmark-codex-adapter.py`, `evals/skill-benchmark/*.schema.json`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `evals/skill-benchmark/examples/benchmark-summary.example.json`, `evals/README.md`, `tests/test-data/skill-benchmark-pilot/*`, `tests/test-data/skill-benchmark-integrity/*`, `tests/test-data/skill-benchmark-codex-adapter/*`, `tests/run-skill-benchmark-smoke.sh`, `tests/framework/README.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/`, `.cogworks-runs/README.md`, `tmp-agentic-output/README.md`.
+
+## [D-035] Infrastructure debt cleanup and source-intake trust gate — *Partially superseded by D-036, D-037, and D-038*
+
+- **Date:** 2026-03-08 | **By:** William (owner)
+- **Status:** Partially superseded
+- **Decision:** Removed interim comparison/tooling debt around the early agentic benchmark surface and introduced `source-intake/source-trust-gate.json` as a required blocking artifact before synthesis begins.
+- **Rationale:** The interim engine and benchmark surfaces had accumulated tooling without the corresponding decision-grade experiment results. The trust gate addition closed a real security/runtime gap even though other parts of the cleanup were later revised.
+- **Operational implication:** The lasting contract from this decision is the enforced `source-trust-gate.json` requirement now reflected in current runtime docs and validators. The deleted-adapter and deleted-comparison-script aspects were later overtaken by D-036 through D-038.
+- **Scope:** `skills/cogworks/agentic-runtime.md`, `scripts/validate-agentic-run.sh`, `skills/cogworks/role-profiles.json`.
 
 ## [D-033] Default agent retrieval is restricted to canonical instruction surfaces; research, history, and generated artifacts are non-default
 
 - **Date:** 2026-03-07 | **By:** William (owner)
 - **Status:** Accepted
-- **Decision:** Agents working in this repository must treat only the following as default retrieval surfaces unless the task explicitly calls for deeper context: `AGENTS.md`, top-level product docs (`README.md`, `TESTING.md`, `CONTRIBUTIONS.md`, `INSTALL.md`), `_plans/DECISIONS.md`, active `_plans/*.md`, and directly relevant canonical files under `skills/**`, `.claude/agents/**`, and `evals/**`. The following are non-default and must not be loaded opportunistically: `.github/agents/**`, `.squad/**`, `_plans/archive/**`, `_sources/**`, `.cogworks-runs/**`, `tmp-agentic-output/**`, `tests/results/**`, `tests/test-data/**`, and `tests/datasets/golden-samples/**`.
+- **Decision:** Agents working in this repository must treat only the following as default retrieval surfaces unless the task explicitly calls for deeper context: `AGENTS.md`, top-level product docs (`README.md`, `TESTING.md`, `CONTRIBUTIONS.md`, `INSTALL.md`), `_plans/DECISIONS.md`, active `_plans/*.md`, and directly relevant canonical files under `skills/**`, `.claude/agents/**`, and `evals/**`. The following are non-default and must not be loaded opportunistically: `.github/agents/**`, `.squad/**`, `_sources/**`, `.cogworks-runs/**`, `tmp-agentic-output/**`, `tests/results/**`, `tests/test-data/**`, and `tests/datasets/golden-samples/**`. Closed plan files are deleted after extraction and therefore are not a retained retrieval surface.
 - **Rationale:** The 2026-03-07 repository-wide context audit found that the repo has multiple high-authority but non-canonical surfaces: a large Copilot auto-loaded Squad instruction file, duplicate decision ledgers, tracked generated run artifacts, production-shaped generated skills outside `skills/`, and a mixed-authority research corpus under `_sources/`. Without a hard default retrieval boundary, agents can waste context budget or act on the wrong source of truth.
-- **Operational implication:** Default retrieval now follows an allowlist model. Research corpora, Squad memory, archived plans, run artifacts, and realistic fixtures remain valid repository assets, but only when a task explicitly requires them. When these surfaces are consulted, agents must treat them as scoped reference material rather than repo-wide policy.
+- **Operational implication:** Default retrieval now follows an allowlist model. Research corpora, Squad memory, run artifacts, and realistic fixtures remain valid repository assets, but only when a task explicitly requires them. When these surfaces are consulted, agents must treat them as scoped reference material rather than repo-wide policy.
 - **Audit artifact:** `docs/ai-context-retrieval-risk-audit-2026-03-07.md`
-- **Scope:** `AGENTS.md`, `_plans/DECISIONS.md`, `docs/ai-context-retrieval-risk-audit-2026-03-07.md`, `_plans/archive/2026-03-07-ai-context-retrieval-risk-audit.md`
+- **Scope:** `AGENTS.md`, `_plans/DECISIONS.md`, `docs/ai-context-retrieval-risk-audit-2026-03-07.md`
 
 ## [D-034] Context-hygiene cleanup marks non-canonical surfaces and defaults live smoke output to disposable paths
 
@@ -73,7 +93,7 @@ Archive plan files are deleted once their decision is extracted here; git histor
 - **Decision:** The repository now enforces the default retrieval policy in live docs, not just in the decision record. `AGENTS.md` now carries the canonical allowlist for default loading. `TESTING.md` now recognizes the current skill-benchmark pilot harness under `evals/` and distinguishes it from the still-reconstructing broader behavioral harness. Live smoke docs now prefer disposable output roots outside the repository. High-risk non-canonical surfaces (`.github/agents/`, `.squad/`, `_sources/`, `.cogworks-runs/`, `tmp-agentic-output/`, `tests/test-data/`, and `tests/datasets/golden-samples/`) now contain explicit warning markers or READMEs that tell humans and agents not to treat them as default instruction sources.
 - **Rationale:** Policy that exists only in a decision file still leaves first-touch retrieval vulnerable. The audit showed that the repo's highest-risk surfaces were dangerous precisely because they looked canonical when opened directly. Marking those surfaces in place reduces wrong-authority retrieval without deleting useful historical evidence or test fixtures.
 - **Operational implication:** Future smoke runs and benchmark runs should default to disposable output roots, and any preserved in-repo artifacts should be treated as deliberate examples, not ambient scratch state. Historical handoff material no longer belongs in active `_plans/`.
-- **Scope:** `.gitignore`, `AGENTS.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `.github/agents/squad.agent.md`, `.squad/decisions.md`, `.squad/identity/now.md`, `.squad/README.md`, `_sources/README.md`, `.cogworks-runs/README.md`, `tmp-agentic-output/README.md`, `tests/test-data/README.md`, `tests/datasets/golden-samples/README.md`, `docs/testing-workflow-guide.md`, `docs/cogworks-agent-risk-analysis.md`, `_plans/archive/2026-03-06-agentic-v2-next-session.md`, `_plans/archive/2026-03-07-context-hygiene-cleanup.md`
+- **Scope:** `.gitignore`, `AGENTS.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `.github/agents/squad.agent.md`, `.squad/decisions.md`, `.squad/identity/now.md`, `.squad/README.md`, `_sources/README.md`, `.cogworks-runs/README.md`, `tmp-agentic-output/README.md`, `tests/test-data/README.md`, `tests/datasets/golden-samples/README.md`, `docs/testing-workflow-guide.md`, `docs/cogworks-agent-risk-analysis.md`
 
 ## [D-029] Generalised agentic runtime with adapters — *Superseded by D-037 and D-038*
 
@@ -85,7 +105,7 @@ Archive plan files are deleted once their decision is extracted here; git histor
 - **Rationale:** Previous repo guidance correctly rejected circular self-grading, but it still left open a key attribution problem: if model, runtime, and skill all move at once, the result is not a skill benchmark. A clean intervention framing removes that ambiguity. Separating activation from efficacy also prevents two distinct failure modes from being flattened into one opaque score.
 - **Default benchmark policy:** Fixed model, fixed agent, fixed environment, repeated paired trials, hard-negative and boundary cases included, confidence intervals required, and no same-family generator/judge pairing for rubric-based grading.
 - **Artifacts:** The canonical specification now lives under `evals/`, with a research memo, benchmark doctrine, runbook, schemas, and examples. These artifacts are specification-grade; a harness and benchmark datasets remain future implementation work.
-- **Scope:** `evals/README.md`, `evals/research/2026-03-07-objective-skill-evaluation-research.md`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `evals/skill-benchmark/*.schema.json`, `evals/skill-benchmark/examples/*`, `_plans/archive/2026-03-07-objective-skill-benchmark-framework.md`.
+- **Scope:** `evals/README.md`, `evals/research/2026-03-07-objective-skill-evaluation-research.md`, `evals/skill-benchmark/README.md`, `evals/skill-benchmark/runbook.md`, `evals/skill-benchmark/*.schema.json`, `evals/skill-benchmark/examples/*`.
 - **D-025 audit (Scribe, 2026-03-07):** Clean — no stale refs in owned files.
 
 ## [D-031] Pilot skill benchmark harness uses normalized observation artifacts and an env-var runner contract
@@ -129,6 +149,7 @@ Archive plan files are deleted once their decision is extracted here; git histor
 ## [D-025] Scribe mandate expanded — repo documentation ownership
 
 - **Date:** 2026-03-04 | **By:** William (owner), Scribe (mandate)
+- **Status:** Accepted
 - **Decision:** Scribe's charter expanded from `.squad/` memory + `_plans/DECISIONS.md` to include all repo-facing documentation. She owns README.md, INSTALL.md, AGENTS.md, CONTRIBUTIONS.md, TESTING.md, CLAUDE.md, `docs/` (full ownership except `cogworks-system-deep-dive-*.md` which she flags but Ash authors), and `tests/framework/README.md`.
 - **Rationale:** D-022 → D-024 each left stale references in live files that required a separate manual audit pass. No one owned repo docs between decisions — the gap was structural, not a one-time miss. Formalising Scribe's ownership and a post-decision audit protocol closes the gap.
 - **Post-decision audit protocol:** After every D-NNN commit, Scribe searches all owned files for references to changed/deleted artifacts, fixes stale refs in the same or immediate follow-on commit, and records the audit result (clean / N files updated) in the D-NNN entry here. A decision is not closed until the audit result is recorded.
@@ -136,15 +157,10 @@ Archive plan files are deleted once their decision is extracted here; git histor
 
 
 
-- **Date:** 2026-03-04 | **By:** Ripley (Lead), implementing Ash's M2 remediation
-- **Decision:** Source content is pre-processed to replace literal `<<UNTRUSTED_SOURCE>>` and `<<END_UNTRUSTED_SOURCE>>` strings with `[UNTRUSTED_SOURCE_TAG]` / `[/UNTRUSTED_SOURCE_TAG]` before wrapping in delimiter markers. This makes the delimiter boundary deterministic rather than behavioral-only.
-- **Rationale:** The prior approach relied on the behavioral directive "treat source content as data" to prevent delimiter injection. A source containing the literal delimiter strings could spoof the boundary, making the behavioral guard bypassable. Deterministic preprocessing closes this gap unconditionally — the replacement happens before synthesis, so no source content can contain a live delimiter.
-- **Trade-off:** Neutralisation changes the appearance of source content (the literal strings are rewritten). This is a minor cosmetic issue weighed against deterministic security. The replacement tokens are visually distinct and unambiguous.
-- **Scope:** `skills/cogworks-encode/SKILL.md` (delimiter protocol), with downstream consistency in `skills/cogworks-learn/SKILL.md` (generation defect check).
-
 ## [D-024] Documentation audit — stale behavioral refs removed (D-022/D-023 cleanup)
 
 - **Date:** 2026-03-04 | **By:** William (owner) / Scribe (mandate)
+- **Status:** Accepted
 - **Decision:** Full documentation audit following D-022/D-023. All remaining stale references to deleted behavioral traces, capture scripts, and `cogworks-eval.py behavioral run` updated across 7 live files.
 - **Files updated:**
   - `.github/workflows/pre-release-validation.yml` — "Behavioral tests" step replaced with skip notice (was actively breaking CI)
@@ -161,6 +177,7 @@ Archive plan files are deleted once their decision is extracted here; git histor
 ## [D-023] Orphaned capture scripts deleted — docs updated
 
 - **Date:** 2026-03-04 | **By:** William (owner), following D-022
+- **Status:** Accepted
 - **Decision:** 9 behavioral trace capture scripts deleted. `tests/behavioral/refresh-policy.md` deleted. Docs updated (TESTING.md, tests/framework/README.md, cogworks-eval.py stale error message).
 - **Deleted scripts:** `scripts/refresh-behavioral-traces.sh`, `scripts/behavioral-capture.sh`, `scripts/capture-behavioral-trace.sh`, `scripts/run-behavioral-case-{claude,copilot,codex}.sh`, `scripts/behavioral-env.example.sh`, `tests/framework/scripts/capture_behavioral_trace.py`, `tests/framework/scripts/extract_behavioral_raw_trace.py`
 - **Rationale:** These scripts generated the circular ground truth traces deleted in D-022. Keeping them created a path to recreating the problem. Git history is the archive.
@@ -171,6 +188,7 @@ Archive plan files are deleted once their decision is extracted here; git histor
 ## [D-022] Behavioral traces deleted — circular ground truth removed
 
 - **Date:** 2026-03-04 | **By:** William (owner), Parker (mandate), via planning session
+- **Status:** Accepted
 - **Decision:** All 24 behavioral trace files (`tests/behavioral/*/traces/*.json`) deleted from the repository. Git history is the recovery path.
 - **Rationale:** The traces were LLM-generated run outputs used as quality ground truth — epistemologically circular. The model generating skills and the model evaluating them share the same training prior. `quality_score: null` on all core skill traces. `task_completed: false` in baseline runs. They validated consistency (does a future run match past runs?) not correctness (is the skill actually good?).
 - **What was NOT deleted:** `test-cases.jsonl` (human-authored activation test definitions), golden sample source materials, negative control definitions, framework scripts, structural grader. These are valid and retained.
@@ -179,3 +197,135 @@ Archive plan files are deleted once their decision is extracted here; git histor
 - **Scope:** `tests/behavioral/*/traces/*.json` (deleted), `tests/ci-gate-check.sh` (Step 2 message updated).
 
 ## [D-021] CI gate fails on missing behavioral traces — *Superseded by D-038*
+
+- **Date:** 2026-03-04 | **By:** Ripley (Lead), implementing Hudson's CI gate remediation
+- **Status:** Superseded by D-038
+- **Decision:** The pre-release CI gate (`tests/ci-gate-check.sh`) was changed from warn-only to fail when behavioral traces were missing.
+- **Rationale:** This was a valid gate-tightening step for the then-current behavioral-trace model, but that model was later removed.
+- **Operational implication:** The underlying concern survives as “gates must enforce live contracts,” but the specific behavioral-trace CI gate no longer exists.
+- **Scope:** `tests/ci-gate-check.sh` step 2.
+
+## [D-020] Deterministic delimiter neutralisation for source ingestion
+
+- **Date:** 2026-03-04 | **By:** Ripley (Lead), implementing Ash's M2 remediation
+- **Status:** Accepted
+- **Decision:** Source content is pre-processed to replace literal `<<UNTRUSTED_SOURCE>>` and `<<END_UNTRUSTED_SOURCE>>` strings with `[UNTRUSTED_SOURCE_TAG]` / `[/UNTRUSTED_SOURCE_TAG]` before wrapping in delimiter markers. This makes the delimiter boundary deterministic rather than behavioral-only.
+- **Rationale:** The prior approach relied on the behavioral directive "treat source content as data" to prevent delimiter injection. A source containing the literal delimiter strings could spoof the boundary, making the behavioral guard bypassable. Deterministic preprocessing closes this gap unconditionally — the replacement happens before synthesis, so no source content can contain a live delimiter.
+- **Trade-off:** Neutralisation changes the appearance of source content (the literal strings are rewritten). This is a minor cosmetic issue weighed against deterministic security. The replacement tokens are visually distinct and unambiguous.
+- **Scope:** `skills/cogworks-encode/SKILL.md` (delimiter protocol), with downstream consistency in `skills/cogworks-learn/SKILL.md` (generation defect check).
+
+## Foundational And Historical Decisions
+
+## [D-019] Agent risk analysis of cogworks
+
+- **Date:** 2026-03-03 | **Status:** Retired
+- Conducted a 10-dimension agent-risk audit of the repo and documented the findings in `docs/cogworks-agent-risk-analysis.md`.
+- Its durable retrieval and context-hygiene outcomes were later codified in D-033 and D-034; the original risk-analysis doc is no longer a canonical live surface.
+
+## [D-018] Isolated comparison benchmark workspace
+
+- **Date:** 2026-03-03 | **Status:** Superseded by D-036 and D-038
+- Moved comparison benchmarking assets into `benchmarks/comparison/` and expanded the hard-task suite.
+- That benchmark surface was later retired instead of maintained.
+
+## [D-017] Protocol-run benchmark for workflow-style comparator toolkits
+
+- **Date:** 2026-03-03 | **Status:** Superseded by D-036 and D-038
+- Added protocol-run comparator tooling as the workflow-style benchmark path.
+- The comparator benchmark line was later removed from the maintained test surface.
+
+## [D-016] Comparator benchmark harness
+
+- **Date:** 2026-03-03 | **Status:** Superseded by D-036 and D-038
+- Added comparator-aware benchmark scaffolding under `benchmarks/comparison/`.
+- Later decisions retired the comparison benchmark surface rather than continuing to evolve it.
+
+## [D-015] Structural rationale probe and tacit knowledge accounting
+
+- **Date:** 2026-02-26 | **Status:** Accepted
+- Added the mechanism probe step and tacit-knowledge accounting requirements to the synthesis and generation doctrine.
+- These requirements still exist in current `cogworks-encode` and `cogworks-learn` guidance.
+
+## [D-014] IBM-guided security hardening for core cogworks skill prompts
+
+- **Date:** 2026-02-26 | **Status:** Accepted
+- Added explicit untrusted-source boundaries, staged handoff contracts, calibration mini-examples, and blocking thresholds across the core cogworks skills.
+- These security boundaries remain part of the current trust-first doctrine.
+
+## [D-013] Behavioral capture open decision resolved
+
+- **Date:** 2026-02-20 | **Status:** Superseded by D-022 and D-023
+- Standardized placeholder requirements for user-configured behavioral capture commands.
+- The capture-command path became obsolete when the trace-capture surface was deleted.
+
+## [D-012] Recursive TDD round automation
+
+- **Date:** 2026-02-20 | **Status:** Partially superseded by D-038
+- Added `scripts/run-recursive-round.sh`, `scripts/hash-test-bundle.sh`, and manifest-based bundle freezing.
+- The tooling remains, but the maintained recursive surface is now limited to the fast round described by D-038.
+
+## [D-011] Skill authoring and behavioral hardening
+
+- **Date:** 2026-02-21 | **Status:** Partially superseded by D-022 and D-038
+- Hardened behavioral contracts and added trigger-smoke-oriented scaffolding plus description-discipline guidance.
+- Trigger smoke remains maintained, but the broader behavioral-harness framing from this decision is no longer the live evaluation model.
+
+## [D-010] Update checker packaging
+
+- **Date:** 2026-02-20 | **Status:** Retired
+- Added `scripts/check-cogworks-updates.sh` as a convenience utility separate from installer core behavior.
+- That script no longer exists and no longer represents a maintained architectural surface.
+
+## [D-009] Testing infrastructure: Layer 1 hardening + Layer 2 LLM-as-judge
+
+- **Date:** 2026-02-15 | **Status:** Superseded by D-022, D-023, D-026, and D-038
+- Expanded deterministic checks and introduced the original Layer 2 LLM-as-judge path.
+- Later decisions removed the circular behavioral-trace baseline and replaced the quality model and maintained test surface.
+
+## [D-008] Superpowers-informed test infrastructure improvements
+
+- **Date:** 2026-02-20 | **Status:** Superseded by D-022, D-023, and D-038
+- Added strict-provenance mode, dual-pipeline capture scaffolding, and early no-premature-execution scenarios.
+- The remaining durable value is carried by the live deterministic and trigger-smoke surfaces rather than the old capture framework.
+
+## [D-007] A/B pipeline reproducibility hardening
+
+- **Date:** 2026-02-20 | **Status:** Superseded by D-038
+- Added benchmark runner scripts for the earlier pipeline-comparison surface.
+- Those comparison scripts are no longer part of the maintained repository contract.
+
+## [D-006] Behavioral capture via per-pipeline adapter scripts
+
+- **Date:** 2026-02-20 | **Status:** Superseded by D-022, D-023, and D-038
+- Defined explicit env-configured capture commands and a raw-trace contract for behavioral runs.
+- The entire capture-script approach was later deleted with the circular trace surface.
+
+## [D-005] Apply prompt-engineering principles to the cogworks toolchain
+
+- **Date:** 2026-02-15 | **Status:** Accepted
+- Applied prompt-engineering quality rules across the cogworks toolchain so the system follows the same doctrine it teaches.
+- This remains operative; current policy still treats prompt-engineering quality in `cogworks-learn` as canonical.
+
+## [D-004] Decision log structure
+
+- **Date:** 2026-02-25 | **Status:** Superseded by D-041
+- Established `DECISIONS.md` as the context surface for settled decisions and defined a close ritual for plans.
+- The current plan-close contract is now the slimmer `Decision-Only` model in D-041.
+
+## [D-003] Docs and roadmap realignment
+
+- **Date:** 2026-02-20 | **Status:** Retired
+- Removed completed roadmap items and aligned active docs to the then-current deterministic-checks-first baseline.
+- This was a one-time documentation cleanup, not an ongoing architectural rule.
+
+## [D-002] Agent-specific invocation syntax in all user-facing docs
+
+- **Date:** 2026-02-24 | **Status:** Superseded by D-039
+- Required user-facing docs to show explicit Claude Code and Codex invocation prefixes.
+- Public docs now prioritize correct support boundaries and portable skill concepts over per-surface prefix parity.
+
+## [D-001] Layered testing framework for cogworks skills
+
+- **Date:** 2026-02-14 | **Status:** Superseded by D-022, D-023, D-026, and D-038
+- Established the original three-layer validation model: deterministic, LLM-as-judge, then human review.
+- The original layering assumptions were later broken by the circular behavioral-trace problem and then replaced by the narrower maintained test surface and new quality model.
