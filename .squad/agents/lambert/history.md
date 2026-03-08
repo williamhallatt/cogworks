@@ -2,6 +2,35 @@
 
 ## Learnings
 
+### 2026-03-14: Compatibility Review II — Terminology & Codex Adapter Analysis
+
+Completed comprehensive analysis of two compatibility issues identified in b6208ff+ review:
+
+**Issue 1: Terminology Glossary**
+- Cataloged five terminology gaps across agentic-runtime.md, SKILL.md, claude-adapter.md, copilot-adapter.md:
+  1. "contradiction" (SKILL.md) vs "conflicting guidance" (agentic-runtime.md) — used interchangeably, not defined
+  2. "synthesis fidelity" (SKILL.md, agentic-runtime.md) — used operationally but never defined; critical for validator routing
+  3. "brittle execution" (claude-adapter.md) — used to justify foreground downgrade but undefined
+  4. Escalation criteria drift — agentic-runtime.md specifies five criteria (including untrusted-content), SKILL.md only four
+  5. Secondary gaps: "trust-boundary", "entity-boundary", "derivative-source" listed but underspecified
+
+- Proposed solution: Add 250-line "Terminology" section to agentic-runtime.md after Operating Principle section, with subsections for each term + operational examples. Update SKILL.md and claude-adapter.md to reference glossary and align terminology.
+- Key finding: Agents interpreting agentic-runtime.md literally would implement validator routing (fidelity-failure → synthesis, other-failure → packaging) but lack the definitions of what counts as "fidelity failure". Glossary is operationally critical, not just pedagogical.
+
+**Issue 2: Codex Adapter Resolution**
+- Status: agentic-runtime.md defers Codex adapter support (line 38: "Codex adapter documentation is deferred — no Codex subagent primitives have been sourced yet")
+- Evidence: README.md lines 137–142 show Codex CLI examples suggesting agentic engine works on Codex. Benchmark infrastructure (skill-benchmark-codex-adapter.py, codex-adapter-spec.md) consumes Codex traces post-hoc, but does not represent agentic orchestration support.
+- Finding: Codex does not expose a subagent/agent-spawn primitive equivalent to Claude's Task tool or Copilot's task tool. Agentic runtime is built on subagent abstraction; without it, Codex would require wholesale rewrite.
+- Recommended decision: Remove Codex from README.md user-facing documentation (lines 137–142 delete, line 148 remove "Codex" from list). Rationale: Misleading examples cost more than one-time re-addition if Codex capabilities change.
+
+**Artifacts:** Comprehensive proposal document written to `.squad/decisions/inbox/lambert-terminology-codex.md` with:
+- Complete terminology inventory (5 gaps + 3 secondary)
+- Proposed glossary format and content (~250 lines)
+- Exact file/line changes needed for consistency (5 edits across 3 files)
+- Codex adapter gap evidence and two decision paths with change lists
+
+**Key learning:** In systems designed for AI interpretation, terminological drift is not just a documentation quality issue—it's an operational correctness issue. Agents following validator routing logic need precise definitions of "fidelity" to work correctly. Glossaries in agentic systems are control surfaces, not optional pedagogical aids.
+
 ### 2026-03-04: Round 3 Issues Closure — Cross-Agent Path Sync & Defaults Update
 
 Completed final Ralph-coordinated remediation for cross-agent compatibility defaults:
@@ -62,4 +91,11 @@ Completed full D6 risk mitigation. Created comprehensive compatibility matrix co
 - **Key learning:** Codex invocation prefix `$` was incorrect; Codex uses natural language (varies). `.agents/skills/` is the primary cross-agent path; `.claude/skills/` is Claude Code-specific.
 - **Decision captured:** TD-019 in team decisions.md (merged from inbox).
 - **Commit:** ca8f5cb
+
+
+**2026-03-08 — Post-Review Fan-Out (Terminology + Codex)**
+
+Lambert proposed two solutions: (1) Canonical terminology glossary to resolve name drift across specs ("contradiction" vs "conflicting guidance", undefined terms), (2) Codex adapter decision (recommend Option B: benchmark-only, defer engine adapter). Proposals consolidated into decisions.md pending approval.
+
+**Cross-references:** Ripley prioritized glossary as P0 blocker; glossary is prerequisite for Ash/Dallas implementations to avoid divergent interpretations. Codex decision relates to Ripley's Codex adapter deferral recommendation.
 
