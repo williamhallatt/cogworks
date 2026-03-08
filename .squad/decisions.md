@@ -211,3 +211,146 @@ Hudson implements evaluation harness per `HARNESS-SPEC.md` (Parker's next delive
 **Why:** Hudson owns harness implementation; Parker owns spec and methodology. This entry signals handoff.
 **Action required (Hudson):** Read `tests/framework/HARNESS-SPEC.md` and implement the behavioral delta runner. Implement cross-model independence check at startup (generator model ≠ judge model). Do not store run outputs as future ground truth.
 **Blocked until:** Hudson implements the harness — CI behavioral coverage gate remains failing.
+
+---
+
+## Pending Proposals (2026-03-08 Fan-Out Session)
+
+> **Status:** These are 6 proposals from comprehensive post-review analysis. Not yet accepted as decisions — pending user review and prioritization. Stored in inbox pending approval. See `.squad/decisions/inbox/` for full documents.
+
+---
+
+
+### Proposal 1: Ripley — Post-Review Implementation Roadmap
+
+**Date:** 2026-03-08  
+**Author:** Ripley (Lead)  
+**Status:** Proposal  
+
+**Summary:** Comprehensive remediation roadmap organizing 10 identified issues into 4 tiers (P0-P3) based on risk × value × dependency blocking. P0 items (decision skeleton spec, terminology glossary, security hardening) block trust and downstream work. P1 items (Copilot adapter, error path testing, Codex decision) block adoption. P2 items (production benchmark, behavioral eval reconstruction) improve operational quality. P3 items are cleanup/deferred. Total estimated effort: ~14-20 weeks with significant parallelization.
+
+**Key Decisions Required:**
+- Accept P0-P2 roadmap in sequence
+- Codex adapter decision: defer (Option B), implement (Option A), or drop (Option C)
+- Sequencing: Weeks 1-2 spec hardening → Weeks 3-4 security/foundation → Weeks 5-6 validation → Weeks 7-8 quality infrastructure
+
+**File:** `.squad/decisions/inbox/ripley-post-review-roadmap.md` (356 lines)
+
+---
+
+### Proposal 2: Dallas — Pipeline Solutions (3 Ownership Gaps)
+
+**Date:** 2026-03-08  
+**Author:** Dallas (Pipeline Engineer)  
+**Status:** Proposal  
+
+**Summary:** Three specification ownership gaps with concrete solutions:
+1. **Decision Skeleton Ownership** — Assign to `composer` role in skill-packaging stage; update role-profiles.json, agentic-runtime.md, SKILL.md, adapters; formalize 5-7 entry quality gate.
+2. **Copilot Adapter Underspecification** — Add runtime capability detection, inherit-session-model fallback, inline binding resolution, degraded mode spec.
+3. **Comparison Tooling Consolidation** — Deprecate run-agentic-quality-compare.py; extend run-skill-benchmark.py via datasets and flexible config.
+
+**Key Decisions Required:**
+- Accept all three solutions; Dallas implements in parallel with Ripley's P0 hardening
+- Order: Skeleton ownership first (unblocks everything), then adapter completion, then tooling consolidation
+
+**File:** `.squad/decisions/inbox/dallas-pipeline-solutions.md` (510 lines)
+
+---
+
+### Proposal 3: Parker — Benchmark Strategy (2 Major Gaps)
+
+**Date:** 2026-03-08  
+**Author:** Parker (Benchmark & Evaluation)  
+**Status:** Proposal  
+
+**Summary:** Two evidence gaps addressed:
+1. **First Real Benchmark Run** — Execute legacy vs agentic comparison with 15-case dataset (invoked-task, hard-negative, boundary). Cross-model judge (GPT/Gemini). 5 trials per case. Phase 1-4 execution plan over 5-7 days.
+2. **Behavioral Evaluation Reconstruction** — Two-track architecture: Activation track (deterministic, observable behavior) runs in CI; Efficacy track (cross-model judge, WITH vs WITHOUT baseline) runs manually. Replaces D-022 deleted circular traces with non-circular protocol.
+
+**Key Decisions Required:**
+- Accept benchmark methodology; approve dataset authorship (Parker scaffolds, William reviews?)
+- Approve efficacy track scope (2-3 weeks per track after judge calibration)
+- Cross-model judge availability and cost budget
+
+**File:** `.squad/decisions/inbox/parker-benchmark-strategy.md` (460 lines)
+
+---
+
+### Proposal 4: Hudson — Error Path Testing Design
+
+**Date:** 2026-03-08  
+**Author:** Hudson (Test Infrastructure)  
+**Status:** Proposal  
+
+**Summary:** Comprehensive error path testing strategy for agentic engine addressing gap: success paths validated, error/recovery paths untested. Designs 8 scenarios:
+1. Contradictory source inputs (escalation)
+2. Missing stage artifacts (stop and emit failed status)
+3. Stage failure + retry
+4. Fallback to single-agent
+5. Invalid dispatch manifest
+6. Context overflow
+7. Tool degradation
+8. Blocking rule violations
+
+Each scenario has fixture specs, expected behaviors, validation criteria. Implementation plan: deterministic error corpus (27 cases), behavioral error traces, recovery validation, CI regression gate.
+
+**Key Decisions Required:**
+- Accept error path design; Hudson implements 2-week project
+- Prioritize which scenarios block P1 vs can defer to P2
+
+**File:** `.squad/decisions/inbox/hudson-error-path-testing.md` (699 lines)
+
+---
+
+### Proposal 5: Lambert — Terminology Glossary + Codex Adapter
+
+**Date:** 2026-03-08  
+**Author:** Lambert (Compatibility Engineer)  
+**Status:** Proposal  
+
+**Summary:** Two cross-specification coordination gaps:
+1. **Terminology Glossary** — Same concepts have different names across specs ("contradiction" vs "conflicting guidance", undefined terms like "synthesis fidelity", "brittle execution"). Solution: Canonical glossary document (`docs/agentic-terminology.md`) with single definition per term, cross-references in all specs.
+2. **Codex Adapter Decision** — Three options: (A) Full production (2-3 weeks), (B) Benchmark-only (simpler), (C) Defer/remove. Recommendation: Option B for near-term.
+
+**Key Decisions Required:**
+- Approve glossary priority (P0 blocker for Ash/Dallas implementations)
+- Codex adapter decision (B recommended but user may prefer A/C)
+
+**File:** `.squad/decisions/inbox/lambert-terminology-codex.md` (424 lines)
+
+---
+
+### Proposal 6: Ash — Agentic Dispatch Security Hardening
+
+**Date:** 2026-03-08  
+**Author:** Ash (Security & Hardening)  
+**Status:** Proposal  
+
+**Summary:** Comprehensive security hardening for agentic dispatch (P0 priority). Threat surface: untrusted source injection, stage output tampering, cross-agent privilege escalation, model API response poisoning. Hardening layers:
+1. Input validation — Strict schema enforcement on inter-stage contracts
+2. Artifact integrity — Cryptographic signatures on intermediate outputs
+3. Dispatch isolation — Privilege separation between stages
+4. Output verification — Deterministic checks on model responses
+
+Timeline: 1 week for P0 core (input validation + integrity), 2-3 weeks for full suite.
+
+**Key Decisions Required:**
+- Accept security hardening as P0; Ash leads implementation
+- Phasing: core (Week 3-4) then full suite (Weeks 5-8)
+
+**File:** `.squad/decisions/inbox/ash-agentic-security.md` (410 lines)
+
+---
+
+## Proposal Coordination Notes
+
+**Fan-out context:** All 6 agents analyzed their problem domains and proposed concrete solutions in response to Ripley's comprehensive post-review roadmap. No conflicts detected; dependency graph is acyclic:
+
+- **Dallas's skeleton fix** is P0 blocker for Ash's security hardening
+- **Lambert's glossary** is prerequisite for Ash and Dallas implementations
+- **Parker's behavioral eval** depends on D-026 quality schema (not proposal, already settled)
+- **Hudson's error paths** integrate with Parker's evaluation harness
+- **Ripley's roadmap** informs sequencing for all others
+
+**Next step:** User reviews inbox + proposals → approves subset → assigns owners → Phase 1 begins.
+

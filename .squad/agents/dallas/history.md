@@ -2,6 +2,25 @@
 
 ## Learnings
 
+### 2026-03-05: Pipeline Ownership Gap Analysis and Solutions
+
+Reviewed comprehensive agentic pipeline audit (165-line plan) identifying three specification ownership gaps:
+
+1. **Decision Skeleton Ownership Gap** — The Decision Skeleton (arguably the most fragile handoff) has no formal role owner, no explicit creation trigger, and no quality gate in the specs. While SKILL.md (165-173) specifies extraction, role-profiles.json doesn't assign it, agentic-runtime.md doesn't specify when it happens, and claude-adapter.md doesn't include it in coordinator guidance. The smoke run shows it exists in skill-packaging output but this is implicit.
+
+2. **Copilot Adapter Underspecification** — The copilot-adapter.md correctly focuses on Copilot-specific deltas but lacks implementation detail: how to detect native subagent capability at runtime, what happens if `inherit-session-model` fails, how inline bindings resolve, and fallback behavior specification. A contributor debugging a failed Copilot agentic run would need smoke artifacts for clues.
+
+3. **Comparison Tooling Duplication** — `run-agentic-quality-compare.py` (636 lines) overlaps significantly with `run-skill-benchmark.py` (748 lines), both generating `benchmark-summary.json` + `benchmark-report.md`. The quality compare script hardcodes 3 cases and was built during pilot of the general harness — premature parallel implementation.
+
+**Proposed solutions delivered to `.squad/decisions/inbox/dallas-pipeline-solutions.md`:**
+- Issue 1: Assign decision skeleton ownership to composer role; formalize trigger and quality gate in role-profiles.json, agentic-runtime.md, SKILL.md, and adapters.
+- Issue 2: Add four new sections to copilot-adapter.md (capability detection, inherit-session-model fallback, inline binding resolution, degraded mode specification).
+- Issue 3: Consolidate via dataset-driven approach: deprecated run-agentic-quality-compare.py, extend run-skill-benchmark.py with flexible configuration, create `tests/datasets/agentic-quality-comparison/benchmark-cases.jsonl`.
+
+**Key insights:**
+- Decision skeleton gates run completion; fewer than 5 entries signals source inadequacy, not success.
+- Copilot runtime detection must be explicit and recorded; assuming capability creates debugging nightmares.
+- General-purpose harness should generalize via datasets and config, not parallel special-case scripts.
 
 ### 2026-03-04: Gap Closure Round 3: D9 Slug Collision + D3 Handoff Artifacts
 
@@ -63,4 +82,11 @@ Completed spec-alignment pass on cogworks-learn addressing incorrect presentatio
 
 No structure changes. Surgical edits only.
 
+
+
+**2026-03-08 — Post-Review Fan-Out (Pipeline Solutions)**
+
+Dallas proposed three ownership gap solutions in response to Ripley's post-review roadmap. Decision skeleton ownership fix (P0) is critical blocker for Ash's security work. Pipeline solutions consolidated into decisions.md pending approval.
+
+**Cross-references:** Ripley prioritized all issues; Parker benchmarking depends on skeleton clarity. Lambert glossary supports Dallas adapter implementations.
 
