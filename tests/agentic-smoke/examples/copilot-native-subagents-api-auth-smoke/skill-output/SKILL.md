@@ -6,8 +6,6 @@ description: >
   token lifecycle best practices, and the conceptual distinction between
   authentication failure and authorization failure.
 version: "1.0.0"
-engine_mode: agentic
-execution_surface: copilot-cli
 sources:
   - id: src-01
     file: 01-status-codes.md

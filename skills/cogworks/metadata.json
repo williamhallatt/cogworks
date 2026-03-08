@@ -1,8 +1,8 @@
 {
   "slug": "cogworks",
-  "version": "4.1.2",
-  "cogworks_version": "4.1.2",
-  "snapshot_date": "2026-03-07",
+  "version": "4.2.0",
+  "cogworks_version": "4.2.0",
+  "snapshot_date": "2026-03-08",
   "topic": "Cogworks",
   "author": "cogworks",
   "license": "MIT",

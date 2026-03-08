@@ -7,6 +7,16 @@ audited_through: 2026-03-08
 Settled decisions for the cogworks project. Agents load this file for context;
 see `_plans/archive/` for historical plans.
 
+## [D-037] Cogworks resets to one trust-first product entry point; sub-agent build path becomes internal maintainer machinery
+
+- **Date:** 2026-03-08 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** `cogworks` is reset around one stable user-facing skill entry point. Users invoke `cogworks` to turn source material into a generated skill; they no longer select between public engine modes such as `--engine agentic`. Claude Code and GitHub Copilot keep the internal sub-agent build path, but that path is now maintainer-facing implementation detail rather than product surface. Generated skills remain the only primary product artifact. The product is fail-closed: if source trust, contradiction handling, provenance, or deterministic validation is insufficient, `cogworks` must stop with a blocking trust report instead of presenting a production-ready skill.
+- **Rationale:** The previous pivot drifted into a pseudo-CLI and runtime-contract product that exposed internal pipeline choices instead of improving the one thing users actually care about: the quality and trustworthiness of generated skills. Making sub-agents internal again preserves their benefits while removing user-facing complexity and context bloat.
+- **Operational implication:** Public docs and the `cogworks` skill now teach one natural invocation surface. Maintainer smoke validation still verifies the Claude/Copilot sub-agent build path, but benchmarking and runtime evidence are explicitly separate from the normal user workflow. Runtime metadata no longer belongs in generated skill frontmatter or generated-skill metadata. Codex sub-agent support is deferred rather than simulated.
+- **Supersedes:** D-027, D-028, and D-029 at the product-surface level. Their history remains valid background, but the active product contract is now the single-entry trust-first model described here.
+- **Scope:** `skills/cogworks/SKILL.md`, `skills/cogworks/README.md`, `skills/cogworks/metadata.json`, `skills/cogworks/agentic-runtime.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/copilot-adapter.md`, `README.md`, `INSTALL.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/**`, `scripts/test-agentic-contract.sh`, `scripts/validate-agentic-run.sh`, `scripts/run-agentic-quality-compare.py` (deleted), `_plans/archive/2026-03-08-cogworks-reset-single-entry-subagent-trust.md`.
+
 ## [D-036] Benchmark evidence is fail-closed; preserved smoke proof lives in a canonical example surface
 
 - **Date:** 2026-03-08 | **By:** William (owner)

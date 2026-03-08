@@ -3,7 +3,6 @@
   "stage": "source-intake",
   "skill_name": "api-auth-smoke",
   "execution_surface": "copilot-cli",
-  "engine_mode": "agentic",
   "sources": [
     {
       "id": "src-01",
