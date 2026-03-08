@@ -15,8 +15,19 @@ The active testing strategy is:
 | **4 — Skill benchmark** | Paired skill-vs-skill efficacy comparison with separate activation diagnostics | Optional live run | Medium to high |
 | **5 — Behavioral evaluation** | Broader judged quality work outside the benchmark harness | Pending reconstruction | High |
 
+| **Static contract** | Agentic contract surface (docs, adapters, deterministic checks) | No | Free / instant |
+
 Use these layers in order. Do not make quality claims from Layer 1 or Layer 3
 alone.
+
+## One-Command Test Invocation
+
+```bash
+bash tests/run-all.sh
+```
+
+Runs all headless suites (Layers 1-4 + schema validation) in sequence. Exit 0
+means all passed.
 
 The canonical benchmark specification lives under `evals/`.
 

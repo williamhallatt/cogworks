@@ -85,6 +85,5 @@ tests/framework/
 │   ├── behavioral_lib.py
 │   └── cogworks-eval.py
 └── templates/
-    ├── behavioral-test-case-template.jsonl
-    └── behavioral-trace-template.json
+    └── behavioral-test-case-template.jsonl
 ```
