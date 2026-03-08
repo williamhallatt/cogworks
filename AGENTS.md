@@ -1,6 +1,28 @@
 # Repository Guidelines
 
-## Related Documentation
+## Start Here: Retrieval Contract
+
+- **Load context in stages and stop early** — read `AGENTS.md` first, then `_plans/DECISIONS.md`, then at most one matching active `_plans/*.md` file in the `_plans/` root if its title clearly matches the task.
+- **Choose one task-matched canonical file next** — load exactly one next source based on the task: `README.md` for product overview, `INSTALL.md` for setup, `TESTING.md` for validation, `CONTRIBUTIONS.md` for development/release conventions, one specific file under `skills/` for skill behavior, or one specific file under `evals/` for benchmark/evaluation policy.
+- **Do not preload all top-level docs** — load additional docs only when the current source is insufficient for safe execution or planning.
+- **Prefer leaf files over directory scans** — do not read whole directories when one named entrypoint file will answer the question.
+- **Treat non-default surfaces as scoped references only** — even when a task requires them, they do not become repo-wide policy surfaces.
+- **Use this authority order on conflict** — directly task-relevant canonical file, matching active plan in `_plans/`, `_plans/DECISIONS.md`, `AGENTS.md`, then general product docs.
+
+### Non-default Context Surfaces
+
+- **Do not opportunistically load these surfaces**:
+  - `.github/agents/`
+  - `.squad/`
+  - `_sources/`
+  - `.cogworks-runs/`
+  - `tmp-agentic-output/`
+  - `tests/results/`
+  - `tests/test-data/`
+  - `tests/datasets/golden-samples/`
+- These surfaces remain valid reference material when a task explicitly calls for them, but they are not repo-wide policy and should not be auto-loaded for ordinary work.
+
+## Task-Matched Documentation
 
 - [README.md](README.md) - Project overview and quick start
 - [TESTING.md](TESTING.md) - Testing guidelines and framework
@@ -10,7 +32,7 @@
 ## Collaboration Principles
 
 - **Save ACCEPTED Plans** - whenever a plan is *accepted*, save it in [_plans/](./_plans/) with a descriptive name and date. This creates a living archive of strategic thinking and decision-making.
-- **Archive plans on close** - when a plan is accepted and its work completed, extract its core decision into `_plans/DECISIONS.md`, move the plan to `_plans/archive/`, and update the `audited_through` date. These three steps are atomic — archiving without extracting is not a close.
+- **Close plans by deletion** - when a plan is accepted and its work completed, extract its core decision into `_plans/DECISIONS.md`, delete the plan file, and update the `audited_through` date. These three steps are atomic — deleting without extracting is not a close. Git history is the archive; the working tree does not need the file.
 
 ## The Expert Subtraction Principle
 
@@ -33,7 +55,7 @@
 - **Require reproducible evals for quality claims** - claims like "more robust", "cheaper", or "higher quality" must be backed by benchmark runs and saved artifacts, not single samples.
 - **Standardize benchmark artifacts** - keep machine-readable summaries and human-readable reports for comparisons (for example `benchmark-summary.json` and `benchmark-report.md`).
 - **Report done vs outstanding** - after implementing an accepted plan, explicitly list what was completed and what remains.
-- **`DECISIONS.md` is the agent context surface for `_plans/`** — load `_plans/DECISIONS.md` for settled decisions; check `_plans/*.md` (root only) for active in-flight plans; treat `_plans/archive/` as human-readable history only.
+- **`DECISIONS.md` is the agent context surface for `_plans/`** — load `_plans/DECISIONS.md` for settled decisions; check `_plans/*.md` (root only) for active in-flight plans. Closed plan files are deleted; git history is the archive.
 - **Enforce prompt-engineering quality through `cogworks-learn`** - keep `*-prompt-engineering` skills as canonical references, and apply their doctrine via integrated gates in `cogworks-learn` during generation.
 - **Use one canonical recursive runbook** - for recursive TDD rounds, treat `tests/datasets/recursive-round/README.md` as the source of truth for commands and artifact expectations.
 
@@ -56,25 +78,6 @@
 - **Convention:** if you accidentally invoke a skill while editing it, treat the session as potentially corrupted — restart, or carefully verify that the instructions in memory still match the file on disk.
 - **`.github/agents/squad.agent.md` is auto-loaded by GitHub Copilot** — this file is 1,000+ lines and will consume a significant portion of your context window on every Copilot session. For non-Squad work, run `/clear` after session start or use a scoped workspace that excludes `.github/agents/`.
 
-### Default Retrieval Policy
-- **Default-load only canonical instruction surfaces** unless the task explicitly requires deeper context:
-  - `AGENTS.md`
-  - `README.md`, `TESTING.md`, `CONTRIBUTIONS.md`, `INSTALL.md`
-  - `_plans/DECISIONS.md`
-  - active `_plans/*.md` in the `_plans/` root
-  - directly relevant files under `skills/` and `evals/`
-- **Do not opportunistically load non-default context surfaces**:
-  - `.github/agents/`
-  - `.squad/`
-  - `_plans/archive/`
-  - `_sources/`
-  - `.cogworks-runs/`
-  - `tmp-agentic-output/`
-  - `tests/results/`
-  - `tests/test-data/`
-  - `tests/datasets/golden-samples/`
-- These non-default surfaces remain valid reference material when a task specifically calls for them, but they are not repo-wide policy and should not be auto-loaded for ordinary work.
-
 ## Build, Test, and Development Commands
 - `npx skills add williamhallatt/cogworks` installs skills to detected agents.
 - `npx skills add . -a claude-code -y` installs from local repo for development.
@@ -93,7 +96,7 @@
 
 ## Testing Guidelines
 - Treat Layer 1 deterministic checks as the minimum gate for all skill changes.
-- For `cogworks-*` updates, run Layer 1 checks before opening a PR. *(Layer 2 behavioral evaluation pending reconstruction — D-022/D-023. See `.squad/agents/parker/charter.md`.)*
+- For `cogworks-*` updates, run Layer 1 checks before opening a PR. *(Layer 2 behavioral evaluation pending reconstruction — see D-022/D-023 in `_plans/DECISIONS.md`.)*
 - Store behavioral test cases under `tests/behavioral/*/test-cases.jsonl` and new skill source materials under `_sources/`.
 
 ## Git Rules
