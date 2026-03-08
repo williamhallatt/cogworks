@@ -61,18 +61,12 @@ jobs:
           fi
           echo "✓ testing framework present"
 
-      - name: Behavioral tests (cogworks-*)
-        run: |
-          echo "⚠️  Behavioral evaluation pending reconstruction (D-022/D-023)."
-          echo "    Behavioral traces were deleted — they were circular LLM ground truth."
-          echo "    Capture scripts have been removed. DO NOT regenerate."
-          echo "    Parker is defining replacement quality ground truth."
-          echo "    See .squad/agents/parker/charter.md"
-          echo "    Skipping this step."
+      - name: Install Python dependencies
+        run: pip install jsonschema
 
-      - name: Framework black-box tests
+      - name: Run all test suites
         run: |
-          bash tests/run-black-box-tests.sh
+          bash tests/run-all.sh
 
       - name: Summary
         if: success()
