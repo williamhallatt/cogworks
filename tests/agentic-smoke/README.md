@@ -13,6 +13,9 @@ This is a **live smoke test**, not a benchmark. It answers:
   truthfully?
 
 It does **not** prove the build path is better than alternatives.
+It also does not prove exact transcript provenance for every saved field; the
+maintained validator proves run-contract conformance of the preserved artifact
+set.
 
 > Context hygiene: prefer a disposable output root outside the repository, for
 > example `/tmp/cogworks-subagent-smoke/`. Repo-local `.cogworks-runs/` and
@@ -127,12 +130,13 @@ run completes, validate the evidence with:
 ```bash
 bash tests/validate-fail-closed-run.sh \
   --report-path <blocking-report-path> \
-  --skill-path <unexpected-skill-output-path>
+  --skill-path <blocked-output-path> \
+  --expect-pattern "BLOCKED - Runtime Misconfiguration"
 ```
 
-If your blocking report format is stable, add one or more `--expect-pattern`
-checks so the validator confirms the failure reason text as well as the absence
-of `SKILL.md`.
+Release-grade validation should always include at least one stable
+`--expect-pattern` check so the validator confirms the failure reason text as
+well as the absence of `SKILL.md`.
 
 ## Manual Review Checklist
 
@@ -148,10 +152,14 @@ Confirm all of the following:
 - `execution_surface` is present
 - `specialist_profile_source` is present
 - `dispatch-manifest.json` records canonical role profiles, surface bindings,
-  model policy, and dispatch modes
+  model policy, dispatch modes, and non-empty `tool_scope` declarations
 - the generated skill itself does **not** leak runtime metadata such as engine
   mode, execution surface, or run root into its public frontmatter or
   `metadata.json`
+
+Current limit:
+- `validate-agentic-run.sh` proves canonical binding refs and contract shape,
+  but does not yet prove exact transcript provenance for every saved field
 
 ## Preserved Examples
 

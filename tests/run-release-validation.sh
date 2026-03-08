@@ -21,11 +21,9 @@ Required options:
   --copilot-run-root <path>
   --copilot-skill-path <path>
   --fail-closed-report <path>
-  --benchmark-summary <path>
-
-Optional:
   --fail-closed-skill-path <path>
   --fail-closed-pattern <text>   Repeatable required text in the blocking report
+  --benchmark-summary <path>
 USAGE
 }
 
@@ -81,12 +79,19 @@ for required in \
   COPILOT_RUN_ROOT \
   COPILOT_SKILL_PATH \
   FAIL_CLOSED_REPORT \
+  FAIL_CLOSED_SKILL_PATH \
   BENCHMARK_SUMMARY; do
   if [[ -z "${!required}" ]]; then
     usage >&2
     exit 2
   fi
 done
+
+if [[ ${#FAIL_CLOSED_PATTERNS[@]} -eq 0 ]]; then
+  echo "At least one --fail-closed-pattern is required for release validation." >&2
+  usage >&2
+  exit 2
+fi
 
 echo "=== Offline Bar ==="
 bash "$ROOT_DIR/tests/run-all.sh"
@@ -109,11 +114,9 @@ echo ""
 echo "=== Fail-Closed Evidence ==="
 FAIL_CLOSED_ARGS=(
   --report-path "$FAIL_CLOSED_REPORT"
+  --skill-path "$FAIL_CLOSED_SKILL_PATH"
   --label "release fail-closed evidence"
 )
-if [[ -n "$FAIL_CLOSED_SKILL_PATH" ]]; then
-  FAIL_CLOSED_ARGS+=(--skill-path "$FAIL_CLOSED_SKILL_PATH")
-fi
 for pattern in "${FAIL_CLOSED_PATTERNS[@]}"; do
   FAIL_CLOSED_ARGS+=(--expect-pattern "$pattern")
 done
@@ -137,6 +140,12 @@ assert summary["terminal_status"] == "completed"
 assert summary["judge_model"] not in (None, "")
 assert summary["trial_count"] >= 5
 assert summary["confidence_interval_95"][0] > 0
+assert summary["skills_compared"]["candidate_a"] == "generated-skill-v2"
+assert summary["skills_compared"]["candidate_b"] == "single-source-baseline"
+provenance = summary["input_provenance"]
+assert provenance["cases_file"] == "tests/test-data/skill-benchmark-api-auth-release/cases.jsonl"
+assert "tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/skill-output/reference.md" in provenance["candidate_a_command"]
+assert "tests/test-data/skill-benchmark-api-auth-release/baseline-context.md" in provenance["candidate_b_command"]
 PY
 
 echo "PASS  benchmark summary is decision-grade release evidence"

@@ -7,7 +7,8 @@
 3. Run both candidates under identical fixed conditions.
 4. Normalize outputs into `observation.schema.json`.
 5. Use `judge-output.schema.json` only for `judge_only` checks.
-6. Aggregate into `benchmark-summary.json` and `benchmark-report.md`.
+6. Aggregate into `benchmark-summary.json` and `benchmark-report.md`, including
+   input provenance for the cases file and both candidate commands.
 
 ## Modes
 

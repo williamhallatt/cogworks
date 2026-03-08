@@ -9,6 +9,7 @@
     "generated_at",
     "benchmark_id",
     "skills_compared",
+    "input_provenance",
     "model",
     "judge_model",
     "agent_surface",
@@ -60,6 +61,29 @@
           "minLength": 1
         },
         "candidate_b": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "input_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cases_file",
+        "candidate_a_command",
+        "candidate_b_command"
+      ],
+      "properties": {
+        "cases_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_a_command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_b_command": {
           "type": "string",
           "minLength": 1
         }
