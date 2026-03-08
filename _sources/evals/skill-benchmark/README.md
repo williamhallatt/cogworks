@@ -99,15 +99,15 @@ Publication rule:
 
 ## Canonical interfaces
 
-- [`case.schema.json`](/home/will/code/cogworks/evals/skill-benchmark/case.schema.json)
-- [`observation.schema.json`](/home/will/code/cogworks/evals/skill-benchmark/observation.schema.json)
-- [`judge-output.schema.json`](/home/will/code/cogworks/evals/skill-benchmark/judge-output.schema.json)
-- [`benchmark-summary.schema.json`](/home/will/code/cogworks/evals/skill-benchmark/benchmark-summary.schema.json)
-- [`runbook.md`](/home/will/code/cogworks/evals/skill-benchmark/runbook.md)
+- [`case.schema.json`](case.schema.json)
+- [`observation.schema.json`](observation.schema.json)
+- [`judge-output.schema.json`](judge-output.schema.json)
+- [`benchmark-summary.schema.json`](benchmark-summary.schema.json)
+- [`runbook.md`](runbook.md)
 
 ## Pilot harness
 
-The first runnable harness is [`scripts/run-skill-benchmark.py`](/home/will/code/cogworks/scripts/run-skill-benchmark.py).
+The first runnable harness is [`scripts/run-skill-benchmark.py`](../../../scripts/run-skill-benchmark.py).
 
 Candidate commands receive benchmark context through environment variables:
 
@@ -129,7 +129,7 @@ When any case uses `judge_only` checks:
 - the judge model family must differ from the generator model family
 - judge output must record `judge_model`
 
-For Codex CLI runs, the default adapter is [`scripts/skill-benchmark-codex-adapter.py`](/home/will/code/cogworks/scripts/skill-benchmark-codex-adapter.py). It can run `codex exec --json` live or normalize a saved JSONL trace in replay mode.
+For Codex CLI runs, the default adapter is [`scripts/skill-benchmark-codex-adapter.py`](../../../scripts/skill-benchmark-codex-adapter.py). It can run `codex exec --json` live or normalize a saved JSONL trace in replay mode.
 
 ## Defaults
 

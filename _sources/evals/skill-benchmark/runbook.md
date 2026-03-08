@@ -15,7 +15,7 @@ Do not compare results across runs that changed any of the above.
 
 ## 2. Author cases
 
-For each case, fill [`case.schema.json`](/home/will/code/cogworks/evals/skill-benchmark/case.schema.json) with:
+For each case, fill [`case.schema.json`](case.schema.json) with:
 
 - task prompt
 - category
@@ -46,7 +46,7 @@ For each case:
 
 For the pilot harness, candidate commands are responsible for writing the normalized observation JSON to `COGWORKS_BENCHMARK_OBSERVATION_PATH`. If the case contains `judge_only` checks, they must also write judge output to `COGWORKS_BENCHMARK_JUDGE_OUTPUT_PATH`.
 
-Codex candidate commands can use [`scripts/skill-benchmark-codex-adapter.py`](/home/will/code/cogworks/scripts/skill-benchmark-codex-adapter.py) as the bridge layer. In live mode it runs `codex exec --json`; in replay mode it converts a saved Codex event stream into the normalized observation contract for offline smoke tests.
+Codex candidate commands can use [`scripts/skill-benchmark-codex-adapter.py`](../../../scripts/skill-benchmark-codex-adapter.py) as the bridge layer. In live mode it runs `codex exec --json`; in replay mode it converts a saved Codex event stream into the normalized observation contract for offline smoke tests.
 
 If a run crashes or the environment is invalid, mark the trial invalid and rerun until both candidates have the same valid trial count.
 Do not convert invalid trials into scored fallback observations.
@@ -101,7 +101,7 @@ Overall:
 
 Write:
 
-- one machine-readable summary matching [`benchmark-summary.schema.json`](/home/will/code/cogworks/evals/skill-benchmark/benchmark-summary.schema.json)
+- one machine-readable summary matching [`benchmark-summary.schema.json`](benchmark-summary.schema.json)
 - one human-readable `benchmark-report.md`
 - one detailed `benchmark-results.json` containing per-case and per-trial evidence
 
