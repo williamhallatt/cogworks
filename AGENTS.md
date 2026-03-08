@@ -82,7 +82,7 @@
 - `npx skills add williamhallatt/cogworks` installs skills to detected agents.
 - `npx skills add . -a claude-code -y` installs from local repo for development.
 - `bash tests/run-black-box-tests.sh` runs black-box meta-tests for the test framework.
-- `python3 tests/framework/scripts/cogworks-eval.py behavioral scaffold --skill <slug>` scaffolds behavioral test cases for new skills. *(Behavioral evaluation pending reconstruction — D-022/D-023)*
+- `python3 tests/framework/scripts/cogworks-eval.py behavioral scaffold --skill <slug>` scaffolds behavioral test cases for new skills.
 - `bash scripts/run-recursive-round.sh --round-manifest tests/datasets/recursive-round/round-manifest.local.json --mode fast` runs a fast recursive round.
 - `bash scripts/validate-recursive-docs.sh` validates recursive workflow docs consistency.
 - `bash scripts/test-agentic-contract.sh` validates the agentic runtime contract surface (docs, stage graph, adapters, deterministic checks).
@@ -96,7 +96,7 @@
 
 ## Testing Guidelines
 - Treat Layer 1 deterministic checks as the minimum gate for all skill changes.
-- For `cogworks-*` updates, run Layer 1 checks before opening a PR. *(Layer 2 behavioral evaluation pending reconstruction — see D-022/D-023 in `_plans/DECISIONS.md`.)*
+- For `cogworks-*` updates, run Layer 1 checks before opening a PR. For full validation, run `bash tests/run-all.sh` (Layers 1–5a).
 - Store behavioral test cases under `tests/behavioral/*/test-cases.jsonl` and new skill source materials under `_sources/`.
 
 ## Git Rules

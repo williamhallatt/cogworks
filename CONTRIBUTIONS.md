@@ -27,7 +27,7 @@ bash scripts/run-recursive-round.sh \
   --mode fast
 ```
 
-> **Note:** Layer 2 behavioral evaluation (`cogworks-eval.py behavioral run`) is pending reconstruction (D-022/D-023). Layer 1 deterministic checks and recursive rounds are the current gates.
+> **Note:** `bash tests/run-all.sh` runs the full offline bar (Layers 1–5a). See [TESTING.md](TESTING.md) for Layer 5b judge-evaluated tests and the complete layer table.
 
 See [TESTING.md](TESTING.md) for the full test runbook, including recursive improvement rounds and generated-skill testing.
 
