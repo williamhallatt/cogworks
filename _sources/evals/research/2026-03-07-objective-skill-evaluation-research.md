@@ -8,7 +8,7 @@ The cleanest way to compare two agent skills is to treat a skill as an intervent
 
 ## What The Local Corpus Already Got Right
 
-The local materials in [`_sources/evals`](/home/will/code/cogworks/_sources/evals), [`tests/framework/QUALITY-SCHEMA.md`](/home/will/code/cogworks/tests/framework/QUALITY-SCHEMA.md), and [`tests/framework/HARNESS-SPEC.md`](/home/will/code/cogworks/tests/framework/HARNESS-SPEC.md) already establish four strong foundations:
+The local materials in [`_sources/evals`](../), [`tests/framework/QUALITY-SCHEMA.md`](../../../tests/framework/QUALITY-SCHEMA.md), and [`tests/framework/HARNESS-SPEC.md`](../../../tests/framework/HARNESS-SPEC.md) already establish four strong foundations:
 
 1. Evaluation must be task-specific rather than benchmark-theater.
 2. Observable behavior matters more than polished final prose.
@@ -179,7 +179,7 @@ No single scalar should erase the tradeoff profile.
 
 ## What This Research Package Delivers
 
-The benchmark package under [`evals/skill-benchmark`](/home/will/code/cogworks/evals/skill-benchmark) encodes these decisions as a reusable spec:
+The benchmark package under [`evals/skill-benchmark`](../skill-benchmark) encodes these decisions as a reusable spec:
 
 - benchmark doctrine
 - run procedure
