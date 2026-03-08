@@ -61,7 +61,7 @@
 
 ## Project Structure & Module Organization
 - `skills/` at repo root contains all skills — the canonical source discovered by `npx skills add`.
-- `.claude/skills/` and `.agents/skills/` contains symlinks to `skills/` for local Claude Code development.
+- `.claude/skills/` and `.agents/skills/` contains symlinks to `skills/` for local Claude Code development. **Always edit files under `skills/` directly — never under `.claude/skills/` or `.agents/skills/`, which are symlink directories and not the source of truth.**
 - `tests/` contains validation assets:
   - `tests/run-black-box-tests.sh` for framework meta-tests.
   - `tests/framework/` for shared deterministic + behavioral + benchmark tooling.
