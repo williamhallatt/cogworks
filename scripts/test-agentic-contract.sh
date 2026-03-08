@@ -69,9 +69,9 @@ require_dir "tests/agentic-smoke/fixtures/api-auth-smoke"
 require_file "scripts/render-agentic-role-bindings.py"
 require_file "scripts/validate-agentic-run.sh"
 
-require_pattern "skills/cogworks/SKILL.md" 'turn source material into a production-ready agent skill' 'orchestrator exposes the single product purpose'
-require_pattern "skills/cogworks/SKILL.md" 'Fail closed when trust, provenance, contradiction handling, or validation is' 'orchestrator is fail-closed'
-require_pattern "skills/cogworks/SKILL.md" 'Treat sub-agents as internal machinery, not a user-facing mode.' 'orchestrator hides internal execution strategy'
+require_pattern "skills/cogworks/SKILL.md" 'turn source material into a validated generated skill' 'orchestrator exposes the single product purpose'
+require_pattern "skills/cogworks/SKILL.md" 'fail closed when trust, provenance, contradiction handling, or validation is' 'orchestrator is fail-closed'
+require_pattern "skills/cogworks/SKILL.md" 'only the generated skill is a user-facing product artifact' 'orchestrator hides internal execution strategy'
 require_pattern "skills/cogworks/SKILL.md" 'runtime details such as execution surface, run root, or sub-agent metadata do' 'orchestrator forbids runtime metadata leakage'
 forbid_pattern "skills/cogworks/SKILL.md" '--engine agentic' 'orchestrator no longer exposes --engine agentic'
 forbid_pattern "skills/cogworks/SKILL.md" 'Default to `legacy`' 'orchestrator no longer exposes legacy engine choice'
