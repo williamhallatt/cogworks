@@ -9,8 +9,8 @@
     "expected_sha256": "a3bf77d5aa8009d9bbc715ddf7341815dca93960d64c15cab393b71561d67d1c"
   },
   "pipeline_paths": {
-    "claude_skills_root": ".claude/skills",
-    "codex_skills_root": ".agents/skills"
+    "claude_skills_root": "skills",
+    "codex_skills_root": "skills"
   },
   "skill_slugs": [
     "cogworks-encode",
