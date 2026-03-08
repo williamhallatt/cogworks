@@ -2,6 +2,41 @@
 
 ## Learnings
 
+### 2026-03-07 — Error Path Testing Strategy Design
+
+Completed comprehensive error path testing strategy for agentic engine per William's directive. Analyzed full spec against current test coverage and identified complete gap: all existing fixtures (smoke runs, benchmarks) cover happy path only. Designed concrete test scenarios for 8 error categories:
+
+**Error Categories:**
+1. Contradictory source inputs (spec: "preserve contradictions"; test: verify synthesizer doesn't flatten conflicts)
+2. Missing stage artifacts (spec: "emit failed stage-status.json and stop"; test: verify blocking rules prevent downstream starts)
+3. Stage failure and retry (spec: "1 retry per stage, max"; test: verify retry counters and retry logic)
+4. Fallback to single-agent (spec: "native-subagents when available, fallback otherwise"; test: verify adapter detection and mode recording)
+5. Invalid dispatch manifest (spec: schema requirements; test: JSON schema validation)
+6. Context overflow (spec: "never claim stronger capability than surface provides"; test: source size pre-validation)
+7. Tool unavailability degradation (spec: role tool scopes; test: verify stages don't run with missing tools)
+8. Blocking rule violations (spec: stage dependencies; test: verify premature stages blocked)
+
+**Key Findings:**
+- Spec is precise (blocking rules, retry policy, fallback criteria all explicit) but evidence is thin (0 error path fixtures)
+- Smoke run in `.cogworks-runs/` shows all "pass" status for every stage — suspiciously clean for first run
+- Spec gaps identified: decision skeleton ownership implicit, not assigned to role; tool availability check not specified as coordinator responsibility
+- Both platforms (Claude CLI, Copilot CLI) need testing but Copilot fallback already partially proven
+
+**Deliverables:**
+- `.squad/decisions/inbox/hudson-error-path-testing.md` (28K comprehensive design document)
+- 5 fixture sets specified with exact source content
+- 3 new validation scripts identified (dispatch-manifest-schema.json, validate-error-paths.sh, enhanced validate-agentic-run.sh)
+- 4-phase implementation roadmap (fixture creation → validator enhancement → orchestration → execution)
+- CI gate integration plan
+
+**Spec Clarity Improvements Needed:**
+1. Assign decision skeleton generation to composer role (implicit in smoke run)
+2. Define coordinator's tool-availability-check responsibility
+3. Add context-size pre-validation to runtime spec (currently only implicit in acceptance criteria)
+4. Clarify what constitutes "same blocking reason" for retry termination
+
+**Next Action:** Phase 1 fixture creation ready to start. Phase 2-4 blocked until Phase 1 complete. Document is implementation-ready.
+
 ### 2026-03-04 — Round 3 Issues Closure: Test Infrastructure Fixes
 
 Fixed three critical test infrastructure issues (#30, #33, #35) as final Ralph-coordinated remediation:
@@ -158,4 +193,11 @@ Fixed three test infrastructure issues (GitHub #30, #33, #35):
 **Key insight:** Test template mislabeling was introduced when Claude Code extensions were generalized to agentskills.io spec — old check name (`user-invocable`) was CC-specific, description was universal. The llm_judge note makes explicit the current eval limitation (activation-based only) so future implementers understand design intent vs. missing runner.
 
 **Team coordination:** Ralph requested these fixes as pre-merge cleanup for cogworks stabilization.
+
+
+**2026-03-08 — Post-Review Fan-Out (Error Path Testing)**
+
+Hudson proposed comprehensive error path testing strategy for agentic engine covering 8 scenarios (contradictory sources, missing artifacts, stage failures, fallback modes, context overflow, tool degradation, blocking violations). Deterministic error corpus design + behavioral trace validation. Proposals consolidated into decisions.md pending approval.
+
+**Cross-references:** Ripley prioritized (error paths P1); Ash security hardening should complete before error path testing begins. Parker's evaluation harness will integrate Hudson's error fixtures.
 
