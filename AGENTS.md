@@ -31,7 +31,7 @@
 
 ## Collaboration Principles
 
-- **Save ACCEPTED Plans** - whenever a plan is *accepted*, save it in [_plans/](./_plans/) with a descriptive name and date. This creates a living archive of strategic thinking and decision-making.
+- **Save ACCEPTED Plans** - whenever a plan is *accepted*, save it in [_plans/](./_plans/) with a descriptive name and date. This creates a short-lived active work record until the decision is extracted and the plan is closed.
 - **Close plans by deletion** - when a plan is accepted and its work completed, extract its core decision into `_plans/DECISIONS.md`, delete the plan file, and update the `audited_through` date. These three steps are atomic — deleting without extracting is not a close. Git history is the archive; the working tree does not need the file.
 
 ## The Expert Subtraction Principle
