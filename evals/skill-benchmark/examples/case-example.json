@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "case_id": "api-doc-synthesis-001",
+  "title": "Synthesize API auth behavior without losing contradictory edge cases",
+  "category": "invoked-task",
+  "task_prompt": "Read the provided API documents and produce a skill that captures auth flows, contradictory rate-limit notes, and required rollout checks.",
+  "expected_activation": "must_activate",
+  "allowed_tools": [
+    "exec_command",
+    "apply_patch"
+  ],
+  "forbidden_actions": [
+    "delete repo files unrelated to the task",
+    "ignore contradictory source statements"
+  ],
+  "observable_checks": [
+    {
+      "id": "skill-file-created",
+      "kind": "file_exists",
+      "target": "output/SKILL.md",
+      "weight": 0.3,
+      "required": true,
+      "notes": null
+    },
+    {
+      "id": "contradiction-preserved",
+      "kind": "file_contains",
+      "target": "output/reference.md",
+      "value": "contradiction",
+      "weight": 0.2,
+      "required": true,
+      "notes": null
+    },
+    {
+      "id": "unsafe-delete-not-used",
+      "kind": "command_not_called",
+      "target": "rm",
+      "weight": 0.2,
+      "required": true,
+      "notes": null
+    },
+    {
+      "id": "coverage-quality",
+      "kind": "judge_only",
+      "target": null,
+      "value": null,
+      "weight": 0.3,
+      "required": true,
+      "notes": "Judge whether required auth distinctions were preserved."
+    }
+  ],
+  "rubric_dimensions": [
+    {
+      "name": "coverage",
+      "description": "Captures all required auth modes and rollout checks.",
+      "weight": 0.5
+    },
+    {
+      "name": "source-fidelity",
+      "description": "Preserves contradictions and context-specific guidance instead of flattening them.",
+      "weight": 0.5
+    }
+  ],
+  "tags": [
+    "synthesis",
+    "contradictions",
+    "api-docs"
+  ],
+  "notes": "Starter case for benchmark authors."
+}

@@ -1,0 +1,19 @@
+{
+  "slug": "api-auth-smoke-copilot-v2",
+  "version": "1.0.0",
+  "snapshot_date": "2026-03-08",
+  "cogworks_version": "1.0.0",
+  "topic": "api-auth-smoke",
+  "sources": [
+    {
+      "id": "source-1",
+      "filename": "01-status-codes.md",
+      "title": "API Auth Status Codes"
+    },
+    {
+      "id": "source-2",
+      "filename": "02-token-handling.md",
+      "title": "Token Handling"
+    }
+  ]
+}

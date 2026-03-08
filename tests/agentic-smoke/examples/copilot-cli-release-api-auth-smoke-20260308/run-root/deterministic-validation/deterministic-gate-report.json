@@ -1,0 +1,40 @@
+{
+  "gate": "deterministic-validation",
+  "status": "pass",
+  "synthesis_validation": {
+    "script": "skills/cogworks-encode/scripts/validate-synthesis.sh",
+    "target": "skill-output/api-auth-smoke-copilot-v2/reference.md",
+    "exit_code": 0,
+    "result": "pass",
+    "checks_passed": [
+      "All required sections present",
+      "Citations present (16 found)",
+      "Code fences balanced",
+      "No forbidden patterns",
+      "Sources section contains numbered entries"
+    ],
+    "critical_failures": [],
+    "warnings": []
+  },
+  "skill_validation": {
+    "script": "skills/cogworks-learn/scripts/validate-skill.sh",
+    "target": "skill-output/api-auth-smoke-copilot-v2",
+    "exit_code": 0,
+    "result": "pass",
+    "checks_passed": [
+      "SKILL.md exists",
+      "Frontmatter delimiters present",
+      "Required frontmatter fields present (name, description)",
+      "Line count within limit (43/500)",
+      "SKILL.md required sections present",
+      "reference.md required sections present",
+      "Citations present (32 found)",
+      "No forbidden patterns",
+      "Code fences balanced",
+      "metadata.json valid",
+      "Description length adequate (19 words)"
+    ],
+    "critical_failures": [],
+    "warnings": []
+  }
+}

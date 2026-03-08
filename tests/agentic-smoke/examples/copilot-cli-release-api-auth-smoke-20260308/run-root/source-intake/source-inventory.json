@@ -1,0 +1,24 @@
+{
+  "sources": [
+    {
+      "source_id": "source-1",
+      "path": "tests/agentic-smoke/fixtures/api-auth-smoke/01-status-codes.md",
+      "filename": "01-status-codes.md",
+      "type": "markdown",
+      "title": "API Auth Status Codes",
+      "word_count": 52,
+      "topic_signals": ["401 Unauthorized", "403 Forbidden", "WWW-Authenticate", "authentication", "authorization"]
+    },
+    {
+      "source_id": "source-2",
+      "path": "tests/agentic-smoke/fixtures/api-auth-smoke/02-token-handling.md",
+      "filename": "02-token-handling.md",
+      "type": "markdown",
+      "title": "Token Handling",
+      "word_count": 40,
+      "topic_signals": ["short-lived tokens", "expired tokens", "401", "authentication failure", "authorization failure"]
+    }
+  ],
+  "total_sources": 2,
+  "total_words": 92
+}

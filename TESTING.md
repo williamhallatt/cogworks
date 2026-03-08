@@ -53,6 +53,19 @@ benchmark evidence.
 
 The canonical benchmark specification lives under `evals/`.
 
+### Claude prerequisite
+
+The current Claude release path requires delegated-task support on the local
+Claude Code CLI surface. If a quick capability probe returns `NO-TASK`, a
+truthful Claude happy-path sub-agent artifact cannot be produced on that
+machine state, so the release bar is blocked rather than partially passable.
+
+Preserved fail-closed example:
+- `tests/agentic-smoke/examples/claude-cli-no-task-fail-closed-20260308/`
+
+Preserved validated Copilot example:
+- `tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/`
+
 ## Reading This Guide Correctly
 
 Testing-surface references are not product-support claims:

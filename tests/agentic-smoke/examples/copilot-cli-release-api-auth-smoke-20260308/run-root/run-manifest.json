@@ -1,0 +1,10 @@
+{
+  "run_id": "copilot-v2-api-auth-smoke-20260308",
+  "run_type": "subagent-skill-build",
+  "execution_surface": "copilot-cli",
+  "specialist_profile_source": "canonical-role-specs",
+  "topic": "api-auth-smoke",
+  "skill_path": "skill-output/api-auth-smoke-copilot-v2",
+  "started_at": "2026-03-08T13:11:32Z",
+  "stages_expected": ["source-intake", "synthesis", "skill-packaging", "deterministic-validation", "final-review"]
+}

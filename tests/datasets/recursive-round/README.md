@@ -28,15 +28,15 @@ All rounds write artifacts under `tests/results/meta-loop/<run-id>/`.
 
 ```bash
 cp tests/datasets/recursive-round/round-manifest.example.json \
-  tests/datasets/recursive-round/round-manifest.local.json
+  /tmp/round-manifest.local.json
 
 bash scripts/pin-test-bundle-hash.sh \
-  tests/datasets/recursive-round/round-manifest.local.json
+  /tmp/round-manifest.local.json
 
 source scripts/recursive-env.example.sh
 
 bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --round-manifest /tmp/round-manifest.local.json \
   --mode fast \
   --run-id rr-fast-$(date +%Y%m%d-%H%M%S)
 ```
@@ -98,7 +98,7 @@ Per run outputs:
 ## Troubleshooting
 
 1. Hash mismatch
-- Re-pin: `bash scripts/pin-test-bundle-hash.sh tests/datasets/recursive-round/round-manifest.local.json`
+- Re-pin: `bash scripts/pin-test-bundle-hash.sh /tmp/round-manifest.local.json`
 
 2. Behavioral failures
 - Check `tests/results/meta-loop/<run-id>/behavioral-*/<timestamp>/summary.json`

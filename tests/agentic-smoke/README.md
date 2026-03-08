@@ -19,8 +19,11 @@ It does **not** prove the build path is better than alternatives.
 > `tmp-agentic-output/` are non-canonical artifact surfaces and should not be
 > your default scratch locations.
 
-If you need a preserved in-repo example artifact set for contract inspection,
-use `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/`.
+If you need preserved in-repo artifact sets for contract inspection, use:
+
+- `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/`
+- `tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/`
+- `tests/agentic-smoke/examples/claude-cli-no-task-fail-closed-20260308/`
 
 ## Fixture Sources
 
@@ -104,6 +107,22 @@ bash scripts/validate-agentic-run.sh \
   --expect-surface copilot-cli
 ```
 
+## Fail-Closed Evidence
+
+Release-grade validation should also include one negative-path run that stops
+with a blocking report and does not produce an installable skill. After that
+run completes, validate the evidence with:
+
+```bash
+bash tests/validate-fail-closed-run.sh \
+  --report-path <blocking-report-path> \
+  --skill-path <unexpected-skill-output-path>
+```
+
+If your blocking report format is stable, add one or more `--expect-pattern`
+checks so the validator confirms the failure reason text as well as the absence
+of `SKILL.md`.
+
 ## Manual Review Checklist
 
 Confirm all of the following:
@@ -123,12 +142,14 @@ Confirm all of the following:
   mode, execution surface, or run root into its public frontmatter or
   `metadata.json`
 
-## Preserved Example
+## Preserved Examples
 
-The repository keeps one canonical example under:
+The repository keeps canonical maintainer evidence under:
 
 ```text
 tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/
+tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/
+tests/agentic-smoke/examples/claude-cli-no-task-fail-closed-20260308/
 ```
 
-Treat it as maintainer evidence only, not as a default instruction surface.
+Treat these as maintainer evidence only, not as default instruction surfaces.

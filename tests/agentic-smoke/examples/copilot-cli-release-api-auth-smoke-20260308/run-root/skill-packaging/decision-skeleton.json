@@ -1,0 +1,42 @@
+{
+  "topic": "api-auth-smoke",
+  "decision_count": 6,
+  "decisions": [
+    {
+      "id": "d1",
+      "rule": "Missing or invalid token → 401 Unauthorized",
+      "sources": ["source-1"],
+      "category": "status-code-selection"
+    },
+    {
+      "id": "d2",
+      "rule": "Expired token → 401 Unauthorized (not 403)",
+      "sources": ["source-2", "source-1"],
+      "category": "status-code-selection"
+    },
+    {
+      "id": "d3",
+      "rule": "Authenticated but insufficient permissions → 403 Forbidden",
+      "sources": ["source-1"],
+      "category": "status-code-selection"
+    },
+    {
+      "id": "d4",
+      "rule": "Include WWW-Authenticate header with 401 responses",
+      "sources": ["source-1"],
+      "category": "response-headers"
+    },
+    {
+      "id": "d5",
+      "rule": "Prefer short-lived access tokens",
+      "sources": ["source-2"],
+      "category": "token-lifecycle"
+    },
+    {
+      "id": "d6",
+      "rule": "Document authentication vs authorization failure distinction",
+      "sources": ["source-2", "source-1"],
+      "category": "operator-guidance"
+    }
+  ]
+}
