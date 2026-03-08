@@ -20,6 +20,7 @@ def main() -> int:
     observation_path = Path(os.environ["COGWORKS_BENCHMARK_OBSERVATION_PATH"])
     judge_output_path = Path(os.environ["COGWORKS_BENCHMARK_JUDGE_OUTPUT_PATH"])
     model = os.environ["COGWORKS_BENCHMARK_MODEL"]
+    judge_model = os.environ.get("COGWORKS_BENCHMARK_JUDGE_MODEL", "fixture-judge")
     agent_surface = os.environ["COGWORKS_BENCHMARK_AGENT_SURFACE"]
 
     case = json.loads(case_file.read_text(encoding="utf-8"))
@@ -80,6 +81,7 @@ def main() -> int:
         "notes": "Synthetic pilot runner.",
     }
     judge_output = {
+        "judge_model": judge_model,
         "score": judge_score,
         "verdict": "pass" if judge_score >= 0.5 else "fail",
         "confidence": 0.9,

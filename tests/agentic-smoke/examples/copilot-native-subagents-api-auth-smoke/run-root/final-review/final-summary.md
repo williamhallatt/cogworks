@@ -1,6 +1,6 @@
 # Final Summary — api-auth-smoke
 
-**Run ID:** api-auth-smoke-copilot-smoke-20260307
+**Run ID:** copilot-native-subagents-api-auth-smoke-example-20260307
 **Surface:** copilot-cli
 **Adapter:** native-subagents
 **Model policy:** inherit-session-model
@@ -18,7 +18,7 @@
 
 ## Generated Skill
 
-Output: `tmp-agentic-output/api-auth-smoke/SKILL.md`
+Output: `tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/skill-output/SKILL.md`
 
 The skill covers HTTP 401/403 semantics for API authentication, token failure handling, and the WWW-Authenticate header obligation. Coverage gaps (refresh tokens, revocation, step-up auth) are documented and out of scope for this source set.
 

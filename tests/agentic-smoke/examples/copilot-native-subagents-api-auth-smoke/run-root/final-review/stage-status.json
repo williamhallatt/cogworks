@@ -1,0 +1,11 @@
+{
+  "stage": "final-review",
+  "status": "pass",
+  "artifacts": [
+    "tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/run-root/final-review/stage-status.json",
+    "tests/agentic-smoke/examples/copilot-native-subagents-api-auth-smoke/run-root/final-review/final-summary.md"
+  ],
+  "blocking_failures": [],
+  "warnings": [],
+  "recommended_next_action": "run complete — generated skill is ready"
+}

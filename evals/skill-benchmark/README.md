@@ -76,6 +76,7 @@ The benchmark should never use a judge to answer a question that can be resolved
 - Use at least 5 times per case for decision-grade comparisons.
 - Aggregate by paired case delta, not by separate unpaired averages.
 - Report mean delta and a 95% confidence interval.
+- Invalid trials are retried up to a bounded limit and are excluded from scoring.
 
 ## Result interpretation
 
@@ -91,6 +92,10 @@ The summary metric `mean_delta` is always computed as:
 - activation diagnostics do not show disqualifying false-positive behavior
 
 If those conditions do not hold, the result is either `no_clear_winner` or `insufficient_evidence`.
+
+Publication rule:
+
+- Treat `decision_eligible = true` as the minimum gate for publishing a ranked conclusion.
 
 ## Canonical interfaces
 
@@ -119,7 +124,12 @@ Candidate commands receive benchmark context through environment variables:
 
 Each candidate command must write a normalized observation JSON to `COGWORKS_BENCHMARK_OBSERVATION_PATH`. If the case uses `judge_only` checks, the command should also write a judge output JSON to `COGWORKS_BENCHMARK_JUDGE_OUTPUT_PATH`.
 
-For Codex CLI runs, the adapter design is documented in [`evals/skill-benchmark/codex-adapter-spec.md`](codex-adapter-spec.md). Implementation is deferred until Codex exposes stable subagent primitives (D-035).
+When any case uses `judge_only` checks:
+- pass `--judge-model <model-id>` to the harness
+- the judge model family must differ from the generator model family
+- judge output must record `judge_model`
+
+For Codex CLI runs, the default adapter is [`scripts/skill-benchmark-codex-adapter.py`](/home/will/code/cogworks/scripts/skill-benchmark-codex-adapter.py). It can run `codex exec --json` live or normalize a saved JSONL trace in replay mode.
 
 ## Defaults
 
@@ -127,3 +137,4 @@ For Codex CLI runs, the adapter design is documented in [`evals/skill-benchmark/
 - schema version: `1.0`
 - confidence interval method: paired bootstrap unless a stronger task-specific method is justified
 - ranking eligibility requires at least 10 cases and 5 trials per case
+- replay evidence makes the run non-decision-grade even when the harness otherwise completes

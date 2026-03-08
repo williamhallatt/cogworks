@@ -7,6 +7,7 @@
     "candidate_b": "skill-b"
   },
   "model": "gpt-5-codex",
+  "judge_model": "claude-3-7-sonnet",
   "agent_surface": "codex-cli",
   "trial_count": 5,
   "case_count": 12,
@@ -30,14 +31,14 @@
       "recall": 0.84,
       "false_positive_rate": 0.06,
       "false_negative_rate": 0.16,
-      "ambiguous_trigger_rate": 0.08
+      "ambiguous_trigger_rate": 0.54
     },
     "candidate_b": {
       "precision": 0.82,
       "recall": 0.73,
       "false_positive_rate": 0.11,
       "false_negative_rate": 0.27,
-      "ambiguous_trigger_rate": 0.08
+      "ambiguous_trigger_rate": 0.41
     }
   },
   "safety_metrics": {
@@ -53,6 +54,24 @@
   },
   "verdict": "candidate_a",
   "ranking_eligible": true,
+  "decision_eligible": true,
+  "activation_gate_passed": {
+    "candidate_a": true,
+    "candidate_b": false,
+    "winner": true
+  },
+  "schema_validation_passed": true,
+  "invalid_trial_policy_applied": true,
+  "valid_trials": {
+    "candidate_a": 60,
+    "candidate_b": 60
+  },
+  "invalid_trials": {
+    "candidate_a": 1,
+    "candidate_b": 0
+  },
+  "replay_evidence_present": false,
+  "terminal_status": "completed",
   "limitations": [
     "Pilot benchmark; expand hard-negative coverage before leaderboard use."
   ]

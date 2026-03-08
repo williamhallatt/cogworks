@@ -3,7 +3,7 @@
 **Stage:** source-intake
 **Skill:** api-auth-smoke
 **Surface:** copilot-cli / agentic
-**Generated:** run `api-auth-smoke-copilot-smoke`
+**Generated:** run `copilot-native-subagents-api-auth-smoke-example`
 
 ---
 
