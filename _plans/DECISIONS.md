@@ -7,6 +7,15 @@ audited_through: 2026-03-08
 Settled decisions for the cogworks project. Agents load this file for context;
 see `_plans/archive/` for historical plans.
 
+## [D-039] Public docs now state surface support boundaries explicitly at first touch
+
+- **Date:** 2026-03-08 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** Public/user-facing docs must distinguish artifact portability from build-surface support explicitly and early. `README.md`, `INSTALL.md`, `skills/cogworks/README.md`, `TESTING.md`, and `CONTRIBUTIONS.md` now teach one consistent support model: generated skills are portable across agents that support skills; the trust-first internal build flow is currently supported only on Claude Code and GitHub Copilot CLI; Codex may appear as a generated-skill destination or maintainer benchmark/trigger surface, but it must not be presented as a supported trust-first build surface.
+- **Rationale:** The previous docs required readers to infer the Codex restriction by combining public and maintainer-only files. That made the product surface easy to misread and allowed installation or testing examples to imply parity that the runtime does not actually support. Explicit first-touch boundaries reduce user confusion and keep public docs aligned with the live product contract.
+- **Operational implication:** Any future public doc change that mentions Codex, portability, or supported surfaces must preserve the portability-versus-build distinction. Maintainer testing docs may continue to reference Codex where trigger smoke or benchmark tooling genuinely uses it, but those references must remain visibly separate from product support claims.
+- **Scope:** `README.md`, `INSTALL.md`, `skills/cogworks/README.md`, `TESTING.md`, `CONTRIBUTIONS.md`, `_plans/archive/2026-03-08-public-docs-surface-clarity.md`.
+
 ## [D-038] Test surface subtraction removes dead contracts and keeps only maintained validation paths
 
 - **Date:** 2026-03-08 | **By:** William (owner)
