@@ -26,22 +26,19 @@ pretending equivalence.
 Canonical role definitions live in:
 - `skills/cogworks/role-profiles.json`
 
-Claude binds them to these repo-local agent files:
+Claude resolves them directly from the canonical role profiles:
 
 | Stage | Role | Profile ID | Binding type | Binding ref | Model policy | Preferred dispatch |
 |---|---|---|---|---|---|---|
-| `source-intake` | `intake-analyst` | `intake-analyst` | `claude-agent-file` | `.claude/agents/cogworks-intake-analyst.md` | `pinned-haiku` | `background` |
-| `synthesis` | `synthesizer` | `synthesizer` | `claude-agent-file` | `.claude/agents/cogworks-synthesizer.md` | `pinned-sonnet` | `foreground` |
-| `skill-packaging` | `composer` | `composer` | `claude-agent-file` | `.claude/agents/cogworks-composer.md` | `pinned-sonnet` | `foreground` |
-| `deterministic-validation` | `validator` | `validator` | `claude-agent-file` | `.claude/agents/cogworks-validator.md` | `pinned-haiku` | `background` |
+| `source-intake` | `intake-analyst` | `intake-analyst` | `claude-role-profile` | `skills/cogworks/role-profiles.json#intake-analyst` | `pinned-haiku` | `background` |
+| `synthesis` | `synthesizer` | `synthesizer` | `claude-role-profile` | `skills/cogworks/role-profiles.json#synthesizer` | `pinned-sonnet` | `foreground` |
+| `skill-packaging` | `composer` | `composer` | `claude-role-profile` | `skills/cogworks/role-profiles.json#composer` | `pinned-sonnet` | `foreground` |
+| `deterministic-validation` | `validator` | `validator` | `claude-role-profile` | `skills/cogworks/role-profiles.json#validator` | `pinned-haiku` | `background` |
 
 Before the first specialist dispatch, the coordinator must write
 `{run_root}/dispatch-manifest.json` recording the canonical profile ID, binding
 type, binding ref, model policy, preferred dispatch mode, actual dispatch mode,
 and tool scope.
-
-If any required Claude agent file is missing, stop and surface the runtime
-misconfiguration.
 
 ## Dispatch Rules
 
@@ -76,8 +73,8 @@ Each specialist must also write its own `stage-status.json`.
 The Claude adapter is working correctly when:
 - verbose exploration stays in sub-agent context
 - coordinator context receives summaries, not raw logs
-- each specialist stage maps to a canonical role profile and concrete Claude
-  agent file
+- each specialist stage maps to a canonical role profile and truthful Claude
+  binding record
 - no specialist spawns another specialist
 - `dispatch-manifest.json` proves which canonical role profiles and Claude
   bindings were used

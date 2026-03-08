@@ -62,7 +62,7 @@
   - `README.md`, `TESTING.md`, `CONTRIBUTIONS.md`, `INSTALL.md`
   - `_plans/DECISIONS.md`
   - active `_plans/*.md` in the `_plans/` root
-  - directly relevant files under `skills/`, `.claude/agents/`, and `evals/`
+  - directly relevant files under `skills/` and `evals/`
 - **Do not opportunistically load non-default context surfaces**:
   - `.github/agents/`
   - `.squad/`

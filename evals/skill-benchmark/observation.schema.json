@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogworks.dev/evals/skill-benchmark/observation.schema.json",
+  "title": "Skill Benchmark Observation",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "benchmark_id",
+    "case_id",
+    "candidate_id",
+    "trial_id",
+    "model",
+    "agent_surface",
+    "invoked",
+    "completed",
+    "commands",
+    "tool_calls",
+    "files_written",
+    "timing",
+    "cost"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "benchmark_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trial_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_surface": {
+      "type": "string",
+      "minLength": 1
+    },
+    "invoked": {
+      "type": "boolean"
+    },
+    "completed": {
+      "type": "boolean"
+    },
+    "commands": {
+      "type": "array"
+    },
+    "tool_calls": {
+      "type": "array"
+    },
+    "files_written": {
+      "type": "array"
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "wall_clock_ms"
+      ],
+      "properties": {
+        "wall_clock_ms": {
+          "type": "number"
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

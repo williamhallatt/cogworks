@@ -3,13 +3,10 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EVAL_CLI="$ROOT_DIR/tests/framework/scripts/cogworks-eval.py"
-BENCH_SCRIPT="$ROOT_DIR/benchmarks/comparison/scripts/test-cogworks-pipeline.sh"
 
 ROUND_MANIFEST=""
 RUN_ID="rr-$(date +%Y%m%d-%H%M%S)"
 MODE="fast"
-TASK_MANIFEST="$ROOT_DIR/benchmarks/comparison/datasets/pipeline-benchmark/manifest.jsonl"
-SMOKE_ONLY=0
 SKIP_HOOKS=0
 
 usage() {
@@ -19,9 +16,7 @@ Usage: $0 --round-manifest <path> [options]
 Options:
   --round-manifest <path>   Round manifest JSON (required)
   --run-id <id>             Run identifier (default: timestamped)
-  --mode <fast|deep>        Evaluation depth (default: fast)
-  --task-manifest <path>    Benchmark manifest for deep mode
-  --smoke-only              In deep mode, use offline benchmark signal (non-decision-grade)
+  --mode fast               Maintained evaluation depth (default: fast)
   --skip-hooks              Do not run generation/improvement hook commands from manifest
   -h, --help                Show this help
 USAGE
@@ -40,14 +35,6 @@ while [[ $# -gt 0 ]]; do
     --mode)
       MODE="$2"
       shift 2
-      ;;
-    --task-manifest)
-      TASK_MANIFEST="$2"
-      shift 2
-      ;;
-    --smoke-only)
-      SMOKE_ONLY=1
-      shift
       ;;
     --skip-hooks)
       SKIP_HOOKS=1
@@ -70,18 +57,13 @@ if [[ -z "$ROUND_MANIFEST" ]]; then
   exit 2
 fi
 
-if [[ "$MODE" != "fast" && "$MODE" != "deep" ]]; then
-  echo "--mode must be fast or deep." >&2
+if [[ "$MODE" != "fast" ]]; then
+  echo "--mode must be fast." >&2
   exit 2
 fi
 
 if [[ ! -f "$ROUND_MANIFEST" ]]; then
   echo "Round manifest not found: $ROUND_MANIFEST" >&2
-  exit 2
-fi
-
-if [[ "$MODE" == "deep" && ! -f "$TASK_MANIFEST" ]]; then
-  echo "Task manifest not found: $TASK_MANIFEST" >&2
   exit 2
 fi
 
@@ -245,69 +227,6 @@ SELECTION_STATUS="not-run"
 BENCHMARK_SUMMARY=""
 BENCHMARK_REPORT=""
 
-if [[ "$MODE" == "deep" ]]; then
-  if [[ "$SMOKE_ONLY" -eq 1 ]]; then
-    bash "$BENCH_SCRIPT" --mode offline --run-id "$RUN_ID" --manifest "$TASK_MANIFEST" --force
-  else
-    if [[ -z "${COGWORKS_BENCH_CLAUDE_CMD:-}" || -z "${COGWORKS_BENCH_CODEX_CMD:-}" ]]; then
-      echo "Deep mode requires COGWORKS_BENCH_CLAUDE_CMD and COGWORKS_BENCH_CODEX_CMD unless --smoke-only is set." >&2
-      exit 2
-    fi
-    bash "$BENCH_SCRIPT" --mode real --run-id "$RUN_ID" --manifest "$TASK_MANIFEST" --force
-  fi
-
-  BENCHMARK_SUMMARY="$ROOT_DIR/benchmarks/comparison/results/pipeline-benchmark/$RUN_ID/benchmark-summary.json"
-  BENCHMARK_REPORT="$ROOT_DIR/benchmarks/comparison/results/pipeline-benchmark/$RUN_ID/benchmark-report.md"
-
-  mapfile -t BENCH_STATE < <(python3 - "$MANIFEST_STATE" "$BENCHMARK_SUMMARY" <<'PY'
-import json
-import sys
-from pathlib import Path
-
-manifest_state = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-summary = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
-sel = manifest_state["selection"]
-max_tokens = float(sel["max_total_tokens"])
-max_runtime = float(sel["max_runtime_sec"])
-
-signal_mode = summary.get("signal_mode", "offline-smoke")
-ranking_eligible = bool(summary.get("ranking_eligible", False))
-
-winner = "none"
-status = "FAIL"
-best_utility = -1.0
-for name, payload in summary.get("pipelines", {}).items():
-    if payload.get("disqualified", False):
-        continue
-    cost = payload.get("cost", {})
-    total_tokens = float(cost.get("total_tokens_median", 0.0))
-    runtime_sec = float(cost.get("runtime_sec_median", 0.0))
-    if total_tokens > max_tokens or runtime_sec > max_runtime:
-        continue
-    utility = float(payload.get("utility_score", 0.0))
-    if utility > best_utility:
-        best_utility = utility
-        winner = name
-        status = "PASS"
-
-print(signal_mode)
-print(str(ranking_eligible).lower())
-print(winner)
-print(status)
-PY
-)
-
-  SIGNAL_MODE="${BENCH_STATE[0]}"
-  RANKING_ELIGIBLE="${BENCH_STATE[1]}"
-  SELECTED_WINNER="${BENCH_STATE[2]}"
-  SELECTION_STATUS="${BENCH_STATE[3]}"
-
-  if [[ "$SMOKE_ONLY" -eq 0 && "$RANKING_ELIGIBLE" != "true" ]]; then
-    echo "Deep mode real run requires ranking_eligible=true in benchmark summary." >&2
-    exit 1
-  fi
-fi
-
 if [[ "$SKIP_HOOKS" -eq 0 ]]; then
   run_hook_phase "post_round"
 fi
@@ -334,13 +253,6 @@ selected_winner = sys.argv[10]
 selection_status = sys.argv[11]
 
 recommendation = "continue-fast-iteration"
-if mode == "deep":
-    if ranking_eligible and selection_status == "PASS" and selected_winner != "none":
-        recommendation = f"promote-{selected_winner}"
-    elif ranking_eligible:
-        recommendation = "no-promotion-within-caps"
-    else:
-        recommendation = "deep-run-smoke-only"
 
 payload = {
     "timestamp": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),

@@ -28,6 +28,31 @@ Prefer disposable output roots outside the repository for live smoke runs and
 benchmark runs. Do not use repo-local `.cogworks-runs/` or
 `tmp-agentic-output/` as your default scratch paths.
 
+## Recursive Round Runbook
+
+The canonical recursive runbook is `tests/datasets/recursive-round/README.md`.
+Use it as the source of truth for command shape, hook behavior, manifest
+pinning, and artifact expectations.
+
+Maintained recursive tooling:
+- `scripts/run-recursive-round.sh`
+- `scripts/run-recursive-hook.sh`
+- `scripts/hash-test-bundle.sh`
+- `scripts/pin-test-bundle-hash.sh`
+- `scripts/recursive-env.example.sh`
+
+The maintained recursive surface is the fast round:
+
+```bash
+source scripts/recursive-env.example.sh
+bash scripts/run-recursive-round.sh \
+  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
+  --mode fast
+```
+
+If decision-grade recursive benchmarking is ever reintroduced, the minimum bar
+remains `ranking_eligible=true`.
+
 ## Prerequisites
 
 - `python3`
@@ -75,6 +100,15 @@ bash scripts/run-trigger-smoke-tests.sh codex
 
 These tests validate invocation behavior only. They do not validate output
 quality.
+
+Offline parser coverage:
+
+```bash
+bash tests/run-trigger-smoke-parser-smoke.sh
+```
+
+If a live runner cannot reach its backend, the trigger smoke reports `SKIP`
+rather than a false activation failure.
 
 ## Layer 3 — Sub-Agent Build Smoke
 

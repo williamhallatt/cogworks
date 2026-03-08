@@ -12,8 +12,7 @@ A round executes these phases:
 4. `regenerate`
 5. invariant checks (runtime/artifact)
 6. behavioral checks
-7. optional benchmark (`deep` mode)
-8. `post_round`
+7. `post_round`
 
 All rounds write artifacts under `tests/results/meta-loop/<run-id>/`.
 
@@ -40,43 +39,13 @@ bash scripts/run-recursive-round.sh \
   --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
   --mode fast \
   --run-id rr-fast-$(date +%Y%m%d-%H%M%S)
-
-bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
-  --mode deep \
-  --smoke-only \
-  --run-id rr-deep-smoke-$(date +%Y%m%d-%H%M%S)
 ```
 
-## Decision-Grade Deep Round
+## Decision-Grade Note
 
-1. Set real benchmark backends:
-
-```bash
-export COGWORKS_RECURSIVE_BENCH_CLAUDE_REAL_CMD="<real claude benchmark command that writes metrics.json>"
-export COGWORKS_RECURSIVE_BENCH_CODEX_REAL_CMD="<real codex benchmark command that writes metrics.json>"
-```
-
-2. Keep benchmark env vars pointed at concrete wrappers:
-
-```bash
-export COGWORKS_BENCH_CLAUDE_CMD="bash scripts/recursive-bench.sh claude '{sources_path}' '{out_dir}'"
-export COGWORKS_BENCH_CODEX_CMD="bash scripts/recursive-bench.sh codex '{sources_path}' '{out_dir}'"
-```
-
-3. Run deep mode (no `--smoke-only`):
-
-```bash
-bash scripts/run-recursive-round.sh \
-  --round-manifest tests/datasets/recursive-round/round-manifest.local.json \
-  --mode deep \
-  --run-id rr-deep-real-$(date +%Y%m%d-%H%M%S)
-```
-
-Decision-grade requirement:
-
-- `signal_mode = real`
-- `ranking_eligible = true` (equivalent to `ranking_eligible=true`)
+Recursive rounds no longer run an in-band benchmark stage. If a future decision-
+grade benchmark is reintroduced, the minimum publication bar remains
+`ranking_eligible=true`.
 
 ## Hook Commands
 
@@ -126,21 +95,10 @@ Per run outputs:
 - `round-summary.json`
 - `round-report.md`
 
-Deep mode adds references to:
-
-- `benchmarks/comparison/results/pipeline-benchmark/<run-id>/benchmark-summary.json`
-- `benchmarks/comparison/results/pipeline-benchmark/<run-id>/benchmark-report.md`
-
 ## Troubleshooting
 
 1. Hash mismatch
 - Re-pin: `bash scripts/pin-test-bundle-hash.sh tests/datasets/recursive-round/round-manifest.local.json`
 
-2. Missing benchmark env vars
-- Set `COGWORKS_BENCH_CLAUDE_CMD` and `COGWORKS_BENCH_CODEX_CMD`
-
-3. Deep run is non-decision-grade
-- Ensure real backend env vars are set and wrappers are writing real metrics.
-
-4. Behavioral failures
+2. Behavioral failures
 - Check `tests/results/meta-loop/<run-id>/behavioral-*/<timestamp>/summary.json`

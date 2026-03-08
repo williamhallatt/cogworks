@@ -66,11 +66,6 @@ require_file "INSTALL.md"
 require_file "TESTING.md"
 require_file "tests/agentic-smoke/README.md"
 require_dir "tests/agentic-smoke/fixtures/api-auth-smoke"
-require_dir ".claude/agents"
-require_file ".claude/agents/cogworks-intake-analyst.md"
-require_file ".claude/agents/cogworks-synthesizer.md"
-require_file ".claude/agents/cogworks-composer.md"
-require_file ".claude/agents/cogworks-validator.md"
 require_file "scripts/render-agentic-role-bindings.py"
 require_file "scripts/validate-agentic-run.sh"
 
@@ -102,7 +97,7 @@ forbid_pattern "skills/cogworks/agentic-runtime.md" 'engine_mode' 'runtime no lo
 
 require_pattern "skills/cogworks/claude-adapter.md" 'execution_surface = claude-cli' 'Claude adapter declares claude-cli surface'
 require_pattern "skills/cogworks/claude-adapter.md" 'If the `Task` tool is unavailable' 'Claude adapter fails closed without Task'
-require_pattern "skills/cogworks/claude-adapter.md" '.claude/agents/cogworks-composer.md' 'Claude adapter maps composer to concrete agent file'
+require_pattern "skills/cogworks/claude-adapter.md" 'claude-role-profile' 'Claude adapter records canonical profile bindings'
 forbid_pattern "skills/cogworks/claude-adapter.md" 'single-agent-fallback' 'Claude adapter no longer claims single-agent fallback'
 
 require_pattern "skills/cogworks/copilot-adapter.md" 'execution_surface = copilot-cli' 'Copilot adapter declares copilot-cli surface'
@@ -114,7 +109,7 @@ require_pattern "skills/cogworks/role-profiles.json" '"profile_id": "intake-anal
 require_pattern "skills/cogworks/role-profiles.json" '"profile_id": "synthesizer"' 'role profiles define synthesizer'
 require_pattern "skills/cogworks/role-profiles.json" '"profile_id": "composer"' 'role profiles define composer'
 require_pattern "skills/cogworks/role-profiles.json" '"profile_id": "validator"' 'role profiles define validator'
-require_pattern "skills/cogworks/role-profiles.json" '"binding_type": "claude-agent-file"' 'role profiles define Claude bindings'
+require_pattern "skills/cogworks/role-profiles.json" '"binding_type": "claude-role-profile"' 'role profiles define Claude bindings'
 require_pattern "skills/cogworks/role-profiles.json" '"binding_type": "copilot-inline-prompt"' 'role profiles define Copilot bindings'
 
 require_pattern "TESTING.md" 'Sub-agent build smoke' 'testing guide documents sub-agent build smoke'
