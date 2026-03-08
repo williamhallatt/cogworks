@@ -6,6 +6,11 @@
     "candidate_a": "skill-a",
     "candidate_b": "skill-b"
   },
+  "input_provenance": {
+    "cases_file": "tests/test-data/skill-benchmark-pilot/cases.jsonl",
+    "candidate_a_command": "python3 tests/test-data/skill-benchmark-pilot/fake-runner.py",
+    "candidate_b_command": "python3 tests/test-data/skill-benchmark-pilot/fake-runner.py"
+  },
   "model": "gpt-5-codex",
   "judge_model": "claude-3-7-sonnet",
   "agent_surface": "codex-cli",

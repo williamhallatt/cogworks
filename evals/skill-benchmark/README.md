@@ -22,6 +22,10 @@ The intended difference is the skill under test.
 - `benchmark-report.md`
 - `benchmark-results.json`
 
+For release-grade use, `benchmark-summary.json` must also preserve the input
+provenance needed to tie the result back to the maintained cases file and both
+candidate commands.
+
 ## Canonical interfaces
 
 - [`case.schema.json`](/home/will/code/cogworks/evals/skill-benchmark/case.schema.json)
@@ -54,6 +58,7 @@ following are true:
 - `decision_eligible = true`
 - `replay_evidence_present = false`
 - the summary includes a 95% confidence interval and preserved artifacts
+- the summary preserves the cases file and both candidate command strings
 
 Do not treat single-run anecdotes, replay-only runs, or same-family
 generator/judge pairings as decision-grade evidence.

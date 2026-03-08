@@ -16,6 +16,9 @@ conditions. The adapter forbids outside knowledge and asks the model to mark
 unsupported policies explicitly, so the measured difference comes from encoded
 skill content rather than hidden background knowledge.
 
+This dataset is deterministic-only. `judge_model` is still recorded for summary
+consistency, but no `judge_only` checks depend on it here.
+
 ## Files
 
 - `cases.jsonl`: maintained benchmark cases
@@ -24,6 +27,10 @@ skill content rather than hidden background knowledge.
   adapter for these cases
 - `examples/benchmark-summary.20260308.json`: preserved decision-grade summary
 - `examples/benchmark-report.20260308.md`: preserved human-readable report
+
+The preserved summary is reference evidence. Fresh release validation should
+prefer a newly generated summary for the current candidate when the benchmark
+inputs have changed.
 
 ## Candidate A Context
 
@@ -43,7 +50,7 @@ model, Copilot surface, and dataset stay fixed.
 python3 scripts/run-skill-benchmark.py \
   --benchmark-id api-auth-skill-release-20260308 \
   --cases-file tests/test-data/skill-benchmark-api-auth-release/cases.jsonl \
-  --candidate-a generated-skill \
+  --candidate-a generated-skill-v2 \
   --candidate-a-command "python3 scripts/skill-benchmark-copilot-context-runner.py --context-file tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/skill-output/reference.md" \
   --candidate-b single-source-baseline \
   --candidate-b-command "python3 scripts/skill-benchmark-copilot-context-runner.py --context-file tests/test-data/skill-benchmark-api-auth-release/baseline-context.md" \
@@ -61,3 +68,5 @@ python3 scripts/run-skill-benchmark.py \
   deterministic-only case sets, so the example command passes one explicitly.
 - A release-grade claim still requires a positive lower bound on the 95%
   bootstrap CI, not just `decision_eligible = true`.
+- Current release validation also expects the summary to preserve input
+  provenance for the cases file and both candidate commands.

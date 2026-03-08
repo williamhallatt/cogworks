@@ -895,6 +895,11 @@ def main() -> int:
             "candidate_a": args.candidate_a,
             "candidate_b": args.candidate_b,
         },
+        "input_provenance": {
+            "cases_file": args.cases_file,
+            "candidate_a_command": args.candidate_a_command,
+            "candidate_b_command": args.candidate_b_command,
+        },
         "model": args.model,
         "judge_model": args.judge_model,
         "agent_surface": args.agent_surface,

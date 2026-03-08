@@ -69,6 +69,18 @@ else
   fail "$LABEL report exists and is non-empty"
 fi
 
+if grep -Eq '^# .*Blocking Report|^## Blocking Issue|^\*\*Status:\*\* BLOCKED' "$REPORT_PATH"; then
+  pass "$LABEL report has blocking-report structure"
+else
+  fail "$LABEL report has blocking-report structure"
+fi
+
+if grep -Eq 'INSTALL APPROVED|ready for installation|installation ready|Status:\s*pass' "$REPORT_PATH"; then
+  fail "$LABEL report does not claim installation success"
+else
+  pass "$LABEL report does not claim installation success"
+fi
+
 for pattern in "${EXPECT_PATTERNS[@]}"; do
   if grep -Fq "$pattern" "$REPORT_PATH"; then
     pass "$LABEL report contains '$pattern'"

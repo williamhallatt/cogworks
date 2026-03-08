@@ -27,3 +27,7 @@ bash scripts/validate-agentic-run.sh \
 
 This is the canonical preserved Claude happy-path evidence for the current
 release-grade validation bar.
+
+It is reference evidence and a debugging aid. Fresh release validation should
+prefer a newly generated Claude artifact set when the release candidate has
+changed.

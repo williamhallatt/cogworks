@@ -255,6 +255,7 @@ fi
 
 check_nonempty_file "$RUN_ROOT/deterministic-validation/deterministic-gate-report.json" "deterministic-validation/deterministic-gate-report.json exists and is non-empty"
 check_nonempty_file "$RUN_ROOT/deterministic-validation/final-gate-report.json" "deterministic-validation/final-gate-report.json exists and is non-empty"
+check_nonempty_file "$RUN_ROOT/deterministic-validation/targeted-probe-report.md" "deterministic-validation/targeted-probe-report.md exists and is non-empty"
 
 REFERENCE_VALIDATION_EXIT=0
 REFERENCE_VALIDATION_OUTPUT=""

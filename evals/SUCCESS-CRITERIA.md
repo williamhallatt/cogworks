@@ -90,7 +90,7 @@ the skill name, negative controls do not, category distribution is adequate).
 
 ## Release Bar
 
-**Command:** `bash tests/run-release-validation.sh --claude-run-root ... --copilot-run-root ... --fail-closed-report ... --benchmark-summary ...`
+**Command:** `bash tests/run-release-validation.sh --claude-run-root ... --copilot-run-root ... --fail-closed-report ... --fail-closed-skill-path ... --fail-closed-pattern ... --benchmark-summary ...`
 
 ### Layer 5b — LLM-Judged Quality Evaluation
 
@@ -122,8 +122,8 @@ effectiveness.
 |---|---|---|
 | Claude run artifacts valid | Contract checks pass | `validate-agentic-run.sh` |
 | Copilot run artifacts valid | Contract checks pass | `validate-agentic-run.sh` |
-| Fail-closed report present | Blocking report validates | Release validation |
-| Benchmark evidence present | `decision_eligible = true` | `benchmark-summary.json` |
+| Fail-closed report present | Blocking report validates and intended skill path remains uninstalled | Release validation |
+| Benchmark evidence present | `decision_eligible = true` with maintained input provenance | `benchmark-summary.json` |
 
 ## Cross-Model Independence (D-026 / D-036)
 

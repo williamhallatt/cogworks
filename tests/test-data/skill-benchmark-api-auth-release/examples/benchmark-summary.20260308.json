@@ -6,6 +6,11 @@
     "candidate_a": "generated-skill-v2",
     "candidate_b": "single-source-baseline"
   },
+  "input_provenance": {
+    "cases_file": "tests/test-data/skill-benchmark-api-auth-release/cases.jsonl",
+    "candidate_a_command": "python3 scripts/skill-benchmark-copilot-context-runner.py --context-file tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/skill-output/reference.md",
+    "candidate_b_command": "python3 scripts/skill-benchmark-copilot-context-runner.py --context-file tests/test-data/skill-benchmark-api-auth-release/baseline-context.md"
+  },
   "model": "claude-opus-4.6",
   "judge_model": "claude-opus-4.6",
   "agent_surface": "copilot-cli",

@@ -28,8 +28,18 @@ alone.
 bash tests/run-all.sh
 ```
 
-Runs all headless suites (Layers 1-4 + schema validation) in sequence. Exit 0
-means all passed.
+Runs all headless suites (Layers 1-4, Layer 5a, and schema validation) in
+sequence. Exit 0 means all passed.
+
+What this proves:
+- deterministic framework checks still behave as expected
+- contract docs, schemas, and benchmark smoke paths are internally consistent
+- behavioral case definitions remain structurally valid
+
+What this does not prove:
+- live activation on any agent surface
+- current Claude/Copilot build-path health
+- current benchmark superiority of one skill artifact over another
 
 ### Release bar
 
@@ -44,6 +54,8 @@ bash tests/run-release-validation.sh \
   --copilot-run-root <copilot-run-root> \
   --copilot-skill-path <copilot-skill-path> \
   --fail-closed-report <blocking-report-path> \
+  --fail-closed-skill-path <blocked-skill-output-path> \
+  --fail-closed-pattern "BLOCKED - Runtime Misconfiguration" \
   --benchmark-summary <benchmark-summary.json>
 ```
 
@@ -52,6 +64,18 @@ artifact contracts, a fail-closed negative-path report, and decision-grade
 benchmark evidence.
 
 The canonical benchmark specification lives under `evals/`.
+
+What this proves:
+- a current Claude artifact set and a current Copilot artifact set satisfy the
+  maintained run-contract validator
+- the supplied negative-path evidence blocks and leaves no installable
+  `SKILL.md` at the intended output path
+- the supplied benchmark summary is decision-grade and tied to the maintained
+  API-auth dataset and candidate context paths
+
+What this does not prove:
+- human usefulness beyond the maintained benchmark cases
+- that preserved historical artifacts are a substitute for a fresh release run
 
 ### Claude prerequisite
 
@@ -74,6 +98,10 @@ Preserved validated Copilot example:
 
 Preserved fail-closed example:
 - `tests/agentic-smoke/examples/claude-cli-no-task-fail-closed-20260308/`
+
+Preserved examples are reference evidence and debugging aids. Fresh release
+validation should prefer newly generated artifacts whenever the release
+candidate has changed.
 
 ## Reading This Guide Correctly
 
@@ -177,6 +205,13 @@ bash scripts/run-trigger-smoke-tests.sh codex
 These tests validate invocation behavior only. They do not validate output
 quality.
 
+What this proves:
+- the activation layer still routes representative prompts as expected
+
+What this does not prove:
+- build-path support
+- output quality
+
 They also do not imply that every tested surface supports the same build
 runtime. Codex trigger smoke is an activation check, not trust-first build-path
 support.
@@ -209,6 +244,13 @@ This verifies that the repository still expresses the current product model:
 - canonical role specs still exist
 - deterministic validation still passes for `skills/cogworks`
 - testing docs point to the current maintainer smoke tooling
+
+What this proves:
+- the documented internal contract surfaces still exist and align structurally
+
+What this does not prove:
+- that a live agent surface can still execute the flow
+- that any preserved artifact set remains current
 
 ### 3.2 Live sub-agent smoke
 
@@ -258,7 +300,16 @@ A passing live sub-agent smoke run must prove all of the following:
 - `run-manifest.json` records `run_type`, `execution_surface`, and
   `specialist_profile_source`
 - `dispatch-manifest.json` records the canonical role profiles, surface
-  bindings, model policy, and dispatch modes for each specialist stage
+  bindings, model policy, dispatch modes, and a non-empty `tool_scope`
+  declaration for each specialist stage
+
+What this proves:
+- the saved artifact set conforms to the maintained run-contract checks
+- the generated skill survives deterministic validation
+
+What this does not prove:
+- exact live transcript provenance for every saved field
+- downstream efficacy beyond deterministic gates and separate benchmark runs
 
 Layer 3 proves that the sub-agent build path still works. It does **not** prove
 it is better than alternatives.

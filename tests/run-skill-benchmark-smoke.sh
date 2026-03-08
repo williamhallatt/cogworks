@@ -37,7 +37,7 @@ python3 scripts/run-skill-benchmark.py \
   --out-dir "$PILOT_OUT" \
   --work-root "$TMP_ROOT/work-pilot"
 
-run_python_asserts "$PILOT_OUT/benchmark-summary.json" $'assert summary["schema_validation_passed"] is True\nassert summary["decision_eligible"] is False\nassert summary["invalid_trials"]["candidate_a"] == 0\nassert summary["invalid_trials"]["candidate_b"] == 0\nassert abs(summary["activation_metrics"]["candidate_a"]["ambiguous_trigger_rate"] - 1.0) < 1e-9'
+run_python_asserts "$PILOT_OUT/benchmark-summary.json" $'assert summary["schema_validation_passed"] is True\nassert summary["decision_eligible"] is False\nassert summary["invalid_trials"]["candidate_a"] == 0\nassert summary["invalid_trials"]["candidate_b"] == 0\nassert abs(summary["activation_metrics"]["candidate_a"]["ambiguous_trigger_rate"] - 1.0) < 1e-9\nassert summary["input_provenance"]["cases_file"] == "tests/test-data/skill-benchmark-pilot/cases.jsonl"\nassert "fake-runner.py" in summary["input_provenance"]["candidate_a_command"]'
 
 RERUN_OUT="$TMP_ROOT/rerun-out"
 python3 scripts/run-skill-benchmark.py \
