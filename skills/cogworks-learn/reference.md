@@ -21,14 +21,17 @@ Agent skills are SKILL.md files that extend agent capabilities through YAML fron
 
 ## Related Files
 
-- [patterns.md](patterns.md) - Transferable patterns and anti-patterns
-- [examples.md](examples.md) - Practical usage scenarios
+- [patterns.md](patterns.md) - Transferable patterns not already covered here
+- [examples.md](examples.md) - Minimal examples that demonstrate the contract
+- [persuasion-principles.md](persuasion-principles.md) - Calibration for
+  strong language in high-fragility skills
 
 ---
 
 ## Prompt Quality Gates for Generated Skills (Required)
 
-See SKILL.md § Integrated Prompt Quality Gates for the mandatory gate definitions, priority order, quantitative thresholds, and the instruction quality rewrite pass. The gates below are a summary — SKILL.md is canonical.
+This file is canonical for the generated-skill contract. `SKILL.md` is the
+operator-facing summary; when the two differ, follow `reference.md`.
 
 ### Instruction Quality Rewrite Pass (Required)
 
@@ -40,6 +43,24 @@ After draft generation:
 4. Re-run all five prompt quality gates.
 
 A generated skill is incomplete until rewrite and gate re-check both pass.
+
+---
+
+## Decision Rules
+
+1. Keep `SKILL.md` as an operator-facing entry contract, not the full doctrine.
+2. Put normative generated-skill structure and compatibility rules in
+   `reference.md`.
+3. Add support files only when they contribute unique information.
+4. Use strong authority language only for high-fragility or fail-closed gates.
+5. Stop on blocking validation failures instead of compensating with prose.
+
+## Anti-Patterns
+
+- Monolithic `SKILL.md` files that duplicate the reference manual
+- Supporting files that merely reformat `reference.md`
+- Runtime-specific features without explicit compatibility disclosure
+- Broad bright-line wording in reference material with no boundary condition
 
 ---
 
@@ -154,8 +175,9 @@ For generated skills, default to a compact decision-first contract unless source
 - Overview
 - When to Use
 - Quick Decision Cheatsheet
-- Supporting Docs
 - Invocation
+- Compatibility (only when runtime-specific features require it)
+- Supporting Docs
 
 **reference.md**
 - TL;DR
@@ -170,7 +192,8 @@ For generated skills, default to a compact decision-first contract unless source
 - `patterns.md` and `examples.md` are optional
 - Include only if they add unique information not present in `reference.md`
 - Begin each supporting file with: `Source IDs map to reference.md#sources.`
-- See the **Generated Skill Profile** section in [SKILL.md](SKILL.md) for the complete default profile including frontmatter template, metadata defaults detection, `metadata.json` schema, snapshot date embedding, and source citation requirements.
+- Do not create or retain a support file whose main contribution is reformatted
+  duplication of `reference.md`.
 
 **Source scope taxonomy**
 - Primary platform (normative)
