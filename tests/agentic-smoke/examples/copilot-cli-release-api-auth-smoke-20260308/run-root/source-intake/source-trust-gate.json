@@ -1,0 +1,17 @@
+{
+  "gate_passed": true,
+  "sources": [
+    {
+      "source_id": "source-1",
+      "classification": "fixture-trusted",
+      "provenance": "local-fixture"
+    },
+    {
+      "source_id": "source-2",
+      "classification": "fixture-trusted",
+      "provenance": "local-fixture"
+    }
+  ],
+  "risk_signals": [],
+  "recommendation": "proceed"
+}

@@ -1,0 +1,17 @@
+{
+  "topic": "api-auth-smoke",
+  "sources": [
+    {
+      "id": "source-1",
+      "path": "tests/agentic-smoke/fixtures/api-auth-smoke/01-status-codes.md",
+      "trust_classification": "fixture-trusted",
+      "provenance": "local-fixture"
+    },
+    {
+      "id": "source-2",
+      "path": "tests/agentic-smoke/fixtures/api-auth-smoke/02-token-handling.md",
+      "trust_classification": "fixture-trusted",
+      "provenance": "local-fixture"
+    }
+  ]
+}

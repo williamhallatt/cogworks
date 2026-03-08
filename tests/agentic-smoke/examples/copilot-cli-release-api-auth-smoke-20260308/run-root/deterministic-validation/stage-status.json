@@ -1,0 +1,10 @@
+{
+  "stage": "deterministic-validation",
+  "status": "pass",
+  "artifacts_written": [
+    "deterministic-gate-report.json",
+    "final-gate-report.json",
+    "targeted-probe-report.md"
+  ],
+  "completed_at": "2026-03-08T13:12:40Z"
+}

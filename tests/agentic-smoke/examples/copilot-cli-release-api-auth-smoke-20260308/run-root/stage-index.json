@@ -1,0 +1,61 @@
+{
+  "stages": [
+    {
+      "stage": "source-intake",
+      "status": "pass",
+      "owner": "intake-analyst",
+      "artifacts": [
+        "source-intake/source-inventory.json",
+        "source-intake/source-manifest.json",
+        "source-intake/source-trust-report.md",
+        "source-intake/source-trust-gate.json",
+        "source-intake/stage-status.json"
+      ]
+    },
+    {
+      "stage": "synthesis",
+      "status": "pass",
+      "owner": "synthesizer",
+      "artifacts": [
+        "synthesis/synthesis.md",
+        "synthesis/cdr-registry.md",
+        "synthesis/traceability-map.md",
+        "synthesis/stage-status.json"
+      ]
+    },
+    {
+      "stage": "skill-packaging",
+      "status": "pass",
+      "owner": "composer",
+      "artifacts": [
+        "skill-packaging/decision-skeleton.json",
+        "skill-packaging/composition-notes.md",
+        "skill-packaging/stage-status.json",
+        "skill-output/api-auth-smoke-copilot-v2/SKILL.md",
+        "skill-output/api-auth-smoke-copilot-v2/reference.md",
+        "skill-output/api-auth-smoke-copilot-v2/metadata.json"
+      ]
+    },
+    {
+      "stage": "deterministic-validation",
+      "status": "pass",
+      "owner": "validator",
+      "artifacts": [
+        "deterministic-validation/deterministic-gate-report.json",
+        "deterministic-validation/final-gate-report.json",
+        "deterministic-validation/targeted-probe-report.md",
+        "deterministic-validation/stage-status.json"
+      ]
+    },
+    {
+      "stage": "final-review",
+      "status": "pass",
+      "owner": "coordinator",
+      "artifacts": [
+        "stage-index.json",
+        "final-summary.md",
+        "final-review/stage-status.json"
+      ]
+    }
+  ]
+}
