@@ -1,7 +1,7 @@
 # Calibration Notes — cogworks-learn
-**Date:** 2026-03-05
-**Judge prompt version:** Five dimensions — parallel_instruction, subagent_delegation, cc_feature_labeling, allowed_tools_accuracy, compatibility_field
-**Calibrated against:** cogworks-learn-parallel-001, cogworks-learn-subagent-001, cogworks-learn-subagent-002, cogworks-learn-persistent-001, cogworks-learn-arguments-001, cogworks-learn-compatibility-001, cogworks-learn-allowed-tools-001
+**Date:** 2026-03-08
+**Judge prompt version:** Six dimensions — parallel_instruction, subagent_delegation, cc_feature_labeling, allowed_tools_accuracy, compatibility_field, scope_appropriateness
+**Calibrated against:** cogworks-learn-parallel-001, cogworks-learn-subagent-001, cogworks-learn-subagent-002, cogworks-learn-persistent-001, cogworks-learn-arguments-001, cogworks-learn-compatibility-001, cogworks-learn-allowed-tools-001, cogworks-learn-hook-001, cogworks-learn-subagent-def-001, cogworks-learn-subagent-type-001, cogworks-learn-subagent-dispatch-001
 
 **Note on calibration data schema:** cogworks-learn quality cases do not use the `evaluator_notes` / `ground_truth` fields used by quality_gate cases in cogworks and cogworks-encode. They use `notes`, `expected_content`, and `forbidden_content` instead. This is a schema divergence across the test suite. The calibration data is functionally equivalent — `expected_content` maps directly to rubric pass signals — but reviewers should be aware that the field names differ.
 
@@ -29,9 +29,9 @@
 
 ### cogworks-learn-persistent-001
 - **Expected behavior (from notes/expected_content):** A skill for enforcing code style rules that apply to every session should recommend persistent configuration (CLAUDE.md, copilot-instructions.md) rather than a skill. Expected content: `["CLAUDE.md", "copilot-instructions.md", "persistent configuration", "always-on"]`.
-- **Rubric dimension(s) that cover this:** None of the five dimensions address whether a skill is the appropriate artifact for the request. `parallel_instruction`, `subagent_delegation`, `cc_feature_labeling`, `allowed_tools_accuracy`, and `compatibility_field` all evaluate the quality of a skill that was produced — none evaluate whether a skill should have been produced at all. The expected behavior is a meta-level routing decision (redirect to persistent config), not a skill authoring decision.
-- **Gap identified:** Yes — no rubric dimension covers "scope appropriateness" or "skill vs. persistent-config routing." A cogworks-learn run that generates a well-structured SKILL.md with correct CC labels and parallel instruction for a task that should instead go to CLAUDE.md would pass all five dimensions with no penalty.
-- **Calibration verdict:** gap
+- **Rubric dimension(s) that cover this:** `scope_appropriateness` — dimension 6 pass signal "Explicit redirect to the appropriate mechanism with rationale" covers the expected redirect to persistent config. Fail signal "Skill generated for always-on rules without recommending persistent config" catches the omission case.
+- **Gap identified:** No. Previously identified gap (no dimension for skill vs. persistent-config routing) is now **CLOSED** by dimension 6.
+- **Calibration verdict:** covered
 
 ### cogworks-learn-arguments-001
 - **Expected behavior (from notes/expected_content/forbidden_content):** A skill using `$ARGUMENTS` must label it as Claude Code-specific, note it is not in the agentskills.io spec, and include a compatibility field. Expected: `["Claude Code", "$ARGUMENTS", "compatibility", "not in agentskills.io spec"]`. Forbidden: `["universal", "standard"]`.
@@ -51,15 +51,35 @@
 - **Gap identified:** No.
 - **Calibration verdict:** covered
 
+### cogworks-learn-hook-001
+- **Expected behavior (from notes/expected_content):** A request to block git push without running tests is deterministic enforcement — should recommend a hook, not a skill. Expected content: `["hook", "deterministic"]`.
+- **Rubric dimension(s) that cover this:** `scope_appropriateness` — dimension 6 fail signal "Skill generated for deterministic enforcement without recommending hooks" directly covers this case. Pass signal "Explicit redirect to the appropriate mechanism with rationale" matches the expected redirect to hooks.
+- **Gap identified:** No.
+- **Calibration verdict:** covered
+
+### cogworks-learn-subagent-def-001
+- **Expected behavior (from notes/expected_content):** A request for a custom code review agent with restricted tools and model is a subagent definition, not a skill. Expected content: `["subagent", "definition", "tools", "model"]`.
+- **Rubric dimension(s) that cover this:** `scope_appropriateness` — dimension 6 fail signal "Skill generated for task orchestration with restricted tools/model without recommending subagent definitions" directly covers this case. Pass signal "Explicit redirect to the appropriate mechanism with rationale" matches the expected redirect.
+- **Gap identified:** No.
+- **Calibration verdict:** covered
+
+### cogworks-learn-subagent-type-001
+- **Expected behavior (from notes/expected_content):** A Claude Code batch log analysis skill should select the Explore subagent type (read-only, Haiku) and label `context: fork` as CC-specific. Expected content: `["Explore", "read-only", "subagent", "context: fork"]`.
+- **Rubric dimension(s) that cover this:** `subagent_delegation` — dimension 2 covers both the delegation requirement and the CC-specific `context:fork` pass signal. The enriched SKILL.md subagent type table now provides the knowledge to select Explore for read-only tasks, which the generated skill should reflect. `cc_feature_labeling` covers the `context: fork` annotation requirement.
+- **Gap identified:** No.
+- **Calibration verdict:** covered
+
+### cogworks-learn-subagent-dispatch-001
+- **Expected behavior (from notes/expected_content):** Three independent research tasks should use background dispatch for concurrent subagent execution. Expected content: `["parallel", "subagent", "background", "concurrent"]`.
+- **Rubric dimension(s) that cover this:** `subagent_delegation` — dimension 2 pass signal "Subagent receives the high-volume operation; only summary returns to main context" covers delegation. The enriched SKILL.md orchestration patterns section now covers parallel research via background dispatch, which the generated skill should reference.
+- **Gap identified:** No.
+- **Calibration verdict:** covered
+
 ---
 
 ## Summary
 
-- **Coverage:** 6/7 cases fully covered (parallel-001, subagent-001, subagent-002, arguments-001, compatibility-001, allowed-tools-001)
-- **Gaps found:**
-  1. **Scope appropriateness / skill vs. persistent-config routing** (persistent-001): No rubric dimension evaluates whether a skill is the right artifact for the request. Always-on rules that belong in persistent config (CLAUDE.md, copilot-instructions.md) cannot be caught by any of the five dimensions, which all assume a skill is being produced and evaluate its quality.
-- **Judge prompt adjustments recommended (do not edit judge prompt — notes only):**
-  1. Add a sixth dimension — `scope_appropriateness` — that evaluates whether cogworks-learn correctly identifies requests that should not produce a skill. The dimension should pass when the output explicitly recommends persistent configuration for always-on rules, and fail when a skill is generated for a use case that is better served by CLAUDE.md or equivalent persistent agent configuration.
-  2. Consider adding a `not_applicable` score value for this dimension, since most requests (non-persistent-rule requests) would have scope_appropriateness genuinely not applicable — consistent with how the rubric already handles null dimensions for cc_feature_labeling and compatibility_field.
-- **Note on schema divergence:** cogworks-learn quality cases use `notes` + `expected_content` + `forbidden_content` rather than `evaluator_notes` + `ground_truth`. For all seven cases, the `expected_content` tokens map cleanly to rubric pass signals and `forbidden_content` maps to fail signals, so calibration is functionally unambiguous. However, the schema inconsistency means any tooling that reads `evaluator_notes` or `ground_truth` to drive calibration automation would silently skip all cogworks-learn quality cases. Recommend standardizing the schema or adding a compatibility adapter.
-- **Recommendation:** ready for harness — six of seven cases are fully covered, and the one gap (persistent-001) is a meta-routing case that the current five-dimension rubric was not designed to catch. The gap should be addressed by a rubric revision before the harness includes persistent-001 as a pass/fail criterion.
+- **Coverage:** 11/11 cases fully covered (parallel-001, subagent-001, subagent-002, persistent-001, arguments-001, compatibility-001, allowed-tools-001, hook-001, subagent-def-001, subagent-type-001, subagent-dispatch-001)
+- **Gaps found:** None. The previously identified scope_appropriateness gap is now **CLOSED** — dimension 6 covers persistent-config routing (persistent-001), hook routing (hook-001), and subagent definition routing (subagent-def-001).
+- **Note on schema divergence:** cogworks-learn quality cases use `notes` + `expected_content` + `forbidden_content` rather than `evaluator_notes` + `ground_truth`. For all eleven cases, the `expected_content` tokens map cleanly to rubric pass signals and `forbidden_content` maps to fail signals, so calibration is functionally unambiguous. However, the schema inconsistency means any tooling that reads `evaluator_notes` or `ground_truth` to drive calibration automation would silently skip all cogworks-learn quality cases. Recommend standardizing the schema or adding a compatibility adapter.
+- **Recommendation:** ready for harness — all eleven cases are fully covered with no remaining gaps.
