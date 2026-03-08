@@ -94,8 +94,8 @@ Execute stages in this order:
 
 | Stage | Owner | Required inputs | Required outputs |
 |---|---|---|---|
-| `source-intake` | `intake-analyst` | raw user sources | `source-inventory.json`, `source-manifest.json`, `source-trust-report.md` |
-| `synthesis` | `synthesizer` | source inventory, source trust report | `synthesis.md`, `cdr-registry.md`, `traceability-map.md` |
+| `source-intake` | `intake-analyst` | raw user sources | `source-inventory.json`, `source-manifest.json`, `source-trust-report.md`, `source-trust-gate.json` |
+| `synthesis` | `synthesizer` | source inventory, source trust report, source trust gate | `synthesis.md`, `cdr-registry.md`, `traceability-map.md` |
 | `skill-packaging` | `composer` | synthesis, CDR, metadata defaults | `decision-skeleton.json`, packaged skill files at `{skill_path}` |
 | `deterministic-validation` | `validator` | packaged skill files at `{skill_path}` | deterministic report, optional targeted probe, final gate report |
 | `final-review` | `coordinator` | prior stage outputs | `final-summary.md`, `stage-index.json` |
@@ -130,6 +130,7 @@ Behavior:
 - If a required artifact is missing, emit a failed `stage-status.json` and stop.
 - Each specialist-owned stage must write its own `stage-status.json` before returning `pass`.
 - The coordinator verifies specialist-authored stage status files and stage outputs; it must not rewrite a successful specialist-authored `stage-status.json` unless recording an explicit retry after a failed stage.
+- **`synthesis` must not start until `source-intake/source-trust-gate.json` exists with `gate_passed: true`.** If `gate_passed` is `false` or the file is missing, stop and surface the issue to the user — do not attempt synthesis on unclassified sources.
 - Any critical failure from `validate-synthesis.sh` or `validate-skill.sh` blocks `deterministic-validation`.
 - Deterministic failures route back only to `skill-packaging`.
 - Targeted-probe failures route back to `synthesis` only when the issue is synthesis fidelity; otherwise route to `skill-packaging`.
@@ -157,6 +158,7 @@ Write runtime artifacts to:
   final-summary.md              # optional root-level emission
   source-intake/
     stage-status.json
+    source-trust-gate.json    # required — synthesis gate
     ...artifacts...
   synthesis/
     stage-status.json
@@ -260,6 +262,7 @@ A run is valid only if all of the following hold:
 - every expected stage directory exists
 - every stage has a non-empty `stage-status.json`
 - every required artifact exists and is non-empty
+- `source-intake/source-trust-gate.json` exists, is non-empty, and contains `gate_passed: true` with at least one classified source
 - `run-manifest.json` declares `engine_mode`, `execution_surface`, `execution_adapter`, `execution_mode`, `specialist_profile_source`, and `agentic_path`
 - the generated skill at `{skill_path}` contains non-empty `SKILL.md`, `reference.md`, and `metadata.json`
 - generated-skill validation has no critical failures; missing YAML frontmatter, missing `name` or `description`, and missing `[Source N]` citations are blocking, not warnings

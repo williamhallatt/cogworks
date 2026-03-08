@@ -119,7 +119,7 @@ Candidate commands receive benchmark context through environment variables:
 
 Each candidate command must write a normalized observation JSON to `COGWORKS_BENCHMARK_OBSERVATION_PATH`. If the case uses `judge_only` checks, the command should also write a judge output JSON to `COGWORKS_BENCHMARK_JUDGE_OUTPUT_PATH`.
 
-For Codex CLI runs, the default adapter is [`scripts/skill-benchmark-codex-adapter.py`](/home/will/code/cogworks/scripts/skill-benchmark-codex-adapter.py). It can run `codex exec --json` live or normalize a saved JSONL trace in replay mode.
+For Codex CLI runs, the adapter design is documented in [`evals/skill-benchmark/codex-adapter-spec.md`](codex-adapter-spec.md). Implementation is deferred until Codex exposes stable subagent primitives (D-035).
 
 ## Defaults
 

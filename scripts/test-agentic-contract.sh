@@ -71,7 +71,6 @@ require_file ".claude/agents/cogworks-validator.md"
 require_file "scripts/render-agentic-role-bindings.py"
 require_file "scripts/validate-agentic-run.sh"
 require_file "scripts/run-agentic-quality-compare.py"
-require_file "scripts/compare-engine-performance.py"
 
 require_pattern "skills/cogworks/SKILL.md" '--engine agentic' 'orchestrator exposes --engine agentic'
 require_pattern "skills/cogworks/SKILL.md" 'execution_surface' 'orchestrator records execution_surface'
@@ -98,6 +97,8 @@ require_pattern "skills/cogworks/agentic-runtime.md" 'binding_ref' 'runtime disp
 require_pattern "skills/cogworks/agentic-runtime.md" 'model_policy' 'runtime dispatch contract records model_policy'
 require_pattern "skills/cogworks/agentic-runtime.md" 'Each specialist-owned stage must write its own `stage-status.json` before returning `pass`.' 'runtime assigns stage-status ownership to specialist stages'
 require_pattern "skills/cogworks/agentic-runtime.md" 'must not rewrite a successful specialist-authored `stage-status.json`' 'runtime prevents coordinator from rewriting successful stage statuses'
+require_pattern "skills/cogworks/agentic-runtime.md" 'source-trust-gate.json' 'runtime defines trust gate artifact'
+require_pattern "skills/cogworks/agentic-runtime.md" 'gate_passed' 'runtime requires gate_passed before synthesis'
 
 require_pattern "skills/cogworks/claude-adapter.md" 'execution_surface = claude-cli' 'Claude adapter declares claude-cli surface'
 require_pattern "skills/cogworks/claude-adapter.md" 'execution_adapter = native-subagents' 'Claude adapter declares native-subagents mode'
@@ -164,17 +165,14 @@ require_pattern "scripts/validate-agentic-run.sh" 'native-subagents' 'live run v
 require_pattern "scripts/validate-agentic-run.sh" 'copilot-inline-prompt' 'live run validator validates Copilot inline bindings'
 require_pattern "scripts/validate-agentic-run.sh" 'inherit-session-model' 'live run validator validates Copilot model policy'
 require_pattern "scripts/validate-agentic-run.sh" 'canonical-role-specs' 'live run validator validates canonical-role-specs'
+require_pattern "scripts/validate-agentic-run.sh" 'source-trust-gate.json' 'live run validator enforces trust gate artifact'
+require_pattern "scripts/validate-agentic-run.sh" 'gate_passed' 'live run validator checks gate_passed: true'
 
 require_pattern "scripts/run-agentic-quality-compare.py" 'execution_surface = claude-cli' 'quality comparison prompt requires claude-cli surface'
 require_pattern "scripts/run-agentic-quality-compare.py" 'execution_adapter = native-subagents' 'quality comparison prompt requires native-subagents'
 require_pattern "scripts/run-agentic-quality-compare.py" 'specialist_profile_source = canonical-role-specs' 'quality comparison prompt requires canonical role specs'
 require_pattern "scripts/run-agentic-quality-compare.py" 'role-profiles.json' 'quality comparison prompt references canonical role profiles'
 require_pattern "scripts/run-agentic-quality-compare.py" '--expect-surface' 'quality comparison runner validates execution surface explicitly'
-
-require_pattern "scripts/compare-engine-performance.py" 'Execution surface' 'comparison report includes execution surface'
-require_pattern "scripts/compare-engine-performance.py" 'Specialist profile source' 'comparison report includes specialist profile source'
-require_pattern "scripts/compare-engine-performance.py" 'Binding types' 'comparison report includes binding types'
-require_pattern "scripts/compare-engine-performance.py" 'Model policies' 'comparison report includes model policies'
 
 if python3 - <<'PY' "$ROOT_DIR/skills/cogworks/role-profiles.json"
 import json

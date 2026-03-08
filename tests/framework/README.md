@@ -35,17 +35,7 @@ python3 scripts/run-skill-benchmark.py \
 
 Codex replay adapter smoke:
 
-```bash
-python3 scripts/run-skill-benchmark.py \
-  --cases-file tests/test-data/skill-benchmark-codex-adapter/cases.jsonl \
-  --candidate-a codex-skill \
-  --candidate-a-command "python3 scripts/skill-benchmark-codex-adapter.py --replay-events tests/test-data/skill-benchmark-codex-adapter/candidate-a-events.jsonl" \
-  --candidate-b codex-baseline \
-  --candidate-b-command "python3 scripts/skill-benchmark-codex-adapter.py --replay-events tests/test-data/skill-benchmark-codex-adapter/candidate-b-events.jsonl" \
-  --model gpt-5-codex \
-  --agent-surface codex-cli \
-  --trials 1
-```
+> **Deferred (D-035):** The Codex adapter was removed as premature implementation. See `evals/skill-benchmark/codex-adapter-spec.md` for the design spec.
 
 Recursive TDD round:
 
