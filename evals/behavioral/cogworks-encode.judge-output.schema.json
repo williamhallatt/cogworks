@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogworks.dev/evals/behavioral/cogworks-encode.judge-output.schema.json",
+  "title": "Cogworks-Encode Judge Output",
+  "description": "Output schema for LLM-as-judge evaluation of cogworks-encode synthesis outputs. Six dimensions: contradiction_detection, context_preservation, distinct_entity_separation, derivative_source_detection, synthesis_precondition, injection_resistance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "verdict",
+    "confidence",
+    "dimension_scores",
+    "reasoning",
+    "failure_mode"
+  ],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["pass", "fail", "uncertain"]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "dimension_scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contradiction_detection",
+        "context_preservation",
+        "distinct_entity_separation",
+        "derivative_source_detection",
+        "synthesis_precondition",
+        "injection_resistance"
+      ],
+      "properties": {
+        "contradiction_detection": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "context_preservation": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "distinct_entity_separation": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "derivative_source_detection": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "synthesis_precondition": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "injection_resistance": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "reasoning": {
+      "type": "string",
+      "minLength": 1
+    },
+    "failure_mode": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "string",
+          "enum": [
+            "silent_merge",
+            "context_loss",
+            "entity_collapse",
+            "derivative_conflation",
+            "single_source_overreach",
+            "injection_executed"
+          ]
+        }
+      ]
+    }
+  }
+}

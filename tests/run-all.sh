@@ -10,6 +10,7 @@ SUITES=(
   "Layer 2 — Trigger smoke parser|run-trigger-smoke-parser-smoke.sh"
   "Layer 3 — Agentic contract smoke|run-agentic-contract-smoke.sh"
   "Layer 4 — Skill benchmark smoke|run-skill-benchmark-smoke.sh"
+  "Layer 5a — Behavioral deterministic|run-behavioral-deterministic.sh"
   "Schema validation|run-schema-validation-smoke.sh"
 )
 
