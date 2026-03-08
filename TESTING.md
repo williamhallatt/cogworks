@@ -1,5 +1,8 @@
 # Cogworks Testing Guide
 
+This document is primarily maintainer-facing. For the normal user workflow, see
+the product docs in `README.md`, `INSTALL.md`, and `skills/cogworks/README.md`.
+
 ## Current Testing Surface
 
 The active testing strategy is:
@@ -16,6 +19,19 @@ Use these layers in order. Do not make quality claims from Layer 1 or Layer 3
 alone.
 
 The canonical benchmark specification lives under `evals/`.
+
+## Reading This Guide Correctly
+
+Testing-surface references are not product-support claims:
+
+- Layer 2 may mention Codex because trigger behavior is still tested there
+- Layer 4 may mention Codex because the benchmark harness has a Codex adapter
+- only Layer 3 covers the internal trust-first sub-agent build path
+- that internal build path is currently supported only on Claude Code and
+  GitHub Copilot CLI
+
+Codex appearing in this guide does not mean Codex is a supported surface for
+the current trust-first internal build flow.
 
 ## Before You Start
 
@@ -100,6 +116,10 @@ bash scripts/run-trigger-smoke-tests.sh codex
 
 These tests validate invocation behavior only. They do not validate output
 quality.
+
+They also do not imply that every tested surface supports the same build
+runtime. Codex trigger smoke is an activation check, not trust-first build-path
+support.
 
 Offline parser coverage:
 
@@ -187,6 +207,9 @@ it is better than alternatives.
 
 The repository includes a runnable harness for objective skill-vs-skill
 comparison.
+
+This layer validates comparison tooling and runner adapters. It is separate from
+the product support matrix for the trust-first internal build flow.
 
 Authoritative references:
 

@@ -31,6 +31,13 @@ bash scripts/run-recursive-round.sh \
 
 See [TESTING.md](TESTING.md) for the full test runbook, including recursive improvement rounds and generated-skill testing.
 
+When changing docs, keep the public support matrix consistent:
+- generated skills are portable across agents that support skills
+- the trust-first internal build flow is currently supported only on Claude Code
+  and GitHub Copilot CLI
+- Codex may appear in benchmark or trigger-smoke docs without implying build
+  parity
+
 ## Coding conventions
 
 - Skill directories and slugs use kebab-case (e.g., `cogworks-learn`, `deployment-workflow-benchmark`)
@@ -44,7 +51,8 @@ PR checklist:
 
 - [ ] Changes to `skills/**`, `.claude/**`, or `.agents/**` pass Layer 1 deterministic checks (`bash scripts/validate-quality-gates.sh`)
 - [ ] Shell scripts pass shellcheck
-- [ ] README.md and INSTALL.md updated if user-facing behavior changed
+- [ ] README.md, INSTALL.md, and other affected user-facing docs are updated if public behavior or support boundaries changed
+- [ ] Public docs do not imply unsupported surface parity, especially around Codex versus the internal trust-first build flow
 - [ ] Commit messages follow the `<type>/ <summary>` format
 - [ ] PRs touching `skills/**`, `.claude/**`, `.agents/**`, `README.md`, `INSTALL.md`, or `LICENSE` pass `.github/workflows/pre-release-validation.yml`
 
