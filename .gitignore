@@ -35,6 +35,7 @@ benchmarks/comparison/results/**/
 # Agent skill install targets (managed by npx skills add, not tracked in repo)
 .agents/skills/
 .claude/skills/
+skills-lock.json
 
 # OS files
 .DS_Store
