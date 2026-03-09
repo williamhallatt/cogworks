@@ -91,7 +91,7 @@ python3 scripts/render-agentic-role-bindings.py
 ```
 
 Current preserved Claude release example:
-- `tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/`
+- `tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/`
 
 Preserved validated Copilot example:
 - `tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/`
@@ -300,15 +300,14 @@ A passing live sub-agent smoke run must prove all of the following:
 - `run-manifest.json` records `run_type`, `execution_surface`, and
   `specialist_profile_source`
 - `dispatch-manifest.json` records the canonical role profiles, surface
-  bindings, model policy, dispatch modes, and a non-empty `tool_scope`
-  declaration for each specialist stage
+  bindings, model policy, dispatch modes, and canonical per-stage `tool_scope`
+  values for each specialist stage
 
 What this proves:
 - the saved artifact set conforms to the maintained run-contract checks
 - the generated skill survives deterministic validation
 
 What this does not prove:
-- exact live transcript provenance for every saved field
 - downstream efficacy beyond deterministic gates and separate benchmark runs
 
 Layer 3 proves that the sub-agent build path still works. It does **not** prove

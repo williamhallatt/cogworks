@@ -57,7 +57,11 @@ Use `cogworks` to:
 - resolve topic, sources, destination, and metadata defaults
 - build `dispatch-manifest.json` from `role-profiles.json` as the canonical
   source for `binding_ref`, `model_policy`, `preferred_dispatch_mode`, and the
-  top-level `tool_scope` string
+  canonical `tool_scope` string
+- after the specialist dispatch modes are known, write
+  `dispatch-manifest.json` with
+  `python3 scripts/render-dispatch-manifest.py --surface <surface> --output {run_root}/dispatch-manifest.json ...`
+  and provide per-profile `--actual-mode profile_id=mode` overrides as needed
 - classify trust before synthesis using `cogworks-encode`
 - run the fixed internal build through packaging and deterministic validation
 - apply `cogworks-learn` packaging rules to the final skill

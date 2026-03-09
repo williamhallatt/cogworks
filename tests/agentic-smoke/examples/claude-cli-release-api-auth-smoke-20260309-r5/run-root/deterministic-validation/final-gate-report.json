@@ -1,0 +1,15 @@
+{
+  "gate_passed": true,
+  "timestamp": "2026-03-09T10:10:00Z",
+  "decision": "PASS",
+  "critical_failures": [],
+  "warnings": [
+    "SKILL.md missing sections: When to Use,Quick Decision|Cheatsheet,Invocation",
+    "metadata.json: slug 'api-auth-smoke-claude-bridge' != directory 'skill-output'"
+  ],
+  "total_checks_passed": 23,
+  "total_warnings": 2,
+  "total_critical_failures": 0,
+  "summary": "All validators passed. Two non-blocking warnings detected: missing optional SKILL.md sections and slug/directory name mismatch. No critical failures found.",
+  "recommendation": "Skill package is valid and ready for deployment with minor warnings noted."
+}

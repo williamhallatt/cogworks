@@ -1,0 +1,63 @@
+{
+  "timestamp": "2026-03-09T10:10:00Z",
+  "validators_run": [
+    {
+      "name": "validate-synthesis.sh",
+      "target": "synthesis/synthesis.md",
+      "result": {
+        "critical_failures": [],
+        "warnings": [],
+        "checks_passed": [
+          "All required sections present",
+          "Citations present (17 found)",
+          "Code fences balanced",
+          "No forbidden patterns",
+          "Sources section contains numbered entries"
+        ],
+        "status": "pass"
+      }
+    },
+    {
+      "name": "validate-synthesis.sh",
+      "target": "skill-output/reference.md",
+      "result": {
+        "critical_failures": [],
+        "warnings": [],
+        "checks_passed": [
+          "All required sections present",
+          "Citations present (17 found)",
+          "Code fences balanced",
+          "No forbidden patterns",
+          "Sources section contains numbered entries"
+        ],
+        "status": "pass"
+      }
+    },
+    {
+      "name": "validate-skill.sh",
+      "target": "skill-output/",
+      "result": {
+        "critical_failures": [],
+        "warnings": [
+          "SKILL.md missing sections: When to Use,Quick Decision|Cheatsheet,Invocation",
+          "metadata.json: slug 'api-auth-smoke-claude-bridge' != directory 'skill-output'"
+        ],
+        "checks_passed": [
+          "SKILL.md exists",
+          "Frontmatter delimiters present",
+          "Required frontmatter fields present (name, description)",
+          "Line count within limit (63/500)",
+          "reference.md required sections present",
+          "Citations present (34 found)",
+          "No forbidden patterns",
+          "Code fences balanced",
+          "Description length adequate (26 words)"
+        ],
+        "status": "pass"
+      }
+    }
+  ],
+  "overall_status": "pass",
+  "critical_failures_found": 0,
+  "warnings_found": 2
+}

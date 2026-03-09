@@ -1,0 +1,86 @@
+{
+  "skill_name": "api-auth-smoke-claude-bridge",
+  "decision_points": [
+    {
+      "id": "dp-1",
+      "category": "status-code-selection",
+      "trigger": "authentication_failure",
+      "decision": "Return 401 Unauthorized",
+      "conditions": [
+        "missing_authentication_token",
+        "invalid_authentication_token",
+        "expired_authentication_token",
+        "malformed_authentication_token",
+        "caller_has_not_authenticated"
+      ],
+      "sources": ["Source 1", "Source 2"]
+    },
+    {
+      "id": "dp-2",
+      "category": "status-code-selection",
+      "trigger": "authorization_failure",
+      "decision": "Return 403 Forbidden",
+      "conditions": [
+        "caller_is_authenticated",
+        "caller_lacks_permission_for_resource",
+        "valid_token_insufficient_authorization_scope"
+      ],
+      "sources": ["Source 1"]
+    },
+    {
+      "id": "dp-3",
+      "category": "header-requirements",
+      "trigger": "401_response",
+      "decision": "Include WWW-Authenticate header",
+      "conditions": [
+        "authentication_scheme_requires_retry_with_credentials"
+      ],
+      "sources": ["Source 1"]
+    },
+    {
+      "id": "dp-4",
+      "category": "token-lifecycle",
+      "trigger": "access_token_policy",
+      "decision": "Prefer short-lived access tokens",
+      "conditions": [],
+      "sources": ["Source 2"]
+    },
+    {
+      "id": "dp-5",
+      "category": "token-lifecycle",
+      "trigger": "expired_token",
+      "decision": "Reject with 401 (authentication failure)",
+      "conditions": [
+        "token_has_expired"
+      ],
+      "sources": ["Source 2"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "ap-1",
+      "pattern": "Using 403 for expired or malformed tokens",
+      "why_wrong": "These are authentication failures, not authorization failures",
+      "correct_approach": "Must return 401 instead",
+      "sources": ["Source 2"]
+    },
+    {
+      "id": "ap-2",
+      "pattern": "Conflating authentication and authorization failures",
+      "why_wrong": "Authentication proves identity (401 when fails), authorization checks permission (403 when insufficient)",
+      "correct_approach": "Use 401 for authentication failures, 403 for authorization failures",
+      "sources": ["Source 2"]
+    }
+  ],
+  "source_metadata": {
+    "source_count": 2,
+    "contradictions_detected": 0,
+    "derivative_relationships": 1,
+    "entity_boundaries": 1
+  },
+  "extraction_metadata": {
+    "extracted_from": "synthesis/synthesis.md",
+    "extraction_date": "2026-03-09",
+    "cogworks_version": "v3.3.0"
+  }
+}

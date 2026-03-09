@@ -54,11 +54,12 @@ and tool scope.
 Dispatch-manifest field discipline:
 - `tool_scope` must be copied from the canonical top-level `tool_scope` string
   in `skills/cogworks/role-profiles.json`.
-- Do not replace that string with the Claude custom-agent frontmatter `tools`
-  array.
 - If the generated Claude agent file and `role-profiles.json` disagree or
   overlap, `role-profiles.json` is the source of truth for dispatch-manifest
   fields.
+- Preferred helper:
+  `python3 scripts/render-dispatch-manifest.py --surface claude-cli --output {run_root}/dispatch-manifest.json --actual-mode <profile_id>=<mode>`
+  and supply only the live `actual_dispatch_mode` overrides needed for that run.
 
 ## Dispatch Rules
 

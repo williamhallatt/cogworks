@@ -13,9 +13,9 @@ This is a **live smoke test**, not a benchmark. It answers:
   truthfully?
 
 It does **not** prove the build path is better than alternatives.
-It also does not prove exact transcript provenance for every saved field; the
-maintained validator proves run-contract conformance of the preserved artifact
-set.
+It does prove that the saved artifact set records the canonical role/profile
+bindings, dispatch modes, and per-stage `tool_scope` values defined by the
+maintained contract.
 
 > Context hygiene: prefer a disposable output root outside the repository, for
 > example `/tmp/cogworks-subagent-smoke/`. Repo-local `.cogworks-runs/` and
@@ -25,12 +25,8 @@ set.
 If you need preserved in-repo artifact sets for contract inspection, use:
 
 - `tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/`
-- `tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/`
+- `tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/`
 - `tests/agentic-smoke/examples/claude-cli-no-task-fail-closed-20260308/`
-
-The Claude example keeps its historical path name, but the later root-cause
-investigation showed the real blocker was missing Claude custom-agent
-provisioning, not absence of the delegated-agent primitive itself.
 
 ## Fixture Sources
 
@@ -152,14 +148,10 @@ Confirm all of the following:
 - `execution_surface` is present
 - `specialist_profile_source` is present
 - `dispatch-manifest.json` records canonical role profiles, surface bindings,
-  model policy, dispatch modes, and non-empty `tool_scope` declarations
+  model policy, dispatch modes, and canonical per-stage `tool_scope` values
 - the generated skill itself does **not** leak runtime metadata such as engine
   mode, execution surface, or run root into its public frontmatter or
   `metadata.json`
-
-Current limit:
-- `validate-agentic-run.sh` proves canonical binding refs and contract shape,
-  but does not yet prove exact transcript provenance for every saved field
 
 ## Preserved Examples
 
@@ -167,7 +159,7 @@ The repository keeps canonical maintainer evidence under:
 
 ```text
 tests/agentic-smoke/examples/copilot-cli-release-api-auth-smoke-20260308/
-tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/
+tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/
 tests/agentic-smoke/examples/claude-cli-no-task-fail-closed-20260308/
 ```
 

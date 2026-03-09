@@ -1,0 +1,23 @@
+{
+  "stage": "source-intake",
+  "status": "pass",
+  "timestamp": "2026-03-09T00:00:00Z",
+  "artifacts_written": [
+    "source-intake/source-inventory.json",
+    "source-intake/source-manifest.json",
+    "source-intake/source-trust-report.md",
+    "source-intake/source-trust-gate.json",
+    "source-intake/stage-status.json"
+  ],
+  "blocking_failures": [],
+  "warnings": [],
+  "inputs": {
+    "source_directory": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/",
+    "source_count": 2
+  },
+  "outputs": {
+    "gate_passed": true,
+    "trust_level": "controlled",
+    "sources_suitable_for_synthesis": 2
+  }
+}

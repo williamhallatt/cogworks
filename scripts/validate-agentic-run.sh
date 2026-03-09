@@ -9,6 +9,7 @@ FINAL_SUMMARY_PATH=""
 STAGE_INDEX_PATH=""
 DISPATCH_MANIFEST_PATH=""
 FAILURES=0
+ROLE_PROFILES_PATH="$ROOT_DIR/skills/cogworks/role-profiles.json"
 
 usage() {
   cat <<'USAGE'
@@ -156,6 +157,12 @@ validate_dispatch_record() {
   local binding_type="$4"
   local binding_ref="$5"
   local model_policy="$6"
+  local expected_tool_scope
+  expected_tool_scope="$(jq -r --arg profile_id "$profile_id" '.profiles[] | select(.profile_id == $profile_id) | .tool_scope' "$ROLE_PROFILES_PATH")"
+  if [[ -z "$expected_tool_scope" || "$expected_tool_scope" == "null" ]]; then
+    fail "$stage canonical tool_scope lookup failed"
+    return
+  fi
   if jq -e \
     --arg stage "$stage" \
     --arg role "$role" \
@@ -163,6 +170,7 @@ validate_dispatch_record() {
     --arg binding_type "$binding_type" \
     --arg binding_ref "$binding_ref" \
     --arg model_policy "$model_policy" \
+    --arg expected_tool_scope "$expected_tool_scope" \
     '
     any(.dispatches[]?;
       .stage == $stage and
@@ -173,7 +181,7 @@ validate_dispatch_record() {
       .model_policy == $model_policy and
       (.preferred_dispatch_mode == "background" or .preferred_dispatch_mode == "foreground") and
       (.actual_dispatch_mode == "background" or .actual_dispatch_mode == "foreground") and
-      ((.tool_scope | type) == "string" and (.tool_scope | length > 0)) and
+      .tool_scope == $expected_tool_scope and
       ((.status | type) == "string" and (.status | length > 0))
     )
   ' "$DISPATCH_MANIFEST_PATH" >/dev/null; then

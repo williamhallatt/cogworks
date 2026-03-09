@@ -1,11 +1,21 @@
----
-audited_through: 2026-03-08
+audited_through: 2026-03-09
 ---
 
 # Architectural Decisions
 
 Settled decisions for the cogworks project. Agents load this file for context.
 Archive plan files are deleted once their decision is extracted here; git history is the recovery path.
+
+## [D-042] Dispatch manifests now record canonical stage scope, and release validation requires exact equality
+
+- **Date:** 2026-03-09 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** Claude-side dispatch-manifest production is now canonicalized through repo-owned helpers rather than inferred from live tool inventory strings. `scripts/render-dispatch-manifest.py` writes the maintained dispatch-manifest shape directly from `skills/cogworks/role-profiles.json`, and `scripts/resolve-role-profile.py` exposes per-profile canonical fields for coordinator use. `scripts/validate-agentic-run.sh` now requires exact per-stage `tool_scope` equality against the canonical role-profile contract for both Claude and Copilot artifact sets. The preserved Claude happy-path release evidence is refreshed to `tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/`, and the earlier superseded Claude evidence sets are removed.
+- **Rationale:** The previous Claude manifest serialized the raw Claude tool inventory into `dispatch-manifest.tool_scope`, which was useful metadata but not defensible provenance. That left one known gap between “the run happened” and “the saved manifest is an exact canonical record of stage scope.” Fixing the producer first and then tightening the validator closes that gap without confusing provenance rigor with downstream skill-quality evidence, which is still primarily earned through deterministic validation and benchmark evidence.
+- **Operational implication:** Release-grade Claude and Copilot artifacts must now record canonical semantic `tool_scope` values, not adapter-native tool listings. Maintainers should treat preserved happy-path artifacts as the current canonical evidence only when they pass the exact-equality validator. Any future adapter change that touches dispatch-manifest production must preserve canonicalization through `role-profiles.json`.
+- **Builds on:** D-038 and D-039 by making the maintained release bar more truthful and auditable rather than broader.
+- **Scope:** `scripts/render-dispatch-manifest.py`, `scripts/resolve-role-profile.py`, `scripts/validate-agentic-run.sh`, `scripts/test-agentic-contract.sh`, `skills/cogworks/SKILL.md`, `skills/cogworks/claude-adapter.md`, `skills/cogworks/reference.md`, `TESTING.md`, `tests/agentic-smoke/README.md`, `tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/**`, and deletion of `tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r2/**`.
+- **D-025 audit (Scribe, 2026-03-09):** Clean — owned docs now point only at the current preserved Claude artifact and no longer describe the old `tool_scope` provenance limitation.
 
 ## [D-041] Closed plans are retained as extracted decisions, not archived files
 

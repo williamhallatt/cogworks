@@ -1,0 +1,44 @@
+{
+  "stage": "deterministic-validation",
+  "status": "pass",
+  "timestamp": "2026-03-09T10:10:00Z",
+  "artifacts_written": [
+    "deterministic-validation/deterministic-gate-report.json",
+    "deterministic-validation/final-gate-report.json",
+    "deterministic-validation/targeted-probe-report.md",
+    "deterministic-validation/stage-status.json"
+  ],
+  "validators_run": [
+    {
+      "script": "validate-synthesis.sh",
+      "target": "synthesis/synthesis.md",
+      "status": "pass",
+      "critical_failures": 0,
+      "warnings": 0
+    },
+    {
+      "script": "validate-synthesis.sh",
+      "target": "skill-output/reference.md",
+      "status": "pass",
+      "critical_failures": 0,
+      "warnings": 0
+    },
+    {
+      "script": "validate-skill.sh",
+      "target": "skill-output/",
+      "status": "pass",
+      "critical_failures": 0,
+      "warnings": 2
+    }
+  ],
+  "gate_decision": {
+    "passed": true,
+    "blocking_failures": [],
+    "warnings": [
+      "SKILL.md missing sections: When to Use,Quick Decision|Cheatsheet,Invocation",
+      "metadata.json: slug 'api-auth-smoke-claude-bridge' != directory 'skill-output'"
+    ]
+  },
+  "summary": "All deterministic validators passed. No critical failures detected. Two non-blocking warnings identified regarding optional SKILL.md sections and slug/directory naming.",
+  "recommended_next_action": "Proceed to agentic-validation stage for behavioral testing."
+}

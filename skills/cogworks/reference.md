@@ -66,9 +66,12 @@ before anything is presented as production-ready. [Source 1] [Source 2]
   `targeted-probe-report.md`
 - Dispatch-manifest construction:
   read `role-profiles.json` directly and copy `binding_ref`, `model_policy`,
-  `preferred_dispatch_mode`, and the canonical top-level `tool_scope` string
-- Dispatch-manifest `tool_scope`: do not substitute the Claude agent `tools`
-  list
+  `preferred_dispatch_mode`, and the canonical `tool_scope` string
+- Preferred helper:
+  `python3 scripts/render-dispatch-manifest.py --surface <surface> --output {run_root}/dispatch-manifest.json --actual-mode <profile_id>=<mode>`
+  writes the canonical dispatch-manifest shape and canonical per-stage fields
+- Dispatch-manifest `tool_scope`: canonical stage-scope contract from
+  `role-profiles.json`
 - Dependency check:
   ```bash
   cat ../cogworks-encode/SKILL.md | head -5

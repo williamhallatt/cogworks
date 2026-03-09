@@ -1,0 +1,58 @@
+{
+  "run_id": "claude-cli-release-api-auth-smoke-20260309-r5",
+  "stages": [
+    {
+      "stage": "source-intake",
+      "status": "completed",
+      "status_file": "source-intake/stage-status.json",
+      "artifacts": [
+        "source-intake/source-inventory.json",
+        "source-intake/source-manifest.json",
+        "source-intake/source-trust-report.md",
+        "source-intake/source-trust-gate.json"
+      ]
+    },
+    {
+      "stage": "synthesis",
+      "status": "completed",
+      "status_file": "synthesis/stage-status.json",
+      "artifacts": [
+        "synthesis/synthesis.md",
+        "synthesis/cdr-registry.md",
+        "synthesis/traceability-map.md"
+      ]
+    },
+    {
+      "stage": "skill-packaging",
+      "status": "completed",
+      "status_file": "skill-packaging/stage-status.json",
+      "artifacts": [
+        "skill-packaging/decision-skeleton.json",
+        "skill-packaging/composition-notes.md"
+      ],
+      "generated_skill_files": [
+        "../skill-output/SKILL.md",
+        "../skill-output/reference.md",
+        "../skill-output/metadata.json"
+      ]
+    },
+    {
+      "stage": "deterministic-validation",
+      "status": "completed",
+      "status_file": "deterministic-validation/stage-status.json",
+      "artifacts": [
+        "deterministic-validation/deterministic-gate-report.json",
+        "deterministic-validation/final-gate-report.json",
+        "deterministic-validation/targeted-probe-report.md"
+      ]
+    },
+    {
+      "stage": "final-review",
+      "status": "completed",
+      "status_file": "final-review/stage-status.json",
+      "artifacts": []
+    }
+  ],
+  "final_outcome": "pass",
+  "skill_path": "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/skill-output"
+}
