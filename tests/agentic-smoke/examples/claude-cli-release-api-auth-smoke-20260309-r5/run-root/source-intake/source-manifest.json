@@ -1,0 +1,41 @@
+{
+  "manifest_version": "1.0",
+  "skill_topic": "api-auth-smoke-claude-bridge",
+  "skill_description": "API authentication and authorization status code guidance",
+  "run_timestamp": "2026-03-09T00:00:00Z",
+  "source_root": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/",
+  "run_root": "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/run-root",
+  "sources": [
+    {
+      "id": "src-001",
+      "path": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/01-status-codes.md",
+      "provenance": {
+        "origin": "test-fixture",
+        "repository": "cogworks",
+        "fixture_path": "tests/agentic-smoke/fixtures/api-auth-smoke/",
+        "purpose": "validation-input",
+        "entity_boundary": "internal-test-asset"
+      },
+      "content_summary": "HTTP status code guidance for authentication and authorization - 401 vs 403 semantics",
+      "execution_surface": "none"
+    },
+    {
+      "id": "src-002",
+      "path": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/02-token-handling.md",
+      "provenance": {
+        "origin": "test-fixture",
+        "repository": "cogworks",
+        "fixture_path": "tests/agentic-smoke/fixtures/api-auth-smoke/",
+        "purpose": "validation-input",
+        "entity_boundary": "internal-test-asset"
+      },
+      "content_summary": "Token lifecycle guidance - short-lived tokens, expiration handling, auth vs authz failure classification",
+      "execution_surface": "none"
+    }
+  ],
+  "provenance_summary": {
+    "all_sources_from_test_fixtures": true,
+    "controlled_environment": true,
+    "external_dependencies": false
+  }
+}

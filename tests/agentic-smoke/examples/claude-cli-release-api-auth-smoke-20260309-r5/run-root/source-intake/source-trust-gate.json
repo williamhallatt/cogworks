@@ -1,0 +1,24 @@
+{
+  "gate_passed": true,
+  "gate_timestamp": "2026-03-09T00:00:00Z",
+  "trust_level": "controlled",
+  "decision_rationale": "Test fixture sources from controlled repository environment with no executable code or external dependencies",
+  "sources": [
+    {
+      "id": "src-001",
+      "path": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/01-status-codes.md",
+      "trust_classification": "controlled",
+      "suitable_for_synthesis": true,
+      "risk_signals": []
+    },
+    {
+      "id": "src-002",
+      "path": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/02-token-handling.md",
+      "trust_classification": "controlled",
+      "suitable_for_synthesis": true,
+      "risk_signals": []
+    }
+  ],
+  "blocking_issues": [],
+  "warnings": []
+}

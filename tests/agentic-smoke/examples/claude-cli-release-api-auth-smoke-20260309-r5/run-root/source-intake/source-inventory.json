@@ -1,0 +1,22 @@
+{
+  "sources": [
+    {
+      "id": "src-001",
+      "path": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/01-status-codes.md",
+      "relative_path": "01-status-codes.md",
+      "type": "markdown",
+      "size_bytes": 341,
+      "modified_epoch": 1772761217
+    },
+    {
+      "id": "src-002",
+      "path": "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/02-token-handling.md",
+      "relative_path": "02-token-handling.md",
+      "type": "markdown",
+      "size_bytes": 314,
+      "modified_epoch": 1772761217
+    }
+  ],
+  "inventory_timestamp": "2026-03-09T00:00:00Z",
+  "source_count": 2
+}

@@ -1,0 +1,43 @@
+{
+  "stage": "synthesis",
+  "status": "pass",
+  "timestamp": "2026-03-09T00:00:00Z",
+  "run_root": "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/run-root",
+  "artifacts": [
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/run-root/synthesis/synthesis.md",
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/run-root/synthesis/cdr-registry.md",
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/run-root/synthesis/traceability-map.md",
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/run-root/synthesis/stage-status.json"
+  ],
+  "inputs_validated": [
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/run-root/source-intake/source-inventory.json",
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/run-root/source-intake/source-manifest.json",
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/run-root/source-intake/source-trust-report.md",
+    "/home/will/code/cogworks/tests/agentic-smoke/examples/claude-cli-release-api-auth-smoke-20260309-r5/run-root/source-intake/source-trust-gate.json"
+  ],
+  "sources_synthesized": [
+    "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/01-status-codes.md",
+    "/home/will/code/cogworks/tests/agentic-smoke/fixtures/api-auth-smoke/02-token-handling.md"
+  ],
+  "synthesis_characteristics": {
+    "source_count": 2,
+    "contradictions_detected": 0,
+    "derivative_relationships": 1,
+    "entity_boundaries": 1,
+    "decision_rules": 8,
+    "anti_patterns": 2,
+    "citation_count": 16
+  },
+  "quality_checks": {
+    "required_sections_present": true,
+    "source_citations_present": true,
+    "sources_section_complete": true,
+    "cdr_registry_non_empty": true,
+    "traceability_map_non_empty": true,
+    "contradictions_preserved": true,
+    "entity_boundaries_preserved": true
+  },
+  "blocking_failures": [],
+  "warnings": [],
+  "recommended_next_action": "Proceed to skill-packaging stage to generate skill artifacts from synthesis.md"
+}

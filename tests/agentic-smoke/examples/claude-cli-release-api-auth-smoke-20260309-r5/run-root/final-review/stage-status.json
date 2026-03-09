@@ -1,0 +1,13 @@
+{
+  "stage": "final-review",
+  "status": "pass",
+  "owner": "coordinator",
+  "started_at": "2026-03-09T10:11:00Z",
+  "completed_at": "2026-03-09T10:11:00Z",
+  "blocking_failures": [],
+  "warnings": [
+    "SKILL.md missing optional sections: When to Use, Quick Decision|Cheatsheet, Invocation",
+    "metadata.json slug 'api-auth-smoke-claude-bridge' does not match directory 'skill-output'"
+  ],
+  "decision": "Validated skill ready for installation with minor warnings"
+}
