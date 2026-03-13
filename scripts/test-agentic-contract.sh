@@ -67,14 +67,20 @@ require_file "TESTING.md"
 require_file "tests/agentic-smoke/README.md"
 require_dir "tests/agentic-smoke/fixtures/api-auth-smoke"
 require_file "scripts/render-agentic-role-bindings.py"
+require_file "scripts/install-cogworks.sh"
 require_file "scripts/render-dispatch-manifest.py"
 require_file "scripts/resolve-role-profile.py"
 require_file "scripts/validate-agentic-run.sh"
 require_dir ".claude/agents"
+require_dir ".github/agents"
 require_file ".claude/agents/cogworks-intake-analyst.md"
 require_file ".claude/agents/cogworks-synthesizer.md"
 require_file ".claude/agents/cogworks-composer.md"
 require_file ".claude/agents/cogworks-validator.md"
+require_file ".github/agents/cogworks-intake-analyst.agent.md"
+require_file ".github/agents/cogworks-synthesizer.agent.md"
+require_file ".github/agents/cogworks-composer.agent.md"
+require_file ".github/agents/cogworks-validator.agent.md"
 
 require_pattern "skills/cogworks/SKILL.md" 'turn source material into a validated generated skill' 'orchestrator exposes the single product purpose'
 require_pattern "skills/cogworks/SKILL.md" 'fail closed when trust, provenance, contradiction handling, or validation is' 'orchestrator is fail-closed'
@@ -93,6 +99,7 @@ require_pattern "skills/cogworks/README.md" 'They are not a user-facing mode swi
 forbid_pattern "skills/cogworks/README.md" '--engine agentic' 'skill README no longer documents --engine agentic'
 
 require_pattern "INSTALL.md" '`cogworks` is the normal user-facing entry point.' 'install guide documents the single entry point'
+require_pattern "INSTALL.md" 'scripts/install-cogworks.sh' 'install guide documents bootstrap installer'
 forbid_pattern "INSTALL.md" '/cogworks encode' 'install guide no longer documents pseudo-CLI invocation'
 
 require_pattern "skills/cogworks/agentic-runtime.md" 'run_type = subagent-skill-build' 'runtime defines subagent build run type'
@@ -105,12 +112,12 @@ forbid_pattern "skills/cogworks/agentic-runtime.md" 'engine_mode' 'runtime no lo
 require_pattern "skills/cogworks/claude-adapter.md" 'execution_surface = claude-cli' 'Claude adapter declares claude-cli surface'
 require_pattern "skills/cogworks/claude-adapter.md" 'If the `Task` tool is unavailable' 'Claude adapter fails closed without Task'
 require_pattern "skills/cogworks/claude-adapter.md" 'claude-role-profile' 'Claude adapter records canonical profile bindings'
-require_pattern "skills/cogworks/claude-adapter.md" 'python3 scripts/render-agentic-role-bindings.py' 'Claude adapter documents provisioning bridge'
+require_pattern "skills/cogworks/claude-adapter.md" 'python3 scripts/render-agentic-role-bindings.py --surface claude-cli' 'Claude adapter documents provisioning bridge'
 forbid_pattern "skills/cogworks/claude-adapter.md" 'single-agent-fallback' 'Claude adapter no longer claims single-agent fallback'
 
 require_pattern "skills/cogworks/copilot-adapter.md" 'execution_surface = copilot-cli' 'Copilot adapter declares copilot-cli surface'
 require_pattern "skills/cogworks/copilot-adapter.md" 'inherit-session-model' 'Copilot adapter records inherit-session-model policy'
-require_pattern "skills/cogworks/copilot-adapter.md" 'There is no v1 `.copilot/agents/` file format contract.' 'Copilot adapter does not invent a .copilot agent-file format'
+require_pattern "skills/cogworks/copilot-adapter.md" '.github/agents/cogworks-*.agent.md' 'Copilot adapter documents native agent files'
 forbid_pattern "skills/cogworks/copilot-adapter.md" 'single-agent-fallback' 'Copilot adapter no longer claims single-agent fallback'
 
 require_pattern "skills/cogworks/role-profiles.json" '"profile_id": "intake-analyst"' 'role profiles define intake-analyst'
@@ -158,9 +165,9 @@ else
 fi
 
 if python3 "$ROOT_DIR/scripts/render-agentic-role-bindings.py" --check >/dev/null 2>&1; then
-  pass 'render-agentic-role-bindings.py is in sync with committed Claude agent files'
+  pass 'render-agentic-role-bindings.py is in sync with committed Claude and Copilot agent files'
 else
-  fail 'render-agentic-role-bindings.py output differs from committed Claude agent files'
+  fail 'render-agentic-role-bindings.py output differs from committed native agent files'
 fi
 
 DET_EXIT=0

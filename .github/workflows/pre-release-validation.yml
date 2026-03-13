@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - "skills/**"
-
+      - ".claude/agents/**"
+      - ".github/agents/**"
       - "tests/**"
       - "scripts/**"
       - "README.md"
       - "INSTALL.md"
       - "TESTING.md"
+      - "CONTRIBUTIONS.md"
       - "LICENSE"
     branches:
       - main
@@ -63,6 +65,10 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install jsonschema
+
+      - name: Validate native agent renderings
+        run: |
+          python3 scripts/render-agentic-role-bindings.py --check
 
       - name: Run all test suites
         run: |

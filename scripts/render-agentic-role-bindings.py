@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Render executable Claude custom-agent bindings from canonical role profiles.
+"""Render native agent bindings from canonical cogworks role profiles.
 
 The canonical source of truth remains ``skills/cogworks/role-profiles.json``.
 This script materializes those abstract role contracts into project-scoped
-Claude custom-agent files under ``.claude/agents/`` so Claude Code can execute
-the documented specialist workflow.
+Claude and Copilot agent files so supported surfaces can execute the documented
+specialist workflow without hand-maintained adapter drift.
 """
 
 from __future__ import annotations
@@ -16,7 +16,8 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_ROLE_PROFILES = ROOT_DIR / "skills" / "cogworks" / "role-profiles.json"
-DEFAULT_OUTPUT_DIR = ROOT_DIR / ".claude" / "agents"
+DEFAULT_CLAUDE_OUTPUT_DIR = ROOT_DIR / ".claude" / "agents"
+DEFAULT_COPILOT_OUTPUT_DIR = ROOT_DIR / ".github" / "agents"
 
 SUMMARY_CONTRACT = """Stage: <stage-name>
 Status: pass | fail
@@ -67,7 +68,7 @@ def stage_contract_addendum(profile: dict) -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Render project-scoped Claude custom agents for cogworks."
+        description="Render project-scoped native agent bindings for cogworks."
     )
     parser.add_argument(
         "--role-profiles",
@@ -75,9 +76,20 @@ def parse_args() -> argparse.Namespace:
         help="Path to role-profiles.json",
     )
     parser.add_argument(
-        "--output-dir",
-        default=str(DEFAULT_OUTPUT_DIR),
-        help="Directory where .md Claude agent files will be written",
+        "--surface",
+        choices=("all", "claude-cli", "copilot-cli"),
+        default="all",
+        help="Which surface bindings to render",
+    )
+    parser.add_argument(
+        "--claude-output-dir",
+        default=str(DEFAULT_CLAUDE_OUTPUT_DIR),
+        help="Directory where Claude agent files will be written",
+    )
+    parser.add_argument(
+        "--copilot-output-dir",
+        default=str(DEFAULT_COPILOT_OUTPUT_DIR),
+        help="Directory where Copilot agent files will be written",
     )
     parser.add_argument(
         "--check",
@@ -95,8 +107,12 @@ def load_profiles(path: Path) -> list[dict]:
     return profiles
 
 
-def agent_filename(profile_id: str) -> str:
+def claude_agent_filename(profile_id: str) -> str:
     return f"cogworks-{profile_id}.md"
+
+
+def copilot_agent_filename(profile_id: str) -> str:
+    return f"cogworks-{profile_id}.agent.md"
 
 
 def build_description(profile: dict) -> str:
@@ -152,7 +168,7 @@ Return this summary shape exactly:
 """
 
 
-def render_agent_markdown(profile: dict) -> str:
+def render_claude_agent_markdown(profile: dict) -> str:
     claude_binding = profile.get("bindings", {}).get("claude-cli", {})
     tools = claude_binding.get("tools", [])
     description = build_description(profile)
@@ -161,7 +177,7 @@ def render_agent_markdown(profile: dict) -> str:
 
     return (
         "---\n"
-        f"name: {agent_filename(str(profile['profile_id'])).removesuffix('.md')}\n"
+        f"name: {claude_agent_filename(str(profile['profile_id'])).removesuffix('.md')}\n"
         f"description: {json.dumps(description)}\n"
         f"tools: {tools_yaml}\n"
         "---\n\n"
@@ -169,13 +185,36 @@ def render_agent_markdown(profile: dict) -> str:
     )
 
 
-def write_agents(profiles: list[dict], output_dir: Path, check: bool) -> None:
+def render_copilot_agent_markdown(profile: dict) -> str:
+    description = build_description(profile)
+    prompt = build_prompt(profile)
+
+    return (
+        "---\n"
+        f"name: {copilot_agent_filename(str(profile['profile_id'])).removesuffix('.agent.md')}\n"
+        f"description: {json.dumps(description)}\n"
+        "model: inherit\n"
+        "---\n\n"
+        f"{prompt}"
+    )
+
+
+def write_agents(
+    profiles: list[dict],
+    output_dir: Path,
+    surface: str,
+    check: bool,
+) -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
     mismatches: list[str] = []
 
     for profile in profiles:
-        target_path = output_dir / agent_filename(str(profile["profile_id"]))
-        rendered = render_agent_markdown(profile)
+        if surface == "claude-cli":
+            target_path = output_dir / claude_agent_filename(str(profile["profile_id"]))
+            rendered = render_claude_agent_markdown(profile)
+        else:
+            target_path = output_dir / copilot_agent_filename(str(profile["profile_id"]))
+            rendered = render_copilot_agent_markdown(profile)
         if check:
             if not target_path.exists() or target_path.read_text(encoding="utf-8") != rendered:
                 mismatches.append(str(target_path))
@@ -184,15 +223,38 @@ def write_agents(profiles: list[dict], output_dir: Path, check: bool) -> None:
 
     if check and mismatches:
         joined = "\n".join(mismatches)
-        raise SystemExit(f"Rendered Claude agents are out of date:\n{joined}")
+        raise SystemExit(f"Rendered {surface} agents are out of date:\n{joined}")
+
+    return len(profiles)
 
 
 def main() -> None:
     args = parse_args()
     profiles = load_profiles(Path(args.role_profiles))
-    write_agents(profiles, Path(args.output_dir), args.check)
+    rendered = []
+
+    if args.surface in ("all", "claude-cli"):
+        claude_count = write_agents(
+            profiles,
+            Path(args.claude_output_dir),
+            "claude-cli",
+            args.check,
+        )
+        if not args.check:
+            rendered.append(f"{claude_count} Claude agents to {args.claude_output_dir}")
+
+    if args.surface in ("all", "copilot-cli"):
+        copilot_count = write_agents(
+            profiles,
+            Path(args.copilot_output_dir),
+            "copilot-cli",
+            args.check,
+        )
+        if not args.check:
+            rendered.append(f"{copilot_count} Copilot agents to {args.copilot_output_dir}")
+
     if not args.check:
-        print(f"Rendered {len(profiles)} Claude agents to {args.output_dir}")
+        print("Rendered " + " and ".join(rendered))
 
 
 if __name__ == "__main__":

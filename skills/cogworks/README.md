@@ -115,6 +115,10 @@ Claude Code and GitHub Copilot may use specialist sub-agents internally for:
 Those are implementation details used to improve quality and context isolation.
 They are not a user-facing mode switch.
 
+The recommended install path is native-first: bootstrap the three skills and
+the matching native agent files together. `npx skills add` remains a manual
+skill-only path, not the full product install.
+
 If you are using Codex, treat generated-skill portability and benchmark support
 as separate from this internal build path.
 
@@ -127,7 +131,7 @@ Maintainer-only references:
 ## Prerequisites
 
 - an agent that supports skills
-- Node.js 18+ for `npx skills add`
+- Node.js 18+ and Python 3
 - a project repository where generated skills can be written to
   `_generated-skills/`
 

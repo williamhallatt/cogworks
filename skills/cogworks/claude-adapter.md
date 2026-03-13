@@ -39,7 +39,7 @@ Executable project-scoped Claude agents are generated from those canonical role
 profiles with:
 
 ```bash
-python3 scripts/render-agentic-role-bindings.py
+python3 scripts/render-agentic-role-bindings.py --surface claude-cli
 ```
 
 This materializes `.claude/agents/cogworks-*.md` files. The JSON role profiles

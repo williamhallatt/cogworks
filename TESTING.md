@@ -77,17 +77,19 @@ What this does not prove:
 - human usefulness beyond the maintained benchmark cases
 - that preserved historical artifacts are a substitute for a fresh release run
 
-### Claude prerequisite
+### Native agent provisioning prerequisite
 
-The current Claude release path requires two things:
+The current native-first release path requires:
 
-- a local Claude Code CLI surface with the delegated-agent primitive available
+- a local Claude Code or GitHub Copilot CLI surface with the delegated-agent
+  primitive available
 - executable provisioning for the four canonical `cogworks` specialist roles
 
-Provision those project-scoped Claude custom agents with:
+Provision the target surface with:
 
 ```bash
-python3 scripts/render-agentic-role-bindings.py
+bash scripts/install-cogworks.sh --agent claude-code --project /path/to/project
+bash scripts/install-cogworks.sh --agent copilot-cli --project /path/to/project
 ```
 
 Current preserved Claude release example:

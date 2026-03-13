@@ -2,17 +2,27 @@
 
 ## Quick Install (Recommended)
 
-Use the [`npx skills`](https://www.npmjs.com/package/skills) CLI to add all cogworks skills with one command:
+Clone the repository, then run the bootstrap installer for the surface you
+actually want to use for trust-first skill generation:
 
 ```bash
-npx skills add williamhallatt/cogworks
+git clone https://github.com/williamhallatt/cogworks.git
+
+# Claude Code
+bash cogworks/scripts/install-cogworks.sh --agent claude-code --project /path/to/your/project
+
+# GitHub Copilot CLI
+bash cogworks/scripts/install-cogworks.sh --agent copilot-cli --project /path/to/your/project
 ```
 
-> NOTE: `cogworks` is the normal user-facing entry point. `cogworks-encode` and
-> `cogworks-learn` ship as supporting doctrine skills and can still be used
-> independently as expert surfaces.
+This bootstrap path installs:
+- the three required `cogworks` skills
+- the native agent definitions for the selected surface
 
-To update or remove, see the [npx skills documentation](https://www.npmjs.com/package/skills).
+`cogworks` is the normal user-facing entry point. `cogworks-encode` and
+`cogworks-learn` remain supporting doctrine skills and expert surfaces.
+
+To update, rerun the same bootstrap command from the repo checkout.
 
 ## Support Boundaries
 
@@ -27,61 +37,49 @@ Install location and build-flow support are not the same thing:
 
 If you mention Codex in local docs or examples, keep that distinction explicit.
 
-## Installation Options
+## Installer Contract
+
+The bootstrap installer lives at `scripts/install-cogworks.sh`.
+
+Supported arguments:
 
 ```bash
-# Install specific skills only
+bash scripts/install-cogworks.sh --agent claude-code --project /path/to/project
+bash scripts/install-cogworks.sh --agent copilot-cli --project /path/to/project
+bash scripts/install-cogworks.sh --agent claude-code --project /path/to/project --copy
+```
+
+Defaults and behavior:
+- `--agent` is required and must be `claude-code` or `copilot-cli`
+- `--project` is required and must point at an existing project directory
+- by default the installer uses symlinks; `--copy` writes copies instead
+- unsupported surfaces fail closed
+
+Install targets:
+- Claude Code: `.claude/skills/` plus `.claude/agents/`
+- GitHub Copilot CLI: `.agents/skills/` plus `.github/agents/`
+
+## Manual Skill-Only Install
+
+Use this only when you deliberately want the three skills without the full
+native-first product install:
+
+```bash
 npx skills add williamhallatt/cogworks --skill cogworks-encode --skill cogworks-learn
-
-# Install to a specific supported build surface
 npx skills add williamhallatt/cogworks -a claude-code
-
-# Install globally (across all projects)
-npx skills add williamhallatt/cogworks -g
-
-# Copy files instead of symlinks
-npx skills add williamhallatt/cogworks --copy
-
-# List available skills without installing
-npx skills add williamhallatt/cogworks --list
 ```
 
-## Manual Installation
-
-Clone the repository and copy skills directly:
-
-```bash
-git clone https://github.com/williamhallatt/cogworks.git
-
-# For Claude Code
-cp -r cogworks/skills/cogworks your-project/.claude/skills/
-cp -r cogworks/skills/cogworks-encode your-project/.claude/skills/
-cp -r cogworks/skills/cogworks-learn your-project/.claude/skills/
-
-# For agents using the shared `.agents/skills/` directory
-cp -r cogworks/skills/cogworks your-project/.agents/skills/
-cp -r cogworks/skills/cogworks-encode your-project/.agents/skills/
-cp -r cogworks/skills/cogworks-learn your-project/.agents/skills/
-```
-
-The three skills above are the minimum required set.
-
-Installing the files into `.agents/skills/` does not imply every agent supports
-the same internal build behavior. For Codex specifically, treat this as
-generated-skill portability support, not trust-first build-flow support.
+This can make the skill directories available, but it does not provision the
+native sub-agents that the highest-quality `cogworks` flow depends on.
 
 ## Verify Installation
 
 ```bash
-# For Claude Code
-ls your-project/.claude/skills/cogworks/SKILL.md
-ls your-project/.claude/skills/cogworks-encode/SKILL.md
-ls your-project/.claude/skills/cogworks-learn/SKILL.md
+ls /path/to/your/project/.claude/skills/cogworks/SKILL.md
+ls /path/to/your/project/.claude/agents/cogworks-intake-analyst.md
 
-# For agents using the shared `.agents/skills/` directory
-ls your-project/.agents/skills/cogworks/SKILL.md
-ls your-project/.agents/skills/cogworks-encode/SKILL.md
-ls your-project/.agents/skills/cogworks-learn/SKILL.md
+ls /path/to/your/project/.agents/skills/cogworks/SKILL.md
+ls /path/to/your/project/.github/agents/cogworks-intake-analyst.agent.md
 ```
 
 ## Invoking Skills
@@ -129,8 +127,9 @@ Node.js 18+ is required for the `skills` CLI. Install from [nodejs.org](https://
 
 ## Troubleshooting
 
-- **Skills not discovered**: Verify SKILL.md exists in each skill directory and symlinks resolve
-- **Missing dependencies**: `npx skills` requires Node.js 18+
+- **Bootstrap install failed**: Verify the target project directory exists and rerun the installer from the repo checkout
+- **Skills not discovered**: Verify SKILL.md exists in each installed skill directory and symlinks resolve
+- **Missing dependencies**: the bootstrap installer requires Node.js 18+ and Python 3
 - **Symlink issues on Windows**: Use `--copy` flag instead
 - **Codex support confusion**: Generated skills are portable to Codex, but the
   current trust-first internal build flow is supported only on Claude Code and

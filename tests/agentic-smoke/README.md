@@ -45,15 +45,12 @@ tests/agentic-smoke/fixtures/api-auth-smoke/
 Optional local install command from this repo:
 
 ```bash
-npx skills add . -a claude-code -y
+bash scripts/install-cogworks.sh --agent claude-code --project /path/to/project
+bash scripts/install-cogworks.sh --agent copilot-cli --project /path/to/project
 ```
 
-For Claude Code live runs, also render the project-scoped Claude agents from
-the canonical role profiles:
-
-```bash
-python3 scripts/render-agentic-role-bindings.py
-```
+This provisions both the three skills and the native agent files needed for the
+validated sub-agent path.
 
 ## Live Smoke Procedure
 

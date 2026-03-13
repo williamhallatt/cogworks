@@ -9,11 +9,12 @@ generated skill or stops with a clear trust report explaining why it will not.
 ## Installation
 
 ```bash
-npx skills add williamhallatt/cogworks
+git clone https://github.com/williamhallatt/cogworks.git
+bash cogworks/scripts/install-cogworks.sh --agent claude-code --project /path/to/your/project
 ```
 
-Requires Node.js 18+. See [INSTALL.md](INSTALL.md) for installation options and
-manual verification steps.
+Requires Node.js 18+ and Python 3. See [INSTALL.md](INSTALL.md) for supported
+agent targets, Copilot bootstrap details, and manual installation options.
 
 ## Quick Start
 
@@ -91,6 +92,10 @@ Internally, `cogworks` uses:
 Sub-agents are implementation machinery, not a public interface. They are used
 to keep the coordinator context small and to give source intake, synthesis,
 packaging, and validation explicit ownership.
+
+The recommended install path is therefore native-first: bootstrap the three
+skills plus the surface-native agent files together. `npx skills add` remains a
+manual skill-only path, not the full product install.
 
 ## Supporting Skills
 

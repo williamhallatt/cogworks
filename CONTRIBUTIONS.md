@@ -7,12 +7,12 @@ git clone https://github.com/williamhallatt/cogworks.git
 cd cogworks
 ```
 
-Requires Node.js 18+. Uses [`npx skills`](https://github.com/vercel-labs/skills) for installation.
+Requires Node.js 18+ and Python 3.
 
-To install your local copy for development (run from root):
+To install your local copy for development into a test project:
 
 ```bash
-npx skills add .
+bash scripts/install-cogworks.sh --agent claude-code --project /path/to/test-project
 ```
 
 ## Running tests
@@ -50,6 +50,7 @@ When changing docs, keep the public support matrix consistent:
 PR checklist:
 
 - [ ] Changes to `skills/**`, `.claude/**`, or `.agents/**` pass Layer 1 deterministic checks (`bash scripts/validate-quality-gates.sh`)
+- [ ] Changes to native agent wiring keep both `.claude/agents/**` and `.github/agents/**` renderable from `scripts/render-agentic-role-bindings.py`
 - [ ] Shell scripts pass shellcheck
 - [ ] README.md, INSTALL.md, and other affected user-facing docs are updated if public behavior or support boundaries changed
 - [ ] Public docs do not imply unsupported surface parity, especially around Codex versus the internal trust-first build flow
@@ -62,7 +63,8 @@ PR checklist:
 
 Releases use **semantic versioning** with git tags: `v{major}.{minor}.{patch}`
 
-Git tags are the sole source of truth for version numbers. The `skills` CLI installs directly from the repository — no archives to build or upload.
+Git tags are the sole source of truth for version numbers. The repo checkout and
+bootstrap installer are the canonical product install path.
 
 ### Step 1: Validate
 
@@ -72,15 +74,8 @@ for skill in skills/*/; do
   [ ! -f "$skill/SKILL.md" ] && echo "Missing: $skill/SKILL.md"
 done
 
-# Verify symlinks resolve for Claude Code
-for link in .claude/skills/*; do
-  [ -L "$link" ] && [ ! -e "$link/SKILL.md" ] && echo "Broken: $link"
-done
-
-# Verify symlinks resolve for other agents
-for link in .agents/skills/*; do
-  [ -L "$link" ] && [ ! -e "$link/SKILL.md" ] && echo "Broken: $link"
-done
+# Verify native agent renderings are current
+python3 scripts/render-agentic-role-bindings.py --check
 
 # Run tests
 bash tests/run-black-box-tests.sh
@@ -98,26 +93,30 @@ git push origin v1.0.0
 Pushing a tag triggers `.github/workflows/release.yml`, which:
 
 1. Validates all skills have SKILL.md with valid frontmatter
-2. Validates symlinks resolve
+2. Validates native agent renderings are current
 3. Generates a changelog from commits
 4. Creates a GitHub Release with installation instructions
 
 ### What gets released
 
-The entire `skills/` directory is the release. The `skills` CLI clones the repo and discovers skills automatically. No archives needed.
+The release contains the canonical skill sources plus the generated native agent
+bindings and bootstrap installer.
 
 ```
 skills/
 ├── cogworks/                    # Orchestrator
 ├── cogworks-encode/             # Synthesis methodology
 ├── cogworks-learn/              # Skill writing expertise
+scripts/install-cogworks.sh      # Native-first bootstrap installer
+.claude/agents/                  # Rendered Claude native agents
+.github/agents/                  # Rendered Copilot native agents
 ```
 
 ### Release validation checklist
 
 - [ ] All commits pushed to `main`
 - [ ] All `skills/*/SKILL.md` files exist with valid frontmatter
-- [ ] `.claude/skills/` and `.agents/skills/` symlinks resolve
+- [ ] `.claude/agents/` and `.github/agents/` are current
 - [ ] Tests pass: `bash tests/run-black-box-tests.sh`
 - [ ] README.md and INSTALL.md are up to date
 
@@ -133,13 +132,10 @@ for skill in skills/*/; do
 done
 ```
 
-**Broken symlinks**
-
-Symlinks in `.claude/skills/` and `.agents/skills/` must point to `../../skills/<name>`. Verify:
+**Rendered native agents out of date**
 
 ```bash
-ls -la .claude/skills/
-ls -la .agents/skills/
+python3 scripts/render-agentic-role-bindings.py --check
 ```
 
 ### Generating release notes locally

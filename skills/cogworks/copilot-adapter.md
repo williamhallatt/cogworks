@@ -37,8 +37,19 @@ For Copilot CLI, use the same canonical profile IDs as Claude:
 | `skill-packaging` | `composer` | `composer` | `copilot-inline-prompt` | `skills/cogworks/role-profiles.json#composer` | `inherit-session-model` | `foreground` |
 | `deterministic-validation` | `validator` | `validator` | `copilot-inline-prompt` | `skills/cogworks/role-profiles.json#validator` | `inherit-session-model` | `background` |
 
-There is no v1 `.copilot/agents/` file format contract. Record the canonical
-role binding and the truthful model policy in `dispatch-manifest.json`.
+Executable project-scoped Copilot agents are generated from those canonical role
+profiles with:
+
+```bash
+python3 scripts/render-agentic-role-bindings.py --surface copilot-cli
+```
+
+This materializes `.github/agents/cogworks-*.agent.md` files. The JSON role
+profiles remain canonical; the `.github/agents/` files are the executable
+bridge Copilot CLI consumes.
+
+Record the canonical role binding and the truthful model policy in
+`dispatch-manifest.json`.
 
 ## Dispatch Rules
 

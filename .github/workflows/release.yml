@@ -62,6 +62,10 @@ jobs:
             exit 1
           fi
 
+      - name: Validate native agent renderings
+        run: |
+          python3 scripts/render-agentic-role-bindings.py --check
+
       - name: Generate changelog
         run: |
           TAG=${{ steps.version.outputs.tag }}
