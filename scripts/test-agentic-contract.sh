@@ -61,11 +61,15 @@ require_file "skills/cogworks/copilot-adapter.md"
 require_file "skills/cogworks/role-profiles.json"
 require_file "skills/cogworks-encode/SKILL.md"
 require_file "skills/cogworks-learn/SKILL.md"
+require_file "plugin.json"
+require_file ".claude-plugin/plugin.json"
+require_file ".claude-plugin/marketplace.json"
 require_file "README.md"
 require_file "INSTALL.md"
 require_file "TESTING.md"
 require_file "tests/agentic-smoke/README.md"
 require_dir "tests/agentic-smoke/fixtures/api-auth-smoke"
+require_dir "agents"
 require_file "scripts/render-agentic-role-bindings.py"
 require_file "scripts/install-cogworks.sh"
 require_file "scripts/render-dispatch-manifest.py"
@@ -73,6 +77,10 @@ require_file "scripts/resolve-role-profile.py"
 require_file "scripts/validate-agentic-run.sh"
 require_dir ".claude/agents"
 require_dir ".github/agents"
+require_file "agents/cogworks-intake-analyst.agent.md"
+require_file "agents/cogworks-synthesizer.agent.md"
+require_file "agents/cogworks-composer.agent.md"
+require_file "agents/cogworks-validator.agent.md"
 require_file ".claude/agents/cogworks-intake-analyst.md"
 require_file ".claude/agents/cogworks-synthesizer.md"
 require_file ".claude/agents/cogworks-composer.md"
@@ -92,6 +100,7 @@ forbid_pattern "skills/cogworks/SKILL.md" 'Default to `legacy`' 'orchestrator no
 require_pattern "README.md" 'one stable user-facing entry point: `cogworks`' 'root README documents one stable entry point'
 require_pattern "README.md" 'Sub-agents are implementation machinery, not a public interface.' 'root README keeps sub-agents internal'
 require_pattern "README.md" 'Codex sub-agent build' 'root README documents Codex deferral'
+require_pattern "README.md" 'copilot plugin install williamhallatt/cogworks' 'root README documents direct Copilot plugin install'
 forbid_pattern "README.md" '--engine agentic' 'root README no longer documents --engine agentic'
 forbid_pattern "README.md" 'Legacy' 'root README no longer presents a legacy engine mode'
 
@@ -99,7 +108,9 @@ require_pattern "skills/cogworks/README.md" 'They are not a user-facing mode swi
 forbid_pattern "skills/cogworks/README.md" '--engine agentic' 'skill README no longer documents --engine agentic'
 
 require_pattern "INSTALL.md" '`cogworks` is the normal user-facing entry point.' 'install guide documents the single entry point'
-require_pattern "INSTALL.md" 'scripts/install-cogworks.sh' 'install guide documents bootstrap installer'
+require_pattern "INSTALL.md" 'copilot plugin install williamhallatt/cogworks' 'install guide documents direct Copilot plugin install'
+require_pattern "INSTALL.md" '/plugin install cogworks@williamhallatt' 'install guide documents Claude plugin install'
+require_pattern "INSTALL.md" 'scripts/install-cogworks.sh' 'install guide keeps bootstrap fallback'
 forbid_pattern "INSTALL.md" '/cogworks encode' 'install guide no longer documents pseudo-CLI invocation'
 
 require_pattern "skills/cogworks/agentic-runtime.md" 'run_type = subagent-skill-build' 'runtime defines subagent build run type'
@@ -127,6 +138,7 @@ require_pattern "skills/cogworks/role-profiles.json" '"profile_id": "validator"'
 require_pattern "skills/cogworks/role-profiles.json" '"binding_type": "claude-role-profile"' 'role profiles define Claude bindings'
 require_pattern "skills/cogworks/role-profiles.json" '"binding_type": "copilot-inline-prompt"' 'role profiles define Copilot bindings'
 
+require_pattern "TESTING.md" 'copilot plugin install williamhallatt/cogworks' 'testing guide documents plugin-first install'
 require_pattern "TESTING.md" 'Sub-agent build smoke' 'testing guide documents sub-agent build smoke'
 require_pattern "TESTING.md" 'no public engine-selection syntax' 'testing guide enforces removal of public engine selection'
 forbid_pattern "TESTING.md" '--engine agentic' 'testing guide no longer documents --engine agentic'
@@ -164,10 +176,37 @@ else
   fail 'role-profiles.json is missing required canonical role bindings'
 fi
 
-if python3 "$ROOT_DIR/scripts/render-agentic-role-bindings.py" --check >/dev/null 2>&1; then
-  pass 'render-agentic-role-bindings.py is in sync with committed Claude and Copilot agent files'
+if python3 - <<'PY' "$ROOT_DIR/plugin.json" "$ROOT_DIR/.claude-plugin/plugin.json" "$ROOT_DIR/.claude-plugin/marketplace.json"
+import json
+import sys
+from pathlib import Path
+
+plugin_path = Path(sys.argv[1])
+claude_plugin_path = Path(sys.argv[2])
+marketplace_path = Path(sys.argv[3])
+
+plugin = json.loads(plugin_path.read_text(encoding="utf-8"))
+claude_plugin = json.loads(claude_plugin_path.read_text(encoding="utf-8"))
+marketplace = json.loads(marketplace_path.read_text(encoding="utf-8"))
+
+assert plugin["name"] == "cogworks"
+assert plugin["agents"] == "agents/"
+assert plugin["skills"] == "skills/"
+assert claude_plugin["name"] == "cogworks"
+assert marketplace["name"] == "williamhallatt"
+assert marketplace["plugins"][0]["name"] == "cogworks"
+assert marketplace["plugins"][0]["source"] == "./"
+PY
+then
+  pass 'plugin manifests and Claude marketplace catalog are structurally valid'
 else
-  fail 'render-agentic-role-bindings.py output differs from committed native agent files'
+  fail 'plugin manifests or Claude marketplace catalog are invalid'
+fi
+
+if python3 "$ROOT_DIR/scripts/render-agentic-role-bindings.py" --check >/dev/null 2>&1; then
+  pass 'render-agentic-role-bindings.py is in sync with committed plugin, Claude, and Copilot agent files'
+else
+  fail 'render-agentic-role-bindings.py output differs from committed plugin/native agent files'
 fi
 
 DET_EXIT=0

@@ -45,12 +45,17 @@ tests/agentic-smoke/fixtures/api-auth-smoke/
 Optional local install command from this repo:
 
 ```bash
+copilot plugin install williamhallatt/cogworks
+/plugin marketplace add williamhallatt/cogworks
+/plugin install cogworks@williamhallatt
+```
+
+Fallback from a repo checkout:
+
+```bash
 bash scripts/install-cogworks.sh --agent claude-code --project /path/to/project
 bash scripts/install-cogworks.sh --agent copilot-cli --project /path/to/project
 ```
-
-This provisions both the three skills and the native agent files needed for the
-validated sub-agent path.
 
 ## Live Smoke Procedure
 

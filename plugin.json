@@ -1,0 +1,16 @@
+{
+  "name": "cogworks",
+  "description": "Trust-first skill generation with native subagents for Claude Code and GitHub Copilot CLI.",
+  "version": "4.2.0",
+  "author": {
+    "name": "William Hallatt",
+    "email": "williamhallatt+github@proton.me",
+    "url": "https://github.com/williamhallatt"
+  },
+  "homepage": "https://github.com/williamhallatt/cogworks",
+  "repository": "https://github.com/williamhallatt/cogworks",
+  "license": "MIT",
+  "keywords": ["agents", "skills", "subagents", "copilot", "claude"],
+  "agents": "agents/",
+  "skills": "skills/"
+}

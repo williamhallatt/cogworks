@@ -66,6 +66,23 @@ jobs:
         run: |
           python3 scripts/render-agentic-role-bindings.py --check
 
+      - name: Validate plugin manifests
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          plugin = json.loads(Path("plugin.json").read_text(encoding="utf-8"))
+          claude = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+          marketplace = json.loads(Path(".claude-plugin/marketplace.json").read_text(encoding="utf-8"))
+
+          assert plugin["name"] == "cogworks"
+          assert plugin["agents"] == "agents/"
+          assert plugin["skills"] == "skills/"
+          assert claude["name"] == "cogworks"
+          assert marketplace["plugins"][0]["source"] == "./"
+          PY
+
       - name: Generate changelog
         run: |
           TAG=${{ steps.version.outputs.tag }}

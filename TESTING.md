@@ -77,15 +77,23 @@ What this does not prove:
 - human usefulness beyond the maintained benchmark cases
 - that preserved historical artifacts are a substitute for a fresh release run
 
-### Native agent provisioning prerequisite
+### Plugin packaging prerequisite
 
-The current native-first release path requires:
+The current plugin-first release path requires:
 
 - a local Claude Code or GitHub Copilot CLI surface with the delegated-agent
   primitive available
-- executable provisioning for the four canonical `cogworks` specialist roles
+- installable plugin packaging for the four canonical `cogworks` specialist roles
 
-Provision the target surface with:
+Primary install paths:
+
+```bash
+copilot plugin install williamhallatt/cogworks
+/plugin marketplace add williamhallatt/cogworks
+/plugin install cogworks@williamhallatt
+```
+
+Bootstrap fallback:
 
 ```bash
 bash scripts/install-cogworks.sh --agent claude-code --project /path/to/project

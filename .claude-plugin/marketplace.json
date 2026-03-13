@@ -1,0 +1,19 @@
+{
+  "name": "williamhallatt",
+  "owner": {
+    "name": "William Hallatt",
+    "email": "williamhallatt+github@proton.me"
+  },
+  "plugins": [
+    {
+      "name": "cogworks",
+      "source": "./",
+      "description": "Trust-first skill generation with native subagents for Claude Code and GitHub Copilot CLI.",
+      "version": "4.2.0",
+      "author": {
+        "name": "William Hallatt",
+        "email": "williamhallatt+github@proton.me"
+      }
+    }
+  ]
+}

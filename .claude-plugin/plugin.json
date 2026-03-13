@@ -1,0 +1,12 @@
+{
+  "name": "cogworks",
+  "description": "Trust-first skill generation with native subagents for Claude Code.",
+  "version": "4.2.0",
+  "author": {
+    "name": "William Hallatt",
+    "email": "williamhallatt+github@proton.me"
+  },
+  "homepage": "https://github.com/williamhallatt/cogworks",
+  "repository": "https://github.com/williamhallatt/cogworks",
+  "license": "MIT"
+}

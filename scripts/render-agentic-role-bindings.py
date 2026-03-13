@@ -16,6 +16,7 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_ROLE_PROFILES = ROOT_DIR / "skills" / "cogworks" / "role-profiles.json"
+DEFAULT_PLUGIN_OUTPUT_DIR = ROOT_DIR / "agents"
 DEFAULT_CLAUDE_OUTPUT_DIR = ROOT_DIR / ".claude" / "agents"
 DEFAULT_COPILOT_OUTPUT_DIR = ROOT_DIR / ".github" / "agents"
 
@@ -77,9 +78,14 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--surface",
-        choices=("all", "claude-cli", "copilot-cli"),
+        choices=("all", "plugin", "claude-cli", "copilot-cli"),
         default="all",
         help="Which surface bindings to render",
+    )
+    parser.add_argument(
+        "--plugin-output-dir",
+        default=str(DEFAULT_PLUGIN_OUTPUT_DIR),
+        help="Directory where plugin agent files will be written",
     )
     parser.add_argument(
         "--claude-output-dir",
@@ -112,6 +118,10 @@ def claude_agent_filename(profile_id: str) -> str:
 
 
 def copilot_agent_filename(profile_id: str) -> str:
+    return f"cogworks-{profile_id}.agent.md"
+
+
+def plugin_agent_filename(profile_id: str) -> str:
     return f"cogworks-{profile_id}.agent.md"
 
 
@@ -168,6 +178,30 @@ Return this summary shape exactly:
 """
 
 
+def build_capabilities(profile: dict) -> list[str]:
+    stage = str(profile["stage"])
+    purpose = str(profile["purpose"]).rstrip(".")
+    capabilities = [f"Own the {stage} stage for cogworks", purpose]
+    capabilities.extend(str(entry) for entry in profile.get("quality_bar", [])[:2])
+    return capabilities
+
+
+def render_plugin_agent_markdown(profile: dict) -> str:
+    description = build_description(profile)
+    prompt = build_prompt(profile)
+    capabilities = build_capabilities(profile)
+    capabilities_yaml = "[" + ", ".join(json.dumps(item) for item in capabilities) + "]"
+
+    return (
+        "---\n"
+        f"name: {plugin_agent_filename(str(profile['profile_id'])).removesuffix('.agent.md')}\n"
+        f"description: {json.dumps(description)}\n"
+        f"capabilities: {capabilities_yaml}\n"
+        "---\n\n"
+        f"{prompt}"
+    )
+
+
 def render_claude_agent_markdown(profile: dict) -> str:
     claude_binding = profile.get("bindings", {}).get("claude-cli", {})
     tools = claude_binding.get("tools", [])
@@ -209,7 +243,10 @@ def write_agents(
     mismatches: list[str] = []
 
     for profile in profiles:
-        if surface == "claude-cli":
+        if surface == "plugin":
+            target_path = output_dir / plugin_agent_filename(str(profile["profile_id"]))
+            rendered = render_plugin_agent_markdown(profile)
+        elif surface == "claude-cli":
             target_path = output_dir / claude_agent_filename(str(profile["profile_id"]))
             rendered = render_claude_agent_markdown(profile)
         else:
@@ -232,6 +269,16 @@ def main() -> None:
     args = parse_args()
     profiles = load_profiles(Path(args.role_profiles))
     rendered = []
+
+    if args.surface in ("all", "plugin"):
+        plugin_count = write_agents(
+            profiles,
+            Path(args.plugin_output_dir),
+            "plugin",
+            args.check,
+        )
+        if not args.check:
+            rendered.append(f"{plugin_count} plugin agents to {args.plugin_output_dir}")
 
     if args.surface in ("all", "claude-cli"):
         claude_count = write_agents(

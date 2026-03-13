@@ -3,6 +3,9 @@ name: Pre-Release Validation
 on:
   pull_request:
     paths:
+      - "plugin.json"
+      - ".claude-plugin/**"
+      - "agents/**"
       - "skills/**"
       - ".claude/agents/**"
       - ".github/agents/**"

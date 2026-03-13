@@ -9,25 +9,30 @@ generated skill or stops with a clear trust report explaining why it will not.
 ## Installation
 
 ```bash
-git clone https://github.com/williamhallatt/cogworks.git
-bash cogworks/scripts/install-cogworks.sh --agent claude-code --project /path/to/your/project
+# GitHub Copilot CLI
+copilot plugin install williamhallatt/cogworks
+
+# Claude Code
+/plugin marketplace add williamhallatt/cogworks
+/plugin install cogworks@williamhallatt
 ```
 
-Requires Node.js 18+ and Python 3. See [INSTALL.md](INSTALL.md) for supported
-agent targets, Copilot bootstrap details, and manual installation options.
+Requires the target agent CLI. See [INSTALL.md](INSTALL.md) for the direct repo
+install flow, Claude marketplace-source step, and bootstrap fallback.
 
 ## Quick Start
 
 Start your agent in your project directory and invoke the `cogworks` skill in
 your agent's native style.
 
-> **Note:** Skill prefixes are agent-specific. Examples use `/` for Claude Code.
-> Other agents may use a different prefix or natural-language invocation style.
+> **Note:** Skill prefixes are agent-specific. With the Claude plugin install
+> path, the explicit slash form is `/cogworks:cogworks`. Other agents may use a
+> different prefix or natural-language invocation style.
 
 ```text
-/cogworks Turn these API docs into a deployable agent skill for handling webhook retries.
-/cogworks Build a skill from `_sources/auth/` that teaches correct OAuth callback handling.
-/cogworks Use these sources to create a skill named `incident-triage-playbook`.
+/cogworks:cogworks Turn these API docs into a deployable agent skill for handling webhook retries.
+/cogworks:cogworks Build a skill from `_sources/auth/` that teaches correct OAuth callback handling.
+/cogworks:cogworks Use these sources to create a skill named `incident-triage-playbook`.
 ```
 
 `cogworks` will:
@@ -93,9 +98,10 @@ Sub-agents are implementation machinery, not a public interface. They are used
 to keep the coordinator context small and to give source intake, synthesis,
 packaging, and validation explicit ownership.
 
-The recommended install path is therefore native-first: bootstrap the three
-skills plus the surface-native agent files together. `npx skills add` remains a
-manual skill-only path, not the full product install.
+The recommended install path is therefore plugin-first: install directly from
+the `cogworks` repo so the three skills and native agent files arrive together.
+The bootstrap installer remains a maintainer fallback, and `npx skills add`
+remains a manual skill-only path rather than the full product install.
 
 ## Supporting Skills
 

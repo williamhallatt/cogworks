@@ -36,15 +36,16 @@ available as expert surfaces, but they are not the normal end-user entry point.
 
 ## Quick Start
 
-> **Note:** Skill prefixes are agent-specific. Examples use `/` for Claude Code.
-> Other agents may use a different prefix or natural-language invocation style.
+> **Note:** Skill prefixes are agent-specific. With the Claude plugin install
+> path, the explicit slash form is `/cogworks:cogworks`. Other agents may use a
+> different prefix or natural-language invocation style.
 
 Start your agent in your project directory and invoke `cogworks` naturally:
 
 ```text
-/cogworks Turn these docs into a skill for handling API authentication errors.
-/cogworks Build a skill from `_sources/oncall/` for triaging incident alerts.
-/cogworks Use these sources to create a skill named `release-readiness-review`.
+/cogworks:cogworks Turn these docs into a skill for handling API authentication errors.
+/cogworks:cogworks Build a skill from `_sources/oncall/` for triaging incident alerts.
+/cogworks:cogworks Use these sources to create a skill named `release-readiness-review`.
 ```
 
 Cogworks will:
@@ -115,9 +116,10 @@ Claude Code and GitHub Copilot may use specialist sub-agents internally for:
 Those are implementation details used to improve quality and context isolation.
 They are not a user-facing mode switch.
 
-The recommended install path is native-first: bootstrap the three skills and
-the matching native agent files together. `npx skills add` remains a manual
-skill-only path, not the full product install.
+The recommended install path is plugin-first from the main `cogworks` repo so
+the three skills and matching native agent files arrive together. The bootstrap
+installer remains a maintainer fallback, and `npx skills add` remains a manual
+skill-only path rather than the full product install.
 
 If you are using Codex, treat generated-skill portability and benchmark support
 as separate from this internal build path.
@@ -137,8 +139,9 @@ Maintainer-only references:
 
 ## Reinstalling or Updating
 
-See the `skills` CLI documentation:
+Preferred:
 
 ```bash
-npx skills --help
+copilot plugin install williamhallatt/cogworks
+/plugin install cogworks@williamhallatt
 ```

@@ -50,6 +50,7 @@ When changing docs, keep the public support matrix consistent:
 PR checklist:
 
 - [ ] Changes to `skills/**`, `.claude/**`, or `.agents/**` pass Layer 1 deterministic checks (`bash scripts/validate-quality-gates.sh`)
+- [ ] Plugin packaging stays valid across `plugin.json`, `.claude-plugin/plugin.json`, and `.claude-plugin/marketplace.json`
 - [ ] Changes to native agent wiring keep both `.claude/agents/**` and `.github/agents/**` renderable from `scripts/render-agentic-role-bindings.py`
 - [ ] Shell scripts pass shellcheck
 - [ ] README.md, INSTALL.md, and other affected user-facing docs are updated if public behavior or support boundaries changed
@@ -63,8 +64,9 @@ PR checklist:
 
 Releases use **semantic versioning** with git tags: `v{major}.{minor}.{patch}`
 
-Git tags are the sole source of truth for version numbers. The repo checkout and
-bootstrap installer are the canonical product install path.
+Git tags are the sole source of truth for version numbers. The canonical
+product install path is plugin-first from the main repo; the bootstrap
+installer is the maintainer fallback.
 
 ### Step 1: Validate
 
@@ -74,7 +76,7 @@ for skill in skills/*/; do
   [ ! -f "$skill/SKILL.md" ] && echo "Missing: $skill/SKILL.md"
 done
 
-# Verify native agent renderings are current
+# Verify plugin and native agent renderings are current
 python3 scripts/render-agentic-role-bindings.py --check
 
 # Run tests
@@ -93,20 +95,23 @@ git push origin v1.0.0
 Pushing a tag triggers `.github/workflows/release.yml`, which:
 
 1. Validates all skills have SKILL.md with valid frontmatter
-2. Validates native agent renderings are current
+2. Validates plugin and native agent renderings are current
 3. Generates a changelog from commits
 4. Creates a GitHub Release with installation instructions
 
 ### What gets released
 
-The release contains the canonical skill sources plus the generated native agent
-bindings and bootstrap installer.
+The release contains the canonical skill sources, plugin manifests, generated
+plugin/native agent bindings, and the bootstrap fallback installer.
 
 ```
 skills/
 ├── cogworks/                    # Orchestrator
 ├── cogworks-encode/             # Synthesis methodology
 ├── cogworks-learn/              # Skill writing expertise
+agents/                          # Plugin-shipped native agents
+plugin.json                      # Copilot plugin manifest
+.claude-plugin/                  # Claude plugin manifest + marketplace source
 scripts/install-cogworks.sh      # Native-first bootstrap installer
 .claude/agents/                  # Rendered Claude native agents
 .github/agents/                  # Rendered Copilot native agents
@@ -116,7 +121,7 @@ scripts/install-cogworks.sh      # Native-first bootstrap installer
 
 - [ ] All commits pushed to `main`
 - [ ] All `skills/*/SKILL.md` files exist with valid frontmatter
-- [ ] `.claude/agents/` and `.github/agents/` are current
+- [ ] `agents/`, `.claude/agents/`, and `.github/agents/` are current
 - [ ] Tests pass: `bash tests/run-black-box-tests.sh`
 - [ ] README.md and INSTALL.md are up to date
 
@@ -132,7 +137,7 @@ for skill in skills/*/; do
 done
 ```
 
-**Rendered native agents out of date**
+**Rendered plugin/native agents out of date**
 
 ```bash
 python3 scripts/render-agentic-role-bindings.py --check
