@@ -74,18 +74,6 @@ bash scripts/install-cogworks.sh --agent claude-code --project /path/to/project 
 The bootstrap installer writes repo-local skills and native agent files into a
 target project directory.
 
-## Manual Skill-Only Install
-
-Use this only when you deliberately want the three skills without the full
-native-first product install:
-
-```bash
-npx skills add williamhallatt/cogworks --skill cogworks-encode --skill cogworks-learn
-npx skills add williamhallatt/cogworks -a claude-code
-```
-
-This can make the skill directories available, but it does not provision the
-native sub-agents that the highest-quality `cogworks` flow depends on.
 
 ## Verify Installation
 

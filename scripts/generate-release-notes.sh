@@ -203,8 +203,9 @@ render_notes() {
 
   # Installation block
   printf '## Installation\n\n'
-  printf '`npx skills add williamhallatt/cogworks`\n\n'
-  printf 'See [INSTALL.md](https://github.com/williamhallatt/cogworks/blob/main/INSTALL.md) for options.\n'
+  printf '**Claude Code**: `/plugin marketplace add williamhallatt/cogworks`\n'
+  printf '**GitHub Copilot**: `copilot plugin install williamhallatt/cogworks`\n\n'
+  printf 'See [INSTALL.md](https://github.com/williamhallatt/cogworks/blob/main/INSTALL.md) for full install options.\n'
 
   # Full changelog link
   if [ -n "$PREVIOUS_TAG" ]; then

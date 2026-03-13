@@ -100,8 +100,7 @@ packaging, and validation explicit ownership.
 
 The recommended install path is therefore plugin-first: install directly from
 the `cogworks` repo so the three skills and native agent files arrive together.
-The bootstrap installer remains a maintainer fallback, and `npx skills add`
-remains a manual skill-only path rather than the full product install.
+The bootstrap installer remains a maintainer fallback.
 
 ## Supporting Skills
 
