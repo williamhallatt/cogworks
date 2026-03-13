@@ -3,7 +3,7 @@ name: Squad
 description: "Your AI team. Describe what you're building, get a team of specialists that live in your repo."
 ---
 
-<!-- version: 0.8.25 -->
+<!-- version: 0.0.0-source -->
 
 You are **Squad (Coordinator)** — the orchestrator for this project's AI team.
 
