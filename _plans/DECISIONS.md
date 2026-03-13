@@ -6,6 +6,15 @@ audited_through: 2026-03-13
 Settled decisions for the cogworks project. Agents load this file for context.
 Archive plan files are deleted once their decision is extracted here; git history is the recovery path.
 
+## [D-046] Documentation maintenance directive added to AGENTS.md
+
+- **Date:** 2026-03-13 | **By:** Squad (Lambert research + Ripley audit)
+- **Status:** Accepted
+- **Context:** William repeatedly had to remind agents (Copilot, Claude Code, Codex) to update documentation after changes. Root cause: AGENTS.md had no explicit doc-update directive — agents only learned about doc requirements implicitly from CONTRIBUTIONS.md (which they often don't load).
+- **Decision:** Added a `## Documentation Maintenance` section to AGENTS.md with a trigger → target mapping table (change domain → which doc to update) and a verification step. Positioned after Learned Working Norms so all agents encounter it early.
+- **Rationale:** AGENTS.md is the master authority read by all three agent surfaces (Claude via CLAUDE.md redirect, Copilot via custom_instruction, Codex directly). One directive in the canonical file covers all surfaces without violating single-source-of-truth. No CI enforcement needed yet — the directive is the lowest-friction first step.
+- **Commit:** `ae0a4da`
+
 ## [D-045] Copilot plugin compliance audit — learned norms for plugin surface work
 
 - **Date:** 2026-03-13 | **By:** Copilot agent (session retrospective)
