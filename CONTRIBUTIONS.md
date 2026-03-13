@@ -50,9 +50,9 @@ When changing docs, keep the public support matrix consistent:
 PR checklist:
 
 - [ ] Changes to `skills/**`, `.claude/**`, or `.agents/**` pass Layer 1 deterministic checks (`bash scripts/validate-quality-gates.sh`)
-- [ ] Plugin packaging stays valid across `plugin.json`, `.claude-plugin/plugin.json`, and `.claude-plugin/marketplace.json`
-- [ ] `plugin-skills/**` stays renderable from `scripts/render-plugin-skills.py`
-- [ ] Changes to native agent wiring keep both `.claude/agents/**` and `.github/agents/**` renderable from `scripts/render-agentic-role-bindings.py`
+- [ ] Plugin packaging stays valid across `plugin.json`, `plugin/.claude-plugin/plugin.json`, and `.claude-plugin/marketplace.json`
+- [ ] `plugin/skills/**` stays renderable from `scripts/render-plugin-skills.py`
+- [ ] Changes to native agent wiring keep `.claude/agents/**`, `.github/agents/**`, and `plugin/agents/**` renderable from `scripts/render-agentic-role-bindings.py`
 - [ ] Shell scripts pass shellcheck
 - [ ] README.md, INSTALL.md, and other affected user-facing docs are updated if public behavior or support boundaries changed
 - [ ] Public docs do not imply unsupported surface parity, especially around Codex versus the internal trust-first build flow
@@ -111,10 +111,13 @@ skills/
 ├── cogworks/                    # Orchestrator
 ├── cogworks-encode/             # Synthesis methodology
 ├── cogworks-learn/              # Skill writing expertise
-agents/                          # Plugin-shipped native agents
-plugin-skills/                   # Plugin-shipped skill directories
+agents/                          # Plugin-shipped native agents (Copilot format)
+plugin/                          # Claude Code plugin package
+├── .claude-plugin/              #   Claude plugin manifest
+├── skills/                      #   Plugin-shipped skill directories
+└── agents/                      #   Plugin-shipped agent files (Claude Code format)
 plugin.json                      # Copilot plugin manifest
-.claude-plugin/                  # Claude plugin manifest + marketplace source
+.claude-plugin/marketplace.json  # Claude marketplace-source catalog
 scripts/install-cogworks.sh      # Native-first bootstrap installer
 .claude/agents/                  # Rendered Claude native agents
 .github/agents/                  # Rendered Copilot native agents
@@ -124,7 +127,7 @@ scripts/install-cogworks.sh      # Native-first bootstrap installer
 
 - [ ] All commits pushed to `main`
 - [ ] All `skills/*/SKILL.md` files exist with valid frontmatter
-- [ ] `plugin-skills/`, `agents/`, `.claude/agents/`, and `.github/agents/` are current
+- [ ] `plugin/skills/`, `plugin/agents/`, `agents/`, `.claude/agents/`, and `.github/agents/` are current
 - [ ] Tests pass: `bash tests/run-black-box-tests.sh`
 - [ ] README.md and INSTALL.md are up to date
 

@@ -53,10 +53,11 @@ copilot plugin install williamhallatt/cogworks
 
 Packaging surfaces in this repo:
 - `plugin.json`: Copilot plugin manifest
-- `.claude-plugin/plugin.json`: Claude plugin manifest
+- `plugin/.claude-plugin/plugin.json`: Claude plugin manifest
 - `.claude-plugin/marketplace.json`: Claude marketplace-source catalog
-- `skills/`: shipped skills
-- `agents/`: shipped plugin agent files
+- `plugin/skills/`: shipped skill directories (Claude Code plugin)
+- `plugin/agents/`: shipped agent files (Claude Code plugin)
+- `agents/`: shipped agent files (Copilot plugin)
 
 ## Bootstrap Fallback
 
@@ -90,8 +91,9 @@ native sub-agents that the highest-quality `cogworks` flow depends on.
 ```bash
 # Plugin package surfaces in this repo
 ls plugin.json
-ls .claude-plugin/plugin.json
+ls plugin/.claude-plugin/plugin.json
 ls agents/cogworks-intake-analyst.agent.md
+ls plugin/agents/cogworks-intake-analyst.md
 
 # Bootstrap fallback outputs
 ls /path/to/your/project/.claude/agents/cogworks-intake-analyst.md
