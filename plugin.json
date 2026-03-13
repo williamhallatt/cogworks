@@ -12,5 +12,5 @@
   "license": "MIT",
   "keywords": ["agents", "skills", "subagents", "copilot", "claude"],
   "agents": "agents/",
-  "skills": "plugin-skills/"
+  "skills": "plugin/skills/"
 }

@@ -19,6 +19,7 @@ DEFAULT_ROLE_PROFILES = ROOT_DIR / "skills" / "cogworks" / "role-profiles.json"
 DEFAULT_PLUGIN_OUTPUT_DIR = ROOT_DIR / "agents"
 DEFAULT_CLAUDE_OUTPUT_DIR = ROOT_DIR / ".claude" / "agents"
 DEFAULT_COPILOT_OUTPUT_DIR = ROOT_DIR / ".github" / "agents"
+DEFAULT_CLAUDE_PLUGIN_OUTPUT_DIR = ROOT_DIR / "plugin" / "agents"
 
 SUMMARY_CONTRACT = """Stage: <stage-name>
 Status: pass | fail
@@ -78,7 +79,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--surface",
-        choices=("all", "plugin", "claude-cli", "copilot-cli"),
+        choices=("all", "plugin", "claude-cli", "copilot-cli", "claude-plugin"),
         default="all",
         help="Which surface bindings to render",
     )
@@ -96,6 +97,11 @@ def parse_args() -> argparse.Namespace:
         "--copilot-output-dir",
         default=str(DEFAULT_COPILOT_OUTPUT_DIR),
         help="Directory where Copilot agent files will be written",
+    )
+    parser.add_argument(
+        "--claude-plugin-output-dir",
+        default=str(DEFAULT_CLAUDE_PLUGIN_OUTPUT_DIR),
+        help="Directory where Claude Code plugin agent files will be written",
     )
     parser.add_argument(
         "--check",
@@ -249,6 +255,9 @@ def write_agents(
         elif surface == "claude-cli":
             target_path = output_dir / claude_agent_filename(str(profile["profile_id"]))
             rendered = render_claude_agent_markdown(profile)
+        elif surface == "claude-plugin":
+            target_path = output_dir / claude_agent_filename(str(profile["profile_id"]))
+            rendered = render_claude_agent_markdown(profile)
         else:
             target_path = output_dir / copilot_agent_filename(str(profile["profile_id"]))
             rendered = render_copilot_agent_markdown(profile)
@@ -299,6 +308,16 @@ def main() -> None:
         )
         if not args.check:
             rendered.append(f"{copilot_count} Copilot agents to {args.copilot_output_dir}")
+
+    if args.surface in ("all", "claude-plugin"):
+        claude_plugin_count = write_agents(
+            profiles,
+            Path(args.claude_plugin_output_dir),
+            "claude-plugin",
+            args.check,
+        )
+        if not args.check:
+            rendered.append(f"{claude_plugin_count} Claude plugin agents to {args.claude_plugin_output_dir}")
 
     if not args.check:
         print("Rendered " + " and ".join(rendered))

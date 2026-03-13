@@ -69,7 +69,6 @@ METADATA_FILES=(
 
 PLUGIN_MANIFEST_FILES=(
     "plugin.json"
-    ".claude-plugin/plugin.json"
     ".claude-plugin/marketplace.json"
 )
 
@@ -98,7 +97,7 @@ if [ "$DRY_RUN" -eq 1 ]; then
     for f in "${METADATA_FILES[@]}" "${PLUGIN_MANIFEST_FILES[@]}" "${SKILL_FILES[@]}"; do
         echo "  git add $f"
     done
-    echo "  git add plugin-skills/"
+    echo "  git add plugin/skills/"
     echo ""
     echo "DRY RUN: Would commit:"
     echo "  git commit -m \"chore/ bump skill metadata to $NEW_VERSION\""
@@ -164,7 +163,7 @@ PY
 
     python3 scripts/render-plugin-skills.py
 
-    git add "${METADATA_FILES[@]}" "${PLUGIN_MANIFEST_FILES[@]}" "${SKILL_FILES[@]}" plugin-skills
+    git add "${METADATA_FILES[@]}" "${PLUGIN_MANIFEST_FILES[@]}" "${SKILL_FILES[@]}" plugin/skills
     git commit -m "chore/ bump skill metadata to $NEW_VERSION"
 
     git tag -a "$NEW_VERSION" -m "$RELEASE_MSG"

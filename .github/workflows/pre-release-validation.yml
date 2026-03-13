@@ -6,7 +6,7 @@ on:
       - "plugin.json"
       - ".claude-plugin/**"
       - "agents/**"
-      - "plugin-skills/**"
+      - "plugin/**"
       - "skills/**"
       - ".claude/agents/**"
       - ".github/agents/**"

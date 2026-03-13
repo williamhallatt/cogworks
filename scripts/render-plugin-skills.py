@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SOURCE_SKILLS_DIR = ROOT_DIR / "skills"
-DEFAULT_OUTPUT_DIR = ROOT_DIR / "plugin-skills"
+DEFAULT_OUTPUT_DIR = ROOT_DIR / "plugin" / "skills"
 
 COGWORKS_ALLOWED_FILES = {
     "SKILL.md",

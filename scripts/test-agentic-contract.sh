@@ -62,15 +62,21 @@ require_file "skills/cogworks/role-profiles.json"
 require_file "skills/cogworks-encode/SKILL.md"
 require_file "skills/cogworks-learn/SKILL.md"
 require_file "plugin.json"
-require_file ".claude-plugin/plugin.json"
 require_file ".claude-plugin/marketplace.json"
-require_dir "plugin-skills"
+require_dir "plugin"
+require_file "plugin/.claude-plugin/plugin.json"
+require_dir "plugin/skills"
 require_file "README.md"
 require_file "INSTALL.md"
 require_file "TESTING.md"
 require_file "tests/agentic-smoke/README.md"
 require_dir "tests/agentic-smoke/fixtures/api-auth-smoke"
 require_dir "agents"
+require_dir "plugin/agents"
+require_file "plugin/agents/cogworks-intake-analyst.md"
+require_file "plugin/agents/cogworks-synthesizer.md"
+require_file "plugin/agents/cogworks-composer.md"
+require_file "plugin/agents/cogworks-validator.md"
 require_file "scripts/render-plugin-skills.py"
 require_file "scripts/render-agentic-role-bindings.py"
 require_file "scripts/install-cogworks.sh"
@@ -83,13 +89,13 @@ require_file "agents/cogworks-intake-analyst.agent.md"
 require_file "agents/cogworks-synthesizer.agent.md"
 require_file "agents/cogworks-composer.agent.md"
 require_file "agents/cogworks-validator.agent.md"
-require_file "plugin-skills/cogworks/SKILL.md"
-require_file "plugin-skills/cogworks/README.md"
-require_file "plugin-skills/cogworks/reference.md"
-require_file "plugin-skills/cogworks/metadata.json"
-require_file "plugin-skills/cogworks/agents/openai.yaml"
-require_file "plugin-skills/cogworks-encode/SKILL.md"
-require_file "plugin-skills/cogworks-learn/SKILL.md"
+require_file "plugin/skills/cogworks/SKILL.md"
+require_file "plugin/skills/cogworks/README.md"
+require_file "plugin/skills/cogworks/reference.md"
+require_file "plugin/skills/cogworks/metadata.json"
+require_file "plugin/skills/cogworks/agents/openai.yaml"
+require_file "plugin/skills/cogworks-encode/SKILL.md"
+require_file "plugin/skills/cogworks-learn/SKILL.md"
 require_file ".claude/agents/cogworks-intake-analyst.md"
 require_file ".claude/agents/cogworks-synthesizer.md"
 require_file ".claude/agents/cogworks-composer.md"
@@ -185,7 +191,7 @@ else
   fail 'role-profiles.json is missing required canonical role bindings'
 fi
 
-if python3 - <<'PY' "$ROOT_DIR/plugin.json" "$ROOT_DIR/.claude-plugin/plugin.json" "$ROOT_DIR/.claude-plugin/marketplace.json"
+if python3 - <<'PY' "$ROOT_DIR/plugin.json" "$ROOT_DIR/plugin/.claude-plugin/plugin.json" "$ROOT_DIR/.claude-plugin/marketplace.json"
 import json
 import sys
 from pathlib import Path
@@ -201,13 +207,13 @@ marketplace = json.loads(marketplace_path.read_text(encoding="utf-8"))
 assert plugin["name"] == "cogworks"
 assert plugin["version"] == "4.1.0"
 assert plugin["agents"] == "agents/"
-assert plugin["skills"] == "plugin-skills/"
+assert plugin["skills"] == "plugin/skills/"
 assert claude_plugin["name"] == "cogworks"
-assert claude_plugin["version"] == "4.1.0"
-assert claude_plugin["skills"] == "plugin-skills/"
+assert "version" not in claude_plugin
+assert "skills" not in claude_plugin
 assert marketplace["name"] == "williamhallatt"
 assert marketplace["plugins"][0]["name"] == "cogworks"
-assert marketplace["plugins"][0]["source"] == "./"
+assert marketplace["plugins"][0]["source"] == "./plugin/"
 assert marketplace["plugins"][0]["version"] == "4.1.0"
 PY
 then
@@ -217,10 +223,10 @@ else
 fi
 
 for forbidden_path in \
-  "plugin-skills/cogworks/agentic-runtime.md" \
-  "plugin-skills/cogworks/claude-adapter.md" \
-  "plugin-skills/cogworks/copilot-adapter.md" \
-  "plugin-skills/cogworks/role-profiles.json"
+  "plugin/skills/cogworks/agentic-runtime.md" \
+  "plugin/skills/cogworks/claude-adapter.md" \
+  "plugin/skills/cogworks/copilot-adapter.md" \
+  "plugin/skills/cogworks/role-profiles.json"
 do
   if [[ -e "$ROOT_DIR/$forbidden_path" ]]; then
     fail "$forbidden_path should not be shipped in plugin-skills"
@@ -229,13 +235,13 @@ do
   fi
 done
 
-forbid_pattern "plugin-skills/cogworks/SKILL.md" 'agentic-runtime.md' 'plugin cogworks SKILL omits maintainer-only runtime doc reference'
-forbid_pattern "plugin-skills/cogworks/SKILL.md" 'claude-adapter.md' 'plugin cogworks SKILL omits Claude adapter reference'
-forbid_pattern "plugin-skills/cogworks/SKILL.md" 'copilot-adapter.md' 'plugin cogworks SKILL omits Copilot adapter reference'
-forbid_pattern "plugin-skills/cogworks/SKILL.md" 'role-profiles.json' 'plugin cogworks SKILL omits role profile reference'
-forbid_pattern "plugin-skills/cogworks/README.md" 'agentic-runtime.md' 'plugin cogworks README omits maintainer runtime references'
-forbid_pattern "plugin-skills/cogworks/README.md" 'claude-adapter.md' 'plugin cogworks README omits Claude adapter references'
-forbid_pattern "plugin-skills/cogworks/README.md" 'copilot-adapter.md' 'plugin cogworks README omits Copilot adapter references'
+forbid_pattern "plugin/skills/cogworks/SKILL.md" 'agentic-runtime.md' 'plugin cogworks SKILL omits maintainer-only runtime doc reference'
+forbid_pattern "plugin/skills/cogworks/SKILL.md" 'claude-adapter.md' 'plugin cogworks SKILL omits Claude adapter reference'
+forbid_pattern "plugin/skills/cogworks/SKILL.md" 'copilot-adapter.md' 'plugin cogworks SKILL omits Copilot adapter reference'
+forbid_pattern "plugin/skills/cogworks/SKILL.md" 'role-profiles.json' 'plugin cogworks SKILL omits role profile reference'
+forbid_pattern "plugin/skills/cogworks/README.md" 'agentic-runtime.md' 'plugin cogworks README omits maintainer runtime references'
+forbid_pattern "plugin/skills/cogworks/README.md" 'claude-adapter.md' 'plugin cogworks README omits Claude adapter references'
+forbid_pattern "plugin/skills/cogworks/README.md" 'copilot-adapter.md' 'plugin cogworks README omits Copilot adapter references'
 
 if python3 - <<'PY' "$ROOT_DIR"
 import json

@@ -77,15 +77,16 @@ jobs:
           from pathlib import Path
 
           plugin = json.loads(Path("plugin.json").read_text(encoding="utf-8"))
-          claude = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+          claude = json.loads(Path("plugin/.claude-plugin/plugin.json").read_text(encoding="utf-8"))
           marketplace = json.loads(Path(".claude-plugin/marketplace.json").read_text(encoding="utf-8"))
 
           assert plugin["name"] == "cogworks"
           assert plugin["agents"] == "agents/"
-          assert plugin["skills"] == "plugin-skills/"
+          assert plugin["skills"] == "plugin/skills/"
           assert claude["name"] == "cogworks"
-          assert claude["skills"] == "plugin-skills/"
-          assert marketplace["plugins"][0]["source"] == "./"
+          assert "version" not in claude
+          assert "skills" not in claude
+          assert marketplace["plugins"][0]["source"] == "./plugin/"
           PY
 
       - name: Generate changelog
