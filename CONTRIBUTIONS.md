@@ -50,7 +50,7 @@ When changing docs, keep the public support matrix consistent:
 PR checklist:
 
 - [ ] Changes to `skills/**`, `.claude/**`, or `.agents/**` pass Layer 1 deterministic checks (`bash scripts/validate-quality-gates.sh`)
-- [ ] Plugin packaging stays valid across `plugin.json`, `plugin/.claude-plugin/plugin.json`, and `.claude-plugin/marketplace.json`
+- [ ] Plugin packaging stays valid across `plugin.json`, `plugin/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, and `.github/plugin/marketplace.json`
 - [ ] `plugin/skills/**` stays renderable from `scripts/render-plugin-skills.py`
 - [ ] Changes to native agent wiring keep `.claude/agents/**`, `.github/agents/**`, and `plugin/agents/**` renderable from `scripts/render-agentic-role-bindings.py`
 - [ ] Shell scripts pass shellcheck
@@ -65,9 +65,13 @@ PR checklist:
 
 Releases use **semantic versioning** with git tags: `v{major}.{minor}.{patch}`
 
-Git tags are the sole source of truth for version numbers. The canonical
-product install path is plugin-first from the main repo; the bootstrap
-installer is the maintainer fallback.
+`VERSION` is the sole editable source of truth for the repo's release version.
+All live versioned manifests and skill metadata/frontmatter are rendered from
+it. Release tags must exactly match `VERSION`, and release validation deletes a
+pushed `v*` tag if it does not.
+
+The canonical product install path is plugin-first from the main repo; the
+bootstrap installer is the maintainer fallback.
 
 ### Step 1: Validate
 
@@ -78,6 +82,7 @@ for skill in skills/*/; do
 done
 
 # Verify plugin and native agent renderings are current
+python3 scripts/render-release-version-files.py --check
 python3 scripts/render-plugin-skills.py --check
 python3 scripts/render-agentic-role-bindings.py --check
 
@@ -85,11 +90,10 @@ python3 scripts/render-agentic-role-bindings.py --check
 bash tests/run-black-box-tests.sh
 ```
 
-### Step 2: Tag and push
+### Step 2: Bump, tag, and push
 
 ```bash
-git tag -a v1.0.0 -m "Release cogworks v1.0.0"
-git push origin v1.0.0
+./scripts/create-release-tag.sh
 ```
 
 ### Step 3: Automated workflow
@@ -97,9 +101,10 @@ git push origin v1.0.0
 Pushing a tag triggers `.github/workflows/release.yml`, which:
 
 1. Validates all skills have SKILL.md with valid frontmatter
-2. Validates plugin skill and native agent renderings are current
-3. Generates a changelog from commits
-4. Creates a GitHub Release with installation instructions
+2. Rejects and deletes the pushed tag if `VERSION` does not match the tag
+3. Validates rendered release-version files plus plugin/native agent renderings
+4. Generates a changelog from commits
+5. Creates a GitHub Release with installation instructions
 
 ### What gets released
 
@@ -111,12 +116,14 @@ skills/
 ├── cogworks/                    # Orchestrator
 ├── cogworks-encode/             # Synthesis methodology
 ├── cogworks-learn/              # Skill writing expertise
+VERSION                         # Canonical editable release version
 agents/                          # Plugin-shipped native agents (Copilot format)
 plugin/                          # Claude Code plugin package
 ├── .claude-plugin/              #   Claude plugin manifest
 ├── skills/                      #   Plugin-shipped skill directories
 └── agents/                      #   Plugin-shipped agent files (Claude Code format)
 plugin.json                      # Copilot plugin manifest
+.github/plugin/marketplace.json # Copilot marketplace catalog
 .claude-plugin/marketplace.json  # Claude marketplace-source catalog
 scripts/install-cogworks.sh      # Native-first bootstrap installer
 .claude/agents/                  # Rendered Claude native agents
@@ -126,8 +133,10 @@ scripts/install-cogworks.sh      # Native-first bootstrap installer
 ### Release validation checklist
 
 - [ ] All commits pushed to `main`
+- [ ] `VERSION` matches the intended release tag
 - [ ] All `skills/*/SKILL.md` files exist with valid frontmatter
-- [ ] `plugin/skills/`, `plugin/agents/`, `agents/`, `.claude/agents/`, and `.github/agents/` are current
+- [ ] `python3 scripts/render-release-version-files.py --check` passes
+- [ ] `plugin.json`, `.github/plugin/marketplace.json`, `plugin/skills/`, `plugin/agents/`, `agents/`, `.claude/agents/`, and `.github/agents/` are current
 - [ ] Tests pass: `bash tests/run-black-box-tests.sh`
 - [ ] README.md and INSTALL.md are up to date
 
@@ -143,12 +152,16 @@ for skill in skills/*/; do
 done
 ```
 
-**Rendered plugin skill or native agent surfaces out of date**
+**Rendered release, plugin skill, or native agent surfaces out of date**
 
 ```bash
+python3 scripts/render-release-version-files.py --check
 python3 scripts/render-plugin-skills.py --check
 python3 scripts/render-agentic-role-bindings.py --check
 ```
+
+If the first command fails, `VERSION` and the live versioned release surfaces
+are out of sync. Fix that drift before tagging or pushing a release tag.
 
 ### Generating release notes locally
 

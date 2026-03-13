@@ -10,7 +10,13 @@
   "homepage": "https://github.com/williamhallatt/cogworks",
   "repository": "https://github.com/williamhallatt/cogworks",
   "license": "MIT",
-  "keywords": ["agents", "skills", "subagents", "copilot", "claude"],
+  "keywords": [
+    "agents",
+    "skills",
+    "subagents",
+    "copilot",
+    "claude"
+  ],
   "agents": "agents/",
   "skills": "plugin/skills/"
 }

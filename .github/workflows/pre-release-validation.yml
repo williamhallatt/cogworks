@@ -3,6 +3,7 @@ name: Pre-Release Validation
 on:
   pull_request:
     paths:
+      - "VERSION"
       - "plugin.json"
       - ".claude-plugin/**"
       - ".github/plugin/**"
@@ -78,6 +79,10 @@ jobs:
       - name: Validate plugin skill renderings
         run: |
           python3 scripts/render-plugin-skills.py --check
+
+      - name: Validate release version surfaces
+        run: |
+          python3 scripts/render-release-version-files.py --check
 
       - name: Run all test suites
         run: |

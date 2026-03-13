@@ -252,11 +252,16 @@ This verifies that the repository still expresses the current product model:
 - no public engine-selection syntax
 - internal Claude and Copilot sub-agent build docs remain defined
 - canonical role specs still exist
+- `VERSION` exists and remains the editable release-version source
+- live versioned release surfaces still match `VERSION`
+- plugin manifests and both marketplace catalogs remain in sync
+- `render-release-version-files.py --check` remains part of the maintained contract surface
 - deterministic validation still passes for `skills/cogworks`
 - testing docs point to the current maintainer smoke tooling
 
 What this proves:
-- the documented internal contract surfaces still exist and align structurally
+- the documented internal contract surfaces still exist and align structurally,
+  including release-version surface sync
 
 What this does not prove:
 - that a live agent surface can still execute the flow

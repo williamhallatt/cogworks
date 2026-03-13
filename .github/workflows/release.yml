@@ -24,6 +24,28 @@ jobs:
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: Reject mismatched release tag
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          TAG_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          VERSION_FILE=$(python3 scripts/resolve-release-version.py --format bare)
+          if [ "$VERSION_FILE" != "$TAG_VERSION" ]; then
+            echo "ERROR: VERSION=$VERSION_FILE but pushed tag is v$TAG_VERSION"
+            git push --delete origin "$TAG" || true
+            exit 1
+          fi
+
+      - name: Validate release version surfaces
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if ! python3 scripts/render-release-version-files.py --check; then
+            echo "ERROR: committed release version surfaces do not match VERSION"
+            git push --delete origin "$TAG" || true
+            exit 1
+          fi
+
       - name: Validate skill structure
         run: |
           SKILLS_DIR="skills"
@@ -79,14 +101,23 @@ jobs:
           plugin = json.loads(Path("plugin.json").read_text(encoding="utf-8"))
           claude = json.loads(Path("plugin/.claude-plugin/plugin.json").read_text(encoding="utf-8"))
           marketplace = json.loads(Path(".claude-plugin/marketplace.json").read_text(encoding="utf-8"))
+          copilot_marketplace = json.loads(Path(".github/plugin/marketplace.json").read_text(encoding="utf-8"))
+          version_file = Path("VERSION").read_text(encoding="utf-8").strip()
+          version = "${{ steps.version.outputs.version }}"
 
           assert plugin["name"] == "cogworks"
+          assert plugin["version"] == version
+          assert version_file == version
           assert plugin["agents"] == "agents/"
           assert plugin["skills"] == "plugin/skills/"
           assert claude["name"] == "cogworks"
           assert "version" not in claude
           assert "skills" not in claude
           assert marketplace["plugins"][0]["source"] == "./plugin/"
+          assert marketplace["plugins"][0]["version"] == version
+          assert copilot_marketplace["plugins"][0]["source"] == "./"
+          assert copilot_marketplace["metadata"]["version"] == version
+          assert copilot_marketplace["plugins"][0]["version"] == version
           PY
 
       - name: Generate changelog
