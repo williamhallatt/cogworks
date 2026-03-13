@@ -59,6 +59,22 @@
 - **Enforce prompt-engineering quality through `cogworks-learn`** - keep `*-prompt-engineering` skills as canonical references, and apply their doctrine via integrated gates in `cogworks-learn` during generation.
 - **Use one canonical recursive runbook** - for recursive TDD rounds, treat `tests/datasets/recursive-round/README.md` as the source of truth for commands and artifact expectations.
 
+## Documentation Maintenance
+
+When your changes affect behavior, setup, testing, or agent conventions, update the corresponding documentation in the same commit or PR — do not leave it for a separate pass.
+
+| Change domain | Update |
+|---------------|--------|
+| User-facing behavior, product overview, entry points | `README.md` |
+| Installation, setup, packaging surfaces, dependencies | `INSTALL.md` |
+| Test commands, validation procedures, quality gates | `TESTING.md` |
+| Development workflow, PR conventions, release process | `CONTRIBUTIONS.md` |
+| Agent conventions, retrieval contract, project structure | `AGENTS.md` |
+| Skill behavior, invocation, frontmatter | The skill's own `SKILL.md` |
+| New or changed scripts | `AGENTS.md` § Build, Test, and Development Commands |
+
+**Verification:** Before marking work complete, re-read any doc you updated to confirm it is internally consistent and does not reference removed files, renamed commands, or outdated behavior.
+
 ## Project Structure & Module Organization
 - `skills/` at repo root contains all skills — the canonical source discovered by `npx skills add`. Always edit files here directly; never edit rendered copies.
 - `agents/` at repo root contains Copilot-format (`.agent.md`) native agents — the primary native agent surface for Copilot plugin packaging.
@@ -86,7 +102,7 @@
 - `python3 tests/framework/scripts/cogworks-eval.py behavioral scaffold --skill <slug>` scaffolds behavioral test cases for new skills.
 - `bash scripts/run-recursive-round.sh --round-manifest tests/datasets/recursive-round/round-manifest.local.json --mode fast` runs a fast recursive round.
 - `bash scripts/validate-recursive-docs.sh` validates recursive workflow docs consistency.
-- `bash scripts/test-agentic-contract.sh` validates the agentic runtime contract surface (docs, stage graph, adapters, deterministic checks).
+- `bash scripts/test-agentic-contract.sh` validates the agentic runtime contract surface (docs, stage graph, adapters, `VERSION`/release-version surface sync, deterministic checks).
 - `bash scripts/validate-agentic-run.sh --run-root <run-root> --skill-path <skill-path>` validates a completed agentic run's artifacts. See `tests/agentic-smoke/README.md` for the live smoke runbook.
 
 ## Coding Style & Naming Conventions
