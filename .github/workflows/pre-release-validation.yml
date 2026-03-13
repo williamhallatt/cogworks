@@ -5,6 +5,7 @@ on:
     paths:
       - "plugin.json"
       - ".claude-plugin/**"
+      - ".github/plugin/**"
       - "agents/**"
       - "plugin/**"
       - "skills/**"

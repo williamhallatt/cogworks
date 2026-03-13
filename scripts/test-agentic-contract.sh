@@ -63,6 +63,7 @@ require_file "skills/cogworks-encode/SKILL.md"
 require_file "skills/cogworks-learn/SKILL.md"
 require_file "plugin.json"
 require_file ".claude-plugin/marketplace.json"
+require_file ".github/plugin/marketplace.json"
 require_dir "plugin"
 require_file "plugin/.claude-plugin/plugin.json"
 require_dir "plugin/skills"
@@ -191,7 +192,7 @@ else
   fail 'role-profiles.json is missing required canonical role bindings'
 fi
 
-if python3 - <<'PY' "$ROOT_DIR/plugin.json" "$ROOT_DIR/plugin/.claude-plugin/plugin.json" "$ROOT_DIR/.claude-plugin/marketplace.json"
+if python3 - <<'PY' "$ROOT_DIR/plugin.json" "$ROOT_DIR/plugin/.claude-plugin/plugin.json" "$ROOT_DIR/.claude-plugin/marketplace.json" "$ROOT_DIR/.github/plugin/marketplace.json"
 import json
 import sys
 from pathlib import Path
@@ -199,10 +200,12 @@ from pathlib import Path
 plugin_path = Path(sys.argv[1])
 claude_plugin_path = Path(sys.argv[2])
 marketplace_path = Path(sys.argv[3])
+copilot_marketplace_path = Path(sys.argv[4])
 
 plugin = json.loads(plugin_path.read_text(encoding="utf-8"))
 claude_plugin = json.loads(claude_plugin_path.read_text(encoding="utf-8"))
 marketplace = json.loads(marketplace_path.read_text(encoding="utf-8"))
+copilot_marketplace = json.loads(copilot_marketplace_path.read_text(encoding="utf-8"))
 
 assert plugin["name"] == "cogworks"
 assert plugin["version"] == "4.1.0"
@@ -215,11 +218,15 @@ assert marketplace["name"] == "williamhallatt"
 assert marketplace["plugins"][0]["name"] == "cogworks"
 assert marketplace["plugins"][0]["source"] == "./plugin/"
 assert marketplace["plugins"][0]["version"] == "4.1.0"
+assert copilot_marketplace["name"] == "cogworks"
+assert copilot_marketplace["plugins"][0]["name"] == "cogworks"
+assert copilot_marketplace["plugins"][0]["source"] == "./"
+assert copilot_marketplace["plugins"][0]["version"] == "4.1.0"
 PY
 then
-  pass 'plugin manifests and Claude marketplace catalog are structurally valid'
+  pass 'plugin manifests and marketplace catalogs are structurally valid'
 else
-  fail 'plugin manifests or Claude marketplace catalog are invalid'
+  fail 'plugin manifests or marketplace catalogs are invalid'
 fi
 
 for forbidden_path in \
