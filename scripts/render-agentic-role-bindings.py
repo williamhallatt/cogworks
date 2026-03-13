@@ -195,14 +195,11 @@ def build_capabilities(profile: dict) -> list[str]:
 def render_plugin_agent_markdown(profile: dict) -> str:
     description = build_description(profile)
     prompt = build_prompt(profile)
-    capabilities = build_capabilities(profile)
-    capabilities_yaml = "[" + ", ".join(json.dumps(item) for item in capabilities) + "]"
 
     return (
         "---\n"
         f"name: {plugin_agent_filename(str(profile['profile_id'])).removesuffix('.agent.md')}\n"
         f"description: {json.dumps(description)}\n"
-        f"capabilities: {capabilities_yaml}\n"
         "---\n\n"
         f"{prompt}"
     )

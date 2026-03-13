@@ -53,6 +53,7 @@ copilot plugin install williamhallatt/cogworks
 
 Packaging surfaces in this repo:
 - `plugin.json`: Copilot plugin manifest
+- `.github/plugin/marketplace.json`: Copilot marketplace catalog (primary)
 - `plugin/.claude-plugin/plugin.json`: Claude plugin manifest
 - `.claude-plugin/marketplace.json`: Claude marketplace-source catalog
 - `plugin/skills/`: shipped skill directories (Claude Code plugin)

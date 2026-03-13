@@ -1,0 +1,21 @@
+{
+  "name": "cogworks",
+  "owner": {
+    "name": "William Hallatt"
+  },
+  "metadata": {
+    "description": "Trust-first skill generation with native subagents for Claude Code and GitHub Copilot CLI.",
+    "version": "4.1.0"
+  },
+  "plugins": [
+    {
+      "name": "cogworks",
+      "source": "./",
+      "description": "Trust-first skill generation with native subagents for Claude Code and GitHub Copilot CLI.",
+      "version": "4.1.0",
+      "author": {
+        "name": "William Hallatt"
+      }
+    }
+  ]
+}
