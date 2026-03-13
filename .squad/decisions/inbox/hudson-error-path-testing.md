@@ -1,3 +1,8 @@
+> **Triage verdict (2026-03-13):** ACCEPT — MEDIUM PRIORITY  
+> 8 error scenarios well-scoped, ~30 hours total. All 8 currently untested (happy-path only today).  
+> Phase 1 (fixtures) can start immediately. Phase 2 (validators) follows.  
+> No outdated claims. Aligned with D-037 through D-042 specs.
+
 # Error Path Testing Strategy for Agentic Engine
 
 **Date:** 2026-03-07  

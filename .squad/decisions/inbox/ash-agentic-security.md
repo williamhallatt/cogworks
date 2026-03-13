@@ -1,3 +1,9 @@
+> **Triage verdict (2026-03-13):** ACCEPT — HIGH PRIORITY  
+> Phase 1 (documentation formalization) IMMEDIATE, ~4 hours.  
+> Phase 2 (runtime enforcement) depends on Phase 1, ~8 hours.  
+> Phase 3 (validation + CI) depends on Phase 2, ~4 hours.  
+> D-037 reinforces core trust-first principle. No outdated claims.
+
 # Security Hardening Proposal: Agentic Dispatch Security Gap (D2 Extension)
 
 **Prepared by:** Ash (Security Engineer)  

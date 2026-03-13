@@ -5,11 +5,12 @@ domain: "cogworks-pipeline"
 confidence: "high"
 source: "live-run"
 validated_by: "scripts/validate-agentic-run.sh (50/50 checks passed, 2026-03-07)"
+last_reviewed: "2026-03-13"
 ---
 
 ## Context
 
-cogworks v4+ has two execution engines: `legacy` (default) and `agentic` (opt-in via `--engine agentic`). The agentic engine runs a 5-stage pipeline using specialist sub-agents.
+cogworks v4+ uses a trust-first single entry point (`cogworks` skill) that orchestrates a 5-stage pipeline using specialist sub-agents. There is no legacy/agentic engine toggle — the pipeline is the product (D-037).
 
 Squad IS the natural cogworks coordinator on Copilot CLI. This skill encodes how to run and validate an agentic cogworks pipeline from within a Copilot session.
 
@@ -17,14 +18,16 @@ Squad IS the natural cogworks coordinator on Copilot CLI. This skill encodes how
 
 ### Agent Registration
 
-Copilot CLI reads `.claude/agents/` for agent definitions. The four cogworks specialists are registered there and available to Squad's `task` tool:
+The four cogworks specialists are registered as native agent definitions in `agents/` at the repo root. They are rendered to platform-specific locations by `scripts/render-agentic-role-bindings.py`:
 
+- `.claude/agents/` — for Claude Code sessions
+- `.github/agents/` — for Copilot CLI sessions
+
+Specialists available via `task` tool:
 - `cogworks-intake-analyst` — source-intake stage
 - `cogworks-synthesizer` — synthesis stage
 - `cogworks-composer` — skill-packaging stage
 - `cogworks-validator` — deterministic-validation stage
-
-**No `.github/agents/cogworks-*.agent.md` files are needed.** `.claude/agents/` is shared infrastructure for both platforms.
 
 ### Adapter Values (Copilot CLI)
 

@@ -4,8 +4,8 @@
 
 Consolidated decision record for cross-agent coordination and architectural choices.
 
-**Last audited:** 2026-03-05T00:46:55Z
-**Audited by:** Scribe
+**Last audited:** 2026-03-13
+**Audited by:** Scribe (post-deep-dive sync)
 
 ---
 
@@ -214,9 +214,26 @@ Hudson implements evaluation harness per `HARNESS-SPEC.md` (Parker's next delive
 
 ---
 
+## Repo-Level Decisions Affecting Squad Work (D-037 through D-042)
+
+> **Canonical source:** `_plans/DECISIONS.md`. These are cross-references only — do not duplicate full content here.
+
+| Decision | Date | Summary | Squad Impact |
+|----------|------|---------|-------------|
+| **D-037** | 2026-03-06 | Cogworks resets to one trust-first product entry point | Single `cogworks` invocation; encode/learn are internal doctrine. Changes routing and onboarding. |
+| **D-038** | 2026-03-07 | Test surface subtraction removes dead contracts | Test layers renumbered; some inbox proposals may reference stale test surfaces. |
+| **D-039** | 2026-03-07 | Public docs state surface support boundaries explicitly | Platform matrix (Claude ✅, Copilot ✅, Codex portable-only). Affects Lambert's adapter work. |
+| **D-040** | 2026-03-08 | AGENTS.md defines staged retrieval with stop rules | All agents follow retrieval contract. Non-default surfaces not auto-loaded. |
+| **D-041** | 2026-03-08 | Closed plans retained as extracted decisions only | Plans lifecycle is atomic (save → extract → delete). Affects Scribe's archival protocol. |
+| **D-042** | 2026-03-09 | Dispatch manifests record canonical stage scope | Native sub-agents bound via dispatch-manifest.json rendered from role-profiles.json. |
+
+**Last synced:** 2026-03-13
+
+---
+
 ## Pending Proposals (2026-03-08 Fan-Out Session)
 
-> **Status:** These are 6 proposals from comprehensive post-review analysis. Not yet accepted as decisions — pending user review and prioritization. Stored in inbox pending approval. See `.squad/decisions/inbox/` for full documents.
+> **Status:** Triaged 2026-03-13. Verdicts applied to inbox files. 3 ACCEPT, 2 ACCEPT WITH REVISIONS, 1 PARTIALLY SUPERSEDED. See individual files for detailed verdicts.
 
 ---
 

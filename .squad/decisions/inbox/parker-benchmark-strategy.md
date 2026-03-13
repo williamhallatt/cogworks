@@ -1,3 +1,8 @@
+> **Triage verdict (2026-03-13):** ACCEPT — URGENT  
+> Issue 1 (15-case benchmark dataset) is URGENT: gates agentic pivot decision. Harness exists. ~5-7 days.  
+> Issue 2 (behavioral eval reconstruction) MEDIUM PRIORITY: ~8-10 weeks, depends on Issue 1.  
+> No outdated claims. Perfectly aligned with D-037 through D-042.
+
 # Parker's Benchmark Strategy Proposals
 
 **Date:** 2026-03-08

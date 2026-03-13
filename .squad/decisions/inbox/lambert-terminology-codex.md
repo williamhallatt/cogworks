@@ -1,3 +1,7 @@
+> **Triage verdict (2026-03-13):** ACCEPT WITH REVISIONS (PARTIALLY SUPERSEDED)  
+> Issue 1 (terminology glossary) HIGH PRIORITY — still needed. ~4-6 hours.  
+> Issue 2 (Codex adapter) ALREADY DECIDED by D-032 — convert to Scribe documentation cleanup (~30 min).
+
 # Lambert Proposals: Terminology Glossary & Codex Adapter Resolution
 
 **Lambert, Compatibility Engineer**  

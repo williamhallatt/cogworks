@@ -1,15 +1,21 @@
 ---
 name: product-gaps-cogworks
 description: Product gaps in cogworks pipeline identified through agent skills synthesis—what's missing, why it matters, and what done looks like for roadmap prioritization
+last_reviewed: "2026-03-13"
+staleness_note: "Several gaps partially addressed by D-030 through D-042 and new test layers. Status annotations added 2026-03-13."
 ---
 
 # Product Gaps in Cogworks Pipeline
 
 This skill encodes the 10 gaps and 5 priority recommendations from Kane's agent skills synthesis (2026-03-05). Use this for roadmap planning, backlog grooming, and product coherence review.
 
+> **Staleness note (2026-03-13):** Gaps 1, 2, 6, 7, and 9 have been partially addressed by decisions D-030 through D-042 and the expanded testing framework. Status annotations added inline below.
+
 ---
 
 ## Gap 1: No Activation Testing for Generated Skills
+
+> **Status (2026-03-13):** PARTIALLY ADDRESSED. Layer 2 trigger smoke tests validate activation keyword parsing. Layer 5a has 47 behavioral test cases including explicit/implicit/negative activation scenarios. Full CI gate not yet wired.
 
 **What's missing:**
 - Test cases confirming skill triggers when it should
@@ -29,6 +35,8 @@ Skills with excellent content but poor `description` fields may never be discove
 ---
 
 ## Gap 2: No Cross-Agent Compatibility Validation
+
+> **Status (2026-03-13):** PARTIALLY ADDRESSED. D-039 made platform boundaries explicit (Claude ✅, Copilot ✅, Codex portable-only). Copilot adapter exists. Live cross-platform testing still limited.
 
 **What's missing:**
 - Testing of generated skills across Claude Code, GitHub Copilot, Cursor, Codex
@@ -106,6 +114,8 @@ Generated skills for long-running tasks may prematurely terminate as context fil
 
 ## Gap 6: No Evaluation Flywheel Integration
 
+> **Status (2026-03-13):** PARTIALLY ADDRESSED. Recursive round system now exists (`scripts/run-recursive-round.sh`) with manifests, hooks (5 phases), and selection weights. Not yet fully automated CI.
+
 **What's missing:**
 - Skills that self-improve through eval-driven iteration
 - Workflow where generated skills undergo eval → failure analysis → revision → re-eval
@@ -125,6 +135,8 @@ One-shot generation produces skills that fail on real-world edge cases. Eval-dri
 ---
 
 ## Gap 7: Codex-Specific Patterns Not Encoded
+
+> **Status (2026-03-13):** PARTIALLY ADDRESSED. D-032 added Codex benchmark integration via replayable adapter. D-039 classifies Codex as portable-only (no trust-first build path). Full Codex template generation still unimplemented.
 
 **What's missing:**
 - `apply_patch` tool usage patterns (structured diffs for create/update/delete)
@@ -165,6 +177,8 @@ Generated skills with poor caching structure have worse latency/cost profile whe
 ---
 
 ## Gap 9: No Security Injection Scanning for Skill Content
+
+> **Status (2026-03-13):** OPEN — Ash's inbox proposal addresses this. Awaiting user triage.
 
 **What's missing:**
 - Post-generation scan for prompt-override phrases ("ignore prior instructions")

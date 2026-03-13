@@ -1,3 +1,8 @@
+> **Triage verdict (2026-03-13):** ACCEPT WITH REVISIONS  
+> Issue 1 (decision skeleton ownership) already landed in role-profiles.json — document as decided.  
+> Issue 2 (Copilot adapter) HIGH PRIORITY — 4 missing sections needed (~6-8 hours).  
+> Issue 3 (tool consolidation) MEDIUM PRIORITY — deprecate run-agentic-quality-compare.py (~3-4 hours).
+
 # Dallas: Pipeline Solutions for Three Ownership Gaps
 
 **Author:** Dallas (Pipeline Engineer)  

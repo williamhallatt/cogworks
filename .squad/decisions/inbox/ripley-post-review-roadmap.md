@@ -1,3 +1,8 @@
+> **Triage verdict (2026-03-13):** ACCEPT WITH MAJOR REVISIONS  
+> Reposition as implementation roadmap derived from D-037 through D-042, not new proposals.  
+> ~40% already landed (decision skeleton in role-profiles.json, Copilot adapter skeleton, trust concepts).  
+> Items 1, 3, 6 already decided. Consolidate with Dallas, Hudson, Parker proposals.
+
 # Post-Review Implementation Roadmap
 **Author:** Ripley (Lead)  
 **Date:** 2026-03-08  
