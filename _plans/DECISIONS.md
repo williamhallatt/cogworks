@@ -1,10 +1,44 @@
-audited_through: 2026-03-09
+audited_through: 2026-03-13
 ---
 
 # Architectural Decisions
 
 Settled decisions for the cogworks project. Agents load this file for context.
 Archive plan files are deleted once their decision is extracted here; git history is the recovery path.
+
+## [D-045] Copilot plugin compliance audit — learned norms for plugin surface work
+
+- **Date:** 2026-03-13 | **By:** Copilot agent (session retrospective)
+- **Status:** Accepted
+- **Decision:** Five operational lessons from the Copilot plugin compliance audit are captured as norms for future agent work on plugin surfaces:
+  1. **Research before recommending** — when encountering an unfamiliar file format or platform artifact (e.g., `agents/openai.yaml`), search authoritative docs FIRST. File content tells you WHAT it contains, not WHY it exists or WHO uses it.
+  2. **`plugin/` is a shared surface** — `plugin/skills/` and `plugin/agents/` serve both the Copilot CLI plugin (via root `plugin.json`) and the Claude Code plugin (via `plugin/.claude-plugin/plugin.json`). Any change to render scripts or plugin structure must be validated against both consumers.
+  3. **`render-plugin-skills.py` has two copy strategies** — `cogworks` uses `render_cogworks()` (selective copy with content patching); `cogworks-encode` and `cogworks-learn` use `copy_tree()` (verbatim full copy). Changes to one strategy don't affect the other.
+  4. **`agents/openai.yaml` is Codex-specific** — per https://developers.openai.com/codex/skills, this file configures UI metadata, invocation policy, and tool dependencies for OpenAI Codex. Neither Copilot CLI nor Claude Code reads it. Current cogworks use: `policy: allow_implicit_invocation: false`.
+  5. **Question hardcoded string replacements** — the render script uses string replacement to transform SKILL.md content. Hardcoded file references become stale when file layout changes. Flag these for review during any render pipeline modification.
+- **Rationale:** The Copilot plugin compliance audit required three user corrections before converging on correct fixes. These norms prevent repeating the same mistakes.
+- **Scope:** `scripts/render-plugin-skills.py`, `plugin/`, `agents/openai.yaml`, all plugin surface work.
+
+## [D-044] `VERSION` is now the single editable release source, and mismatched pushed tags are auto-rejected
+
+- **Date:** 2026-03-13 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** The repo now uses a single committed `VERSION` file as the only editable release-version source. Live versioned release surfaces (`plugin.json`, `.claude-plugin/marketplace.json`, `.github/plugin/marketplace.json`, and canonical `skills/**` metadata/frontmatter) are rendered from `VERSION` by `scripts/render-release-version-files.py`. `scripts/create-release-tag.sh` now bumps `VERSION`, renders versioned files, re-renders plugin skills, verifies both renderers with `--check`, commits, and then tags. PR validation now runs `scripts/render-release-version-files.py --check`. The tag-push release workflow now rejects and deletes a pushed `v*` tag if the tag does not exactly match `VERSION` or if rendered versioned files are out of date.
+- **Rationale:** Tag-derived validation alone detects drift after the fact, but it still allows maintainers or agents to create and push incorrect release tags. A single editable source plus generated duplicates shrinks the manual sync surface to one file. Auto-rejecting mismatched remote tags makes the release boundary fail closed instead of merely reporting drift.
+- **Operational implication:** Maintainers should edit `VERSION` only through the release script in normal use. Live release surfaces are generated artifacts and should not be hand-edited for version bumps. If any actor pushes a `v*` tag that does not match the committed `VERSION` state, the release workflow will delete the remote tag and fail the release.
+- **Builds on:** D-043 by replacing tag-derived synchronization alone with a stricter single-source render model and remote tag enforcement.
+- **Scope:** `VERSION`, `scripts/resolve-release-version.py`, `scripts/render-release-version-files.py`, `scripts/create-release-tag.sh`, `scripts/test-agentic-contract.sh`, `.github/workflows/pre-release-validation.yml`, `.github/workflows/release.yml`, `CONTRIBUTIONS.md`, `_plans/DECISIONS.md`.
+- **D-025 audit (Scribe, 2026-03-13):** Clean — owned contribution/release docs now describe `VERSION` as the editable source and the fail-closed tag rejection behavior.
+
+## [D-043] Release version validation now resolves from git tags and covers both marketplace catalogs
+
+- **Date:** 2026-03-13 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** `git` release tags remain the canonical cogworks version authority, but repo validation and release bumping are now wired through one repo-owned resolver instead of hard-coded release literals. `scripts/resolve-release-version.py` normalizes an explicit version or the latest `v*` tag. `scripts/test-agentic-contract.sh` now compares versioned manifests against the resolved canonical version rather than hard-coded `4.1.0` assertions. `scripts/create-release-tag.sh` now updates `.github/plugin/marketplace.json` alongside `plugin.json`, `.claude-plugin/marketplace.json`, and the canonical `skills/**` metadata/frontmatter files. `.github/workflows/release.yml` now validates both the Claude and Copilot marketplace catalogs against the pushed tag version.
+- **Rationale:** The previous state mixed two incompatible stories: docs said git tags were the sole source of truth, while several repo surfaces still required manual literal-version edits and one live Copilot marketplace catalog was omitted from the bump script. That made release drift easy and gave maintainers two partially overlapping version authorities. Resolving from tags everywhere keeps the authority model honest and shrinks the manual sync surface.
+- **Operational implication:** Maintainers should treat `plugin/skills/**` as rendered outputs and historical smoke/example artifacts as preserved snapshots, not release metadata. Any future version-bearing live manifest or validator must resolve from the canonical tag-based helper or be generated from a surface that does.
+- **Scope:** `scripts/resolve-release-version.py`, `scripts/create-release-tag.sh`, `scripts/test-agentic-contract.sh`, `.github/workflows/release.yml`, `CONTRIBUTIONS.md`, `_plans/DECISIONS.md`.
+- **D-025 audit (Scribe, 2026-03-13):** Clean — owned release/contribution docs now include the Copilot marketplace catalog in the live packaging surface.
 
 ## [D-042] Dispatch manifests now record canonical stage scope, and release validation requires exact equality
 
