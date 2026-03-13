@@ -66,6 +66,10 @@ jobs:
         run: |
           python3 scripts/render-agentic-role-bindings.py --check
 
+      - name: Validate plugin skill renderings
+        run: |
+          python3 scripts/render-plugin-skills.py --check
+
       - name: Validate plugin manifests
         run: |
           python3 - <<'PY'
@@ -78,8 +82,9 @@ jobs:
 
           assert plugin["name"] == "cogworks"
           assert plugin["agents"] == "agents/"
-          assert plugin["skills"] == "skills/"
+          assert plugin["skills"] == "plugin-skills/"
           assert claude["name"] == "cogworks"
+          assert claude["skills"] == "plugin-skills/"
           assert marketplace["plugins"][0]["source"] == "./"
           PY
 

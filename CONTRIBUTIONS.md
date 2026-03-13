@@ -51,6 +51,7 @@ PR checklist:
 
 - [ ] Changes to `skills/**`, `.claude/**`, or `.agents/**` pass Layer 1 deterministic checks (`bash scripts/validate-quality-gates.sh`)
 - [ ] Plugin packaging stays valid across `plugin.json`, `.claude-plugin/plugin.json`, and `.claude-plugin/marketplace.json`
+- [ ] `plugin-skills/**` stays renderable from `scripts/render-plugin-skills.py`
 - [ ] Changes to native agent wiring keep both `.claude/agents/**` and `.github/agents/**` renderable from `scripts/render-agentic-role-bindings.py`
 - [ ] Shell scripts pass shellcheck
 - [ ] README.md, INSTALL.md, and other affected user-facing docs are updated if public behavior or support boundaries changed
@@ -77,6 +78,7 @@ for skill in skills/*/; do
 done
 
 # Verify plugin and native agent renderings are current
+python3 scripts/render-plugin-skills.py --check
 python3 scripts/render-agentic-role-bindings.py --check
 
 # Run tests
@@ -95,7 +97,7 @@ git push origin v1.0.0
 Pushing a tag triggers `.github/workflows/release.yml`, which:
 
 1. Validates all skills have SKILL.md with valid frontmatter
-2. Validates plugin and native agent renderings are current
+2. Validates plugin skill and native agent renderings are current
 3. Generates a changelog from commits
 4. Creates a GitHub Release with installation instructions
 
@@ -110,6 +112,7 @@ skills/
 ├── cogworks-encode/             # Synthesis methodology
 ├── cogworks-learn/              # Skill writing expertise
 agents/                          # Plugin-shipped native agents
+plugin-skills/                   # Plugin-shipped skill directories
 plugin.json                      # Copilot plugin manifest
 .claude-plugin/                  # Claude plugin manifest + marketplace source
 scripts/install-cogworks.sh      # Native-first bootstrap installer
@@ -121,7 +124,7 @@ scripts/install-cogworks.sh      # Native-first bootstrap installer
 
 - [ ] All commits pushed to `main`
 - [ ] All `skills/*/SKILL.md` files exist with valid frontmatter
-- [ ] `agents/`, `.claude/agents/`, and `.github/agents/` are current
+- [ ] `plugin-skills/`, `agents/`, `.claude/agents/`, and `.github/agents/` are current
 - [ ] Tests pass: `bash tests/run-black-box-tests.sh`
 - [ ] README.md and INSTALL.md are up to date
 
@@ -137,9 +140,10 @@ for skill in skills/*/; do
 done
 ```
 
-**Rendered plugin/native agents out of date**
+**Rendered plugin skill or native agent surfaces out of date**
 
 ```bash
+python3 scripts/render-plugin-skills.py --check
 python3 scripts/render-agentic-role-bindings.py --check
 ```
 

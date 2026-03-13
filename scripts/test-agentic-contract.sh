@@ -64,12 +64,14 @@ require_file "skills/cogworks-learn/SKILL.md"
 require_file "plugin.json"
 require_file ".claude-plugin/plugin.json"
 require_file ".claude-plugin/marketplace.json"
+require_dir "plugin-skills"
 require_file "README.md"
 require_file "INSTALL.md"
 require_file "TESTING.md"
 require_file "tests/agentic-smoke/README.md"
 require_dir "tests/agentic-smoke/fixtures/api-auth-smoke"
 require_dir "agents"
+require_file "scripts/render-plugin-skills.py"
 require_file "scripts/render-agentic-role-bindings.py"
 require_file "scripts/install-cogworks.sh"
 require_file "scripts/render-dispatch-manifest.py"
@@ -81,6 +83,13 @@ require_file "agents/cogworks-intake-analyst.agent.md"
 require_file "agents/cogworks-synthesizer.agent.md"
 require_file "agents/cogworks-composer.agent.md"
 require_file "agents/cogworks-validator.agent.md"
+require_file "plugin-skills/cogworks/SKILL.md"
+require_file "plugin-skills/cogworks/README.md"
+require_file "plugin-skills/cogworks/reference.md"
+require_file "plugin-skills/cogworks/metadata.json"
+require_file "plugin-skills/cogworks/agents/openai.yaml"
+require_file "plugin-skills/cogworks-encode/SKILL.md"
+require_file "plugin-skills/cogworks-learn/SKILL.md"
 require_file ".claude/agents/cogworks-intake-analyst.md"
 require_file ".claude/agents/cogworks-synthesizer.md"
 require_file ".claude/agents/cogworks-composer.md"
@@ -190,12 +199,16 @@ claude_plugin = json.loads(claude_plugin_path.read_text(encoding="utf-8"))
 marketplace = json.loads(marketplace_path.read_text(encoding="utf-8"))
 
 assert plugin["name"] == "cogworks"
+assert plugin["version"] == "4.1.0"
 assert plugin["agents"] == "agents/"
-assert plugin["skills"] == "skills/"
+assert plugin["skills"] == "plugin-skills/"
 assert claude_plugin["name"] == "cogworks"
+assert claude_plugin["version"] == "4.1.0"
+assert claude_plugin["skills"] == "plugin-skills/"
 assert marketplace["name"] == "williamhallatt"
 assert marketplace["plugins"][0]["name"] == "cogworks"
 assert marketplace["plugins"][0]["source"] == "./"
+assert marketplace["plugins"][0]["version"] == "4.1.0"
 PY
 then
   pass 'plugin manifests and Claude marketplace catalog are structurally valid'
@@ -203,10 +216,73 @@ else
   fail 'plugin manifests or Claude marketplace catalog are invalid'
 fi
 
+for forbidden_path in \
+  "plugin-skills/cogworks/agentic-runtime.md" \
+  "plugin-skills/cogworks/claude-adapter.md" \
+  "plugin-skills/cogworks/copilot-adapter.md" \
+  "plugin-skills/cogworks/role-profiles.json"
+do
+  if [[ -e "$ROOT_DIR/$forbidden_path" ]]; then
+    fail "$forbidden_path should not be shipped in plugin-skills"
+  else
+    pass "$forbidden_path excluded from plugin-skills"
+  fi
+done
+
+forbid_pattern "plugin-skills/cogworks/SKILL.md" 'agentic-runtime.md' 'plugin cogworks SKILL omits maintainer-only runtime doc reference'
+forbid_pattern "plugin-skills/cogworks/SKILL.md" 'claude-adapter.md' 'plugin cogworks SKILL omits Claude adapter reference'
+forbid_pattern "plugin-skills/cogworks/SKILL.md" 'copilot-adapter.md' 'plugin cogworks SKILL omits Copilot adapter reference'
+forbid_pattern "plugin-skills/cogworks/SKILL.md" 'role-profiles.json' 'plugin cogworks SKILL omits role profile reference'
+forbid_pattern "plugin-skills/cogworks/README.md" 'agentic-runtime.md' 'plugin cogworks README omits maintainer runtime references'
+forbid_pattern "plugin-skills/cogworks/README.md" 'claude-adapter.md' 'plugin cogworks README omits Claude adapter references'
+forbid_pattern "plugin-skills/cogworks/README.md" 'copilot-adapter.md' 'plugin cogworks README omits Copilot adapter references'
+
+if python3 - <<'PY' "$ROOT_DIR"
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+expected = subprocess.check_output(
+    ["git", "tag", "--sort=-version:refname"],
+    cwd=root,
+    text=True,
+).splitlines()[0].strip().removeprefix("v")
+
+skill_dirs = [
+    root / "skills" / "cogworks",
+    root / "skills" / "cogworks-encode",
+    root / "skills" / "cogworks-learn",
+]
+
+for skill_dir in skill_dirs:
+    metadata = json.loads((skill_dir / "metadata.json").read_text(encoding="utf-8"))
+    assert metadata["version"] == expected
+    assert metadata["cogworks_version"] == expected
+
+    skill_text = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
+    match = re.search(r"^metadata:\n(?:.*\n)*?  version:\s*([^\n]+)", skill_text, re.MULTILINE)
+    assert match is not None
+    assert match.group(1).strip() == expected
+PY
+then
+  pass 'shipped skill metadata and frontmatter versions match latest release tag'
+else
+  fail 'shipped skill metadata/frontmatter versions do not match latest release tag'
+fi
+
 if python3 "$ROOT_DIR/scripts/render-agentic-role-bindings.py" --check >/dev/null 2>&1; then
   pass 'render-agentic-role-bindings.py is in sync with committed plugin, Claude, and Copilot agent files'
 else
   fail 'render-agentic-role-bindings.py output differs from committed plugin/native agent files'
+fi
+
+if python3 "$ROOT_DIR/scripts/render-plugin-skills.py" --check >/dev/null 2>&1; then
+  pass 'render-plugin-skills.py is in sync with committed plugin skill files'
+else
+  fail 'render-plugin-skills.py output differs from committed plugin skill files'
 fi
 
 DET_EXIT=0

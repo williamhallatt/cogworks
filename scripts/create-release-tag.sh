@@ -14,8 +14,8 @@ if [ "$DRY_RUN" -eq 1 ]; then
     echo ""
 fi
 
-# Get the latest tag
-LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
+# Get the latest repo tag by version, not just the nearest reachable tag
+LATEST_TAG=$(git tag --sort=-version:refname | head -n1)
 
 if [ -z "$LATEST_TAG" ]; then
     echo "No tags found. Starting from v0.0.0"
@@ -67,6 +67,12 @@ METADATA_FILES=(
     "skills/cogworks-learn/metadata.json"
 )
 
+PLUGIN_MANIFEST_FILES=(
+    "plugin.json"
+    ".claude-plugin/plugin.json"
+    ".claude-plugin/marketplace.json"
+)
+
 SKILL_FILES=(
     "skills/cogworks/SKILL.md"
     "skills/cogworks-encode/SKILL.md"
@@ -78,16 +84,21 @@ if [ "$DRY_RUN" -eq 1 ]; then
     echo ""
     echo "DRY RUN: Would execute the following version bump commands:"
     for f in "${METADATA_FILES[@]}"; do
-        echo "  sed -i 's/\"version\": \"[0-9.]*\"/\"version\": \"$BARE_VERSION\"/' $f"
+        echo "  update metadata.json version and cogworks_version to $BARE_VERSION in $f"
+    done
+    for f in "${PLUGIN_MANIFEST_FILES[@]}"; do
+        echo "  update plugin manifest version to $BARE_VERSION in $f"
     done
     for f in "${SKILL_FILES[@]}"; do
-        echo "  sed -i \"1,/^---\$/!b; /version: v/s/version: v[0-9.]*/version: $NEW_VERSION/\" $f"
+        echo "  update frontmatter metadata.version to $BARE_VERSION in $f"
     done
+    echo "  render plugin-facing skills with scripts/render-plugin-skills.py"
     echo ""
     echo "DRY RUN: Would stage:"
-    for f in "${METADATA_FILES[@]}" "${SKILL_FILES[@]}"; do
+    for f in "${METADATA_FILES[@]}" "${PLUGIN_MANIFEST_FILES[@]}" "${SKILL_FILES[@]}"; do
         echo "  git add $f"
     done
+    echo "  git add plugin-skills/"
     echo ""
     echo "DRY RUN: Would commit:"
     echo "  git commit -m \"chore/ bump skill metadata to $NEW_VERSION\""
@@ -105,13 +116,55 @@ if [ "$DRY_RUN" -eq 1 ]; then
     echo ""
 else
     for f in "${METADATA_FILES[@]}"; do
-        sed -i "s/\"version\": \"[0-9.]*\"/\"version\": \"$BARE_VERSION\"/" "$f"
+        python3 - <<'PY' "$f" "$BARE_VERSION"
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+version = sys.argv[2]
+data = json.loads(path.read_text(encoding="utf-8"))
+data["version"] = version
+data["cogworks_version"] = version
+path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+PY
     done
     for f in "${SKILL_FILES[@]}"; do
-        sed -i "1,/^---$/!b; /version: v/s/version: v[0-9.]*/version: $NEW_VERSION/" "$f"
+        python3 - <<'PY' "$f" "$BARE_VERSION"
+import re
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+version = sys.argv[2]
+text = path.read_text(encoding="utf-8")
+updated = re.sub(r"(^metadata:\n(?:.*\n)*?  version:\s*)(?:v)?[0-9]+\.[0-9]+\.[0-9]+", rf"\g<1>{version}", text, count=1, flags=re.MULTILINE)
+if updated == text:
+    raise SystemExit(f"Failed to update metadata.version in {path}")
+path.write_text(updated, encoding="utf-8")
+PY
     done
 
-    git add "${METADATA_FILES[@]}" "${SKILL_FILES[@]}"
+    for f in "${PLUGIN_MANIFEST_FILES[@]}"; do
+        python3 - <<'PY' "$f" "$BARE_VERSION"
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+version = sys.argv[2]
+data = json.loads(path.read_text(encoding="utf-8"))
+if path.name == "marketplace.json":
+    data["plugins"][0]["version"] = version
+else:
+    data["version"] = version
+path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+PY
+    done
+
+    python3 scripts/render-plugin-skills.py
+
+    git add "${METADATA_FILES[@]}" "${PLUGIN_MANIFEST_FILES[@]}" "${SKILL_FILES[@]}" plugin-skills
     git commit -m "chore/ bump skill metadata to $NEW_VERSION"
 
     git tag -a "$NEW_VERSION" -m "$RELEASE_MSG"

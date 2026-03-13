@@ -6,6 +6,7 @@ on:
       - "plugin.json"
       - ".claude-plugin/**"
       - "agents/**"
+      - "plugin-skills/**"
       - "skills/**"
       - ".claude/agents/**"
       - ".github/agents/**"
@@ -72,6 +73,10 @@ jobs:
       - name: Validate native agent renderings
         run: |
           python3 scripts/render-agentic-role-bindings.py --check
+
+      - name: Validate plugin skill renderings
+        run: |
+          python3 scripts/render-plugin-skills.py --check
 
       - name: Run all test suites
         run: |
