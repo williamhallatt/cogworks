@@ -84,7 +84,6 @@ files or directories.
 - [README.md](README.md): user-facing product overview and support boundaries
 - [reference.md](reference.md): stable product contract and operator checklist
 - [metadata.json](metadata.json): repo-local release metadata for this skill
-- [agents/openai.yaml](agents/openai.yaml): Codex-specific invocation policy
 
 The frontmatter `metadata` block is a repo-local convention. Other platforms
 may ignore it; canonical package metadata for tooling lives in

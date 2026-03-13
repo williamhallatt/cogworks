@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FAILURES=0
+EXPECTED_RELEASE_VERSION="$(python3 "$ROOT_DIR/scripts/resolve-release-version.py" --format bare)"
 
 pass() {
   echo "PASS  $1"
@@ -61,6 +62,7 @@ require_file "skills/cogworks/copilot-adapter.md"
 require_file "skills/cogworks/role-profiles.json"
 require_file "skills/cogworks-encode/SKILL.md"
 require_file "skills/cogworks-learn/SKILL.md"
+require_file "VERSION"
 require_file "plugin.json"
 require_file ".claude-plugin/marketplace.json"
 require_file ".github/plugin/marketplace.json"
@@ -79,6 +81,7 @@ require_file "plugin/agents/cogworks-synthesizer.md"
 require_file "plugin/agents/cogworks-composer.md"
 require_file "plugin/agents/cogworks-validator.md"
 require_file "scripts/render-plugin-skills.py"
+require_file "scripts/render-release-version-files.py"
 require_file "scripts/render-agentic-role-bindings.py"
 require_file "scripts/install-cogworks.sh"
 require_file "scripts/render-dispatch-manifest.py"
@@ -96,7 +99,9 @@ require_file "plugin/skills/cogworks/reference.md"
 require_file "plugin/skills/cogworks/metadata.json"
 require_file "plugin/skills/cogworks/agents/openai.yaml"
 require_file "plugin/skills/cogworks-encode/SKILL.md"
+require_file "plugin/skills/cogworks-encode/agents/openai.yaml"
 require_file "plugin/skills/cogworks-learn/SKILL.md"
+require_file "plugin/skills/cogworks-learn/agents/openai.yaml"
 require_file ".claude/agents/cogworks-intake-analyst.md"
 require_file ".claude/agents/cogworks-synthesizer.md"
 require_file ".claude/agents/cogworks-composer.md"
@@ -192,7 +197,7 @@ else
   fail 'role-profiles.json is missing required canonical role bindings'
 fi
 
-if python3 - <<'PY' "$ROOT_DIR/plugin.json" "$ROOT_DIR/plugin/.claude-plugin/plugin.json" "$ROOT_DIR/.claude-plugin/marketplace.json" "$ROOT_DIR/.github/plugin/marketplace.json"
+if python3 - <<'PY' "$ROOT_DIR/plugin.json" "$ROOT_DIR/plugin/.claude-plugin/plugin.json" "$ROOT_DIR/.claude-plugin/marketplace.json" "$ROOT_DIR/.github/plugin/marketplace.json" "$ROOT_DIR/VERSION" "$EXPECTED_RELEASE_VERSION"
 import json
 import sys
 from pathlib import Path
@@ -201,14 +206,17 @@ plugin_path = Path(sys.argv[1])
 claude_plugin_path = Path(sys.argv[2])
 marketplace_path = Path(sys.argv[3])
 copilot_marketplace_path = Path(sys.argv[4])
+version_file_path = Path(sys.argv[5])
+expected_version = sys.argv[6]
 
 plugin = json.loads(plugin_path.read_text(encoding="utf-8"))
 claude_plugin = json.loads(claude_plugin_path.read_text(encoding="utf-8"))
 marketplace = json.loads(marketplace_path.read_text(encoding="utf-8"))
 copilot_marketplace = json.loads(copilot_marketplace_path.read_text(encoding="utf-8"))
+assert version_file_path.read_text(encoding="utf-8").strip() == expected_version
 
 assert plugin["name"] == "cogworks"
-assert plugin["version"] == "4.1.0"
+assert plugin["version"] == expected_version
 assert plugin["agents"] == "agents/"
 assert plugin["skills"] == "plugin/skills/"
 assert claude_plugin["name"] == "cogworks"
@@ -217,11 +225,12 @@ assert "skills" not in claude_plugin
 assert marketplace["name"] == "williamhallatt"
 assert marketplace["plugins"][0]["name"] == "cogworks"
 assert marketplace["plugins"][0]["source"] == "./plugin/"
-assert marketplace["plugins"][0]["version"] == "4.1.0"
+assert marketplace["plugins"][0]["version"] == expected_version
 assert copilot_marketplace["name"] == "cogworks"
 assert copilot_marketplace["plugins"][0]["name"] == "cogworks"
 assert copilot_marketplace["plugins"][0]["source"] == "./"
-assert copilot_marketplace["plugins"][0]["version"] == "4.1.0"
+assert copilot_marketplace["metadata"]["version"] == expected_version
+assert copilot_marketplace["plugins"][0]["version"] == expected_version
 PY
 then
   pass 'plugin manifests and marketplace catalogs are structurally valid'
@@ -250,19 +259,14 @@ forbid_pattern "plugin/skills/cogworks/README.md" 'agentic-runtime.md' 'plugin c
 forbid_pattern "plugin/skills/cogworks/README.md" 'claude-adapter.md' 'plugin cogworks README omits Claude adapter references'
 forbid_pattern "plugin/skills/cogworks/README.md" 'copilot-adapter.md' 'plugin cogworks README omits Copilot adapter references'
 
-if python3 - <<'PY' "$ROOT_DIR"
+if python3 - <<'PY' "$ROOT_DIR" "$EXPECTED_RELEASE_VERSION"
 import json
 import re
-import subprocess
 import sys
 from pathlib import Path
 
 root = Path(sys.argv[1])
-expected = subprocess.check_output(
-    ["git", "tag", "--sort=-version:refname"],
-    cwd=root,
-    text=True,
-).splitlines()[0].strip().removeprefix("v")
+expected = sys.argv[2]
 
 skill_dirs = [
     root / "skills" / "cogworks",
@@ -283,7 +287,13 @@ PY
 then
   pass 'shipped skill metadata and frontmatter versions match latest release tag'
 else
-  fail 'shipped skill metadata/frontmatter versions do not match latest release tag'
+  fail 'shipped skill metadata/frontmatter versions do not match VERSION'
+fi
+
+if python3 "$ROOT_DIR/scripts/render-release-version-files.py" --check >/dev/null 2>&1; then
+  pass 'render-release-version-files.py is in sync with VERSION'
+else
+  fail 'render-release-version-files.py output differs from committed versioned files'
 fi
 
 if python3 "$ROOT_DIR/scripts/render-agentic-role-bindings.py" --check >/dev/null 2>&1; then
