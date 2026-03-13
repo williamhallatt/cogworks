@@ -55,9 +55,13 @@
 - **Require reproducible evals for quality claims** - claims like "more robust", "cheaper", or "higher quality" must be backed by benchmark runs and saved artifacts, not single samples.
 - **Standardize benchmark artifacts** - keep machine-readable summaries and human-readable reports for comparisons (for example `benchmark-summary.json` and `benchmark-report.md`).
 - **Report done vs outstanding** - after implementing an accepted plan, explicitly list what was completed and what remains.
+- **Classify repeated references before synchronizing them** - when cleaning up repeated values such as versions, first separate live canonical surfaces, rendered/derived surfaces, and historical snapshot/example artifacts. Only the first two belong in synchronization work.
+- **Prefer source reduction over multi-surface policing** - when the same value drifts across many maintained files, reduce the number of editable sources and generate the rest instead of adding more manual bump steps around many hand-edited copies.
+- **Fail closed at the remote boundary for release-critical invariants** - local scripts and checks are not enough if tags or release actions can bypass them; enforce the invariant where remote release state is created.
 - **`DECISIONS.md` is the agent context surface for `_plans/`** — load `_plans/DECISIONS.md` for settled decisions; check `_plans/*.md` (root only) for active in-flight plans. Closed plan files are deleted; git history is the archive.
 - **Enforce prompt-engineering quality through `cogworks-learn`** - keep `*-prompt-engineering` skills as canonical references, and apply their doctrine via integrated gates in `cogworks-learn` during generation.
 - **Use one canonical recursive runbook** - for recursive TDD rounds, treat `tests/datasets/recursive-round/README.md` as the source of truth for commands and artifact expectations.
+- **Run a docs parity sweep after behavior or release-contract changes** - after changing release flow, validation, packaging, runtime contract, or agent conventions, update the corresponding maintainer docs in the same work cycle rather than waiting for a follow-up prompt.
 
 ## Documentation Maintenance
 

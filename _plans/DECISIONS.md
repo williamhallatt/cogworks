@@ -6,6 +6,16 @@ audited_through: 2026-03-13
 Settled decisions for the cogworks project. Agents load this file for context.
 Archive plan files are deleted once their decision is extracted here; git history is the recovery path.
 
+## [D-047] Session-derived maintenance lessons are now codified as working norms in `AGENTS.md`
+
+- **Date:** 2026-03-13 | **By:** William (owner)
+- **Status:** Accepted
+- **Decision:** Four recurring lessons from the version-sync and documentation cleanup session are now captured as reusable working norms in `AGENTS.md`: classify repeated references before synchronizing them; prefer reducing editable sources over policing many hand-edited copies; enforce release-critical invariants at the remote boundary rather than only locally; and run a docs parity sweep immediately after behavior or release-contract changes.
+- **Rationale:** The session repeatedly hit the same avoidable failure modes: ambiguous scope between live versus historical version references, drift caused by too many editable copies of the same value, local enforcement that still allowed bad remote release actions, and maintainer docs lagging behind code and workflow changes. Turning those into explicit norms is more useful than preserving a narrative retrospective.
+- **Operational implication:** Future agents should treat these lessons as first-touch repository guidance via `AGENTS.md`, not as one-off release notes. `DECISIONS.md` keeps only the rationale for why the norms were added.
+- **Builds on:** D-044 and D-046 by generalizing one release-specific fix and one documentation-maintenance rule into broader reusable doctrine.
+- **Scope:** `AGENTS.md`, `_plans/DECISIONS.md`.
+
 ## [D-046] Documentation maintenance directive added to AGENTS.md
 
 - **Date:** 2026-03-13 | **By:** Squad (Lambert research + Ripley audit)
