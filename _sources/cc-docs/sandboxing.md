@@ -49,7 +49,7 @@ You can grant write access to additional paths using `sandbox.filesystem.allowWr
 Network access is controlled through a proxy server running outside the sandbox:
 
 * **Domain restrictions**: Only approved domains can be accessed
-* **User confirmation**: New domain requests trigger permission prompts
+* **User confirmation**: New domain requests trigger permission prompts (unless [`allowManagedDomainsOnly`](/en/settings#sandbox-settings) is enabled, which blocks non-allowed domains automatically)
 * **Custom proxy support**: Advanced users can implement custom rules on outgoing traffic
 * **Comprehensive coverage**: Restrictions apply to all scripts, programs, and subprocesses spawned by commands
 
@@ -92,7 +92,7 @@ On **Linux and WSL2**, install the required packages first:
 You can enable sandboxing by running the `/sandbox` command:
 
 ```text  theme={null}
-> /sandbox
+/sandbox
 ```
 
 This opens a menu where you can choose between sandbox modes. If required dependencies are missing (such as `bubblewrap` or `socat` on Linux), the menu displays installation instructions for your platform.

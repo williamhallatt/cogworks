@@ -92,7 +92,7 @@ Choose your environment to get started. Most surfaces require a [Claude subscrip
   </Tab>
 
   <Tab title="Desktop app">
-    A standalone app for running Claude Code outside your IDE or terminal. Review diffs visually, run multiple sessions side by side, and kick off cloud sessions.
+    A standalone app for running Claude Code outside your IDE or terminal. Review diffs visually, run multiple sessions side by side, schedule recurring tasks, and kick off cloud sessions.
 
     Download and install:
 
@@ -207,6 +207,7 @@ Beyond the [Terminal](/en/quickstart), [VS Code](/en/vs-code), [JetBrains](/en/j
 | Continue a local session from my phone or another device | [Remote Control](/en/remote-control)                                                                               |
 | Start a task locally, continue on mobile                 | [Web](/en/claude-code-on-the-web) or [Claude iOS app](https://apps.apple.com/app/claude-by-anthropic/id6473753684) |
 | Automate PR reviews and issue triage                     | [GitHub Actions](/en/github-actions) or [GitLab CI/CD](/en/gitlab-ci-cd)                                           |
+| Get automatic code review on every PR                    | [GitHub Code Review](/en/code-review)                                                                              |
 | Route bug reports from Slack to pull requests            | [Slack](/en/slack)                                                                                                 |
 | Debug live web applications                              | [Chrome](/en/chrome)                                                                                               |
 | Build custom agents for your own workflows               | [Agent SDK](https://platform.claude.com/docs/en/agent-sdk/overview)                                                |

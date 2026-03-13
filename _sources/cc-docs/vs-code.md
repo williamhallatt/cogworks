@@ -6,7 +6,7 @@
 
 > Install and configure the Claude Code extension for VS Code. Get AI coding assistance with inline diffs, @-mentions, plan review, and keyboard shortcuts.
 
-<img src="https://mintcdn.com/claude-code/-YhHHmtSxwr7W8gy/images/vs-code-extension-interface.jpg?fit=max&auto=format&n=-YhHHmtSxwr7W8gy&q=85&s=300652d5678c63905e6b0ea9e50835f8" alt="VS Code editor with the Claude Code extension panel open on the right side, showing a conversation with Claude" data-og-width="2500" width="2500" data-og-height="1155" height="1155" data-path="images/vs-code-extension-interface.jpg" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/claude-code/-YhHHmtSxwr7W8gy/images/vs-code-extension-interface.jpg?w=280&fit=max&auto=format&n=-YhHHmtSxwr7W8gy&q=85&s=87630c671517a3d52e9aee627041696e 280w, https://mintcdn.com/claude-code/-YhHHmtSxwr7W8gy/images/vs-code-extension-interface.jpg?w=560&fit=max&auto=format&n=-YhHHmtSxwr7W8gy&q=85&s=716b093879204beec8d952649ef75292 560w, https://mintcdn.com/claude-code/-YhHHmtSxwr7W8gy/images/vs-code-extension-interface.jpg?w=840&fit=max&auto=format&n=-YhHHmtSxwr7W8gy&q=85&s=c1525d1a01513acd9d83d8b5a8fe2fc8 840w, https://mintcdn.com/claude-code/-YhHHmtSxwr7W8gy/images/vs-code-extension-interface.jpg?w=1100&fit=max&auto=format&n=-YhHHmtSxwr7W8gy&q=85&s=1d90021d58bbb51f871efec13af955c3 1100w, https://mintcdn.com/claude-code/-YhHHmtSxwr7W8gy/images/vs-code-extension-interface.jpg?w=1650&fit=max&auto=format&n=-YhHHmtSxwr7W8gy&q=85&s=7babdd25440099886f193cfa99af88ae 1650w, https://mintcdn.com/claude-code/-YhHHmtSxwr7W8gy/images/vs-code-extension-interface.jpg?w=2500&fit=max&auto=format&n=-YhHHmtSxwr7W8gy&q=85&s=08c92eedfb56fe61a61e480fb63784b6 2500w" />
+<img src="https://mintcdn.com/claude-code/-YhHHmtSxwr7W8gy/images/vs-code-extension-interface.jpg?fit=max&auto=format&n=-YhHHmtSxwr7W8gy&q=85&s=300652d5678c63905e6b0ea9e50835f8" alt="VS Code editor with the Claude Code extension panel open on the right side, showing a conversation with Claude" width="2500" height="1155" data-path="images/vs-code-extension-interface.jpg" />
 
 The VS Code extension provides a native graphical interface for Claude Code, integrated directly into your IDE. This is the recommended way to use Claude Code in VS Code.
 
@@ -40,14 +40,15 @@ Once installed, you can start using Claude Code through the VS Code interface:
 
 <Steps>
   <Step title="Open the Claude Code panel">
-    Throughout VS Code, the Spark icon indicates Claude Code: <img src="https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-spark-icon.svg?fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=a734d84e785140016672f08e0abb236c" alt="Spark icon" style={{display: "inline", height: "0.85em", verticalAlign: "middle"}} data-og-width="16" width="16" data-og-height="16" height="16" data-path="images/vs-code-spark-icon.svg" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-spark-icon.svg?w=280&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=9a45aad9a84b9fa1701ac99a1f9aa4e9 280w, https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-spark-icon.svg?w=560&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=3f4cb9254c4d4e93989c4b6bf9292f4b 560w, https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-spark-icon.svg?w=840&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=e75ccc9faa3e572db8f291ceb65bb264 840w, https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-spark-icon.svg?w=1100&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=f147bd81a381a62539a4ce361fac41c7 1100w, https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-spark-icon.svg?w=1650&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=78fe68efaee5d6e844bbacab1b442ed5 1650w, https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-spark-icon.svg?w=2500&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=efb8dbe1dfa722d094edc6ad2ad4bedb 2500w" />
+    Throughout VS Code, the Spark icon indicates Claude Code: <img src="https://mintcdn.com/claude-code/c5r9_6tjPMzFdDDT/images/vs-code-spark-icon.svg?fit=max&auto=format&n=c5r9_6tjPMzFdDDT&q=85&s=3ca45e00deadec8c8f4b4f807da94505" alt="Spark icon" style={{display: "inline", height: "0.85em", verticalAlign: "middle"}} width="16" height="16" data-path="images/vs-code-spark-icon.svg" />
 
     The quickest way to open Claude is to click the Spark icon in the **Editor Toolbar** (top-right corner of the editor). The icon only appears when you have a file open.
 
-        <img src="https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-editor-icon.png?fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=eb4540325d94664c51776dbbfec4cf02" alt="VS Code editor showing the Spark icon in the Editor Toolbar" data-og-width="2796" width="2796" data-og-height="734" height="734" data-path="images/vs-code-editor-icon.png" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-editor-icon.png?w=280&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=56f218d5464359d6480cfe23f70a923e 280w, https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-editor-icon.png?w=560&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=344a8db024b196c795a80dc85cacb8d1 560w, https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-editor-icon.png?w=840&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=f30bf834ee0625b2a4a635d552d87163 840w, https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-editor-icon.png?w=1100&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=81fdf984840e43a9f08ae42729d1484d 1100w, https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-editor-icon.png?w=1650&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=8b60fb32de54717093d512afaa99785c 1650w, https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-editor-icon.png?w=2500&fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=893e6bda8f2e9d42c8a294d394f0b736 2500w" />
+        <img src="https://mintcdn.com/claude-code/mfM-EyoZGnQv8JTc/images/vs-code-editor-icon.png?fit=max&auto=format&n=mfM-EyoZGnQv8JTc&q=85&s=eb4540325d94664c51776dbbfec4cf02" alt="VS Code editor showing the Spark icon in the Editor Toolbar" width="2796" height="734" data-path="images/vs-code-editor-icon.png" />
 
     Other ways to open Claude Code:
 
+    * **Activity Bar**: click the Spark icon in the left sidebar to open the sessions list. Click any session to open it as a full editor tab, or start a new one. This icon is always visible in the Activity Bar.
     * **Command Palette**: `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux), type "Claude Code", and select an option like "Open in New Tab"
     * **Status Bar**: click **✱ Claude Code** in the bottom-right corner of the window. This works even when no file is open.
 
@@ -63,13 +64,13 @@ Once installed, you can start using Claude Code through the VS Code interface:
 
     Here's an example of asking about a particular line in a file:
 
-        <img src="https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-send-prompt.png?fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=ede3ed8d8d5f940e01c5de636d009cfd" alt="VS Code editor with lines 2-3 selected in a Python file, and the Claude Code panel showing a question about those lines with an @-mention reference" data-og-width="3288" width="3288" data-og-height="1876" height="1876" data-path="images/vs-code-send-prompt.png" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-send-prompt.png?w=280&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=f40bde7b2c245fe8f0f5b784e8106492 280w, https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-send-prompt.png?w=560&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=fad66a27a9a6faa23b05370aa4f398b2 560w, https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-send-prompt.png?w=840&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=4539c8a3823ca80a5c8771f6c088ce9e 840w, https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-send-prompt.png?w=1100&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=fae8ebf300c7853409a562ffa46d9c71 1100w, https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-send-prompt.png?w=1650&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=22e4462bb8cf0c0ca20f8102bc4c971a 1650w, https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-send-prompt.png?w=2500&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=739bfd045f70fe7be1a109a53494590e 2500w" />
+        <img src="https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-send-prompt.png?fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=ede3ed8d8d5f940e01c5de636d009cfd" alt="VS Code editor with lines 2-3 selected in a Python file, and the Claude Code panel showing a question about those lines with an @-mention reference" width="3288" height="1876" data-path="images/vs-code-send-prompt.png" />
   </Step>
 
   <Step title="Review changes">
     When Claude wants to edit a file, it shows a side-by-side comparison of the original and proposed changes, then asks for permission. You can accept, reject, or tell Claude what to do instead.
 
-        <img src="https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-edits.png?fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=e005f9b41c541c5c7c59c082f7c4841c" alt="VS Code showing a diff of Claude's proposed changes with a permission prompt asking whether to make the edit" data-og-width="3292" width="3292" data-og-height="1876" height="1876" data-path="images/vs-code-edits.png" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-edits.png?w=280&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=cb5d41b81087f79b842a56b5a3304660 280w, https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-edits.png?w=560&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=90bb691960decdc06393c3c21cd62c75 560w, https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-edits.png?w=840&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=9a11bf878ba619e850380904ff4f38e8 840w, https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-edits.png?w=1100&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=6dddbf596b4f69ec6245bdc5eb6dd487 1100w, https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-edits.png?w=1650&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=ef2713b8cbfd2cee97af817d813d64c7 1650w, https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-edits.png?w=2500&fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=1f7e1c52919cdfddf295f32a2ec7ae59 2500w" />
+        <img src="https://mintcdn.com/claude-code/FVYz38sRY-VuoGHA/images/vs-code-edits.png?fit=max&auto=format&n=FVYz38sRY-VuoGHA&q=85&s=e005f9b41c541c5c7c59c082f7c4841c" alt="VS Code showing a diff of Claude's proposed changes with a permission prompt asking whether to make the edit" width="3292" height="1876" data-path="images/vs-code-edits.png" />
   </Step>
 </Steps>
 
@@ -83,7 +84,7 @@ For more ideas on what you can do with Claude Code, see [Common workflows](/en/c
 
 The prompt box supports several features:
 
-* **Permission modes**: click the mode indicator at the bottom of the prompt box to switch modes. In normal mode, Claude asks permission before each action. In Plan mode, Claude describes what it will do and waits for approval before making changes. In auto-accept mode, Claude makes edits without asking. Set the default in VS Code settings under `claudeCode.initialPermissionMode`.
+* **Permission modes**: click the mode indicator at the bottom of the prompt box to switch modes. In normal mode, Claude asks permission before each action. In Plan mode, Claude describes what it will do and waits for approval before making changes. VS Code automatically opens the plan as a full markdown document where you can add inline comments to give feedback before Claude begins. In auto-accept mode, Claude makes edits without asking. Set the default in VS Code settings under `claudeCode.initialPermissionMode`.
 * **Command menu**: click `/` or type `/` to open the command menu. Options include attaching files, switching models, toggling extended thinking, and viewing plan usage (`/usage`). The Customize section provides access to MCP servers, hooks, memory, permissions, and plugins. Items with a terminal icon open in the integrated terminal.
 * **Context indicator**: the prompt box shows how much of Claude's context window you're using. Claude automatically compacts when needed, or you can run `/compact` manually.
 * **Extended thinking**: lets Claude spend more time reasoning through complex problems. Toggle it on via the command menu (`/`). See [Extended thinking](/en/common-workflows#use-extended-thinking-thinking-mode) for details.
@@ -143,7 +144,7 @@ You can drag the Claude panel to reposition it anywhere in VS Code. Grab the pan
 * **Editor area**: opens Claude as a tab alongside your files. Useful for side tasks.
 
 <Tip>
-  Use the sidebar for your main Claude session and open additional tabs for side tasks. Claude remembers your preferred location. Note that the Spark icon only appears in the Activity Bar when the Claude panel is docked to the left. Since Claude defaults to the right side, use the Editor Toolbar icon to open Claude.
+  Use the sidebar for your main Claude session and open additional tabs for side tasks. Claude remembers your preferred location. The Activity Bar sessions list icon is separate from the Claude panel: the sessions list is always visible in the Activity Bar, while the Claude panel icon only appears there when the panel is docked to the left sidebar.
 </Tip>
 
 ### Run multiple conversations
@@ -266,13 +267,13 @@ The extension has two types of settings:
 
 Claude Code is available as both a VS Code extension (graphical panel) and a CLI (command-line interface in the terminal). Some features are only available in the CLI. If you need a CLI-only feature, run `claude` in VS Code's integrated terminal.
 
-| Feature             | CLI                                           | VS Code Extension                        |
-| ------------------- | --------------------------------------------- | ---------------------------------------- |
-| Commands and skills | [All](/en/interactive-mode#built-in-commands) | Subset (type `/` to see available)       |
-| MCP server config   | Yes                                           | No (configure via CLI, use in extension) |
-| Checkpoints         | Yes                                           | Yes                                      |
-| `!` bash shortcut   | Yes                                           | No                                       |
-| Tab completion      | Yes                                           | No                                       |
+| Feature             | CLI                                           | VS Code Extension                                                                    |
+| ------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Commands and skills | [All](/en/interactive-mode#built-in-commands) | Subset (type `/` to see available)                                                   |
+| MCP server config   | Yes                                           | Partial (add servers via CLI; manage existing servers with `/mcp` in the chat panel) |
+| Checkpoints         | Yes                                           | Yes                                                                                  |
+| `!` bash shortcut   | Yes                                           | No                                                                                   |
+| Tab completion      | Yes                                           | No                                                                                   |
 
 ### Rewind with checkpoints
 
@@ -304,7 +305,7 @@ When Claude runs long-running commands, the extension shows progress in the stat
 
 ### Connect to external tools with MCP
 
-MCP (Model Context Protocol) servers give Claude access to external tools, databases, and APIs. Configure them via CLI, then use them in both extension and CLI.
+MCP (Model Context Protocol) servers give Claude access to external tools, databases, and APIs.
 
 To add an MCP server, open the integrated terminal (`` Ctrl+` `` or `` Cmd+` ``) and run:
 
@@ -312,7 +313,9 @@ To add an MCP server, open the integrated terminal (`` Ctrl+` `` or `` Cmd+` ``)
 claude mcp add --transport http github https://api.githubcopilot.com/mcp/
 ```
 
-Once configured, ask Claude to use the tools (e.g., "Review PR #456"). Some servers require authentication: run `claude` in the terminal, then type `/mcp` to authenticate. See the [MCP documentation](/en/mcp) for available servers.
+Once configured, ask Claude to use the tools (e.g., "Review PR #456").
+
+To manage MCP servers without leaving VS Code, type `/mcp` in the chat panel. The MCP management dialog lets you enable or disable servers, reconnect to a server, and manage OAuth authentication. See the [MCP documentation](/en/mcp) for available servers.
 
 ## Work with git
 
@@ -423,5 +426,5 @@ For additional help, see the [troubleshooting guide](/en/troubleshooting).
 Now that you have Claude Code set up in VS Code:
 
 * [Explore common workflows](/en/common-workflows) to get the most out of Claude Code
-* [Set up MCP servers](/en/mcp) to extend Claude's capabilities with external tools. Configure servers using the CLI, then use them in the extension.
+* [Set up MCP servers](/en/mcp) to extend Claude's capabilities with external tools. Add servers using the CLI, then manage them with `/mcp` in the chat panel.
 * [Configure Claude Code settings](/en/settings) to customize allowed commands, hooks, and more. These settings are shared between the extension and CLI.
