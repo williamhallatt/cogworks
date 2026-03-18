@@ -1,10 +1,11 @@
 ---
 name: cogworks-encode
-description: Use when synthesizing one or more sources on a single topic into a unified, decision-first knowledge base — especially when sources conflict, overlap, or must be mapped to explicit decision rules. Handles single- and multi-source synthesis, contradiction resolution, and cross-source relationship extraction. Does not handle copy-editing or format conversion.
+description: "Distill one or more sources into a decision-first knowledge base. Resolves conflicts, extracts cross-source relationships, and classifies trust. Not a summarizer or copy-editor."
+disable-model-invocation: true
 license: MIT
 metadata:
   author: cogworks
-  version: 4.1.1
+  version: 4.1.2
 ---
 
 # Topic Synthesis Expertise

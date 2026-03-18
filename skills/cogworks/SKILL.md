@@ -1,11 +1,11 @@
 ---
 name: cogworks
-description: "Use when the user explicitly invokes `cogworks` to turn source material into a validated generated skill. Requires cogworks-encode and cogworks-learn and may create files or directories, so do not run unless generation is clearly requested."
+description: "Start here — turn source material into a validated agent skill. Orchestrates cogworks-encode (synthesis) and cogworks-learn (skill generation)."
 disable-model-invocation: true
 license: MIT
 metadata:
   author: cogworks
-  version: 4.1.1
+  version: 4.1.2
 ---
 
 # Cogworks

@@ -1,11 +1,11 @@
 ---
 name: cogworks-learn
-description: Use when creating or revising cogworks-generated agent skills, or when validating SKILL.md structure, invocation controls, compatibility, and supporting-file layout against an explicit skill contract.
+description: "Generate and validate agent skill files (SKILL.md, reference.md, metadata). Enforces structural contracts, quality gates, and runtime compatibility."
 disable-model-invocation: true
 license: MIT
 metadata:
   author: cogworks
-  version: 4.1.1
+  version: 4.1.2
 ---
 
 # Skill Writer Expert
