@@ -1,5 +1,8 @@
 {
   "name": "williamhallatt",
+  "metadata": {
+    "description": "Trust-first skill generation with native subagents for Claude Code and GitHub Copilot CLI."
+  },
   "owner": {
     "name": "William Hallatt",
     "email": "williamhallatt+github@proton.me"
