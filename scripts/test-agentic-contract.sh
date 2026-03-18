@@ -111,7 +111,7 @@ require_file ".github/agents/cogworks-synthesizer.agent.md"
 require_file ".github/agents/cogworks-composer.agent.md"
 require_file ".github/agents/cogworks-validator.agent.md"
 
-require_pattern "skills/cogworks/SKILL.md" 'turn source material into a validated generated skill' 'orchestrator exposes the single product purpose'
+require_pattern "skills/cogworks/SKILL.md" 'turn source material into a validated agent skill' 'orchestrator exposes the single product purpose'
 require_pattern "skills/cogworks/SKILL.md" 'fail closed when trust, provenance, contradiction handling, or validation is' 'orchestrator is fail-closed'
 require_pattern "skills/cogworks/SKILL.md" 'only the generated skill is a user-facing product artifact' 'orchestrator hides internal execution strategy'
 require_pattern "skills/cogworks/SKILL.md" 'runtime details such as execution surface, run root, or sub-agent metadata do' 'orchestrator forbids runtime metadata leakage'
