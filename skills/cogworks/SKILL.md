@@ -5,7 +5,7 @@ disable-model-invocation: true
 license: MIT
 metadata:
   author: cogworks
-  version: 4.1.0
+  version: 4.1.1
 ---
 
 # Cogworks

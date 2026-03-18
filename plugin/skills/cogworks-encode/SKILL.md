@@ -4,7 +4,7 @@ description: Use when synthesizing one or more sources on a single topic into a 
 license: MIT
 metadata:
   author: cogworks
-  version: 4.1.0
+  version: 4.1.1
 ---
 
 # Topic Synthesis Expertise
