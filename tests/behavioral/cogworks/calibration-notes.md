@@ -32,10 +32,10 @@
 - **Calibration verdict:** covered (now covered by `skill_content_fidelity`)
 
 ### cogworks-qual-005
-- **Expected behavior (from evaluator_notes/ground_truth):** Must recognize that a single-source task does not require cogworks-encode (which is for 2+ sources). Must route to cogworks-learn directly, or inform the user that single-source tasks don't benefit from the full pipeline. Must not silently run the full encode pipeline and produce output as if multi-source synthesis occurred.
-- **Rubric dimension(s) that cover this:** `correct_delegation` is the closest fit, but its pass signals explicitly require "Trace shows explicit invocation of cogworks-encode for the synthesis phase" as evidence of correct delegation. A run that correctly *skips* cogworks-encode for a single-source task would fail this pass signal even though skipping is the correct behavior.
-- **Gap identified:** Yes — the `correct_delegation` pass signals assume the full encode+learn pipeline is always required. This creates a false-fail for the legitimate single-source path that bypasses encode. There is no rubric branch for the "encode is optional / not applicable" case.
-- **Calibration verdict:** covered (now covered by amended `correct_delegation` single-source bypass path)
+- **Expected behavior (from evaluator_notes/ground_truth):** Must route the single source through cogworks-encode for synthesis. cogworks-encode accepts single-source input and should note that cross-validation is not possible, but must still proceed with full synthesis. The orchestrator should then pass the synthesis output to cogworks-learn as normal.
+- **Rubric dimension(s) that cover this:** `correct_delegation` — the standard multi-source pass signals apply: trace shows explicit invocation of cogworks-encode for synthesis, then cogworks-learn for skill writing. Single-source input follows the same pipeline as multi-source input.
+- **Gap identified:** No — single-source tasks now follow the standard encode pipeline path. The `correct_delegation` multi-source pass signals apply directly.
+- **Calibration verdict:** covered
 
 ---
 
@@ -43,8 +43,7 @@
 
 - **Coverage:** 5/5 cases fully covered
 - **Judge prompt adjustments applied:**
-  1. `correct_delegation` amended to add a single-source bypass pass path: a run that correctly skips cogworks-encode for a single-source task is valid routing, not a delegation failure.
-  2. `skill_content_fidelity` added as dimension 5: checks whether the generated SKILL.md adds actionable decision value beyond restating the input, and whether synthesis findings are reflected in the skill body.
+  1. `skill_content_fidelity` added as dimension 5: checks whether the generated SKILL.md adds actionable decision value beyond restating the input, and whether synthesis findings are reflected in the skill body.
 - **Recommendation:** ready for harness
 
-> **Revised after initial calibration pass.** Changes: `skill_content_fidelity` dimension added, `correct_delegation` amended for single-source path.
+> **Revised after initial calibration pass.** Changes: `skill_content_fidelity` dimension added.

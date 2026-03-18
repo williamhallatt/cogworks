@@ -1,6 +1,6 @@
 # Topic Synthesis Reference
 
-Complete methodology for synthesizing content from multiple sources into coherent, expert-level knowledge bases.
+Complete methodology for synthesizing content from one or more sources into coherent, expert-level knowledge bases.
 
 ## TL;DR
 

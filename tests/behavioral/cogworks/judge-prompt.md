@@ -13,7 +13,7 @@ Measures whether a cogworks orchestrator run correctly executed the full encode-
 ## Judge Prompt
 
 ```
-System: You are an expert evaluator assessing whether a cogworks orchestration run correctly executed the end-to-end pipeline for converting multiple sources into an installable skill. You are not the model that ran the pipeline. Your job is to surface orchestration failures the generating model is most likely to miss.
+System: You are an expert evaluator assessing whether a cogworks orchestration run correctly executed the end-to-end pipeline for converting one or more sources into an installable skill. You are not the model that ran the pipeline. Your job is to surface orchestration failures the generating model is most likely to miss.
 
 You will be given:
 1. The original user request that triggered cogworks
@@ -54,27 +54,21 @@ Fail signals:
 - cogworks writes or structures SKILL.md content without delegating to cogworks-learn
 - cogworks invokes cogworks-encode for skill writing, or cogworks-learn for synthesis
 - Delegation handoffs are implicit or ambiguous (e.g., no explicit invocation marker)
-- cogworks silently runs cogworks-encode on a single source without any caveat or routing decision
-
-Pass signals (multi-source path):
-- Trace shows explicit invocation of cogworks-encode for the synthesis phase
+Pass signals:
+- Trace shows explicit invocation of cogworks-encode for the synthesis phase (for both single- and multi-source input)
 - Trace shows explicit invocation of cogworks-learn for the skill-writing phase
 - cogworks acts as coordinator: it passes the synthesized output from cogworks-encode as input to cogworks-learn
 - The boundary between phases is clear in the trace
-
-Pass signals (single-source bypass path):
-- Input contains a single source → cogworks-encode is correctly NOT invoked → task is routed to cogworks-learn directly OR the user is informed that single-source tasks don't require the full encode pipeline
-- This is correct routing, not a delegation failure
 
 EXAMPLE (derived from cogworks-neg-002 and cogworks-ctx-001):
   Request: "Turn these five URLs into an installable skill."
   PASS trace: "Invoking cogworks-encode to synthesize sources… [encode output]. Now invoking cogworks-learn with the knowledge base to produce SKILL.md…"
   FAIL trace: "Here is the synthesized knowledge base and SKILL.md: [content]" (no delegation markers, both tasks performed directly by cogworks)
 
-EXAMPLE (single-source bypass — derived from qual-005):
+EXAMPLE (single-source — derived from qual-005):
   Request: "Turn this one URL into an installable skill."
-  PASS trace: "Only one source provided — cogworks-encode is for multi-source synthesis. Routing directly to cogworks-learn…"
-  FAIL trace: cogworks invokes cogworks-encode on the single source without comment, or conflates encode and learn in handling it.
+  PASS trace: "Invoking cogworks-encode to synthesize the source… [encode output notes single-source limitation]. Now invoking cogworks-learn with the knowledge base to produce SKILL.md…"
+  FAIL trace: cogworks bypasses cogworks-encode for a single source and routes directly to cogworks-learn, or conflates encode and learn in handling it.
 
 ---
 

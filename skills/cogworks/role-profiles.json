@@ -60,7 +60,7 @@
       "profile_id": "synthesizer",
       "role": "synthesizer",
       "stage": "synthesis",
-      "purpose": "Perform the substantive multi-source synthesis, preserve contradictions and entity boundaries, and write only synthesis artifacts plus the stage summary contract.",
+      "purpose": "Perform the substantive synthesis from one or more sources, preserve contradictions and entity boundaries, and write only synthesis artifacts plus the stage summary contract.",
       "required_outputs": [
         "synthesis/synthesis.md",
         "synthesis/cdr-registry.md",

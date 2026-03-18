@@ -38,9 +38,9 @@
 - **Calibration verdict:** covered
 
 ### cogworks-encode-d21-edge-003
-- **Expected behavior (from evaluator_notes/ground_truth):** Synthesis must warn that only one source is provided, limiting confidence and cross-validation. Must either refuse or proceed with an explicit single-source disclaimer. Must not present output as multi-source synthesis when only one source was given.
-- **Rubric dimension(s) that cover this:** None of the three dimensions address single-source input handling. `contradiction_detection` requires at least two sources. `context_preservation` and `distinct_entity_separation` presuppose multiple distinct sources. There is no "synthesis precondition" or "source count validation" dimension.
-- **Gap identified:** No — now covered by `synthesis_precondition` (dimension 5). A synthesis that presents confident output from a single source without any disclaimer will fail the pass signal requiring an explicit single-source caveat.
+- **Expected behavior (from evaluator_notes/ground_truth):** Synthesis must note that only one source is provided and that cross-validation is not possible, but must proceed with full synthesis. Must not refuse or pretend to have cross-validated. The output should include a single-source caveat about confidence limitations while still producing a complete synthesis.
+- **Rubric dimension(s) that cover this:** `synthesis_precondition` (dimension 5). A synthesis that presents single-source output as cross-validated will fail. A synthesis that notes the single-source limitation and proceeds with substantive output will pass.
+- **Gap identified:** No — covered by `synthesis_precondition`. The dimension checks for appropriate single-source caveats, not refusal.
 - **Calibration verdict:** covered
 
 ### cogworks-encode-d21-edge-004

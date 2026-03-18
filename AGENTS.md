@@ -42,7 +42,7 @@
 
 ## Terminology
 
-- **cogworks** - orchestration workflow for encoding knowledge from multiple sources and encoding it into skills.
+- **cogworks** - orchestration workflow for encoding knowledge from one or more sources and encoding it into skills.
 - **agents** - refers to Claude Code, OpenAI Codex, GitHub Copilot, Cursor, or any agent supporting the Agent Skills standard.
 - **generated skills** - skills created by the cogworks workflow, deployable to any compatible agent.
 - **testing cogworks** - the process of validating that the `cogworks` toolchain works correctly.
