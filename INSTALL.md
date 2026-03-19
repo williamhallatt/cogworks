@@ -1,64 +1,45 @@
 # Installing Cogworks
 
-## Quick Install (Recommended)
+## Quick Install
 
-Install directly from the main `cogworks` repository using the native plugin
-surface for your agent:
+### Claude Code CLI
+
+Claude Code CLI has an interactive `/plugin` command for managing plugins. To install cogworks, run:
 
 ```bash
-# GitHub Copilot CLI
-copilot plugin install williamhallatt/cogworks
-
-# Claude Code
 /plugin marketplace add williamhallatt/cogworks
-/plugin install cogworks@williamhallatt
+/plugin <make your selection>
 ```
 
-This plugin path installs:
-- the three required `cogworks` skills
-- the native agent definitions for the selected surface
+### GitHub Copilot CLI
+
+```bash
+/plugin marketplace add williamhallatt/cogworks
+/plugin install cogworks@cogworks
+```
+
+> Copilot also supports `copilot plugin install williamhallatt/cogworks` as a
+> one-step direct install, but the marketplace-first flow above allows future
+> updates.
 
 `cogworks` is the normal user-facing entry point. `cogworks-encode` and
-`cogworks-learn` remain supporting doctrine skills and expert surfaces.
+`cogworks-learn` are supporting skills and are installed automatically.
 
 To update:
-- Copilot: rerun `copilot plugin install williamhallatt/cogworks`
-- Claude: refresh the marketplace source if needed, then reinstall
 
-## Support Boundaries
+- Copilot: rerun `copilot plugin install cogworks@williamhallatt`
+- Claude Code: refresh the marketplace source if needed, then reinstall
 
-Install location and build-flow support are not the same thing:
+## Codex
 
-- generated skills are portable across agents that support skills
-- the normal `cogworks` product flow remains one stable entry point
-- the trust-first internal sub-agent build flow is currently supported only on
-  Claude Code and GitHub Copilot CLI
-- Codex can consume generated skills, but it is not a supported surface for the
-  current trust-first build flow
-
-If you mention Codex in local docs or examples, keep that distinction explicit.
-
-## Direct Install Contract
-
-Primary supported plugin-install flows:
+Codex does not support sub-agents, so cogworks cannot run there. Generated
+skills are portable to Codex and can be installed with the skills CLI:
 
 ```bash
-# GitHub Copilot CLI
-copilot plugin install williamhallatt/cogworks
-
-# Claude Code
-/plugin marketplace add williamhallatt/cogworks
-/plugin install cogworks@williamhallatt
+npx skills add ./_generated-skills -a codex
 ```
 
-Packaging surfaces in this repo:
-- `plugin.json`: Copilot plugin manifest
-- `.github/plugin/marketplace.json`: Copilot marketplace catalog (primary)
-- `plugin/.claude-plugin/plugin.json`: Claude plugin manifest
-- `.claude-plugin/marketplace.json`: Claude marketplace-source catalog
-- `plugin/skills/`: shipped skill directories (Claude Code plugin)
-- `plugin/agents/`: shipped agent files (Claude Code plugin)
-- `agents/`: shipped agent files (Copilot plugin)
+Node.js 18+ is required for the `skills` CLI.
 
 ## Bootstrap Fallback
 
@@ -71,77 +52,16 @@ bash scripts/install-cogworks.sh --agent copilot-cli --project /path/to/project
 bash scripts/install-cogworks.sh --agent claude-code --project /path/to/project --copy
 ```
 
-The bootstrap installer writes repo-local skills and native agent files into a
-target project directory.
-
-
-## Verify Installation
-
-```bash
-# Plugin package surfaces in this repo
-ls plugin.json
-ls plugin/.claude-plugin/plugin.json
-ls agents/cogworks-intake-analyst.agent.md
-ls plugin/agents/cogworks-intake-analyst.md
-
-# Bootstrap fallback outputs
-ls /path/to/your/project/.claude/agents/cogworks-intake-analyst.md
-ls /path/to/your/project/.github/agents/cogworks-intake-analyst.agent.md
-```
-
-## Invoking Skills
-
-After installation, invoke `cogworks` using your agent's native skill style:
-
-| Agent | Prefix | Example |
-|-------|--------|---------|
-| Claude Code | `/` | `/cogworks:cogworks Turn these docs into an agent skill for incident triage.` |
-| GitHub Copilot CLI | varies | consult Copilot CLI docs for the current skill invocation style |
-| Codex CLI | varies | use Codex-native invocation for portable generated skills; do not treat Codex as a supported trust-first build surface |
-| Other agents | varies | consult agent documentation |
-
-## Available Skills
-
-| Skill                       | Purpose                                   | Required |
-| --------------------------- | ----------------------------------------- | -------- |
-| `cogworks`                  | Product entry point for generating skills from source material | Yes      |
-| `cogworks-encode`           | Synthesis doctrine and source-fidelity methodology | Yes      |
-| `cogworks-learn`            | Skill-authoring doctrine and quality gates | Yes      |
-
-## Test Generated Skills
-
-```bash
-bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
-bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill --with-behavioral
-```
-
-## Installing Generated Skills
-
-When you use `cogworks`, generated skills are written to the
-`_generated-skills/` staging directory. The workflow automatically installs them
-to detected agents via `npx skills add`.
-
-If automatic installation fails (e.g. Node.js not available), install manually:
-
-```bash
-npx skills add ./_generated-skills
-
-# Example: install a generated skill to Codex
-npx skills add ./_generated-skills -a codex
-```
-
-Node.js 18+ is required for the `skills` CLI. Install from [nodejs.org](https://nodejs.org/).
-
 ## Troubleshooting
 
-- **Plugin install failed**: Verify the target CLI supports plugins and rerun the platform-native install command
-- **Claude install needs a source first**: Add `williamhallatt/cogworks` as a marketplace source, then install `cogworks@williamhallatt`
-- **Bootstrap install failed**: Verify the target project directory exists and rerun the fallback installer from the repo checkout
-- **Skills not discovered**: Verify SKILL.md exists in each installed skill directory and symlinks resolve
-- **Missing dependencies**: the bootstrap fallback requires Node.js 18+ and Python 3
-- **Symlink issues on Windows**: Use `--copy` flag instead
-- **Codex support confusion**: Generated skills are portable to Codex, but the
-  current trust-first internal build flow is supported only on Claude Code and
-  GitHub Copilot CLI
+- **Plugin install failed**: verify the target CLI supports plugins and rerun
+  the platform-native install command
+- **Claude install needs a source first**: add `williamhallatt/cogworks` as a
+  marketplace source, then install `cogworks@williamhallatt`
+- **Bootstrap install failed**: verify the target project directory exists and
+  rerun the fallback installer from the repo checkout
+- **Skills not discovered**: verify SKILL.md exists in each installed skill
+  directory and symlinks resolve
+- **Symlink issues on Windows**: use `--copy` flag instead
 
 For testing generated skills, see [TESTING.md](TESTING.md).

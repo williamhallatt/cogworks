@@ -8,17 +8,22 @@ generated skill or stops with a clear trust report explaining why it will not.
 
 ## Installation
 
-```bash
-# GitHub Copilot CLI
-copilot plugin install williamhallatt/cogworks
+Claude Code CLI has an interactive `/plugin` command for managing plugins. To install cogworks, run:
 
-# Claude Code
+```bash
 /plugin marketplace add williamhallatt/cogworks
-/plugin install cogworks@williamhallatt
+/plugin <make your selection>
 ```
 
-Requires the target agent CLI. See [INSTALL.md](INSTALL.md) for the direct repo
-install flow, Claude marketplace-source step, and bootstrap fallback.
+### GitHub Copilot CLI
+
+```bash
+/plugin marketplace add williamhallatt/cogworks
+/plugin install cogworks@cogworks
+```
+
+See [INSTALL.md](INSTALL.md) for marketplace-first Copilot flow, bootstrap
+fallback, and update instructions.
 
 ## Quick Start
 
@@ -36,6 +41,7 @@ your agent's native style.
 ```
 
 `cogworks` will:
+
 - gather the source material
 - classify trust and provenance before synthesis
 - synthesize the guidance into decision-ready doctrine
@@ -48,22 +54,24 @@ The default output location is `_generated-skills/{slug}/`.
 
 Separate three things when evaluating support:
 
-| Surface | Can install generated skills? | Product support status | Can run the internal trust-first sub-agent build path? |
-|---|---|---|---|
-| Claude Code | Yes | Yes | Yes |
-| GitHub Copilot CLI | Yes | Yes | Yes, when its delegated-task behavior is locally validated |
-| Codex | Yes | Portable generated-skill target only | No |
+| Surface            | Can install generated skills? | Product support status               | Can run the internal trust-first sub-agent build path?     |
+| ------------------ | ----------------------------- | ------------------------------------ | ---------------------------------------------------------- |
+| Claude Code        | Yes                           | Yes                                  | Yes                                                        |
+| GitHub Copilot CLI | Yes                           | Yes                                  | Yes, when its delegated-task behavior is locally validated |
+| Codex              | Yes                           | Portable generated-skill target only | No                                                         |
 
-Codex can consume generated skills, but Codex sub-agent build support is **not**
-part of the current trust-first internal build flow.
+Codex does not support sub-agents, so the Codex sub-agent build path is not
+available. Generated skills remain portable to Codex.
 
 ## Product Contract
 
 `cogworks` is optimized for two things:
+
 - quality of the generated skill
 - trust in both the tool and the generated output
 
 That means:
+
 - there is one stable user-facing entry point: `cogworks`
 - internal orchestration choices are not a user-facing mode
 - the generated skill is the only primary product artifact
@@ -79,6 +87,7 @@ skill.
 ### User-facing flow
 
 The user experience is intentionally concise:
+
 1. invoke `cogworks`
 2. provide sources and, optionally, a desired skill name or destination
 3. review only when a real overwrite or trust decision is needed
@@ -89,6 +98,7 @@ The user experience is intentionally concise:
 ### Internal build path
 
 Internally, `cogworks` uses:
+
 - `cogworks-encode` for synthesis doctrine
 - `cogworks-learn` for skill-authoring doctrine
 - specialist sub-agents on supported surfaces when that improves quality and
@@ -106,17 +116,18 @@ The bootstrap installer remains a maintainer fallback.
 
 The repository ships three skills:
 
-| Skill | Role |
-|---|---|
-| `cogworks` | The only normal user-facing product entry point |
-| `cogworks-encode` | Internal synthesis doctrine; also available as an expert surface when you want synthesis help without full skill generation |
-| `cogworks-learn` | Internal skill-authoring doctrine; also available as an expert surface for manual skill design or review |
+| Skill             | Description                                                                                                                                          |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cogworks`        | Start here — turn source material into a validated agent skill. Orchestrates cogworks-encode (synthesis) and cogworks-learn (skill generation).      |
+| `cogworks-encode` | Distill one or more sources into a decision-first knowledge base. Resolves conflicts, extracts cross-source relationships, and classifies trust.     |
+| `cogworks-learn`  | Generate and validate agent skill files (SKILL.md, reference.md, metadata). Enforces structural contracts, quality gates, and runtime compatibility. |
 
 Most users should start with `cogworks`, not with the support skills directly.
 
 ## Quality And Trust
 
 Trust comes from layered gates:
+
 - source trust classification before synthesis
 - explicit contradiction handling and traceability
 - deterministic validation of the generated skill structure
@@ -129,6 +140,7 @@ workflow or the generated skill output contract.
 ## Maintainer Notes
 
 For maintainers investigating the internal sub-agent build path:
+
 - see [skills/cogworks/agentic-runtime.md](skills/cogworks/agentic-runtime.md)
 - see [skills/cogworks/claude-adapter.md](skills/cogworks/claude-adapter.md)
 - see [skills/cogworks/copilot-adapter.md](skills/cogworks/copilot-adapter.md)
@@ -145,11 +157,9 @@ point.
   invent trustworthy evidence
 - generated skills aim to follow the [Agent Skills standard](https://agentskills.io),
   so the artifact format is portable across agents that support skills
-- build-surface support is narrower than artifact portability; the current
-  trust-first internal build flow is supported only on Claude Code and GitHub
-  Copilot CLI
-- Codex support is currently limited to consuming portable generated skills, not
-  running the trust-first internal build flow
+- the trust-first internal build flow runs on Claude Code and GitHub Copilot
+  CLI; Codex does not support sub-agents, so cogworks cannot run there, but
+  cogworks-generated skills are portable to any agent that supports skills
 
 ## Contributing
 
