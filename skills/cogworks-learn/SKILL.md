@@ -5,7 +5,7 @@ disable-model-invocation: true
 license: MIT
 metadata:
   author: cogworks
-  version: 4.1.2
+  version: 5.0.0
 ---
 
 # Skill Writer Expert
