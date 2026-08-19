@@ -7,19 +7,15 @@ Two advisor skills for authoring agent skills.
 - `cogworks-learn` — skill-authoring doctrine: how to structure, package, and
   validate an agent skill for its target runtime.
 
-Both work standalone. Neither generates a finished artifact on its own; both
-coach the human (or agent) doing the writing.
+Both work standalone.
 
 ## Install
 
-```bash
-git clone https://github.com/williamhallatt/cogworks.git
-cd cogworks
-npx skills add ./skills/cogworks-encode ./skills/cogworks-learn
-```
+Install with [Vercel Skills CLI](https://github.com/vercel-labs/skills):
 
-Requires Node.js 18+. See [INSTALL.md](INSTALL.md) for manual-copy
-alternatives.
+```bash
+npx skills add williamhallatt/cogworks
+```
 
 ## Use
 

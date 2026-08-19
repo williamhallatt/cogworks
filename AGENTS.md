@@ -1,95 +1,32 @@
 # Repository Guidelines
 
-## Start Here: Retrieval Contract
+## What this repo is
 
-- **Load context in stages and stop early** — read `AGENTS.md` first, then `_plans/DECISIONS.md`, then at most one matching active `_plans/*.md` file in the `_plans/` root if its title clearly matches the task.
-- **Choose one task-matched canonical file next** — load exactly one next source based on the task: `README.md` for product overview, `INSTALL.md` for setup, one specific file under `skills/` for skill behavior.
-- **Do not preload all top-level docs** — load additional docs only when the current source is insufficient for safe execution or planning.
-- **Prefer leaf files over directory scans** — do not read whole directories when one named entrypoint file will answer the question.
-- **Treat non-default surfaces as scoped references only** — even when a task requires them, they do not become repo-wide policy surfaces.
-- **Use this authority order on conflict** — directly task-relevant canonical file, matching active plan in `_plans/`, `_plans/DECISIONS.md`, `AGENTS.md`, then general product docs.
+Two advisor skills for authoring agent skills:
 
-### Non-default Context Surfaces
+- `skills/cogworks-encode/` — synthesis methodology: turn one or more sources on a topic into a decision-first knowledge base
+- `skills/cogworks-learn/` — skill-authoring doctrine: structure, package, and validate an agent skill for its target runtime
 
-- **Do not opportunistically load these surfaces**:
-  - `_sources/`
-- These surfaces remain valid reference material when a task explicitly calls for them, but they are not repo-wide policy and should not be auto-loaded for ordinary work.
+Both work standalone. Install with `npx skills add williamhallatt/cogworks`. See [README.md](README.md).
 
-## Task-Matched Documentation
+## Project structure
 
-- [README.md](README.md) - Project overview and quick start
-- [INSTALL.md](INSTALL.md) - End-user installation instructions
+- `skills/cogworks-encode/`, `skills/cogworks-learn/` — canonical skill sources; edit here directly
+- `_sources/` — research material (Agent Skills spec + docs snapshot from agentskills.io); do not auto-load, consult only when a task explicitly calls for reference material
 
-## Collaboration Principles
+## Live-edit hazard
 
-- **Save ACCEPTED Plans** - whenever a plan is *accepted*, save it in [_plans/](./_plans/) with a descriptive name and date. This creates a short-lived active work record until the decision is extracted and the plan is closed.
-- **Close plans by deletion** - when a plan is accepted and its work completed, extract its core decision into `_plans/DECISIONS.md`, delete the plan file, and update the `audited_through` date. These three steps are atomic — deleting without extracting is not a close. Git history is the archive; the working tree does not need the file.
+Editing a `SKILL.md` while operating under that skill's instructions puts the session in a circular / inconsistent state. When editing any `skills/cogworks-*/SKILL.md`, don't invoke that skill during the session. If you invoke a skill you're editing by accident, restart or verify the in-memory instructions still match the current file.
 
-## The Expert Subtraction Principle
+## Coding style
 
-**Core Philosophy:** Experts are systems thinkers who leverage their extensive knowledge and deep understanding to reduce complexity. Novices add. Experts subtract until nothing superfluous remains.
+- Skill directories and slugs use kebab-case
+- `SKILL.md` frontmatter is valid YAML with required `name:` and `description:` fields
 
-**The principle in practice:** True expertise manifests as removal, not addition. The expert's value is knowing what to leave out. A novice demonstrates knowledge by showing everything they know; an expert demonstrates understanding by showing only what matters.
+## Git
 
-## Terminology
-
-- **cogworks** - two advisor skills (`cogworks-encode`, `cogworks-learn`) for authoring agent skills.
-- **agents** - refers to Claude Code, OpenAI Codex, GitHub Copilot, Cursor, or any agent supporting the Agent Skills standard.
-
-## Learned Working Norms
-
-- **Verify provenance claims with artifacts** - when asked whether a workflow/toolchain was used, validate with local evidence first (for example run outputs, timestamps) before concluding.
-- **Use evidence-backed comparisons** - for comparisons, provide concrete diffs/metrics and severity-ranked omissions in both directions.
-- **Report done vs outstanding** - after implementing an accepted plan, explicitly list what was completed and what remains.
-- **Classify repeated references before synchronizing them** - when cleaning up repeated values such as versions, first separate live canonical surfaces, rendered/derived surfaces, and historical snapshot/example artifacts. Only the first two belong in synchronization work.
-- **Prefer source reduction over multi-surface policing** - when the same value drifts across many maintained files, reduce the number of editable sources and generate the rest instead of adding more manual bump steps around many hand-edited copies.
-- **Fail closed at the remote boundary for release-critical invariants** - local scripts and checks are not enough if tags or release actions can bypass them; enforce the invariant where remote release state is created.
-- **`DECISIONS.md` is the agent context surface for `_plans/`** — load `_plans/DECISIONS.md` for settled decisions; check `_plans/*.md` (root only) for active in-flight plans. Closed plan files are deleted; git history is the archive.
-- **Enforce prompt-engineering quality through `cogworks-learn`** - keep `*-prompt-engineering` skills as canonical references, and apply their doctrine via integrated gates in `cogworks-learn` during generation.
-- **Run a docs parity sweep after behavior or release-contract changes** - after changing release flow, packaging, runtime contract, or agent conventions, update the corresponding maintainer docs in the same work cycle rather than waiting for a follow-up prompt.
-
-## Documentation Maintenance
-
-When your changes affect behavior, setup, testing, or agent conventions, update the corresponding documentation in the same commit or PR — do not leave it for a separate pass.
-
-| Change domain | Update |
-|---------------|--------|
-| User-facing behavior, product overview, entry points | `README.md` |
-| Installation, setup, dependencies | `INSTALL.md` |
-| Agent conventions, retrieval contract, project structure | `AGENTS.md` |
-| Skill behavior, invocation, frontmatter | The skill's own `SKILL.md` |
-
-**Verification:** Before marking work complete, re-read any doc you updated to confirm it is internally consistent and does not reference removed files, renamed commands, or outdated behavior.
-
-## Project Structure & Module Organization
-- `skills/` at repo root contains the two advisor skills (`cogworks-encode`, `cogworks-learn`) — the canonical source discovered by `npx skills add`. Always edit files here directly.
-- `.agents/skills/` is a gitignored local development install directory created by `npx skills add`; it is not tracked and will not exist in a clean checkout.
-- `_sources/` and `_plans/` are working materials and research artifacts.
-
-### ⚠️ Live-Edit Hazard
-- An agent operating under a skill's instructions while editing that skill's `SKILL.md` is in a circular / inconsistent state.
-- **Convention:** when editing any `skills/cogworks-*/SKILL.md`, note it at the top of your session and do not invoke the skill you are editing during that session.
-- **Convention:** if you accidentally invoke a skill while editing it, treat the session as potentially corrupted — restart, or carefully verify that the instructions in memory still match the file on disk.
-
-## Coding Style & Naming Conventions
-- Prefer Markdown + Bash clarity: short sections, explicit headings, and executable examples.
-- Shell scripts should use strict mode (`set -euo pipefail`) and descriptive function names (`print_success`, `validate_source_archive`).
-- Skill directories and slugs use kebab-case (example: `cogworks-learn`, `deployment-workflow-benchmark`).
-- Keep `SKILL.md` frontmatter valid YAML with required `name:` and `description:` fields.
-
-## Git Rules
-- Follow the observed commit format: `<type>/ <summary>` (examples: `add/ ...`, `refactor/ ...`, `docs/ ...`, `chore/ ...`).
-- Keep commits focused by concern (skills, tests, docs).
-- In PR descriptions, include: scope, affected paths, test commands run, and representative output snippets for failures/fixes.
-- Delete unused or obsolete files when your changes make them irrelevant (refactors, feature removals, etc.), and revert files only when the change is yours or explicitly requested. If a git operation leaves you unsure about other agents' in-flight work, stop and coordinate instead of deleting.
-- **Before attempting to delete a file to resolve a local type/lint failure, stop and ask the user.** Other agents are often editing adjacent files; deleting their work to silence an error is never acceptable without explicit approval.
-- NEVER edit `.env` or any environment variable files—only the user may change them.
-- Coordinate with other agents before removing their in-progress edits—don't revert or delete work you didn't author unless everyone agrees.
-- Moving/renaming and restoring files is allowed.
-- ABSOLUTELY NEVER run destructive git operations (e.g., `git reset --hard`, `rm`, `git checkout`/`git restore` to an older commit) unless the user gives an explicit, written instruction in this conversation. Treat these commands as catastrophic; if you are even slightly unsure, stop and ask before touching them. *(When working within Cursor or Codex Web, these git limitations do not apply; use the tooling's capabilities as needed.)*
-- Never use `git restore` (or similar commands) to revert files you didn't author—coordinate with other agents instead so their in-progress work stays intact.
-- Always double-check git status before any commit
-- Keep commits atomic: commit only the files you touched and list each path explicitly. For tracked files run `git commit -m "<scoped message>" -- path/to/file1 path/to/file2`. For brand-new files, use the one-liner `git restore --staged :/ && git add "path/to/file1" "path/to/file2" && git commit -m "<scoped message>" -- path/to/file1 path/to/file2`.
-- Quote any git paths containing brackets or parentheses (e.g., `src/app/[candidate]/**`) when staging or committing so the shell does not treat them as globs or subshells.
-- When running `git rebase`, avoid opening editors—export `GIT_EDITOR=:` and `GIT_SEQUENCE_EDITOR=:` (or pass `--no-edit`) so the default messages are used automatically.
-- Never amend commits unless you have explicit written approval in the task thread.
+- Commit format: `<type>/ <summary>` — `add/`, `fix/`, `refactor/`, `docs/`, `chore/`, `release/`
+- Stage explicit paths, not `git add .`
+- Never touch `.env`
+- Never run destructive git operations (`git reset --hard`, `git push --force`, tag deletion of published tags, `git checkout` to an older commit) without an explicit written instruction from the user in the current conversation
+- Never amend commits without explicit approval
