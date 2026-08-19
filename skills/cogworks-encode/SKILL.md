@@ -183,12 +183,6 @@ Before completion, verify:
 For judgment-heavy domains, also record a Tacit Knowledge Boundary when the
 sources cannot fully encode expert judgment.
 
-If available, run:
-
-```bash
-bash {cogworks_encode_dir}/scripts/validate-synthesis.sh {output_path}
-```
-
 ## Supporting Docs
 
 - [reference.md](reference.md) is the canonical detailed methodology, output
@@ -205,5 +199,4 @@ may ignore it; canonical package metadata for tooling lives in
 ## Sources
 
 - [Source 1] [reference.md](reference.md)
-- [Source 2] [scripts/validate-synthesis.sh](scripts/validate-synthesis.sh)
-- [Source 3] [../cogworks/SKILL.md](../cogworks/SKILL.md)
+- [Source 2] [../cogworks/SKILL.md](../cogworks/SKILL.md)

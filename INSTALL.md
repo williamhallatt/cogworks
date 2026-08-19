@@ -108,13 +108,6 @@ After installation, invoke `cogworks` using your agent's native skill style:
 | `cogworks-encode`           | Synthesis doctrine and source-fidelity methodology | Yes      |
 | `cogworks-learn`            | Skill-authoring doctrine and quality gates | Yes      |
 
-## Test Generated Skills
-
-```bash
-bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill
-bash scripts/test-generated-skill.sh --skill-path .claude/skills/my-skill --with-behavioral
-```
-
 ## Installing Generated Skills
 
 When you use `cogworks`, generated skills are written to the
@@ -143,5 +136,3 @@ Node.js 18+ is required for the `skills` CLI. Install from [nodejs.org](https://
 - **Codex support confusion**: Generated skills are portable to Codex, but the
   current trust-first internal build flow is supported only on Claude Code and
   GitHub Copilot CLI
-
-For testing generated skills, see [TESTING.md](TESTING.md).

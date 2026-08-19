@@ -198,12 +198,6 @@ Before completion, verify:
 - citations and supporting files follow the canonical contract
 - no doctrinal duplication remains across files
 
-If available, run:
-
-```bash
-bash {cogworks_learn_dir}/scripts/validate-skill.sh {skill_path}
-```
-
 ## Sources
 
 1. [Agent Skills Specification](https://agentskills.io/specification)

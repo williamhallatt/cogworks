@@ -3,7 +3,7 @@
 ## Start Here: Retrieval Contract
 
 - **Load context in stages and stop early** — read `AGENTS.md` first, then `_plans/DECISIONS.md`, then at most one matching active `_plans/*.md` file in the `_plans/` root if its title clearly matches the task.
-- **Choose one task-matched canonical file next** — load exactly one next source based on the task: `README.md` for product overview, `INSTALL.md` for setup, `TESTING.md` for validation, `CONTRIBUTIONS.md` for development/release conventions, one specific file under `skills/` for skill behavior, or one specific file under `evals/` for benchmark/evaluation policy.
+- **Choose one task-matched canonical file next** — load exactly one next source based on the task: `README.md` for product overview, `INSTALL.md` for setup, one specific file under `skills/` for skill behavior.
 - **Do not preload all top-level docs** — load additional docs only when the current source is insufficient for safe execution or planning.
 - **Prefer leaf files over directory scans** — do not read whole directories when one named entrypoint file will answer the question.
 - **Treat non-default surfaces as scoped references only** — even when a task requires them, they do not become repo-wide policy surfaces.
@@ -13,20 +13,14 @@
 
 - **Do not opportunistically load these surfaces**:
   - `.github/agents/`
-  - `.squad/`
   - `_sources/`
   - `.cogworks-runs/`
   - `tmp-agentic-output/`
-  - `tests/results/`
-  - `tests/test-data/`
-  - `tests/datasets/golden-samples/`
 - These surfaces remain valid reference material when a task explicitly calls for them, but they are not repo-wide policy and should not be auto-loaded for ordinary work.
 
 ## Task-Matched Documentation
 
 - [README.md](README.md) - Project overview and quick start
-- [TESTING.md](TESTING.md) - Testing guidelines and framework
-- [CONTRIBUTIONS.md](CONTRIBUTIONS.md) - Development setup, conventions, and release process
 - [INSTALL.md](INSTALL.md) - End-user installation instructions
 
 ## Collaboration Principles
@@ -45,23 +39,17 @@
 - **cogworks** - orchestration workflow for encoding knowledge from one or more sources and encoding it into skills.
 - **agents** - refers to Claude Code, OpenAI Codex, GitHub Copilot, Cursor, or any agent supporting the Agent Skills standard.
 - **generated skills** - skills created by the cogworks workflow, deployable to any compatible agent.
-- **testing cogworks** - the process of validating that the `cogworks` toolchain works correctly.
-- **testing skills** - the process of validating that a `generated skill` (the product of the `cogworks` pipeline) works as intended, which may include both deterministic checks and behavioral tests.
-
 ## Learned Working Norms
 
 - **Verify provenance claims with artifacts** - when asked whether a workflow/toolchain was used, validate with local evidence first (for example run outputs, timestamps) before concluding.
 - **Use evidence-backed comparisons** - for comparisons, provide concrete diffs/metrics and severity-ranked omissions in both directions.
-- **Require reproducible evals for quality claims** - claims like "more robust", "cheaper", or "higher quality" must be backed by benchmark runs and saved artifacts, not single samples.
-- **Standardize benchmark artifacts** - keep machine-readable summaries and human-readable reports for comparisons (for example `benchmark-summary.json` and `benchmark-report.md`).
 - **Report done vs outstanding** - after implementing an accepted plan, explicitly list what was completed and what remains.
 - **Classify repeated references before synchronizing them** - when cleaning up repeated values such as versions, first separate live canonical surfaces, rendered/derived surfaces, and historical snapshot/example artifacts. Only the first two belong in synchronization work.
 - **Prefer source reduction over multi-surface policing** - when the same value drifts across many maintained files, reduce the number of editable sources and generate the rest instead of adding more manual bump steps around many hand-edited copies.
 - **Fail closed at the remote boundary for release-critical invariants** - local scripts and checks are not enough if tags or release actions can bypass them; enforce the invariant where remote release state is created.
 - **`DECISIONS.md` is the agent context surface for `_plans/`** — load `_plans/DECISIONS.md` for settled decisions; check `_plans/*.md` (root only) for active in-flight plans. Closed plan files are deleted; git history is the archive.
 - **Enforce prompt-engineering quality through `cogworks-learn`** - keep `*-prompt-engineering` skills as canonical references, and apply their doctrine via integrated gates in `cogworks-learn` during generation.
-- **Use one canonical recursive runbook** - for recursive TDD rounds, treat `tests/datasets/recursive-round/README.md` as the source of truth for commands and artifact expectations.
-- **Run a docs parity sweep after behavior or release-contract changes** - after changing release flow, validation, packaging, runtime contract, or agent conventions, update the corresponding maintainer docs in the same work cycle rather than waiting for a follow-up prompt.
+- **Run a docs parity sweep after behavior or release-contract changes** - after changing release flow, packaging, runtime contract, or agent conventions, update the corresponding maintainer docs in the same work cycle rather than waiting for a follow-up prompt.
 
 ## Documentation Maintenance
 
@@ -71,11 +59,9 @@ When your changes affect behavior, setup, testing, or agent conventions, update 
 |---------------|--------|
 | User-facing behavior, product overview, entry points | `README.md` |
 | Installation, setup, packaging surfaces, dependencies | `INSTALL.md` |
-| Test commands, validation procedures, quality gates | `TESTING.md` |
-| Development workflow, PR conventions, release process | `CONTRIBUTIONS.md` |
 | Agent conventions, retrieval contract, project structure | `AGENTS.md` |
 | Skill behavior, invocation, frontmatter | The skill's own `SKILL.md` |
-| New or changed scripts | `AGENTS.md` § Build, Test, and Development Commands |
+| New or changed scripts | `AGENTS.md` § Build and Development Commands |
 
 **Verification:** Before marking work complete, re-read any doc you updated to confirm it is internally consistent and does not reference removed files, renamed commands, or outdated behavior.
 
@@ -86,11 +72,6 @@ When your changes affect behavior, setup, testing, or agent conventions, update 
 - `.claude/agents/` contains rendered Claude CLI agent files — generated by `scripts/render-agentic-role-bindings.py` and auto-loaded by Claude Code. Edit source in `agents/` or `skills/cogworks/role-profiles.json` and re-run the render script; do not edit `.claude/agents/` directly.
 - `.github/agents/` contains rendered Copilot CLI agent files — generated by `scripts/render-agentic-role-bindings.py`.
 - `.agents/skills/` is a gitignored local development install directory created by `npx skills add`; it is not tracked and will not exist in a clean checkout.
-- `tests/` contains validation assets:
-  - `tests/run-black-box-tests.sh` for framework meta-tests.
-  - `tests/framework/` for shared deterministic + behavioral + benchmark tooling.
-  - `tests/behavioral/` for behavioral cases and traces.
-  - `tests/datasets/` for benchmark manifests and golden/control fixtures.
 - `_generated-skills/` is a gitignored runtime staging directory for skills produced by `cogworks encode`; it will not exist in a clean checkout.
 - `_sources/` and `_plans/` are working materials and research artifacts.
 
@@ -99,15 +80,12 @@ When your changes affect behavior, setup, testing, or agent conventions, update 
 - An agent that is both operating under a skill's instructions and editing that skill's `SKILL.md` is in circular/inconsistent state.
 - **Convention:** when editing any `skills/cogworks*/SKILL.md`, note it at the top of your session and do not invoke the skill you are editing during that session.
 - **Convention:** if you accidentally invoke a skill while editing it, treat the session as potentially corrupted — restart, or carefully verify that the instructions in memory still match the file on disk.
-- **`.github/agents/squad.agent.md` is auto-loaded by GitHub Copilot** — this file is 1,000+ lines and will consume a significant portion of your context window on every Copilot session. For non-Squad work, run `/clear` after session start or use a scoped workspace that excludes `.github/agents/`.
 
-## Build, Test, and Development Commands
-- `bash tests/run-black-box-tests.sh` runs black-box meta-tests for the test framework.
-- `python3 tests/framework/scripts/cogworks-eval.py behavioral scaffold --skill <slug>` scaffolds behavioral test cases for new skills.
-- `bash scripts/run-recursive-round.sh --round-manifest tests/datasets/recursive-round/round-manifest.local.json --mode fast` runs a fast recursive round.
-- `bash scripts/validate-recursive-docs.sh` validates recursive workflow docs consistency.
-- `bash scripts/test-agentic-contract.sh` validates the agentic runtime contract surface (docs, stage graph, adapters, `VERSION`/release-version surface sync, deterministic checks).
-- `bash scripts/validate-agentic-run.sh --run-root <run-root> --skill-path <skill-path>` validates a completed agentic run's artifacts. See `tests/agentic-smoke/README.md` for the live smoke runbook.
+## Build and Development Commands
+- `python3 scripts/render-release-version-files.py` propagates the canonical `VERSION` to `plugin.json`, both marketplace manifests, and each skill's `metadata.json` and `SKILL.md` frontmatter.
+- `python3 scripts/render-plugin-skills.py` mirrors `skills/` into `plugin/skills/` for the Claude Code plugin package.
+- `python3 scripts/render-release-version-files.py --check` and `python3 scripts/render-plugin-skills.py --check` verify the rendered surfaces are in sync without mutating them.
+- `bash scripts/create-release-tag.sh` bumps `VERSION`, renders, commits, tags, and pushes a release interactively.
 
 ## Coding Style & Naming Conventions
 - Prefer Markdown + Bash clarity: short sections, explicit headings, and executable examples.
@@ -115,15 +93,9 @@ When your changes affect behavior, setup, testing, or agent conventions, update 
 - Skill directories and slugs use kebab-case (example: `cogworks-learn`, `deployment-workflow-benchmark`).
 - Keep `SKILL.md` frontmatter valid YAML with required `name:` and `description:` fields.
 
-## Testing Guidelines
-- Treat Layer 1 deterministic checks as the minimum gate for all skill changes.
-- For `cogworks-*` updates, run Layer 1 checks before opening a PR. For full validation, run `bash tests/run-all.sh` (Layers 1–5a).
-- Store behavioral test cases under `tests/behavioral/*/test-cases.jsonl` and new skill source materials under `_sources/`.
-
 ## Git Rules
 - Follow the observed commit format: `<type>/ <summary>` (examples: `add/ ...`, `refactor/ ...`, `docs/ ...`, `chore/ ...`).
 - Keep commits focused by concern (skills, tests, docs).
-- PRs targeting `main` that touch `skills/**`, `.claude/**`, `README.md`, `INSTALL.md`, or `LICENSE` should pass `.github/workflows/pre-release-validation.yml`.
 - In PR descriptions, include: scope, affected paths, test commands run, and representative output snippets for failures/fixes.
 - Delete unused or obsolete files when your changes make them irrelevant (refactors, feature removals, etc.), and revert files only when the change is yours or explicitly requested. If a git operation leaves you unsure about other agents' in-flight work, stop and coordinate instead of deleting.
 - **Before attempting to delete a file to resolve a local type/lint failure, stop and ask the user.** Other agents are often editing adjacent files; deleting their work to silence an error is never acceptable without explicit approval.

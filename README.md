@@ -132,10 +132,8 @@ For maintainers investigating the internal sub-agent build path:
 - see [skills/cogworks/agentic-runtime.md](skills/cogworks/agentic-runtime.md)
 - see [skills/cogworks/claude-adapter.md](skills/cogworks/claude-adapter.md)
 - see [skills/cogworks/copilot-adapter.md](skills/cogworks/copilot-adapter.md)
-- see [tests/agentic-smoke/README.md](tests/agentic-smoke/README.md)
 
-These are implementation and validation surfaces, not the normal product entry
-point.
+These are implementation surfaces, not the normal product entry point.
 
 ## Limitations
 
@@ -150,11 +148,6 @@ point.
   Copilot CLI
 - Codex support is currently limited to consuming portable generated skills, not
   running the trust-first internal build flow
-
-## Contributing
-
-See [CONTRIBUTIONS.md](CONTRIBUTIONS.md) for development setup, conventions, and
-release process.
 
 ## License
 
