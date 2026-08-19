@@ -135,24 +135,23 @@ When sources conflict:
 
 ### 5. Maintain Traceability
 
-Required handoff artifacts:
+Every claim in the synthesis output must be traceable to a source. Maintain:
 
-- `{source_inventory}`
-- `{cdr_registry}`
-- `{traceability_map}`
-- `{coverage_gate_report}`
-- `{stage_validation_report}`
+- a source inventory
+- a CDR (Critical Distinctions Registry) recording every cross-source
+  conflict
+- a traceability map from claims to citations
+- a coverage report confirming every named capability is represented or
+  explicitly omitted with rationale
 
-Do not proceed if any required artifact is missing or empty at the point it is
-consumed.
+Do not proceed if any of these is missing or empty.
 
 ## Invocation
 
 Use this skill to:
 
 - synthesize one or more sources into one decision-first knowledge base
-- produce stage artifacts and traceability outputs when part of cogworks
-- answer a focused synthesis question directly when invoked standalone
+- answer a focused synthesis question directly
 
 Do not use it as a generic summarizer.
 
@@ -160,7 +159,7 @@ Do not use it as a generic summarizer.
 
 Before handing synthesis downstream, all of these must hold:
 
-1. every Critical Distinction is captured in `{cdr_registry}`
+1. every Critical Distinction is captured in the CDR (Critical Distinctions Registry)
 2. every Critical Distinction maps to a Decision Rule or Anti-Pattern
 3. no registry item was dropped during compression
 4. every named capability is represented or explicitly omitted with rationale
@@ -199,4 +198,3 @@ may ignore it; canonical package metadata for tooling lives in
 ## Sources
 
 - [Source 1] [reference.md](reference.md)
-- [Source 2] [../cogworks/SKILL.md](../cogworks/SKILL.md)

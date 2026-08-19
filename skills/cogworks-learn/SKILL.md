@@ -62,18 +62,6 @@ For direct responses, keep the output shape explicit:
 - full generation or rewrite: keep each stage summary to one short paragraph or
   a short flat list
 
-## Fast Path For Cogworks
-
-When this skill is used by `cogworks`, treat this file as the working contract
-and load [reference.md](reference.md) only when:
-- a validation failure needs a specific remediation rule
-- the source prescribes a non-default file structure
-- compatibility or runtime details are unclear from this file alone
-
-Load [patterns.md](patterns.md), [examples.md](examples.md), or
-[persuasion-principles.md](persuasion-principles.md) only when they uniquely
-unblock the current task.
-
 ## Invocation
 
 Use this skill to:
@@ -125,15 +113,14 @@ spec.
 ### 3. Generate In Explicit Stages
 
 Required stages:
-1. Draft -> `{draft_skill}`
-2. Deterministic validation -> `{deterministic_gate_report}`
-3. Targeted rewrite -> `{rewrite_diff}` only when needed
-4. Targeted drift probe -> `{drift_probe_report}` only for judgment-heavy
-   domains or brittle outputs
-5. Finalization -> `{final_gate_report}`
+1. Draft the skill files.
+2. Run deterministic validation.
+3. Targeted rewrite when validation surfaces issues.
+4. Targeted drift probe for judgment-heavy domains or brittle outputs.
+5. Finalization: confirm all validation passes.
 
-Do not finalize until every required stage artifact exists and no blocking
-failure remains.
+Do not finalize until every stage is complete and no blocking failure
+remains.
 
 ### 4. Keep Doctrine Canonical
 
@@ -182,8 +169,6 @@ Blocking thresholds:
   language in high-fragility skills
 - [metadata.json](metadata.json): repo-local release metadata for this skill
 - [agents/openai.yaml](agents/openai.yaml): Codex-specific invocation policy
-- [scripts/install-to-agents.sh](scripts/install-to-agents.sh): optional helper
-  for user-run installation after generation
 
 The frontmatter `metadata` block is a repo-local convention. Other platforms
 may ignore it; canonical package metadata for tooling lives in
