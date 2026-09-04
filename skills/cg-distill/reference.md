@@ -280,7 +280,6 @@ Use a decision-first compact structure. Do not optimize for section count or lin
 - reference.md: 600-1200 words
 - patterns.md: 250-700 words (optional)
 - examples.md: 250-700 words (optional)
-- metadata.json: machine-readable (not counted toward word targets)
 - Total across skill files: <=2500 words
 
 **Snapshot date requirements (unchanged):**
@@ -375,35 +374,6 @@ Add these only when they provide unique information not already present:
   - `Source IDs map to reference.md#sources.`
 - If a supporting file only reformats reference.md content, merge it into reference.md and remove the file.
 - Keep one canonical location per fact; avoid restating thresholds, rules, or definitions across files.
-
-### metadata.json (required for generated skills)
-
-Machine-readable regeneration manifest — enables re-running cogworks without recalling source URLs/files.
-
-**Required fields:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `slug` | string | Skill directory name (must match containing directory) |
-| `version` | string | Semantic version of this skill generation (`"1.0.0"` for initial) |
-| `snapshot_date` | string | ISO 8601 date when sources were synthesized |
-| `cogworks_version` | string | Version of cogworks that generated this skill |
-| `topic` | string | Human-readable topic name |
-| `sources` | array | Non-empty list of source objects |
-
-**Source object fields:**
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `type` | yes | `"url"` or `"file"` |
-| `uri` | yes | The URL or `_sources/`-relative path |
-| `original_uri` | no | Original URL for files fetched then saved locally |
-
-**Validation rules:**
-- Must be valid JSON
-- `slug` must match the skill directory name
-- `sources` must be a non-empty array
-- Each source must have `type` and `uri`
 
 ### Source scope taxonomy (required in reference.md)
 

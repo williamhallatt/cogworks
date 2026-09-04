@@ -1,11 +1,11 @@
 ---
-name: cogworks-learn
-description: "Generate and validate agent skill files (SKILL.md, reference.md, metadata). Enforces structural contracts, quality gates, and runtime compatibility."
+name: cg-build
+description: "Generate and validate agent skills (SKILL.md and supporting docs). Enforces structural contracts, quality gates, and runtime compatibility."
 disable-model-invocation: true
 license: MIT
 metadata:
   author: cogworks
-  version: 5.0.0
+  version: 6.0.0
 ---
 
 # Skill Writer Expert
@@ -105,7 +105,6 @@ For generated skills, the canonical structure is:
 - `reference.md`: TL;DR, Decision Rules, Quality Gates, Anti-Patterns, Quick
   Reference, Source Scope, Sources
 - `patterns.md` and `examples.md`: optional, only when they add unique value
-- `metadata.json`: required
 
 If a source spec explicitly requires extra supporting files, follow the source
 spec.
@@ -167,12 +166,7 @@ Blocking thresholds:
   without restating it
 - [persuasion-principles.md](persuasion-principles.md): calibration for strong
   language in high-fragility skills
-- [metadata.json](metadata.json): repo-local release metadata for this skill
 - [agents/openai.yaml](agents/openai.yaml): Codex-specific invocation policy
-
-The frontmatter `metadata` block is a repo-local convention. Other platforms
-may ignore it; canonical package metadata for tooling lives in
-[metadata.json](metadata.json).
 
 ## Validation
 

@@ -1,11 +1,11 @@
 ---
-name: cogworks-encode
+name: cg-distill
 description: "Distill one or more sources into a decision-first knowledge base. Resolves conflicts, extracts cross-source relationships, and classifies trust. Not a summarizer or copy-editor."
 disable-model-invocation: true
 license: MIT
 metadata:
   author: cogworks
-  version: 5.0.0
+  version: 6.0.0
 ---
 
 # Topic Synthesis Expertise
@@ -186,14 +186,8 @@ sources cannot fully encode expert judgment.
 
 - [reference.md](reference.md) is the canonical detailed methodology, output
   contract, and validation surface
-- [metadata.json](metadata.json) is the repo-local release manifest for this
-  skill
 - do not load additional files unless a concrete synthesis or validation gap
   requires them
-
-The frontmatter `metadata` block is a repo-local convention. Other platforms
-may ignore it; canonical package metadata for tooling lives in
-[metadata.json](metadata.json).
 
 ## Sources
 
