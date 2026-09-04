@@ -1,7 +1,6 @@
 ---
 name: cg-build
 description: "Generate and validate agent skills (SKILL.md and supporting docs). Enforces structural contracts, quality gates, and runtime compatibility."
-disable-model-invocation: true
 license: MIT
 metadata:
   author: cogworks
@@ -74,15 +73,12 @@ scope.
 
 ## Compatibility
 
-Claude Code enforces the manual-only posture for this skill via
-`disable-model-invocation: true`.
-
-Codex enforces the same posture via
+Codex enforces the manual-only posture for this skill via
 [agents/openai.yaml](agents/openai.yaml), with implicit invocation disabled.
 
-Other runtimes may ignore these platform-specific controls. Keep treating
-explicit user invocation as the policy boundary for any run that can create or
-rewrite skill files.
+Other runtimes may require equivalent runtime-specific configuration. Keep
+treating explicit user invocation as the policy boundary for any run that can
+create or rewrite skill files.
 
 ## Skill-Writing Contract
 

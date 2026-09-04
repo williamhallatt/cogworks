@@ -1,7 +1,6 @@
 ---
 name: cg-distill
 description: "Distill one or more sources into a decision-first knowledge base. Resolves conflicts, extracts cross-source relationships, and classifies trust. Not a summarizer or copy-editor."
-disable-model-invocation: true
 license: MIT
 metadata:
   author: cogworks
