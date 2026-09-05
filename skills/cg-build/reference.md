@@ -21,7 +21,6 @@ Agent skills are SKILL.md files that extend agent capabilities through YAML fron
 
 ## Related Files
 
-- [patterns.md](patterns.md) - Transferable patterns not already covered here
 - [examples.md](examples.md) - Minimal examples that demonstrate the contract
 - [persuasion-principles.md](persuasion-principles.md) - Calibration for
   strong language in high-fragility skills
@@ -33,6 +32,25 @@ Agent skills are SKILL.md files that extend agent capabilities through YAML fron
 This file is canonical for the generated-skill contract. `SKILL.md` is the
 operator-facing summary; when the two differ, follow `reference.md`.
 
+### Knowledge Advantage Gate (Required)
+
+Before drafting, identify the domain evidence that gives the skill value: a
+completed task, user corrections, input/output formats, project artifacts, or
+real failure cases. For each proposed instruction, ask whether the unassisted
+agent is likely to get it wrong. Omit generic guidance that adds no demonstrated
+advantage.
+
+### Representative Execution Check (Required When Safe)
+
+For full generation or rewrite, run one safe representative task when feasible
+and inspect its output. If the runtime exposes an execution trace or tool
+history, inspect that too for missed requirements, irrelevant instructions,
+vague steps that cause exploration, and menus without a clear default. If the
+task cannot run safely or feasibly, record behavioral validation as deferred.
+If only execution details are unavailable, record that limitation while
+retaining the output review. Never treat deferred or unobservable behavior as
+passing evidence.
+
 ### Instruction Quality Rewrite Pass (Required)
 
 After draft generation:
@@ -40,7 +58,7 @@ After draft generation:
 1. Rewrite vague language into explicit directives.
 2. Remove duplicated doctrine across files.
 3. Compress low-information prose without dropping hard constraints.
-4. Re-run all five prompt quality gates.
+4. Re-run all applicable quality gates.
 
 A generated skill is incomplete until rewrite and gate re-check both pass.
 
@@ -48,15 +66,20 @@ A generated skill is incomplete until rewrite and gate re-check both pass.
 
 ## Decision Rules
 
-1. Keep `SKILL.md` as an operator-facing entry contract, not the full doctrine.
-2. Put normative generated-skill structure and compatibility rules in
+1. Ground new skills in evidence the unassisted agent is likely to lack.
+2. Inspect representative output and, when available, execution traces or tool
+   history before treating behavioral validation as complete.
+3. Keep `SKILL.md` as an operator-facing entry contract, not the full doctrine.
+4. Put normative generated-skill structure and compatibility rules in
    `reference.md`.
-3. Add support files only when they contribute unique information.
-4. Use strong authority language only for high-fragility or fail-closed gates.
-5. Stop on blocking validation failures instead of compensating with prose.
+5. Add support files only when they contribute unique information.
+6. Use strong authority language only for high-fragility or fail-closed gates.
+7. Stop on blocking validation failures instead of compensating with prose.
 
 ## Anti-Patterns
 
+- Skills generated from model knowledge without domain evidence
+- Treating unavailable execution or trace data as passing behavioral evidence
 - Monolithic `SKILL.md` files that duplicate the reference manual
 - Supporting files that merely reformat `reference.md`
 - Runtime-specific features without explicit compatibility disclosure
@@ -104,15 +127,16 @@ my-skill/
 `description` is primarily a trigger contract, not a workflow summary.
 
 Rules:
-- Start with `Use when ...` and describe triggering conditions.
-- Include user-language symptoms and synonyms that improve discoverability.
+- Start with `Use when ...` and describe user intent and triggering contexts.
+- Cover useful implicit phrasings and state adjacent boundaries when they
+  prevent likely misrouting.
 - Keep process details in the skill body; do not compress multi-step flow into `description`.
-- Write in third person only.
+- Keep the description concise and within the 1024-character limit.
 
 Anti-patterns:
 - Workflow summaries in `description` that become shortcut instructions.
 - Vague descriptions with no concrete trigger language.
-- First-person or second-person point-of-view in frontmatter.
+- Keyword lists broad enough to attract adjacent tasks.
 
 ### 3. Invocation Modes
 **Definition:** Skills have two invocation paths: automatic (agent decides based on description match) and manual (user types the skill command (e.g. `/skill-name` in Claude Code, `$skill-name` in Codex CLI)). This duality is controlled by frontmatter.
@@ -146,7 +170,7 @@ _Paths above are Claude Code-specific. Other agents use their own scope paths (e
 **Task Content:** Step-by-step workflows for specific actions. Often invoked manually. May use `disable-model-invocation: true` **[Claude Code only]** to prevent auto-triggering.
 
 ### 6. Progressive Disclosure
-**Definition:** Keep SKILL.md focused and concise (prefer 150-350 words) with detailed reference material in supporting files. The agent loads additional files on-demand when needed.
+**Definition:** Keep SKILL.md below the specification's 500-line and 5,000-token ceiling, but treat that as an upper bound rather than a target. Include only core instructions needed on every run, move conditional detail to supporting files, and state when each file should be loaded.
 
 **Why:** Context window is a public good. Large skills consume tokens that could go to user messages or other skills.
 
@@ -254,22 +278,22 @@ Skill descriptions are loaded into context so the agent knows what's available. 
 - Verbose descriptions crowd out other skills
 - Skills with `disable-model-invocation: true` don't contribute to budget (description not loaded)
 
-**Strategy:** Front-load keywords in descriptions. First 100 characters matter most.
+**Strategy:** Keep descriptions concise and spend their context budget on
+discriminating user intent, triggering contexts, and useful boundaries.
 
 ### Description as Discovery Interface
 
-Agents use description (and first paragraph if no description) to decide auto-loading. This is the entire discovery mechanism - no semantic search, no embeddings, just keyword matching against user input.
+At startup, agents receive the skill name and description so they can decide
+whether a request would benefit from the skill's specialized capability. Even a
+matching description may not activate for a simple task the agent can already
+handle without the skill.
 
 **Writing effective descriptions:**
-1. Start with action verb (Explains, Generates, Deploys)
-2. Include trigger phrases users would say ("how does this work", "deploy to production")
-3. List concrete use cases
-4. Avoid generic terms that match everything
-
-**Critical: Write descriptions in third person.** The description is injected into the system prompt - inconsistent point-of-view causes discovery problems.
-- Good: "Processes Excel files and generates reports"
-- Avoid: "I can help you process Excel files"
-- Avoid: "You can use this to process Excel files"
+1. Use imperative phrasing such as `Use when ...`.
+2. Describe what the user is trying to achieve, not internal implementation.
+3. Include implicit use contexts and adjacent boundaries where they improve
+   routing.
+4. Stay concise and avoid generic terms that match unrelated requests.
 
 ### Specificity Calibration
 

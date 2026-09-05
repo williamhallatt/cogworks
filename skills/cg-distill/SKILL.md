@@ -4,7 +4,7 @@ description: "Distill one or more sources into a decision-first knowledge base. 
 license: MIT
 metadata:
   author: cogworks
-  version: 6.0.0
+  version: 6.0.1
 ---
 
 # Topic Synthesis Expertise
